@@ -232,6 +232,11 @@
 
 {{#extend "scripts"}}
 <script>
+$(document).ready(function (){
+  //redirect to the SP app to start the SP flow
+  window.location = "https://dev.vets.gov/samlproxy/sp/";
+}
+);
 $(document).ready(function() {
    $("#nameIdFormat option").filter(function() {
        return $(this).text() == '{{user.nameIdFormat}}';

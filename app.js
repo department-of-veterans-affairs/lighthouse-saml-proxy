@@ -27,12 +27,12 @@ const express             = require('express'),
  */
 
 const IDP_PATHS = {
-  SSO: '/saml/sso',
-  SLO: '/saml/slo',
-  METADATA: '/metadata',
-  SIGN_IN: '/signin',
-  SIGN_OUT: '/signout',
-  SETTINGS: '/settings'
+  SSO: '/samlproxy/idp/saml/sso',
+  SLO: '/samlproxy/idp/saml/slo',
+  METADATA: '/samlproxy/idp/metadata',
+  SIGN_IN: '/samlproxy/idp/signin',
+  SIGN_OUT: '/samlproxy/idp/signout',
+  SETTINGS: '/samlproxy/idp/settings'
 }
 
 const cryptTypes           = {
@@ -266,6 +266,12 @@ function processArgs(args, options) {
             return fs.readFileSync(filePath, 'utf8')
           }
         }
+      },
+      idpBaseUrl: {
+        description: 'IdP Base URL',
+        required: false,
+        string: true,
+        alias: 'ibu'
       }
     })
     .example('\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV', '')
@@ -339,6 +345,7 @@ function _runServer(argv) {
   SimpleProfileMapper.prototype.metadata = argv.config.metadata;
 
   const idpOptions = {
+    idpBaseUrl:             argv.idpBaseUrl,
     issuer:                 argv.issuer,
     serviceProviderId:      argv.serviceProviderId || argv.audience,
     cert:                   argv.cert,
@@ -729,6 +736,9 @@ function _runServer(argv) {
         baseUrl  = address.address === '0.0.0.0' || address.address === '::' ?
           scheme + '://' + hostname + ':' + address.port :
           scheme + '://localhost:' + address.port;
+     /*
+ * baseUrl = argv.idpBaseUrl ? argv.idpBaseUrl : baseUrl;
+*/
 
     console.log();
     console.log('SAML IdP Metadata URL: ');
