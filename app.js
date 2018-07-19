@@ -426,7 +426,7 @@ function _runServer(argv) {
   app.set('view engine', 'hbs');
   app.set('view options', { layout: 'layout' })
   app.engine('handlebars', hbs.__express);
-  app.use('/bower_components', express.static(__dirname + '/bower_components'))
+  app.use('/samlproxy/idp/bower_components', express.static(__dirname + '/bower_components'))
 
   // Register Helpers
   hbs.registerHelper('extend', function(name, context) {
@@ -466,7 +466,7 @@ function _runServer(argv) {
   app.use(logger(':date> :method :url - {:referrer} => :status (:response-time ms)', {
     skip: function (req, res)
       {
-        return req.path.startsWith('/bower_components') || req.path.startsWith('/css')
+        return req.path.startsWith('/samlproxy/idp/bower_components') || req.path.startsWith('/samlproxy/idp/css')
       }
   }));
   app.use(bodyParser.urlencoded({extended: true}))
