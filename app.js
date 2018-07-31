@@ -20,6 +20,7 @@ const express             = require('express'),
       xmlFormat           = require('xml-formatter'),
       samlp               = require('samlp'),
       SamlStrategy        = require('passport-wsfed-saml2').Strategy,
+      passport            = require('passport'),
       PassportSaml        = require('passport-wsfed-saml2').SAML,
       PassportSamlp       = require('passport-wsfed-saml2').samlp,
       Parser              = require('xmldom').DOMParser,
@@ -164,6 +165,8 @@ function getPath(path) {
 
 function getReqUrl(req, path) {
   if (req) {
+    console.log('req.get: ' + req.get('x-forwarded-proto'))
+    console.log('req.headers[]: ' + req.headers['x-forwarded-proto'])
     return (req.get('x-forwarded-proto') || req.protocol) + '://' + (req.get('x-forwarded-host') || req.get('host')) + getPath(path || req.originalUrl);
   }
 };
@@ -833,6 +836,7 @@ function _runServer(argv) {
   app.set('view options', { layout: 'layout' })
   app.engine('handlebars', hbs.__express);
   app.use('/samlproxy/idp/bower_components', express.static(__dirname + '/bower_components'))
+  app.use(passport.initialize());
 
   // Register Helpers
   hbs.registerHelper('extend', function(name, context) {
@@ -898,15 +902,44 @@ function _runServer(argv) {
     params = spConfig.getAuthnRequestParams(
       acsUrl,
       req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
+	'/samlproxy/sp/');
+/*
       req.authnRequest.relayState);
-
+*/
     console.log('Generating SSO Request with Params ', params);
     responseParams = spConfig.getResponseParams();
     debugger;
 
     var strategy = new SamlStrategy(responseParams,
-      (profile, done) => {});
+      (profile, done) => {
+        console.log();
+        console.log('Assertion => ' + JSON.stringify(profile, null, '\t'));
+        console.log();
+        return done(null, {
+          issuer: profile.issuer,
+          subject: {
+            name: profile.nameIdAttributes.value,
+            format: profile.nameIdAttributes.Format
+          },
+          authnContext: {
+            sessionIndex: profile.sessionIndex,
+            authnMethod: profile['http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod']
+          },
+          claims: _.chain(profile)
+                    .omit('issuer', 'sessionIndex', 'nameIdAttributes',
+                      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+                      'http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod')
+                    .value()
+        });
+
+      }
+    );
+    passport.use(strategy);
+    debugger;
+    passport.authenticate('wsfed-saml2', params)(req, res, next);
+/*
     strategy.authenticate(req, params)(req, res, next);
+*/
   }
 
   /**
