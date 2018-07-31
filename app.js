@@ -1049,7 +1049,7 @@ function _runServer(argv) {
   });
 
   app.get(SP_METADATA_URL, function(req, res, next) {
-    const xml = METADATA_TEMPLATE(config.getMetadataParams(req));
+    const xml = METADATA_TEMPLATE(spConfig.getMetadataParams(req));
     console.log(xml);
     res.set('Content-Type', 'text/xml');
     res.send(xml);
