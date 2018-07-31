@@ -736,7 +736,7 @@ function _runServer(argv) {
         realm: this.audience,
         cert: removeHeaders(this.spCert),
         acsUrls: this.acsUrls.map(url => getReqUrl(req, url)),
-        sloUrl: getReqUrl(req, SLO_URL),
+        sloUrl: getReqUrl(req, SP_SLO_URL),
         nameIDFormat: this.nameIDFormat
       }
     },
