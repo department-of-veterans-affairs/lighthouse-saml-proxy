@@ -1048,6 +1048,13 @@ function _runServer(argv) {
     samlp.metadata(req.idp.options)(req, res);
   });
 
+  app.get(SP_METADATA_URL, function(req, res, next) {
+    const xml = METADATA_TEMPLATE(config.getMetadataParams(req));
+    console.log(xml);
+    res.set('Content-Type', 'text/xml');
+    res.send(xml);
+  });
+
 
   app.get(IDP_PATHS.SIGN_OUT, function(req, res, next) {
     if (req.idp.options.sloUrl) {
