@@ -3,61 +3,75 @@
  * User Profile
  */
 var profile = {
-  userName: 'saml.jackson@example.com',
-  nameIdFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-  firstName: 'Saml',
-  lastName: 'Jackson',
-  displayName: 'saml jackson',
-  email: 'saml.jackson@example.com',
-  mobilePhone: '+1-415-555-5141',
-  groups: 'Simple IdP Users, West Coast Users, Cloud Users'
+  birth_date: '1936-04-10',
+  email: 'vets.gov.user+503@id.me',
+  fname: 'Wendeline',
+  social: '564930708',
+  gender: 'Female',
+  lname: 'O\'Heffernan',
+  level_of_assurance: '3',
+  mname: 'Kitty',
+  multifactor: 'true',
+  uuid: '43bb64d44a44452a8b30929003a89f53'
 }
 
 /**
  * SAML Attribute Metadata
  */
 var metadata = [{
-  id: "firstName",
+  id: "fname",
   optional: false,
   displayName: 'First Name',
-  description: 'The given name of the user',
+  description: 'The given name of the Veteran',
   multiValue: false
 }, {
-  id: "lastName",
+  id: "lname",
   optional: false,
   displayName: 'Last Name',
-  description: 'The surname of the user',
+  description: 'The surname of the Veteran',
   multiValue: false
 }, {
-  id: "displayName",
+  id: "mname",
   optional: true,
-  displayName: 'Display Name',
-  description: 'The display name of the user',
+  displayName: 'Middle Name',
+  description: 'The middle name of the Veteran',
   multiValue: false
 }, {
   id: "email",
   optional: false,
   displayName: 'E-Mail Address',
-  description: 'The e-mail address of the user',
+  description: 'The e-mail address of the Veteran',
   multiValue: false
 },{
-  id: "mobilePhone",
+  id: "social",
   optional: true,
-  displayName: 'Mobile Phone',
-  description: 'The mobile phone of the user',
+  displayName: 'SSN',
+  description: 'The SSN of the Veteran',
   multiValue: false
 }, {
-  id: "groups",
+  id: "multifactor",
   optional: true,
-  displayName: 'Groups',
-  description: 'Group memberships of the user',
-  multiValue: true
+  displayName: 'Multifactor',
+  description: 'If the Veteran has two factor auth enabled',
+  multiValue: false
 }, {
-  id: "userType",
+  id: "gender",
   optional: true,
-  displayName: 'User Type',
-  description: 'The type of user',
-  options: ['Admin', 'Editor', 'Commenter']
+  displayName: 'Gender',
+  description: 'The gender of the Veteran',
+  multiValue: false
+}, {
+  id: "uuid",
+  optional: true,
+  displayName: 'uuid',
+  description: 'UUID of the Veteran model',
+  multiValue: false
+}, {
+  id: "level_of_assurance",
+  optional: true,
+  displayName: 'Level of Assurance',
+  description: 'Level of identify proofing available for the Veteran',
+  multiValue: false
 }];
 
 module.exports = {
