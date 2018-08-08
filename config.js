@@ -72,6 +72,12 @@ var metadata = [{
   displayName: 'Level of Assurance',
   description: 'Level of identify proofing available for the Veteran',
   multiValue: false
+}, {
+  id: "birth_date",
+  optional: false,
+  displayName: 'Birth Date',
+  description: 'The birth date of the Veteran',
+  multiValue: false
 }];
 
 module.exports = {
