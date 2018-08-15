@@ -928,7 +928,7 @@ function _runServer(argv) {
         params = spConfig.getAuthnRequestParams(
           acsUrl,
           req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
-          '/samlproxy/sp/'
+          req.authnRequest.relayState
         );
         console.log('Generating SSO Request with Params ', params);
         passport.authenticate('wsfed-saml2', params)(req, res, next);
@@ -1109,7 +1109,7 @@ function _runServer(argv) {
                 function(req, res, next) {
                   const authOptions = extend({}, req.idp.options);
                   if (req.session && req.session.authnRequest) {
-                    authOptions.RelayState = decodeURIComponent(req.session.authnRequest.relayState);
+                    authOptions.RelayState = req.session.authnRequest.relayState;
                   }
                   console.log('Sending SAML Response\nUser => \n%s\nOptions => \n',
                               JSON.stringify(req.user, null, 2), authOptions);
