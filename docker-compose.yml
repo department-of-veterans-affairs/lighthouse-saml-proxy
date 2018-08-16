@@ -1,4 +1,4 @@
-saml-idp:
+saml-proxy:
    build: .
    ports:
     - "7000:7000"
