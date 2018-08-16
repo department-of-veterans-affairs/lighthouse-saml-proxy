@@ -679,6 +679,7 @@ function _runServer(argv) {
         },
         responseHandler:        function(response, opts, req, res, next) {
           console.log();
+          console.log(`req.session.ssoResponse = ${JSON.stringify(req.session.ssoResponse)}\n`);
           console.log(`Sending SAMLResponse to ${opts.postUrl} with RelayState ${opts.RelayState} =>\n`);
           console.log(xmlFormat(response.toString(), {indentation: '  '}));
           console.log();
@@ -1108,10 +1109,8 @@ function _runServer(argv) {
                 },
                 function(req, res, next) {
                   const authOptions = extend({}, req.idp.options);
-                  if (req.session && req.session.authnRequest) {
-                    authOptions.RelayState = req.session.authnRequest.relayState;
-                  }
-                  console.log('Sending SAML Response\nUser => \n%s\nOptions => \n',
+                  authOptions.RelayState = req.session.ssoResponse.state;
+                  console.log('SP Sending SAML Response\nUser => \n%s\nOptions => \n',
                               JSON.stringify(req.user, null, 2), authOptions);
                   samlp.auth(authOptions)(req, res);
                 });
