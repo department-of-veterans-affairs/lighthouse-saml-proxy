@@ -1,9 +1,9 @@
 {
-  "name": "saml-idp",
-  "description": "Test Identity Provider (IdP) for SAML 2.0 Web Browser SSO Profile",
+  "name": "saml-proxy",
+  "description": "SAML 2.0 Proxy allows modification/mediation of requests/responses",
   "version": "1.1.0",
   "private": false,
-  "author": "Karl McGuinness",
+  "author": "Patrick Vinograd",
   "keywords": [
     "saml",
     "idp",
@@ -12,10 +12,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcguinness/saml-idp"
+    "url": "https://github.com/patrickvinograd/saml-proxy"
   },
   "bugs": {
-    "url": "https://github.com/mcguinness/saml-idp/issues"
+    "url": "https://github.com/patrickvinograd/saml-proxy/issues"
   },
   "main": "./app.js",
   "scripts": {
@@ -35,9 +35,14 @@
     "extend": "^3.0.1",
     "hbs": "~4.0.1",
     "morgan": "~1.9.0",
-    "samlp": "mcguinness/node-samlp",
+    "passport": "^0.4.0",
+    "passport-wsfed-saml2": "edpaget/passport-wsfed-saml2#auth-demo",
+    "samlp": "edpaget/node-samlp#auth-demo",
+    "underscore": "^1.9.0",
     "xml-formatter": "^1.0.1",
     "xmldom": "^0.1.27",
+    "request": "^2.87.0",
+    "xml2js": "^0.4.19",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
