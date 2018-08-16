@@ -862,7 +862,8 @@ function _runServer(argv) {
       app.set('view engine', 'hbs');
       app.set('view options', { layout: 'layout' })
       app.engine('handlebars', hbs.__express);
-      app.use('/samlproxy/idp/bower_components', express.static(__dirname + '/bower_components'))
+      app.use(express.static(path.join(__dirname, 'public')));
+      app.use('/samlproxy/idp/bower_components', express.static(__dirname + '/public/bower_components'))
       app.use(passport.initialize());
 
       // Register Helpers
@@ -908,7 +909,6 @@ function _runServer(argv) {
       }));
       app.use(bodyParser.urlencoded({extended: true}));
       app.use(cookieParser());
-      app.use(express.static(path.join(__dirname, 'public')));
       app.use(session({
         secret: 'The universe works on a math equation that never even ever really ends in the end',
         resave: false,
