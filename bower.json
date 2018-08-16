@@ -1,5 +1,5 @@
 {
-  "name": "saml-idp",
+  "name": "saml-proxy",
   "private": true,
   "dependencies": {
     "bootstrap-tagsinput": "0.8.0",
@@ -10,11 +10,11 @@
     "jquery-validation": "1.17.0"
   },
   "authors": [
-    "Karl McGuinness"
+    "Patrick Vinograd"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcguinness/saml-idp"
+    "url": "https://github.com/patrickvinograd/saml-proxy"
   },
   "license": "MIT",
   "ignore": [
