@@ -5,6 +5,7 @@
 
 const express             = require('express'),
       _                   = require('underscore'),
+      url                 = require('url'),
       os                  = require('os'),
       fs                  = require('fs'),
       http                = require('http'),
@@ -745,7 +746,7 @@ function _runServer(argv) {
             wctx:   wctx || this.relayState,
           }
         },
-        getAuthnRequestParams: function(acsUrl, forceAuthn, relayState) {
+        getAuthnRequestParams: function(acsUrl, forceAuthn, relayState, authnContext) {
           const params = {
             protocol:             this.protocol,
             realm:                this.audience,
@@ -754,7 +755,7 @@ function _runServer(argv) {
             identityProviderUrl:  this.idpSsoUrl,
             providerName:         this.providerName,
             forceAuthn:           forceAuthn,
-            authnContext:         this.authnContextClassRef,
+            authnContext:         authnContext || this.authnContextClassRef,
             requestContext: {
               NameIDFormat: this.nameIDFormat
             },
@@ -925,11 +926,14 @@ function _runServer(argv) {
         const acsUrl = req.query.acsUrl ?
               getReqUrl(req, req.query.acsUrl) :
               getReqUrl(req, spConfig.requestAcsUrl);
+        const authnRequest = req.authnRequest ? req.authnRequest : req.session.authnRequest;
+        req.authnRequest = authnRequest;
 
         params = spConfig.getAuthnRequestParams(
           acsUrl,
           req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
-          req.authnRequest.relayState
+          req.authnRequest.relayState,
+          req.query.authnContext
         );
         console.log('Generating SSO Request with Params ', params);
         passport.authenticate('wsfed-saml2', params)(req, res, next);
@@ -1106,6 +1110,17 @@ function _runServer(argv) {
                   } else {
                     res.redirect(SP_LOGIN_URL);
                   }
+                },
+                function(req, res, next) {
+                  if (req.user && req.user.claims && req.user.claims.level_of_assurance != '3') {
+                    res.redirect(url.format({
+                      pathname: IDP_PATHS.SSO,
+                      query: {
+                        authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
+                      }
+                    }));
+                  }
+                  next();
                 },
                 function(req, res, next) {
                   const authOptions = extend({}, req.idp.options);
