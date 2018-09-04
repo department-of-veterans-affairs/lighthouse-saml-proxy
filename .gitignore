@@ -112,5 +112,9 @@ $RECYCLE.BIN/
 
 ### Project ###
 
-idp-private-key.pem
-idp-public-cert.pem
+*.pem
+*.key
+*.crt
+
+# Typescript build
+build/

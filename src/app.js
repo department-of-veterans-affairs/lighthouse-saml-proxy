@@ -3,31 +3,31 @@
  * Module dependencies.
  */
 
-const express             = require('express'),
-      _                   = require('underscore'),
-      url                 = require('url'),
-      os                  = require('os'),
-      fs                  = require('fs'),
-      http                = require('http'),
-      https               = require('https'),
-      path                = require('path'),
-      extend              = require('extend'),
-      hbs                 = require('hbs'),
-      logger              = require('morgan'),
-      cookieParser        = require('cookie-parser'),
-      bodyParser          = require('body-parser'),
-      session             = require('express-session'),
-      yargs               = require('yargs/yargs'),
-      xmlFormat           = require('xml-formatter'),
-      samlp               = require('samlp'),
-      SamlStrategy        = require('passport-wsfed-saml2').Strategy,
-      passport            = require('passport'),
-      PassportSaml        = require('passport-wsfed-saml2').SAML,
-      PassportSamlp       = require('passport-wsfed-saml2').samlp,
-      Parser              = require('xmldom').DOMParser,
-      SessionParticipants = require('samlp/lib/sessionParticipants'),
-      SimpleProfileMapper = require('./lib/simpleProfileMapper.js'),
-      IdPMetadata         = require('./idp-metadata');
+import express from "express";
+import template from "lodash.template";
+import omit from "lodash.omit";
+import assignIn from "lodash.assignin";
+import url from "url";
+import fs from "fs";
+import extend from "extend";
+import hbs from "hbs";
+import http from "http";
+import https from "https";
+import os from "os";
+import path from "path";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import bodyParser from "body-parser";
+import session from "express-session";
+import samlp from "samlp";
+import xmlFormat from "xml-formatter";
+import { SAML, Strategy } from "passport-wsfed-saml2";
+import passport from "passport";
+import { DOMParser } from "xmldom";
+import SessionParticipants from "samlp/lib/sessionParticipants";
+import SimpleProfileMapper from "./simpleProfileMapper";
+import * as IdPMetadata from "./idpMetadata";
+import * as cli from "./cli";
 
 /**
  * Globals
@@ -42,11 +42,11 @@ const IDP_PATHS = {
   SETTINGS: '/samlproxy/idp/settings'
 }
 
-const AUTHN_REQUEST_TEMPLATE = _.template(
-  fs.readFileSync(path.join(__dirname, '/templates/authnrequest.tpl'), 'utf8')
+const AUTHN_REQUEST_TEMPLATE = template(
+  fs.readFileSync(path.join(__dirname, '../templates/authnrequest.tpl'), 'utf8')
 );
-const METADATA_TEMPLATE = _.template(
-  fs.readFileSync(path.join(__dirname, '/templates/metadata.tpl'), 'utf8')
+const METADATA_TEMPLATE = template(
+  fs.readFileSync(path.join(__dirname, '../templates/metadata.tpl'), 'utf8')
 );
 
 const SP_SLO_URL = '/samlproxy/sp/saml/slo';
@@ -57,11 +57,6 @@ const SP_METADATA_URL = '/samlproxy/sp/metadata';
 const SP_SETTINGS_URL = '/samlproxy/sp/settings';
 const SP_ERROR_URL = '/samlproxy/sp/error';
 
-const BINDINGS = {
-  REDIRECT: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-  POST: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
-}
-
 const NAMEID_FORMAT_PREFERENCE = [
   'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
   'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
@@ -70,82 +65,6 @@ const NAMEID_FORMAT_PREFERENCE = [
   'urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos',
   'urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName'
 ]
-
-
-const cryptTypes           = {
-  certificate: /-----BEGIN CERTIFICATE-----[^-]*-----END CERTIFICATE-----/,
-  'RSA private key': /-----BEGIN RSA PRIVATE KEY-----\n[^-]*\n-----END RSA PRIVATE KEY-----/,
-  'public key': /-----BEGIN PUBLIC KEY-----\n[^-]*\n-----END PUBLIC KEY-----/,
-},
-      KEY_CERT_HELP_TEXT = "Please generate a key-pair for the IdP using the following openssl command:\n" +
-      "\topenssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout idp-private-key.pem -out idp-public-cert.pem -days 7300";
-
-
-function matchesCertType(value, type) {
-  // console.info(`Testing ${cryptTypes[type].toString()} against "${value}"`);
-  // console.info(`result: ${cryptTypes[type] && cryptTypes[type].test(value)}`);
-  return cryptTypes[type] && cryptTypes[type].test(value);
-}
-
-function bufferFromString(value) {
-  if (Buffer.hasOwnProperty('from')) {
-    // node 6+
-    return Buffer.from(value);
-  } else {
-    return new Buffer(value);
-  }
-}
-
-function resolveFilePath(filePath) {
-  var possiblePath;
-  if (fs.existsSync(filePath)) {
-    return filePath;
-  }
-  if (filePath.slice(0, 2) === '~/') {
-    possiblePath = path.resolve(process.env.HOME, filePath.slice(2));
-    if (fs.existsSync(possiblePath)) {
-      return possiblePath;
-    } else {
-      // for ~/ paths, don't try to resolve further
-      return filePath;
-    }
-  }
-  ['.', __dirname].forEach(function (base) {
-    possiblePath = path.resolve(base, filePath);
-    if (fs.existsSync(possiblePath)) {
-      return possiblePath;
-    }
-  });
-  return null;
-}
-
-function makeCertFileCoercer(type, description, helpText) {
-  return function certFileCoercer(value) {
-    if (matchesCertType(value, type)) {
-      return value;
-    }
-
-    const filePath = resolveFilePath(value);
-    if (filePath) {
-      return fs.readFileSync(filePath)
-    }
-    throw new Error(
-      'Invalid ' + description + ', not a valid crypt cert/key or file path' +
-        (helpText ? '\n' + helpText : '')
-    )
-  };
-}
-
-function certToPEM(cert) {
-  if (/-----BEGIN CERTIFICATE-----/.test(cert)) {
-    return cert;
-  }
-
-  cert = cert.match(/.{1,64}/g).join('\n');
-  cert = "-----BEGIN CERTIFICATE-----\n" + cert;
-  cert = cert + "\n-----END CERTIFICATE-----\n";
-  return cert;
-}
 
 function getHashCode(str) {
   var hash = 0;
@@ -186,350 +105,7 @@ function processArgs(args, options) {
   console.log();
   console.log('loading configuration...');
 
-  if (options) {
-    baseArgv = yargs(args).config(options);
-  } else {
-    baseArgv = yargs(args).config('settings', function(settingsPathArg) {
-      const settingsPath = resolveFilePath(settingsPathArg);
-      return JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-    });
-  }
   return baseArgv
-    .usage('\nSimple IdP for SAML 2.0 WebSSO & SLO Profile\n\n' +
-           'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
-           'Usage:\n\t$0 -acs {url} -aud {uri}')
-    .options({
-      idpPort: {
-        description: 'IdP Web Server Listener Port',
-        required: true,
-        default: 7000
-      },
-      idpCert: {
-        description: 'IdP Signature PublicKey Certificate',
-        required: true,
-        default: './idp-public-cert.pem',
-        coerce: makeCertFileCoercer('certificate', 'IdP Signature PublicKey Certificate', KEY_CERT_HELP_TEXT)
-      },
-      idpKey: {
-        description: 'IdP Signature PrivateKey Certificate',
-        required: true,
-        default: './idp-private-key.pem',
-        coerce: makeCertFileCoercer('RSA private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
-      },
-      idpIssuer: {
-        description: 'IdP Issuer URI',
-        required: true,
-        default: 'urn:example:idp'
-      },
-      idpAcsUrl: {
-        description: 'SP Assertion Consumer URL',
-        required: true,
-      },
-      idpSloUrl: {
-        description: 'SP Single Logout URL',
-        required: false,
-      },
-      idpAudience: {
-        description: 'SP Audience URI',
-        required: true,
-      },
-      idpServiceProviderId: {
-        description: 'SP Issuer/Entity URI',
-        required: false,
-        string: true
-      },
-      idpRelayState: {
-        description: 'Default SAML RelayState for SAMLResponse',
-        required: false,
-      },
-      idpDisableRequestAcsUrl: {
-        description: 'Disables ability for SP AuthnRequest to specify Assertion Consumer URL',
-        required: false,
-        boolean: true,
-        default: false
-      },
-      idpEncryptAssertion: {
-        description: 'Encrypts assertion with SP Public Key',
-        required: false,
-        boolean: true,
-        default: false
-      },
-      idpEncryptionCert: {
-        description: 'SP Certificate (pem) for Assertion Encryption',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('certificate', 'Encryption cert')
-      },
-      idpEncryptionPublicKey: {
-        description: 'SP RSA Public Key (pem) for Assertion Encryption ' +
-          '(e.g. openssl x509 -pubkey -noout -in sp-cert.pem)',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('public key', 'Encryption public key')
-      },
-      idpHttpsPrivateKey: {
-        description: 'Web Server TLS/SSL Private Key (pem)',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('RSA private key')
-      },
-      idpHttpsCert: {
-        description: 'Web Server TLS/SSL Certificate (pem)',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('certificate')
-      },
-      idpHttps: {
-        description: 'Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)',
-        required: true,
-        boolean: true,
-        default: false
-      },
-      idpSignResponse: {
-        description: 'Enables signing of responses',
-        required: false,
-        boolean: true,
-        default: true,
-      },
-      idpConfigFile: {
-        description: 'Path to a SAML attribute config file',
-        required: true,
-        default: require.resolve('./config.js'),
-      },
-      idpRollSession: {
-        description: 'Create a new session for every authn request instead of reusing an existing session',
-        required: false,
-        boolean: true,
-        default: false
-      },
-      idpAuthnContextClassRef: {
-        description: 'Authentication Context Class Reference',
-        required: false,
-        string: true,
-        default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
-      },
-      idpAuthnContextDecl: {
-        description: 'Authentication Context Declaration (XML FilePath)',
-        required: false,
-        string: true,
-        coerce: function (value) {
-          const filePath = resolveFilePath(value);
-          if (filePath) {
-            return fs.readFileSync(filePath, 'utf8')
-          }
-        }
-      },
-      idpBaseUrl: {
-        description: 'IdP Base URL',
-        required: false,
-        string: true,
-      },
-      spPort: {
-        description: 'Web Server listener port',
-        required: true,
-        number: true,
-        default: 7070
-      },
-      spProtocol: {
-        description: 'Federation Protocol',
-        required: true,
-        string: true,
-        default: 'samlp'
-      },
-      spIdpIssuer: {
-        description: 'IdP Issuer URI',
-        required: false,
-        string: true,
-        default: 'urn:example:idp'
-      },
-      spIdpSsoUrl: {
-        description: 'IdP Single Sign-On Service URL (SSO URL)',
-        required: false,
-        string: true
-      },
-      spIdpSsoBinding: {
-        description: 'IdP Single Sign-On AuthnRequest Binding',
-        required: true,
-        string: true,
-        default: BINDINGS.REDIRECT
-      },
-      spIdpSloUrl: {
-        description: 'IdP Single Logout Service URL (SLO URL) (SAMLP)',
-        required: false,
-        string: true
-      },
-      spIdpSloBinding: {
-        description: 'IdP Single Logout Request Binding (SAMLP)',
-        required: true,
-        string: true,
-        default: BINDINGS.REDIRECT
-      },
-      spIdpCert: {
-        description: 'IdP Public Key Signing Certificate (PEM)',
-        required: false,
-        string: true,
-        coerce: (value) => {
-          return certToPEM(makeCertFileCoercer('certificate', 'IdP Public Key Signing Certificate (PEM)', KEY_CERT_HELP_TEXT));
-        }
-      },
-      spIdpThumbprint: {
-        description: 'IdP Public Key Signing Certificate SHA1 Thumbprint',
-        required: false,
-        string: true,
-        coerce: (value) => {
-          return value ? value.replace(/:/g, '') : value
-        }
-      },
-      spIdpMetaUrl: {
-        description: 'IdP SAML Metadata URL',
-        required: false,
-        string: true
-      },
-      spAudience: {
-        description: 'SP Audience URI / RP Realm',
-        required: false,
-        string: true,
-        default: 'urn:example:sp'
-      },
-      spProviderName: {
-        description: 'SP Provider Name',
-        required: false,
-        string: true,
-        default: 'Simple SAML Service Provider'
-      },
-      spAcsUrls: {
-        description: 'SP Assertion Consumer Service (ACS) URLs (Relative URL)',
-        required: true,
-        array: true,
-        default: ['/saml/sso']
-      },
-      spSignAuthnRequests: {
-        description: 'Sign AuthnRequest Messages (SAMLP)',
-        required: true,
-        boolean: true,
-        default: true,
-      },
-      spSignatureAlgorithm: {
-        description: 'Signature Algorithm',
-        required: false,
-        string: true,
-        default: 'rsa-sha256'
-      },
-      spDigestAlgorithm: {
-        description: 'Digest Algorithm',
-        required: false,
-        string: true,
-        default: 'sha256'
-      },
-      spRequestNameIDFormat : {
-        description: 'Request Subject NameID Format (SAMLP)',
-        required: false,
-        boolean: true,
-        default: true
-      },
-      spValidateNameIDFormat : {
-        description: 'Validate format of Assertion Subject NameID',
-        required: false,
-        boolean: true,
-        default: true
-      },
-      spNameIDFormat : {
-        description: 'Assertion Subject NameID Format',
-        required: false,
-        string: true,
-        default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
-      },
-      spRequestAuthnContext : {
-        description: 'Request Authentication Context (SAMLP)',
-        required: false,
-        boolean: true,
-        default: true
-      },
-      spAuthnContextClassRef : {
-        description: 'Authentication Context Class Reference',
-        required: false,
-        string: true,
-        default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
-      },
-      spCert: {
-        description: 'SP/RP Public Key Signature & Encryption Certificate (PEM)',
-        string: true,
-        required: false,
-        default: path.resolve(__dirname, './sp-cert.pem'),
-        coerce: makeCertFileCoercer('certificate', 'SP Signing Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
-      },
-      spKey: {
-        description: 'SP/RP Private Key Signature & Decryption Certificate(PEM)',
-        string: true,
-        required: false,
-        default: path.resolve(__dirname, './sp-key.pem'),
-        coerce: makeCertFileCoercer('privateKey', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
-      },
-      spHttpsPrivateKey: {
-        description: 'Web Server TLS/SSL Private Key (PEM)',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('privateKey', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
-      },
-      spHttpsCert: {
-        description: 'Web Server TLS/SSL Certificate (PEM)',
-        required: false,
-        string: true,
-        coerce: makeCertFileCoercer('certificate', 'Web Server TLS/SSL Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
-      },
-      spHttps: {
-        description: 'Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)',
-        required: false,
-        boolean: true,
-        default: false
-      },
-      spRelayState: {
-        description: 'Default Relay State',
-        required: false,
-        string: true
-      }
-    })
-    .example('\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV', '')
-    .check(function(argv, aliases) {
-      if (argv.idpEncryptAssertion) {
-        if (argv.idpEncryptionPublicKey === undefined) {
-          return 'encryptionPublicKey argument is also required for assertion encryption';
-        }
-        if (argv.idpEncryptionCert === undefined) {
-          return 'encryptionCert argument is also required for assertion encryption';
-        }
-      }
-      return true;
-    })
-    .check(function(argv, aliases) {
-      if (argv.idpConfig) {
-        return true;
-      }
-      const configFilePath = resolveFilePath(argv.idpConfigFile);
-
-      if (!configFilePath) {
-        return 'SAML attribute config file path "' + argv.idpConfigFile + '" is not a valid path.\n';
-      }
-      try {
-        argv.idpConfig = require(configFilePath);
-      } catch (error) {
-        return 'Encountered an exception while loading SAML attribute config file "' + configFilePath + '".\n' + error;
-      }
-      return true;
-    })
-    .check((argv, aliases) => {
-      if (!_.isString(argv.spIdpMetaUrl)) {
-        if (!_.isString(argv.spIdpSsoUrl) || argv.spIdpSsoUrl === '') {
-          return 'IdP SSO Assertion Consumer URL (spIdpSsoUrl) is required when IdP metadata is not specified';
-        }
-        if (!_.isString(argv.spIdpCert) && !_.isString(argv.spIdpThumbprint)) {
-          return ' IdP Signing Certificate (spIdpCert) or IdP Signing Key Thumbprint (spIdpThumbprint) is required when IdP metadata is not specified';
-        }
-        // convert cert to PEM
-        argv.spIdpCertPEM = certToPEM(argv.spIdpCert)
-      }
-      return true;
-    })
     .wrap(baseArgv.terminalWidth());
 }
 
@@ -540,7 +116,7 @@ function _runServer(argv) {
       if (metadata.protocol) {
         argv.protocol = metadata.protocol;
         if (metadata.signingKeys[0]) {
-          argv.spIdpCert = certToPEM(metadata.signingKeys[0]);
+          argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
         }
 
         switch (metadata.protocol) {
@@ -816,8 +392,8 @@ function _runServer(argv) {
 
       };
 
-      responseParams = spConfig.getResponseParams();
-      const strategy = new SamlStrategy(responseParams,
+      const responseParams = spConfig.getResponseParams();
+      const strategy = new Strategy(responseParams,
                                         (profile, done) => {
                                           console.log();
                                           console.log('Assertion => ' + JSON.stringify(profile, null, '\t'));
@@ -830,15 +406,18 @@ function _runServer(argv) {
                                               sessionIndex: profile.sessionIndex,
                                               authnMethod: profile['http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod']
                                             },
-                                            claims: _.chain(profile)
-                                              .omit('issuer', 'sessionIndex', 'nameIdAttributes',
-                                                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
-                                                    'http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod')
-                                              .value()
+                                            claims: omit(
+                                              profile,
+                                              'issuer',
+                                              'sessionIndex',
+                                              'nameIdAttributes',
+                                              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+                                              'http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod'
+                                            )
                                           });
 
                                         }
-                                       );
+                                   );
       passport.use(strategy);
 
       passport.serializeUser(function(user, done) {
@@ -854,7 +433,7 @@ function _runServer(argv) {
        */
 
       app.set('port', process.env.PORT || argv.idpPort);
-      app.set('views', path.join(__dirname, 'views'));
+      app.set('views', path.join(__dirname, '../views'));
 
       /**
        * View Engine
@@ -1175,7 +754,7 @@ function _runServer(argv) {
         const scheme   = argv.idpHttps ? 'https' : 'http',
               address  = httpServer.address(),
               hostname = os.hostname();
-        baseUrl  = address.address === '0.0.0.0' || address.address === '::' ?
+        const baseUrl  = address.address === '0.0.0.0' || address.address === '::' ?
           scheme + '://' + hostname + ':' + address.port :
           scheme + '://localhost:' + address.port;
 
@@ -1207,13 +786,12 @@ function _runServer(argv) {
 }
 
 function runServer(options) {
-  const args = processArgs([], options);
+  const args = urocessArgs([], options);
   return _runServer(args.argv);
 }
 
 function main () {
-  const args = processArgs(process.argv.slice(2));
-  _runServer(args.argv);
+  _runServer(cli.processArgs());
 }
 
 module.exports = {

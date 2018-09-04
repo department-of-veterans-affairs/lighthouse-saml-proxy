@@ -28,7 +28,7 @@ function getFirstCert(keyEl) {
   }
 }
 
-function fetch(url) {
+export function fetch(url) {
 
   return new Promise((resolve, reject) => {
     const metadata = { sso: {}, slo: {}, nameIdFormats: [], signingKeys: [] };
@@ -113,7 +113,3 @@ function fetch(url) {
     });
   });
 }
-
-module.exports = {
-  fetch: fetch
-};
