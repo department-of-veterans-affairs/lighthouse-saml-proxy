@@ -3,7 +3,7 @@ import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
 import samlp from "samlp";
 
-const getHashCode = (str) => {
+export const getHashCode = (str) => {
   var hash = 0;
   var i = 0;
   if (str.length == 0) return hash;

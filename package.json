@@ -22,8 +22,23 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "prestart": "yarn build",
-    "start": "node -r source-map-support/register build/app.js",
+    "start": "node build/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "start-dev": "ts-node -r source-map-support/register build/app.js",
     "prepare": "bower install"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ]
   },
   "bin": "./bin/run.js",
   "engines": {
@@ -54,11 +69,16 @@
   "devDependencies": {
     "@types/express": "^4.16.0",
     "@types/handlebars": "^4.0.39",
+    "@types/jest": "^23.3.1",
     "@types/node": "^10.9.4",
     "@types/samlp": "^1.0.7",
     "@types/xmldom": "^0.1.29",
     "bower": "^1.8.4",
+    "jest": "^23.5.0",
+    "nodemon": "^1.18.4",
     "source-map-support": "^0.5.9",
+    "ts-jest": "^23.1.4",
+    "ts-node": "^7.0.1",
     "typescript": "^3.0.3"
   }
 }
