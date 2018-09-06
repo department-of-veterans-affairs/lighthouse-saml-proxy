@@ -161,8 +161,6 @@ export const acsFactory = (app, acsUrl) => {
   app.get(
     getPath(acsUrl),
     function (req, res, next) {
-      console.log(req.method);
-      console.log(req.query);
       if (req.method === 'GET' && req.query && (req.query.SAMLResponse || req.body.wresult)) {
         req.body = req.query;
         const ssoResponse = {

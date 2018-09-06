@@ -22,7 +22,6 @@ const METADATA_TEMPLATE = template(
 );
 
 export default function addRoutes(app, idpConfig, spConfig) {
-  console.log(IDP_SSO);
   app.get(['/', '/idp', IDP_SSO], parseSamlRequest);
   app.post(['/', '/idp', IDP_SSO], parseSamlRequest);
 

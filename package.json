@@ -25,7 +25,8 @@
     "start": "node build/app.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start-dev": "ts-node -r source-map-support/register build/app.js",
+    "start-dev": "ts-node -r source-map-support/register src/app.js --config dev-config.json",
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
     "prepare": "bower install"
   },
   "jest": {
