@@ -26,10 +26,10 @@ function getFirstCert(keyEl) {
 
     return keyEl.KeyInfo[0].X509Data[0].X509Certificate[0]._;
   }
+  return null;
 }
 
 export function fetch(url) {
-
   return new Promise((resolve, reject) => {
     const metadata = { sso: {}, slo: {}, nameIdFormats: [], signingKeys: [] };
 
@@ -37,16 +37,10 @@ export function fetch(url) {
       return resolve(metadata);
     }
 
-    console.log('downloading IdP metadata from ' + url)
     request.get(url, (err, resp, body) => {
       if (err) {
-        console.log('unable to fetch metadata: ' + err.message);
         return reject(err);
       };
-
-      console.log();
-      console.log(body);
-      console.log();
 
       const parserConfig  = {
                               explicitRoot: true,
@@ -62,7 +56,7 @@ export function fetch(url) {
         }
 
         if (docEl.EntityDescriptor) {
-          metadata.issuer = docEl.EntityDescriptor.$.entityID
+          metadata.issuer = docEl.EntityDescriptor.$.entityID;
 
           if (docEl.EntityDescriptor.IDPSSODescriptor && docEl.EntityDescriptor.IDPSSODescriptor.length === 1) {
 
@@ -75,7 +69,7 @@ export function fetch(url) {
               if (keyEl.$.use && keyEl.$.use.toLowerCase() !== 'encryption') {
                 metadata.signingKeys.push(getFirstCert(keyEl));
               }
-            })
+            });
 
             if (ssoEl.NameIDFormat) {
               ssoEl.NameIDFormat.forEach((element, index, array) => {
@@ -99,11 +93,11 @@ export function fetch(url) {
             let roleEl = docEl.EntityDescriptor.RoleDescriptor.find((el) => {
               return el.$['xsi:type'].endsWith(':SecurityTokenServiceType');
             });
-            metadata.sso.redirectUrl = roleEl.PassiveRequestorEndpoint[0].EndpointReference[0].Address[0]._
+            metadata.sso.redirectUrl = roleEl.PassiveRequestorEndpoint[0].EndpointReference[0].Address[0]._;
 
             roleEl.KeyDescriptor.forEach((keyEl) => {
               metadata.signingKeys.push(getFirstCert(keyEl));
-            })
+            });
           } catch(e) {
             console.log('unable to parse RoleDescriptor metadata', e);
           }

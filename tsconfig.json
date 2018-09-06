@@ -3,10 +3,10 @@
     "target": "es5",
     "module": "commonjs",
     "allowJs": true,
-    // "checkJs": true,
     "outDir": "./build",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "sourceMap": true
   },
   "include": [
     "./src/**/*"
