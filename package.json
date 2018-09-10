@@ -24,8 +24,10 @@
     "prestart": "yarn build",
     "start": "node build/app.js",
     "test": "jest",
+    "test:ci": "jest --ci --testResultsProcessor=\"./node_modules/jest-junit-reporter\"",
     "test:watch": "jest --watch",
     "start-dev": "ts-node -r source-map-support/register src/app.js --config dev-config.json",
+    "ci": "npm audit && npm run-script test:ci",
     "dev": "./node_modules/nodemon/bin/nodemon.js",
     "prepare": "bower install"
   },
@@ -76,6 +78,7 @@
     "@types/xmldom": "^0.1.29",
     "bower": "^1.8.4",
     "jest": "^23.5.0",
+    "jest-junit-reporter": "^1.1.0",
     "nodemon": "^1.18.4",
     "source-map-support": "^0.5.9",
     "ts-jest": "^23.1.4",

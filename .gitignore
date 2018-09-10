@@ -118,3 +118,4 @@ $RECYCLE.BIN/
 
 # Typescript build
 build/
+/test-report.xml
