@@ -63,7 +63,7 @@
     "passport": "^0.4.0",
     "passport-wsfed-saml2": "edpaget/passport-wsfed-saml2#auth-demo",
     "request": "^2.87.0",
-    "samlp": "edpaget/node-samlp#auth-demo",
+    "samlp": "github:edpaget/node-samlp#auth-demo",
     "xml-formatter": "^1.0.1",
     "xml2js": "^0.4.19",
     "xmldom": "^0.1.27",
