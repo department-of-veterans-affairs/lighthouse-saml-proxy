@@ -3,7 +3,11 @@ export function getPath(path) {
 }
 
 export function getReqUrl(req, path) {
-  return `${(req.get('x-forwarded-proto') || req.protocol)}://${(req.get('x-forwarded-host') || req.get('host'))}${getPath(path || req.originalUrl)}`;
+  if (req.get('host') === 'localhost:7000') {
+    return `http://${(req.get('x-forwarded-host') || req.get('host'))}${getPath(path || req.originalUrl)}`;
+  } else {
+    return `https://${(req.get('x-forwarded-host') || req.get('host'))}${getPath(path || req.originalUrl)}`;
+  }
 };
 
 export function removeHeaders(cert) {
