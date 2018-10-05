@@ -36,7 +36,6 @@ pipeline {
       when { branch 'master' }
 
       steps {
-        // hack to get the commit hash, some plugin is swallowing git variables and I can't figure out which one
         script {
           commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
         }
