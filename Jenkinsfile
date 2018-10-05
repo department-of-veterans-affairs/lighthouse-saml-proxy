@@ -16,18 +16,21 @@ pipeline {
 
     stage('Run tests') {
       agent {
-        dockerfile {
-          args  "-v ${pwd()}:/opt/application"
-        }
+        dockerfile true
       }
+
       steps {
         withEnv(['CI=true']) {
-          sh 'npm run-script ci'
+          dir("/opt/app") {
+            sh 'npm run-script ci'
+          }
         }
       }
       post {
         always {
-          junit 'test-report.xml'
+          dir("/opt/app") {
+            junit 'test-report.xml'
+          }
         }
       }
     }
