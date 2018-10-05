@@ -1,8 +1,4 @@
 pipeline {
-  environment {
-    DOCKER_IMAGE = env.BUILD_TAG.replaceAll(/[%\/]/, '')
-  }
-
   options {
     buildDiscarder(logRotator(daysToKeepStr: '60'))
   }
@@ -21,14 +17,12 @@ pipeline {
     stage('Run tests') {
       agent {
         dockerfile {
-          args  "-v ${pwd()}:/application"
+          args  "-v ${pwd()}:/opt/application"
         }
       }
       steps {
         withEnv(['CI=true']) {
-          dockerImage.inside(args) {
-            sh 'npm run-script ci'
-          }
+          sh 'npm run-script ci'
         }
       }
       post {
@@ -69,8 +63,8 @@ pipeline {
       script {
         if (env.BRANCH_NAME == 'master') {
           slackSend message: "Failed vets-saml-proxy CI on branch: `${env.BRANCH_NAME}`! ${env.RUN_DISPLAY_URL}".stripMargin(),
-          color: 'danger',
-          failOnError: true
+            color: 'danger',
+            failOnError: true
         }
       }
     }

@@ -64,7 +64,7 @@ export const samlLogin = function(req, res, next) {
 export const parseSamlRequest = function(req, res, next) {
   samlp.parseRequest(req, function(err, data) {
     if (err) {
-      console.warn("Allowing login with no final redirect.")
+      console.warn("Allowing login with no final redirect.");
       next();
     };
     if (data) {
