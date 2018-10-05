@@ -30,7 +30,7 @@ pipeline {
       }
       post {
         always {
-          junit '/opt/app/test-report.xml'
+          junit 'test-report.xml'
         }
       }
     }
