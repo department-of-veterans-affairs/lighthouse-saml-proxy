@@ -27,7 +27,7 @@
     "test:ci": "jest --ci --testResultsProcessor=\"./node_modules/jest-junit-reporter\"",
     "test:watch": "jest --watch",
     "start-dev": "ts-node -r source-map-support/register src/app.js --config dev-config.json",
-    "ci": "npm run-script test:ci",
+    "ci": "npm run-script test:ci && cat test-report.xml",
     "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
   "jest": {
