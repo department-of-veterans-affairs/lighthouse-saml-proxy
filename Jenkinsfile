@@ -23,14 +23,13 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
-          dir("/opt/app") {
-            sh 'npm run-script ci'
-          }
+          sh 'npm install'
+          sh 'npm run-script ci'
         }
       }
       post {
         always {
-          junit '/opt/app/test-report.xml'
+          junit 'test-report.xml'
         }
       }
     }
@@ -58,7 +57,6 @@ pipeline {
   }
   post {
     always {
-      sh 'make clean'
       deleteDir() /* clean up our workspace */
     }
     failure {
