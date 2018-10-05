@@ -23,9 +23,7 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
-          dir("/opt/app") {
-            sh 'npm run-script ci'
-          }
+          sh 'npm run-script ci'
         }
       }
       post {
@@ -58,7 +56,6 @@ pipeline {
   }
   post {
     always {
-      sh 'make clean'
       deleteDir() /* clean up our workspace */
     }
     failure {
