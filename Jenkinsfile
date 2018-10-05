@@ -23,6 +23,7 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
+          sh 'pwd'
           sh 'npm run-script ci'
         }
       }
