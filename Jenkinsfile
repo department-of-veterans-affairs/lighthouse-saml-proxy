@@ -16,7 +16,9 @@ pipeline {
 
     stage('Run tests') {
       agent {
-        dockerfile true
+        dockerfile {
+          args "--entrypoint='' -u 0:0"
+        }
       }
 
       steps {
@@ -28,9 +30,7 @@ pipeline {
       }
       post {
         always {
-          dir("/opt/app") {
-            junit 'test-report.xml'
-          }
+          junit '/opt/app/test-report.xml'
         }
       }
     }
