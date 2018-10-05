@@ -28,8 +28,7 @@
     "test:watch": "jest --watch",
     "start-dev": "ts-node -r source-map-support/register src/app.js --config dev-config.json",
     "ci": "npm audit && npm run-script test:ci",
-    "dev": "./node_modules/nodemon/bin/nodemon.js",
-    "prepare": "bower install"
+    "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
   "jest": {
     "transform": {
@@ -76,7 +75,6 @@
     "@types/node": "^10.9.4",
     "@types/samlp": "^1.0.7",
     "@types/xmldom": "^0.1.29",
-    "bower": "^1.8.4",
     "jest": "^23.5.0",
     "jest-junit-reporter": "^1.1.0",
     "nodemon": "^1.18.4",
