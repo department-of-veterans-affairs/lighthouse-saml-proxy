@@ -1,6 +1,7 @@
 export const IDP_SSO = '/samlproxy/idp/saml/sso';
 export const IDP_SLO = '/samlproxy/idp/saml/slo';
 export const IDP_METADATA = '/samlproxy/idp/metadata';
+export const IDP_REDIRECT = '/samlproxy//idp/redirect';
 export const IDP_SIGN_IN = '/samlproxy/idp/signin';
 export const IDP_SIGN_OUT = '/samlproxy/idp/signout';
 export const IDP_SETTINGS = '/samlproxy/idp/settings';

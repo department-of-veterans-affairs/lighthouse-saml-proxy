@@ -1,5 +1,8 @@
 FROM node:alpine
 
+RUN mkdir /opt/app/
+WORKDIR /opt/app/
+
 RUN apk add git
 RUN git config --global url."https://".insteadOf git://
 ADD ./package.json package.json

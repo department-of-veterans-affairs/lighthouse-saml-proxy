@@ -1,13 +1,16 @@
 import { IDP_SSO,
          IDP_SLO,
-         IDP_SIGN_IN,
          IDP_METADATA,
+         IDP_REDIRECT,
          SP_METADATA_URL,
+         IDP_SIGN_IN,
          IDP_SIGN_OUT } from "./constants";
 
 import { acsFactory,
          parseSamlRequest,
          parseLogoutRequest,
+         showLoginOptions,
+         samlLogin,
          idpSignIn,
          idpSignOut } from "./handlers";
 
@@ -22,8 +25,8 @@ const METADATA_TEMPLATE = template(
 );
 
 export default function addRoutes(app, idpConfig, spConfig) {
-  app.get(['/', '/idp', IDP_SSO], parseSamlRequest);
-  app.post(['/', '/idp', IDP_SSO], parseSamlRequest);
+  app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
+  app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
 
   app.get(IDP_SLO, parseLogoutRequest);
   app.post(IDP_SLO, parseLogoutRequest);

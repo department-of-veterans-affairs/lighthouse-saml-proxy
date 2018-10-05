@@ -2,6 +2,7 @@ import { getPath, getReqUrl } from "../utils";
 import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
 import samlp from "samlp";
+import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -15,21 +16,45 @@ export const getHashCode = (str) => {
   return hash;
 };
 
-export const showUser = function (req, res, next) {
+export const samlLogin = function(req, res, next) {
   const acsUrl = req.query.acsUrl ?
         getReqUrl(req, req.query.acsUrl) :
         getReqUrl(req, req.sp.options.requestAcsUrl);
   const authnRequest = req.authnRequest ? req.authnRequest : req.session.authnRequest;
   req.authnRequest = authnRequest;
+  const samlp = new _samlp(req.sp.options.getResponseParams(), new SAML.SAML(req.sp.options.getResponseParams()));
 
-  const params = req.sp.options.getAuthnRequestParams(
-    acsUrl,
-    req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
-    req.authnRequest.relayState,
-    req.query.authnContext
-  );
-  console.log('Generating SSO Request with Params ', params);
-  req.passport.authenticate('wsfed-saml2', params)(req, res, next);
+  [
+    ['id_me_login_link', 'http://idmanagement.gov/ns/assurance/loa/3'],
+    ['dslogon_login_link', 'dslogon'],
+    ['mhv_login_link', 'myhealthevet'],
+    ['id_me_signup_link', 'http://idmanagement.gov/ns/assurance/loa/3', '&op=signup']
+  ].reduce((memo, [key, authnContext, exParams = null]) => {
+    const params = req.sp.options.getAuthnRequestParams(
+      acsUrl,
+      req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
+      (req.authnRequest && req.authnRequest.relayState) || '/',
+      authnContext
+    );
+    return memo.then((m) => {
+      return new Promise((resolve, reject) => {
+        samlp.getSamlRequestUrl(params, (err, url) => {
+          if (err) {
+            reject(err);
+          }
+
+          if (exParams) {
+            m[key] = url + exParams;
+          } else {
+            m[key] = url;
+          }
+          resolve(m);
+        });
+      });
+    });
+  }, Promise.resolve({})).then(
+    (authOptions) => res.render('login_selection', authOptions)
+  ).catch(next);
 };
 
 /**
@@ -39,10 +64,8 @@ export const showUser = function (req, res, next) {
 export const parseSamlRequest = function(req, res, next) {
   samlp.parseRequest(req, function(err, data) {
     if (err) {
-      return res.render('error', {
-        message: 'SAML AuthnRequest Parse Error: ' + err.message,
-        error: err
-      });
+      console.warn("Allowing login with no final redirect.")
+      next();
     };
     if (data) {
       req.authnRequest = {
@@ -54,9 +77,8 @@ export const parseSamlRequest = function(req, res, next) {
         forceAuthn: data.forceAuthn === 'true'
       };
       req.session.authnRequest = req.authnRequest;
-      console.log('Received AuthnRequest => \n', req.authnRequest);
     }
-    return showUser(req, res, next);
+    next();
   });
 };
 
@@ -84,8 +106,6 @@ export const parseLogoutRequest = function(req, res, next) {
     });
   };
 
-  console.log('Processing SAML SLO request for participant => \n', req.participant);
-
   return samlp.logout({
     cert:                   req.idp.options.cert,
     key:                    req.idp.options.key,
@@ -96,7 +116,6 @@ export const parseLogoutRequest = function(req, res, next) {
         req.participant
       ]),
     clearIdPSession: function(callback) {
-      console.log('Destroying session ' + req.session.id + ' for participant', req.participant);
       req.session.destroy();
       callback();
     }
@@ -105,11 +124,8 @@ export const parseLogoutRequest = function(req, res, next) {
 
 export const idpSignOut = function(req, res, next) {
   if (req.idp.options.sloUrl) {
-    console.log('Initiating SAML SLO request for user: ' + req.user.userName +
-                ' with sessionIndex: ' + getSessionIndex(req));
     res.redirect(IDP_PATHS.SLO);
   } else {
-    console.log('SAML SLO is not enabled for SP, destroying IDP session');
     req.session.destroy(function(err) {
       if (err) {
         throw err;
@@ -152,8 +168,6 @@ export const idpSignIn = function(req, res) {
   authOptions.sessionIndex = getSessionIndex(req);
 
   // Keep calm and Single Sign On
-  console.log('Sending SAML Response\nUser => \n%s\nOptions => \n',
-              JSON.stringify(req.user, null, 2), authOptions);
   samlp.auth(authOptions)(req, res);
 };
 
@@ -168,12 +182,8 @@ export const acsFactory = (app, acsUrl) => {
           url: getReqUrl(req, acsUrl)
         };
         req.session.ssoResponse = ssoResponse;
-        console.log();
-        console.log('Received SSO Response on ACS URL %s', ssoResponse.url);
-        console.log();
 
         const params = req.sp.options.getResponseParams(ssoResponse.url);
-        console.log('Validating SSO Response with Params ', params);
         assignIn(req.strategy.options, params);
         req.passport.authenticate('wsfed-saml2', params)(req, res, next);
       } else {
@@ -194,8 +204,6 @@ export const acsFactory = (app, acsUrl) => {
     function(req, res, next) {
       const authOptions = assignIn({}, req.idp.options);
       authOptions.RelayState = req.session.ssoResponse.state;
-      console.log('SP Sending SAML Response\nUser => \n%s\nOptions => \n',
-                  JSON.stringify(req.user, null, 2), authOptions);
       samlp.auth(authOptions)(req, res);
     }
   );

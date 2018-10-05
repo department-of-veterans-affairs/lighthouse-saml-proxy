@@ -1,5 +1,5 @@
 import passport from "passport";
-import { SAML, Strategy } from "passport-wsfed-saml2";
+import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
 
 export default function createPassport(spConfig) {
