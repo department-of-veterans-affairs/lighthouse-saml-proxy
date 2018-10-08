@@ -54,9 +54,10 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
     debug: true,
     importer: tildeImporter,
     outputStyle: 'expanded',
+    prefix: '/samlproxy/idp',
   }));
 
-  app.use('/', express.static(path.join(process.cwd(), 'public')));
+  app.use('/samlproxy/idp', express.static(path.join(process.cwd(), 'public')));
 
   app.use(function(req, res, next){
     req.user = argv.idpConfig.user;
