@@ -1,4 +1,77 @@
+$font-path: "~uswds/src/fonts";
+$image-path: "~uswds/src/img";
+$idme-green: #2e8540;
+$dslogon-blue: #003e73;
+
 @import "~@department-of-veterans-affairs/formation/sass/core";
+
+.saml-proxy {
+    margin: 2em;
+    padding: 1.5em 0;
+    border: 1px solid $color-gray-light-alt;
+
+    .row {
+        max-width: 90rem;
+    }
+
+    .logo-banner {
+        a {
+            display: inline-block;
+            width: 100%
+        }
+
+        img {
+            height: auto;
+            width: 100%
+        }
+    }
+
+    hr {
+        border-color: $color-gray-light-alt;
+    }
+
+    .idme-signup-footer {
+        text-align: center;
+    }
+
+    .login-selection-header {
+        text-align: center;
+        margin-bottom: 1em;
+
+        h2 {
+            margin-top: 0;
+        }
+    }
+
+    .usa-button {
+        width: 100%;
+        font-weight: 700;
+
+        &.dslogon {
+            background-color: $dslogon-blue;
+        }
+
+        &.idme-signin {
+            background-color: $idme-green;
+        }
+
+        &.idme-signup {
+            background-color: white;
+            box-shadow: inset 0 0 0 2px $idme-green;
+            color: $idme-green;
+        }
+
+        img {
+            display: inline-block;
+            vertical-align: middle;
+            height: 1em;
+            max-width: 100%;
+            padding: 0 0.25em;
+        }
+    }
+}
+
+
 
 span.sidelines {
     position: relative;
@@ -7,9 +80,9 @@ span.sidelines {
     text-align: center;
     width: 100%;
     display: inline-block;
-
     font-size: 1.15em;
     font-weight: bold;
+    margin: 1em 0;
 
     &:before, &:after {
         position: absolute;

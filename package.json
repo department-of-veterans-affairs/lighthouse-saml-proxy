@@ -58,6 +58,7 @@
     "express": "~4.16.3",
     "express-session": "^1.15.6",
     "extend": "^3.0.1",
+    "font-awesome": "^4.7.0",
     "hbs": "~4.0.1",
     "lodash.assignin": "^4.2.0",
     "lodash.isstring": "^4.0.1",

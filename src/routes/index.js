@@ -26,7 +26,6 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   app.set('view engine', 'hbs');
   app.set('view options', { layout: 'layout' });
   app.engine('handlebars', hbs.__express);
-  app.use(express.static(path.join(process.cwd(), 'public')));
   app.use(passport.initialize());
 
   /**
@@ -54,8 +53,10 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
     dest: path.join(process.cwd(), "public"),
     debug: true,
     importer: tildeImporter,
-    outputStyle: 'expanded'
+    outputStyle: 'expanded',
   }));
+
+  app.use('/', express.static(path.join(process.cwd(), 'public')));
 
   app.use(function(req, res, next){
     req.user = argv.idpConfig.user;

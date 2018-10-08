@@ -1,9 +1,33 @@
-<ul>
-  <li><a href="{{ id_me_login_link }}">id.me sign in</a></li>
-  <li><a href="{{ dslogon_login_link }}">DSLogon</a></li>
-  <li><a href="{{ mhv_login_link }}">My Healthy Vet</a></li>
-</ul>
-<hr />
-<ul>
-  <li><a href="{{ id_me_signup_link }}">id.me sign up</a></li>
-</ul>
+<div class="row login-selection-header">
+  <div class="columns">
+    <h2>Sign in to VA.gov</h2>
+    <p>Sign in using your preferred VA related account</p>
+  </div>
+</div>
+<div class="row">
+  <div class="columns usa-width-one-half medium-6">
+    <a class="usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon" src="/img/dslogon-icon.svg" />Sign in with DSLogon</a>
+    <a class="usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet" src="/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
+    <a class="usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me" src="/img/idme-icon-white.svg" />Sign in with ID.me</a>
+  </div>
+  <div class="columns usa-width-one-half medium-6">
+    <h4>Having trouble signing in?</h4>
+    <p><a href="https://staging.va.gov/sign-in-faq/">Get answers to Frequently Asked Questions</a></p>
+    <p>
+      Or call the VA.gov Help Desk at<br />
+      <a href"tel:18855747286">1-885-574-7286</a><br />
+      TTY: <a href="tel:18008778339">1-800-877-8339</a>
+    </p>
+    <p>We're here Monday &ndash; Friday, 8:00 a.m. &ndash; 8:00 p.m. (ET)</p>
+  </div>
+</div>
+<div class="row">
+  <span class="sidelines">OR</span>
+</div>
+<div class="row idme-signup-footer">
+  <div class="columns usa-width-one-half medium-6 usa-offset-one-fourth">
+    <h4>Don't have these accounts?</h4>
+    <a class="usa-button idme-signup" href="{{ id_me_signup_link }}"><img alt="ID.me" src="/img/idme-icon-dark.svg" />Create an ID.me account</a>
+    <p>Use your email, Google, or Facebook</p>
+  </div>
+</div>
