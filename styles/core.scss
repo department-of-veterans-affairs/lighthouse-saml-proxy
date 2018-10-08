@@ -10,6 +10,10 @@ $dslogon-blue: #003e73;
     padding: 1.5em 0;
     border: 1px solid $color-gray-light-alt;
 
+    [href^="http"] {
+        background-image: none;
+    }
+
     .row {
         max-width: 90rem;
     }
