@@ -51,6 +51,7 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
+    "@department-of-veterans-affairs/formation": "^1.7.7",
     "body-parser": "~1.18.3",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
@@ -63,10 +64,13 @@
     "lodash.omit": "^4.5.0",
     "lodash.template": "^4.4.0",
     "morgan": "~1.9.0",
+    "node-sass-middleware": "^0.11.0",
+    "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",
     "passport-wsfed-saml2": "https://github.com/edpaget/passport-wsfed-saml2#auth-demo",
     "request": "^2.87.0",
     "samlp": "https://github.com/edpaget/node-samlp#auth-demo",
+    "uswds": "^1.6.8",
     "xml-formatter": "^1.0.1",
     "xml2js": "^0.4.19",
     "xmldom": "^0.1.27",

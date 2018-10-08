@@ -1,0 +1,32 @@
+@import "~@department-of-veterans-affairs/formation/sass/core";
+
+span.sidelines {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+
+    font-size: 1.15em;
+    font-weight: bold;
+
+    &:before, &:after {
+        position: absolute;
+        top: 51%;
+        overflow: hidden;
+        width: 50%;
+        height: 2px;
+        content: "\a0";
+        background-color: $color-gray-light-alt;
+    }
+
+    &:before {
+        margin-left: -52%;
+        text-align: right;
+    }
+
+    &:after {
+        margin-left: 2%;
+    }
+}

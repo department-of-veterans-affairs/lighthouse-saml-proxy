@@ -119,3 +119,4 @@ $RECYCLE.BIN/
 # Typescript build
 build/
 /test-report.xml
+/public/core.css

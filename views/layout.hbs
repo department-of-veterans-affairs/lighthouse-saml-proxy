@@ -4,54 +4,22 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Simple Identity Provider</title>
-<!--
-    <link href="/samlproxy/idp/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet">
-    <link href="/samlproxy/idp/css/bootstrap.css" rel="stylesheet">
-    <link href="/samlproxy/idp/css/main.css" rel="stylesheet">
--->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" href="/core.css" />
+    <title>Choose Login Provider</title>
   </head>
-  <body>
+  <body class="saml-proxy">
+    <div class="row">
+      <div class="columns">
+        <a href="/">
+          <img class="va-header-logo" src="/img/logo-alt.png" />
+        </a>
+        <span class="sidelines">OR</span>
+      </div>
+    </div>
     <div class="container">
       <div class="row">
         {{{body}}}
       </div>
     </div>
   </body>
-<!--
-  <script src="/samlproxy/idp/bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="/samlproxy/idp/bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
-  <script src="/samlproxy/idp/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script src="/samlproxy/idp/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
-  <script src="/samlproxy/idp/bower_components/underscore/underscore.js"></script>
--->
-<!--
-  <script>
-  $(document).ready(function() {
-    jQuery.validator.setDefaults({
-      errorPlacement: function(error, element) {
-        if(element.parent().hasClass('input-prepend') || element.parent().hasClass('input-append')) {
-          error.insertAfter(element.parent());
-        } else {
-          error.insertAfter(element);
-        }
-      },
-      errorElement: "span",
-      errorClass: "help-block",
-      highlight: function(element) {
-        $(element).closest('.form-group').addClass('has-error');
-      },
-      success: function(element) {
-        $(element).closest('.form-group').removeClass('has-error');
-      }
-    });
-  });
-  </script>
--->
-  {{{block "scripts"}}}
-
 </html>

@@ -12,6 +12,3 @@ export const SP_LOGOUT_URL = '/samlproxy/sp/logout';
 export const SP_METADATA_URL = '/samlproxy/sp/metadata';
 export const SP_SETTINGS_URL = '/samlproxy/sp/settings';
 export const SP_ERROR_URL = '/samlproxy/sp/error';
-
-
-

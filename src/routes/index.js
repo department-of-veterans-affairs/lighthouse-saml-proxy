@@ -5,6 +5,8 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import sassMiddleware from "node-sass-middleware";
+import tildeImporter from "node-sass-tilde-importer";
 
 import createPassport from "./passport";
 import addRoutes from "./routes";
@@ -24,8 +26,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   app.set('view engine', 'hbs');
   app.set('view options', { layout: 'layout' });
   app.engine('handlebars', hbs.__express);
-  app.use(express.static(path.join(__dirname, 'public')));
-  app.use('/samlproxy/idp/bower_components', express.static(__dirname + '/public/bower_components'));
+  app.use(express.static(path.join(process.cwd(), 'public')));
   app.use(passport.initialize());
 
   /**
@@ -46,6 +47,14 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
     saveUninitialized: true,
     name: 'idp_sid',
     cookie: { maxAge: 60000 }
+  }));
+
+  app.use(sassMiddleware({
+    src: path.join(process.cwd(), "styles"),
+    dest: path.join(process.cwd(), "public"),
+    debug: true,
+    importer: tildeImporter,
+    outputStyle: 'expanded'
   }));
 
   app.use(function(req, res, next){
