@@ -58,6 +58,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   }));
 
   app.use('/samlproxy/idp', express.static(path.join(process.cwd(), 'public')));
+  app.use('/fonts', express.static(path.join(process.cwd(), 'public/fonts')));
 
   app.use(function(req, res, next){
     req.user = argv.idpConfig.user;

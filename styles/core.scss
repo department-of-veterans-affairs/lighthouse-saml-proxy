@@ -1,5 +1,5 @@
-$font-path: "~uswds/src/fonts";
-$image-path: "~uswds/src/img";
+$font-path: "/samlproxy/idp/fonts";
+$image-path: "img";
 $idme-green: #2e8540;
 $dslogon-blue: #003e73;
 
@@ -11,10 +11,6 @@ $dslogon-blue: #003e73;
 
     [href^="http"] {
         background-image: none;
-    }
-
-    .row {
-        max-width: 90rem;
     }
 
     .logo-banner {
@@ -29,8 +25,9 @@ $dslogon-blue: #003e73;
         }
     }
 
-    hr {
+    .usa-grid > hr {
         border-color: $color-gray-light-alt;
+        margin: 1em 0;
     }
 
     .idme-signup-footer {
@@ -72,37 +69,35 @@ $dslogon-blue: #003e73;
             padding: 0 0.25em;
         }
     }
-}
 
-
-
-span.sidelines {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    text-align: center;
-    width: 100%;
-    display: inline-block;
-    font-size: 1.15em;
-    font-weight: bold;
-    margin: 1em 0;
-
-    &:before, &:after {
-        position: absolute;
-        top: 51%;
+    .usa-grid > span.sidelines {
+        position: relative;
+        z-index: 1;
         overflow: hidden;
-        width: 50%;
-        height: 2px;
-        content: "\a0";
-        background-color: $color-gray-light-alt;
-    }
+        text-align: center;
+        width: 100%;
+        display: inline-block;
+        font-size: 1.15em;
+        font-weight: bold;
+        margin: 1em 0;
 
-    &:before {
-        margin-left: -52%;
-        text-align: right;
-    }
+        &:before, &:after {
+            position: absolute;
+            top: 51%;
+            overflow: hidden;
+            width: 50%;
+            height: 2px;
+            content: "\a0";
+            background-color: $color-gray-light-alt;
+        }
 
-    &:after {
-        margin-left: 2%;
+        &:before {
+            margin-left: -52%;
+            text-align: right;
+        }
+
+        &:after {
+            margin-left: 2%;
+        }
     }
 }
