@@ -108,6 +108,7 @@ export default class SPConfig {
       identityProviderUrl: this.idpSsoUrl,  //wsfed
       recipientUrl: destinationUrl,
       destinationUrl: destinationUrl,
+      protocolBinding: this.idpSsoBinding,
       decryptionKey: this.spKey,
       checkResponseID: true,
       checkDestination: true,

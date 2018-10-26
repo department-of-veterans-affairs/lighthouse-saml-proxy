@@ -176,7 +176,6 @@ export const acsFactory = (app, acsUrl) => {
     getPath(acsUrl),
     function (req, res, next) {
       if (req.method === 'GET' && req.query && (req.query.SAMLResponse || req.body.wresult)) {
-        req.body = req.query;
         const ssoResponse = {
           state: req.query.RelayState || req.body.wctx,
           url: getReqUrl(req, acsUrl)
@@ -185,12 +184,14 @@ export const acsFactory = (app, acsUrl) => {
 
         const params = req.sp.options.getResponseParams(ssoResponse.url);
         assignIn(req.strategy.options, params);
+        console.log(req.strategy.options);
         req.passport.authenticate('wsfed-saml2', params)(req, res, next);
       } else {
         res.redirect(SP_LOGIN_URL);
       }
     },
     function(req, res, next) {
+      console.log(req.user);
       if (req.user && req.user.claims && req.user.claims.level_of_assurance != '3') {
         res.redirect(url.format({
           pathname: IDP_PATHS.SSO,
