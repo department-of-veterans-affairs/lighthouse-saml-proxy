@@ -57,10 +57,6 @@ pipeline {
     }
   }
   post {
-    always {
-      deleteDir() /* clean up our workspace */
-    }
-
     failure {
       script {
         if (env.BRANCH_NAME == 'master') {
