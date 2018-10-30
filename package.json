@@ -48,7 +48,7 @@
   },
   "bin": "./bin/run.js",
   "engines": {
-    "node": "~8.12.0"
+    "node": ">=6.0.0"
   },
   "dependencies": {
     "@department-of-veterans-affairs/formation": "^1.10.0",
