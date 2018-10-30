@@ -23,6 +23,7 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
+          sh 'pwd'
           sh 'npm install'
           sh 'npm run-script ci'
         }
@@ -56,6 +57,10 @@ pipeline {
     }
   }
   post {
+    always {
+      deleteDir() /* clean up our workspace */
+    }
+
     failure {
       script {
         if (env.BRANCH_NAME == 'master') {
