@@ -3,7 +3,7 @@ FROM node:alpine
 RUN mkdir /opt/app/
 WORKDIR /opt/app/
 
-RUN apk add git
+RUN apk add git python
 RUN git config --global url."https://".insteadOf git://
 ADD ./package.json package.json
 ADD ./package-lock.json package-lock.json
