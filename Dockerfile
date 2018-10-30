@@ -1,9 +1,9 @@
-FROM node:alpine
+FROM node:8-alpine
 
 RUN mkdir /opt/app/
 WORKDIR /opt/app/
 
-RUN apk add git
+RUN apk add git python make g++
 RUN git config --global url."https://".insteadOf git://
 ADD ./package.json package.json
 ADD ./package-lock.json package-lock.json

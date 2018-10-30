@@ -3,6 +3,7 @@ import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
+import * as url from "url";
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -192,7 +193,9 @@ export const acsFactory = (app, acsUrl) => {
     },
     function(req, res, next) {
       console.log(req.user);
-      if (req.user && req.user.claims && req.user.claims.level_of_assurance != '3') {
+      if (req.user && req.user.claims &&
+          (req.user.claims.level_of_assurance != '3' ||
+           req.user.claims.dslogon_assurance.parseInt() < 2)) {
         res.redirect(url.format({
           pathname: IDP_PATHS.SSO,
           query: {

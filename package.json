@@ -43,7 +43,8 @@
       "ts",
       "tsx",
       "js",
-      "json"
+      "json",
+      "node"
     ]
   },
   "bin": "./bin/run.js",
