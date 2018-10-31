@@ -195,8 +195,8 @@ export const acsFactory = (app, acsUrl) => {
     function(req, res, next) {
       console.log(req.user);
       if (req.user && req.user.claims &&
-          (req.user.claims.level_of_assurance != '3' &&
-           parseInt(req.user.claims.dslogon_assurance) != 2)) {
+          (req.user.claims.level_of_assurance !== '3' &&
+           req.user.claims.dslogon_assurance !== '2')) {
         res.redirect(url.format({
           pathname: IDP_SSO,
           query: {
