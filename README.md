@@ -63,7 +63,7 @@ You will also need to generated a self-signed certificate of the SP functions
 openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout sp-key.pem -out sp-cert.pem -days 7300
 ```
 
-You can also grab the development certificates from [here]().
+You can also grab the development certificates from [here](https://github.com/department-of-veterans-affairs/vets-contrib/blob/master/Developer%20Process/SAML%20Proxy/Certificates.md).
 
 ## SAML Flow
 
