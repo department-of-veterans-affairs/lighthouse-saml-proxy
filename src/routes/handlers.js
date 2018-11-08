@@ -101,42 +101,6 @@ export const getParticipant = (req) => {
   };
 };
 
-export const parseLogoutRequest = function(req, res, next) {
-  if (!req.idp.options.sloUrl) {
-    return res.render('error', {
-      message: 'SAML Single Logout Service URL not defined for Service Provider'
-    });
-  };
-
-  return samlp.logout({
-    cert:                   req.idp.options.cert,
-    key:                    req.idp.options.key,
-    digestAlgorithm:        req.idp.options.digestAlgorithm,
-    signatureAlgorithm:     req.idp.options.signatureAlgorithm,
-    sessionParticipants:    new SessionParticipants(
-      [
-        req.participant
-      ]),
-    clearIdPSession: function(callback) {
-      req.session.destroy();
-      callback();
-    }
-  })(req, res, next);
-};
-
-export const idpSignOut = function(req, res, next) {
-  if (req.idp.options.sloUrl) {
-    res.redirect(IDP_PATHS.SLO);
-  } else {
-    req.session.destroy(function(err) {
-      if (err) {
-        throw err;
-      }
-      res.redirect('back');
-    });
-  }
-};
-
 export const idpSignIn = function(req, res) {
   const authOptions = extend({}, req.idp.options);
   Object.keys(req.body).forEach(function(key) {
