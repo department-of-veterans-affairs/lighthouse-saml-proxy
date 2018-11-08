@@ -42,7 +42,7 @@
     "moduleFileExtensions": [
       "ts",
       "tsx",
-      "js",
+      js",
       "json",
       "node"
     ]
@@ -70,9 +70,9 @@
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",
-    "passport-wsfed-saml2": "https://github.com/edpaget/passport-wsfed-saml2#http-redirect-response",
+    "passport-wsfed-saml2": "https://github.com/edpaget/passport-wsfed-saml2",
     "request": "^2.87.0",
-    "samlp": "3.4.0",
+    "samlp": "https://github.com/edpaget/node-samlp",
     "uswds": "^1.6.8",
     "xml-formatter": "^1.0.1",
     "xml2js": "^0.4.19",

@@ -1,5 +1,5 @@
 import SimpleProfileMapper from "./simpleProfileMapper";
-import { IDP_SSO, IDP_SLO } from "./routes/constants";
+import { IDP_SSO } from "./routes/constants";
 import { DOMParser } from "xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp"
 import { Response, Request, NextFunction } from "express"
@@ -73,15 +73,7 @@ export default class IDPConfig implements IdPOptions {
     this.profileMapper = SimpleProfileMapper;
     this.postEndpointPath = IDP_SSO;
     this.redirectEndpointPath = IDP_SSO;
-    if (argv.idpSloUrl) {
-      this.logoutEndpointPaths = {
-        redirect: IDP_SLO,
-        post: IDP_SLO
-      };
-    }
-    else {
-      this.logoutEndpointPaths = {};
-    }
+    this.logoutEndpointPaths = {};
   }
 
   public getUserFromRequest(req : Request) {
