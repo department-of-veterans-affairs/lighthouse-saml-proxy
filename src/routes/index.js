@@ -13,9 +13,16 @@ import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
 
+import promBundle from 'express-prom-bundle';
+
 export default function configureExpress(app, argv, idpOptions, spOptions) {
   const [ passport, strategy ] = createPassport(spOptions);
   const hbs = configureHandlebars();
+  const metricsMiddleware = promBundle({
+    includeMethod: true,
+    includePath: true,
+    customLabels: {app: 'saml_proxy'}
+  })
   app.set('port', process.env.PORT || argv.port);
   app.set('views', path.join(process.cwd(), './views'));
 
@@ -26,6 +33,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   app.set('view engine', 'hbs');
   app.set('view options', { layout: 'layout' });
   app.engine('handlebars', hbs.__express);
+  app.use(metricsMiddleware);
   app.use(passport.initialize());
 
   /**
