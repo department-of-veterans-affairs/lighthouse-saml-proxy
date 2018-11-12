@@ -142,7 +142,7 @@ export const idpSignIn = function(req, res) {
 
 export const sufficientLevelOfAssurance = (claims) => {
   if (claims.mhv_profile) {
-    profile = JSON.parse(claims.mhv_profile);
+    var profile = JSON.parse(claims.mhv_profile);
     return (profile.accountType == 'Premium');
   }
   else if (claims.dslogon_assurance) {
