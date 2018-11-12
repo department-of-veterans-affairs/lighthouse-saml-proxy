@@ -1,5 +1,5 @@
 import { SP_ERROR_URL, SP_SLO_URL } from "./routes/constants";
-import { removeHeaders, getReqURl } from "./utils";
+import { removeHeaders, getReqUrl } from "./utils";
 
 import fs from "fs";
 import process from "process";

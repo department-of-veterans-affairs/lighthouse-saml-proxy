@@ -140,6 +140,19 @@ export const idpSignIn = function(req, res) {
   samlp.auth(authOptions)(req, res);
 };
 
+export const sufficientLevelOfAssurance = (claims) => {
+  if (claims.mhv_profile) {
+    profile = JSON.parse(claims.mhv_profile);
+    return (profile.accountType == 'Premium');
+  }
+  else if (claims.dslogon_assurance) {
+    return claims.dslogon_assurance == '2';
+  }
+  else {
+    return claims.level_of_assurnace == '3';
+  }
+};
+
 export const acsFactory = (app, acsUrl) => {
   app.get(
     getPath(acsUrl),
@@ -162,8 +175,7 @@ export const acsFactory = (app, acsUrl) => {
     function(req, res, next) {
       console.log(req.user);
       if (req.user && req.user.claims &&
-          (req.user.claims.level_of_assurance !== '3' &&
-           req.user.claims.dslogon_assurance !== '2')) {
+          !sufficientLevelOfAssurance(req.user.claims)) {
         res.redirect(url.format({
           pathname: IDP_SSO,
           query: {
