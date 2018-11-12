@@ -1,18 +1,14 @@
 import { IDP_SSO,
-         IDP_SLO,
          IDP_METADATA,
          IDP_REDIRECT,
          SP_METADATA_URL,
-         IDP_SIGN_IN,
-         IDP_SIGN_OUT } from "./constants";
+         IDP_SIGN_IN } from "./constants";
 
 import { acsFactory,
          parseSamlRequest,
-         parseLogoutRequest,
          showLoginOptions,
          samlLogin,
-         idpSignIn,
-         idpSignOut } from "./handlers";
+         idpSignIn } from "./handlers";
 
 import fs from "fs";
 import process from "process";
@@ -28,9 +24,6 @@ export default function addRoutes(app, idpConfig, spConfig) {
   app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
   app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
 
-  app.get(IDP_SLO, parseLogoutRequest);
-  app.post(IDP_SLO, parseLogoutRequest);
-
   app.post(IDP_SIGN_IN, idpSignIn);
 
   app.get(IDP_METADATA, function(req, res, next) {
@@ -45,8 +38,6 @@ export default function addRoutes(app, idpConfig, spConfig) {
   });
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
-
-  app.get(IDP_SIGN_OUT, idpSignOut);
 
   return app;
 }
