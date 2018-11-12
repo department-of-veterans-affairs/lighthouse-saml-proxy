@@ -149,7 +149,7 @@ export const sufficientLevelOfAssurance = (claims) => {
     return claims.dslogon_assurance == '2';
   }
   else {
-    return claims.level_of_assurnace == '3';
+    return claims.level_of_assurance == '3';
   }
 };
 
