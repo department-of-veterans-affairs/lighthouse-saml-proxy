@@ -163,7 +163,7 @@ var metadata = [
     if (claims && claims.mhv_profile) {
       return JSON.parse(claims.mhv_profile).accountType;
     }
-    return null;
+    return undefined;
   }
 }
 ];
