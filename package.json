@@ -52,7 +52,7 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
-    "@department-of-veterans-affairs/formation": "^1.10.0",
+    "@department-of-veterans-affairs/formation": "^1.11.0",
     "body-parser": "~1.18.3",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
@@ -70,9 +70,9 @@
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",
-    "passport-wsfed-saml2": "https://github.com/edpaget/passport-wsfed-saml2",
+    "passport-wsfed-saml2": "git+https://github.com/edpaget/passport-wsfed-saml2.git",
     "request": "^2.87.0",
-    "samlp": "https://github.com/edpaget/node-samlp",
+    "samlp": "git+https://github.com/edpaget/node-samlp.git",
     "uswds": "^1.6.8",
     "xml-formatter": "^1.0.1",
     "xml2js": "^0.4.19",
@@ -82,16 +82,16 @@
   "devDependencies": {
     "@types/express": "^4.16.0",
     "@types/handlebars": "^4.0.39",
-    "@types/jest": "^23.3.1",
-    "@types/node": "^10.9.4",
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.5",
     "@types/samlp": "^1.0.7",
     "@types/xmldom": "^0.1.29",
     "jest": "^23.5.0",
     "jest-junit-reporter": "^1.1.0",
-    "nodemon": "^1.18.4",
+    "nodemon": "^1.18.6",
     "source-map-support": "^0.5.9",
     "ts-jest": "^23.1.4",
     "ts-node": "^7.0.1",
-    "typescript": "^3.0.3"
+    "typescript": "^3.1.6"
   }
 }
