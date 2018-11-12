@@ -92,13 +92,16 @@ export const getSessionIndex = (req) => {
 };
 
 export const getParticipant = (req) => {
-  return {
+  const participant = {
     serviceProviderId: req.idp.options.serviceProviderId,
     sessionIndex: getSessionIndex(req),
-    nameId: req.user.userName,
-    nameIdFormat: req.user.nameIdFormat,
     serviceProviderLogoutURL: req.idp.options.sloUrl
   };
+  if (req.user) {
+    participant.nameId = req.user.userName;
+    participant.nameIdFormat = req.user.nameIdFormat;
+  }
+  return participant;
 };
 
 export const idpSignIn = function(req, res) {
