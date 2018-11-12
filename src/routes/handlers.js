@@ -146,7 +146,7 @@ export const sufficientLevelOfAssurance = (claims) => {
     return (profile.accountType == 'Premium');
   }
   else if (claims.dslogon_assurance) {
-    return claims.dslogon_assurance == '2';
+    return (claims.dslogon_assurance == '2' || claims.dslogon_assurance == '3');
   }
   else {
     return claims.level_of_assurance == '3';
