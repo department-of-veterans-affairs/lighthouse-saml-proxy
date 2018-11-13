@@ -4,13 +4,13 @@
     <p>Sign in using your preferred VA related account</p>
   </div>
 </div>
-<div class="usa-grid">
+<div class="usa-grid login-selection">
   <div class="usa-width-one-half">
     <a class="usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon" src="/samlproxy/idp/img/dslogon-icon.svg" />Sign in with DSLogon</a>
     <a class="usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet" src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
     <a class="usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
   </div>
-  <div class="usa-width-one-half">
+  <div class="usa-width-one-half login-help">
     <h4>Having trouble signing in?</h4>
     <p><a href="https://staging.va.gov/sign-in-faq/">Get answers to Frequently Asked Questions</a></p>
     <p>
@@ -18,14 +18,12 @@
     </p>
     <p>We're here Monday &ndash; Friday, 8:00 a.m. &ndash; 8:00 p.m. (ET)</p>
   </div>
-</div>
-<div class="usa-grid">
   <span class="sidelines">OR</span>
-</div>
-<div class="usa-grid idme-signup-footer">
-  <div class="usa-width-one-half usa-offset-one-fourth">
-    <h4>Don't have these accounts?</h4>
-    <a class="usa-button idme-signup" href="{{ id_me_signup_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-dark.svg" />Create an ID.me account</a>
-    <p>Use your email, Google, or Facebook</p>
+  <div class="usa-grid idme-signup-footer">
+    <div class="usa-width-one-half">
+      <h4>Don't have these accounts?</h4>
+      <a class="usa-button idme-signup" href="{{ id_me_signup_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-dark.svg" />Create an ID.me account</a>
+      <p>Use your email, Google, or Facebook</p>
+    </div>
   </div>
 </div>

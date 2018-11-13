@@ -6,8 +6,7 @@ $dslogon-blue: #003e73;
 @import "~@department-of-veterans-affairs/formation/sass/core";
 
 .saml-proxy {
-    margin: 2em;
-    padding: 1.5em 0;
+    margin: 18px;
 
     [href^="http"] {
         background-image: none;
@@ -32,6 +31,8 @@ $dslogon-blue: #003e73;
 
     .idme-signup-footer {
         text-align: center;
+        display: flex;
+        justify-content: center;
     }
 
     .login-selection-header {
@@ -46,6 +47,8 @@ $dslogon-blue: #003e73;
     .usa-button {
         width: 100%;
         font-weight: 700;
+        height: 50px;
+        line-height: inherit;
 
         &.dslogon {
             background-color: $dslogon-blue;
@@ -67,6 +70,27 @@ $dslogon-blue: #003e73;
             height: 1em;
             max-width: 100%;
             padding: 0 0.25em;
+        }
+    }
+
+    .login-selection {
+        display: flex;
+        flex-flow: column;
+
+        @include media($medium-screen) {
+            display: block;
+        }
+    }
+
+    .login-help {
+        text-align: center;
+        order: 1;
+        margin-top: 1em;
+
+        @include media($medium-screen) {
+            margin: 0;
+            text-align: left;
+            order: 0;
         }
     }
 
