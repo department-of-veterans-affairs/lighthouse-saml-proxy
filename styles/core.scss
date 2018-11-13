@@ -8,6 +8,13 @@ $dslogon-blue: #003e73;
 .saml-proxy {
     margin: 18px;
 
+    .usa-grid {
+        @media screen and (max-width: $medium-screen - 1) {
+            margin: 0;
+            padding: 0;
+        }
+    }
+
     .logo-banner {
         width: 315px;
         margin: 0 auto;
@@ -30,8 +37,11 @@ $dslogon-blue: #003e73;
 
     .idme-signup-footer {
         text-align: center;
-        display: flex;
-        justify-content: center;
+
+        @include media($medium-screen) {
+            display: flex;
+            justify-content: center;
+        }
     }
 
     .login-selection-header {
