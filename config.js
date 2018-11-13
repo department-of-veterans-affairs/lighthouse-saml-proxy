@@ -1,20 +1,3 @@
-
-/**
- * User Profile
- */
-var profile = {
-  birth_date: '1936-04-10',
-  email: 'vets.gov.user+503@id.me',
-  fname: 'Wendeline',
-  social: '564930708',
-  gender: 'Female',
-  lname: 'O\'Heffernan',
-  level_of_assurance: '3',
-  mname: 'Kitty',
-  multifactor: 'true',
-  uuid: '43bb64d44a44452a8b30929003a89f53'
-}
-
 /**
  * SAML Attribute Metadata
  */
@@ -147,6 +130,5 @@ var metadata = [{
 }];
 
 module.exports = {
-  user: profile,
   metadata: metadata
 }
