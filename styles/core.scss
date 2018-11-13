@@ -46,6 +46,9 @@ $dslogon-blue: #003e73;
     .usa-button {
         width: 100%;
         font-weight: 700;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         @media screen and (max-width: $medium-screen - 1) {
             height: 50px;
