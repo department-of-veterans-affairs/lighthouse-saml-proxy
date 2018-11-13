@@ -13,9 +13,12 @@ $dslogon-blue: #003e73;
     }
 
     .logo-banner {
+        width: 315px;
+        margin: 0 auto;
+
         a {
             display: inline-block;
-            width: 100%
+            width: 100%;
         }
 
         img {
