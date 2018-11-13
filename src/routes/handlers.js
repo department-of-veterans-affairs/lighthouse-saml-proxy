@@ -188,6 +188,7 @@ export const acsFactory = (app, acsUrl) => {
     function(req, res, next) {
       const authOptions = assignIn({}, req.idp.options);
       authOptions.RelayState = req.session.ssoResponse.state;
+      authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
       samlp.auth(authOptions)(req, res);
     }
   );
