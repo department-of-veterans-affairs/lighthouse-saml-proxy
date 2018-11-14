@@ -67,13 +67,19 @@ You can also grab the development certificates from [here](https://github.com/de
 
 ## SAML Flow
 
+The proxy fills both roles typically seen in a SAML interaction:
+- It acts as an Identity Provider (IDP) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
+- It acts as a Service Provider (SP) relative to ID.me. It sends a SAML request to ID.me, and receives a SAML response. 
+
+These two interactions are interleaved, - the request received from Okta is re-signed and passed along to ID.me. Then the respone from ID.me is validated, transformed, re-signed, and passed along to Okta. 
+
 Flow of the SAML login process: 
 
 ```
 +-----------------------+
 |                       |
 |  User clicks          |
-|  "Login with Va.go^"  |
+|  "Login with Va.gov"  |
 |                       |
 +---|-------------------+
     |
@@ -81,8 +87,8 @@ Flow of the SAML login process:
     |
 +---v---------------+     +-------------------------------+     +-------------------------+
 |                   |     |                               |     |                         |
-|  GET /authorize   |     |  POST /sso                    |     |  User is presented      |
-|  Okta starts SAML +----->  Proxy recei^es AuthNRequest  +-----+  with DSLogon, Id.me, & |
+|  GET /authorize   |     |  POST /samlproxy/idp/saml/sso |     |  User is presented      |
+|  Okta starts SAML +----->  Proxy receives AuthNRequest  +-----+  with DSLogon, Id.me, & |
 |  IdP flow         |     |  From Okta                    |     |  MHV login options      |
 |                   |     |                               |     |                         |
 +-------------------+     +-------------------------------+     +----|-----|---|----------+
@@ -113,7 +119,7 @@ Flow of the SAML login process:
    |    |    |
    |    |    |       +-------------------------------+    +---------------------------+
  +-v----v----v--+    |                               |    |                           |
- |              |    | GET /sso                      |    |  Proxy POSTS SAMLResponse |
+ |              |    | GET /samlproxy/sp/saml/sso    |    |  Proxy POSTS SAMLResponse |
  | User logs in +----> Proxy receives redirect from  +---->  To Okta                  |
  |              |    | Id.me with SAMLResponse       |    |                           |
  +--------------+    |                               |    +---------------------------+

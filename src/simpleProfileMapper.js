@@ -10,9 +10,14 @@ SimpleProfileMapper.prototype.getClaims = function() {
   var claims = {};
 
   SimpleProfileMapper.prototype.metadata.forEach(function(entry) {
-    claims[entry.id] = entry.multiValue ?
-      self._pu['claims'][entry.id].split(',') :
-      self._pu['claims'][entry.id];
+    if (entry.transformer) {
+      claims[entry.id] = entry.transformer(self._pu['claims']);
+    }
+    else {
+      claims[entry.id] = entry.multiValue ?
+        self._pu['claims'][entry.id].split(',') :
+        self._pu['claims'][entry.id];
+    }
   });
 
   console.log(claims);

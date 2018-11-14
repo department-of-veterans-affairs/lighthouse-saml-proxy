@@ -1,7 +1,9 @@
 /**
  * SAML Attribute Metadata
  */
-var metadata = [{
+var metadata = [
+// Common attributes
+{
   id: "email",
   optional: false,
   displayName: 'E-Mail Address',
@@ -25,7 +27,9 @@ var metadata = [{
   displayName: 'uuid',
   description: 'IdP-generated UUID of the user',
   multiValue: false
-}, {
+},
+// ID.me-specific attributes
+{
   id: "fname",
   optional: true,
   displayName: 'First Name',
@@ -55,7 +59,9 @@ var metadata = [{
   displayName: 'Gender',
   description: 'The administrative gender of the user',
   multiValue: false
-}, {
+},
+// DSLogon-specific attributes
+{
   id: "birth_date",
   optional: true,
   displayName: 'Birth Date',
@@ -127,7 +133,40 @@ var metadata = [{
   displayName: 'DS Logon UUID',
   description: 'DSLogon-reported UUID aka EDIPI',
   multiValue: false
-}];
+},
+// MHV-specific attributes
+{
+  id: "mhv_uuid",
+  optional: true,
+  displayName: 'MHV UUID',
+  description: 'MHV-reported UUID',
+  multiValue: false
+}, {
+  id: "mhv_profile",
+  optional: true,
+  displayName: 'MHV user profile',
+  description: 'MHV user profile, includes account status',
+  multiValue: false
+}, {
+  id: "mhv_icn",
+  optional: true,
+  displayName: 'MHV ICN',
+  description: 'MHV-reported ICN',
+  multiValue: false
+}, {
+  id: "mhv_account_type",
+  optional: true,
+  displayName: 'MHV account type',
+  description: 'MHV account type',
+  multiValue: false,
+  transformer: function (claims) {
+    if (claims && claims.mhv_profile) {
+      return JSON.parse(claims.mhv_profile).accountType;
+    }
+    return undefined;
+  }
+}
+];
 
 module.exports = {
   metadata: metadata
