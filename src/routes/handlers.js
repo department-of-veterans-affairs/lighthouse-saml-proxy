@@ -152,44 +152,52 @@ export const sufficientLevelOfAssurance = (claims) => {
     return claims.level_of_assurance == '3';
   }
 };
+const processAcs = (acsUrl) => [
+  function (req, res, next) {
+    if ((req.method === 'GET' || req.method === 'POST')
+        && (req.query && req.query.SAMLResponse)
+        || (req.body && req.body.SAMLResponse)) {
+      const ssoResponse = {
+        state: req.query.RelayState || req.body.RelayState,
+        url: getReqUrl(req, acsUrl)
+      };
+      req.session.ssoResponse = ssoResponse;
+
+      const params = req.sp.options.getResponseParams(ssoResponse.url);
+      assignIn(req.strategy.options, params);
+      req.passport.authenticate('wsfed-saml2', params)(req, res, next);
+    } else {
+      res.redirect(SP_LOGIN_URL);
+    }
+  },
+  function(req, res, next) {
+    if (req.user && req.user.claims &&
+        !sufficientLevelOfAssurance(req.user.claims)) {
+      res.redirect(url.format({
+        pathname: IDP_SSO,
+        query: {
+          authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
+        }
+      }));
+    }
+    next();
+  },
+  function(req, res, next) {
+    const authOptions = assignIn({}, req.idp.options);
+    authOptions.RelayState = req.session.ssoResponse.state;
+    authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
+    console.log(req.user);
+    samlp.auth(authOptions)(req, res);
+  }
+];
 
 export const acsFactory = (app, acsUrl) => {
   app.get(
     getPath(acsUrl),
-    function (req, res, next) {
-      if (req.method === 'GET' && req.query && (req.query.SAMLResponse || req.body.wresult)) {
-        const ssoResponse = {
-          state: req.query.RelayState || req.body.wctx,
-          url: getReqUrl(req, acsUrl)
-        };
-        req.session.ssoResponse = ssoResponse;
-
-        const params = req.sp.options.getResponseParams(ssoResponse.url);
-        assignIn(req.strategy.options, params);
-        console.log(req.strategy.options);
-        req.passport.authenticate('wsfed-saml2', params)(req, res, next);
-      } else {
-        res.redirect(SP_LOGIN_URL);
-      }
-    },
-    function(req, res, next) {
-      console.log(req.user);
-      if (req.user && req.user.claims &&
-          !sufficientLevelOfAssurance(req.user.claims)) {
-        res.redirect(url.format({
-          pathname: IDP_SSO,
-          query: {
-            authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
-          }
-        }));
-      }
-      next();
-    },
-    function(req, res, next) {
-      const authOptions = assignIn({}, req.idp.options);
-      authOptions.RelayState = req.session.ssoResponse.state;
-      authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-      samlp.auth(authOptions)(req, res);
-    }
+    processAcs(acsUrl)
+  );
+  app.post(
+    getPath(acsUrl),
+    processAcs(acsUrl)
   );
 };
