@@ -21,8 +21,12 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   const metricsMiddleware = promBundle({
     includeMethod: true,
     includePath: true,
-    customLabels: {app: 'saml_proxy'}
-  })
+    customLabels: {app: 'saml_proxy'},
+    normalizePath: [
+      ['^/(img|fonts|~font-awesome)/.*', '/samlproxy/idp/#static'],
+      ['^/samlproxy/idp/(img|fonts|~font-awesome)/.*', '/samlproxy/idp/#static']
+    ]
+  });
   app.set('port', process.env.PORT || argv.port);
   app.set('views', path.join(process.cwd(), './views'));
 
