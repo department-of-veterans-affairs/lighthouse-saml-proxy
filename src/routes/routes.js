@@ -32,7 +32,6 @@ export default function addRoutes(app, idpConfig, spConfig) {
 
   app.get(SP_METADATA_URL, function(req, res, next) {
     const xml = METADATA_TEMPLATE(spConfig.getMetadataParams(req));
-    console.log(xml);
     res.set('Content-Type', 'text/xml');
     res.send(xml);
   });
