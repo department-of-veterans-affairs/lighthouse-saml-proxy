@@ -20,7 +20,6 @@ SimpleProfileMapper.prototype.getClaims = function() {
     }
   });
 
-  console.log(claims);
   return Object.keys(claims).length && claims;
 };
 
