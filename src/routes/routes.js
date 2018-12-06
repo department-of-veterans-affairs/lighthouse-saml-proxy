@@ -37,6 +37,10 @@ export default function addRoutes(app, idpConfig, spConfig) {
     res.send(xml);
   });
 
+  app.get('/identity-verification', function(req, res){
+    res.render('verification', { title: 'my other page', layout: 'layout' });
+  })
+
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
 
   return app;
