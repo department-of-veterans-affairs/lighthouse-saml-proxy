@@ -24,7 +24,6 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
-          sh 'cd saml-proxy/'
           sh 'npm install'
           sh 'npm run-script ci'
         }
