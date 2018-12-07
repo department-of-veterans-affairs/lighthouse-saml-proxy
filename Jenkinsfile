@@ -24,6 +24,8 @@ pipeline {
 
       steps {
         withEnv(['CI=true']) {
+          sh 'pwd'
+          sh 'ls'
           sh 'npm install'
           sh 'npm run-script ci'
         }
