@@ -18,6 +18,7 @@ pipeline {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
+          dir "saml-proxy"
         }
       }
 
