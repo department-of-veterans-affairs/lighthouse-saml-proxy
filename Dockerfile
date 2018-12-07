@@ -14,5 +14,7 @@ ADD ./ .
 EXPOSE 7000 7000
 
 RUN ./node_modules/.bin/tsc
+HEALTHCHECK --interval=1m --timeout=4s \
+  CMD curl -f http://localhost:7000/samlproxy/idp/metadata || exit 1
 
 ENTRYPOINT ["node", "build/app.js"]
