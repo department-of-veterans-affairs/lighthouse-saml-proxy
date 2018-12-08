@@ -8,7 +8,7 @@ function processArgs() {
       port: {
         description: 'Port for Proxy to list',
         required: true,
-        default: 8080,
+        default: 7100,
       },
       redirect_uri: {
         description: 'URI to use to hijack upstream redirects',

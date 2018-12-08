@@ -41,6 +41,11 @@ function startApp(issuer) {
   const { port } = config;
   app.use(bodyParser.urlencoded());
 
+  app.get('/.well-known/openid-configuration.json', (req, res) => {
+    const metadata = {...issuer.metadata, ...metadataRewrite }
+    res.send(issuer.metadata);
+  });
+
   app.get('/.well-known/smart-configuration.json', (req, res) => {
     const metadata = {...issuer.metadata, ...metadataRewrite }
     res.send(metadataRemove.reduce((meta, keyToRemove) => {

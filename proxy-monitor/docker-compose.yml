@@ -1,0 +1,9 @@
+version: '2.1'
+services:
+  app:
+    build: .
+    ports:
+      - "7200:7200"
+    volumes:
+      - .:/opt/app
+    command: "--config dev-config.json"

@@ -16,7 +16,7 @@ services:
     depends_on:
       - dynamodb
     ports:
-      - "8080:8080"
+      - "7100:7100"
     volumes:
       - .:/opt/app
     command: "--config dev-config.json"
