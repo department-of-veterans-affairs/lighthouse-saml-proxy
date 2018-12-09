@@ -4,6 +4,7 @@ const process = require('process');
 const { URL, URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
 const request = require('request');
+const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli')
 
@@ -77,7 +78,7 @@ async function createIssuer() {
 function startApp(issuer) {
   const app = express();
   const { port } = config;
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
   app.get(well_known_base_path + '/.well-known/openid-configuration.json', (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
@@ -108,7 +109,7 @@ function startApp(issuer) {
     req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
-  app.get(appRoutes.introspection, async (req, res) => {
+  app.post(appRoutes.introspection, async (req, res) => {
     console.log(req.url, req.query);
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
@@ -135,7 +136,6 @@ function startApp(issuer) {
 
   app.post(appRoutes.token, async (req, res) => {
     console.log(req.url, req.query);
-    debugger;
     const [ client_id, client_secret ] = Buffer.from(
       req.headers.authorization.match(/^Basic\s(.*)$/)[1], 'base64'
     ).toString('utf-8').split(':');
@@ -158,7 +158,6 @@ function startApp(issuer) {
       tokens = await client.grant(
         {...req.body, redirect_uri }
       );
-      debugger;
       const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
       state = document.state.S;
       await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
@@ -166,9 +165,10 @@ function startApp(issuer) {
       throw Error('Unsupported Grant Type');
     }
 
-    const tokenData = await client.introspect(tokens.access_token);
-    if (tokenData.scope.split(' ').indexOf('launch/patient') > -1) {
-      const { patient } = tokenData;
+    var decoded = jwtDecode(tokens.access_token);
+    //const tokenData = await client.introspect(tokens.access_token);
+    if (decoded.scp.indexOf('launch/patient') > -1) {
+      const patient = decoded.patient;
       res.json({...tokens, patient, state});
     } else {
       res.json({...tokens, state});
