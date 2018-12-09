@@ -10,17 +10,9 @@ function processArgs() {
         required: true,
         default: 7100,
       },
-      redirect_uri: {
-        description: 'URI to use to hijack upstream redirects',
-        required: true,
-      },
-      authorization_endpoint: {
-        description: 'URI to replace authorization endpoint metadata with',
-        required: true,
-      },
-      token_endpoint: {
-        description: 'URI to replace token endpoint metadata with',
-        required: true,
+      host: {
+        description: 'host of oauth-proxy in the form of protocol://domain:port',
+        required: true
       },
       upstream_issuer: {
         description: 'URI of upstream issuer to be proxies',
@@ -44,6 +36,14 @@ function processArgs() {
       dynamo_local: {
         description: "flag to use local DynamoDB instance",
         required: false,
+      },
+      okta_url: {
+        description: "base URL of okta organization",
+        required: true,
+      },
+      okta_token: {
+        description: "okta API token",
+        required: true,
       }
     })
     .wrap(yargs.terminalWidth())

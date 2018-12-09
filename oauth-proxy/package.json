@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/department-of-veterans-affairs/oauth-proxy#readme",
   "dependencies": {
+    "@okta/okta-sdk-nodejs": "^1.2.0",
     "aws-sdk": "^2.372.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",

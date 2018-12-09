@@ -7,24 +7,31 @@ const request = require('request');
 const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli')
+const okta = require('@okta/okta-sdk-nodejs');
 
 const config = processArgs();
-const { redirect_uri, well_known_base_path } = config;
-const metadataRewrite = {
-  authorization_endpoint: config.authorization_endpoint,
-  token_endpoint: config.token_endpoint,
-  userinfo_endpoint: config.userinfo_endpoint,
-  introspection_endpoint: config.introspection_endpoint,
-  jwks_uri: config.jwks_uri,
-}
+const oktaClient = new okta.Client({
+  orgUrl: config.okta_url,
+  token: config.okta_token,
+  requestExecutor: new okta.DefaultRequestExecutor()
+});
+const { well_known_base_path } = config;
 const appRoutes = {
-  authorize: new URL(config.authorization_endpoint).pathname,
-  token: new URL(config.token_endpoint).pathname,
-  userinfo: new URL(config.userinfo_endpoint).pathname,
-  introspection: new URL(config.introspection_endpoint).pathname,
-  jwks: new URL(config.jwks_uri).pathname,
-  redirect: new URL(config.redirect_uri).pathname,
-}
+  authorize: '/authorization',
+  token: '/token',
+  userinfo: '/userinfo',
+  introspection: 'introspect',
+  jwks: '/keys',
+  redirect: '/redirect'
+};
+const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
+const metadataRewrite = {
+  authorization_endpoint: `${config.host}${well_known_base_path}${appRoutes.authorize}`,
+  token_endpoint: `${config.host}${well_known_base_path}${appRoutes.token}`,
+  userinfo_endpoint: `${config.host}${well_known_base_path}${appRoutes.userinfo}`,
+  introspection_endpoint: `${config.host}${well_known_base_path}${appRoutes.introspection}`,
+  jwks_uri: `${config.host}${well_known_base_path}${appRoutes.jwks}`,
+};
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
@@ -79,9 +86,10 @@ async function createIssuer() {
 function startApp(issuer) {
   const app = express();
   const { port } = config;
-  app.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
+  const router = new express.Router();
+  router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
-  app.get(well_known_base_path + '/.well-known/openid-configuration.json', (req, res) => {
+  router.get('/.well-known/openid-configuration.json', (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
@@ -91,7 +99,7 @@ function startApp(issuer) {
     res.json(filteredMetadata);
   });
 
-  app.get(well_known_base_path + '/.well-known/smart-configuration.json', (req, res) => {
+  router.get('/.well-known/smart-configuration.json', (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = smartMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
@@ -101,20 +109,20 @@ function startApp(issuer) {
     res.json(filteredMetadata);
   });
 
-  app.get(appRoutes.jwks, async (req, res) => {
+  router.get(appRoutes.jwks, async (req, res) => {
     req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
   });
 
-  app.get(appRoutes.userinfo, async (req, res) => {
+  router.get(appRoutes.userinfo, async (req, res) => {
     console.log(req.url, req.query);
     req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
-  app.post(appRoutes.introspection, async (req, res) => {
+  router.post(appRoutes.introspection, async (req, res) => {
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
-  app.get(appRoutes.redirect, async (req, res) => {
+  router.get(appRoutes.redirect, async (req, res) => {
     const { state } = req.query;
     if (!req.query.hasOwnProperty('error')) {
       try {
@@ -125,18 +133,35 @@ function startApp(issuer) {
     }
     try {
       const document = await dynamoClient.getFromDynamoByState(dynamo, state);
+      const params = new URLSearchParams(req.query);
+      res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error; // This error is actually unrecoverable because we can't look up the original redirect.
     }
-    const params = new URLSearchParams(req.query);
-    res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
   });
 
-  app.get(appRoutes.authorize, async (req, res) => {
+  router.get(appRoutes.authorize, async (req, res) => {
     console.log(req.url, req.query);
-    const { state } = req.query;
+    const { state, client_id, redirect_uri: client_redirect } = req.query;
     try {
-      await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", req.query.redirect_uri)
+      const oktaApp = await oktaClient.getApplication(client_id);
+      if (oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1) {
+        const errorParams = new URLSearchParams({
+          error: 'invalid_client',
+          error_description: 'The specified client is not valid',
+        });
+        res.redirect(`${client_redirect}?${errorParams.toString()}`);
+      }
+    } catch (error) {
+      console.error(error);
+      // This error is unrecoverable because we would be unable to verify
+      // that we are redirecting to a whitelisted client url
+      throw error;
+    }
+
+    try {
+      await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
       console.error(error);
     }
@@ -145,7 +170,7 @@ function startApp(issuer) {
     res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
   });
 
-  app.post(appRoutes.token, async (req, res) => {
+  router.post(appRoutes.token, async (req, res) => {
     const [ client_id, client_secret ] = Buffer.from(
       req.headers.authorization.match(/^Basic\s(.*)$/)[1], 'base64'
     ).toString('utf-8').split(':');
@@ -186,7 +211,7 @@ function startApp(issuer) {
     }
 
     var decoded = jwtDecode(tokens.access_token);
-    //const tokenData = await client.introspect(tokens.access_token);
+    // const tokenData = await client.introspect(tokens.access_token);
     if (decoded.scp.indexOf('launch/patient') > -1) {
       const patient = decoded.patient;
       res.json({...tokens, patient, state});
@@ -195,6 +220,7 @@ function startApp(issuer) {
     }
   });
 
+  app.use(well_known_base_path, router)
   app.listen(port, () => console.log(`OAuth Proxy listening on port ${port}!`));
   return app;
 }
