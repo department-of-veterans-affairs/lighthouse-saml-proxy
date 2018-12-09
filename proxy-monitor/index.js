@@ -26,7 +26,7 @@ function startApp() {
     const saml = await ping(saml_proxy_endpoint);
     const oauth = await ping(oauth_proxy_endpoint);
 
-    if (samlStatus === 'ok' && oauthStatus == 'ok') {
+    if (saml === 'ok' && oauth == 'ok') {
       res.status(200).json({saml, oauth});
     } else {
       res.status(500).json({saml, oauth});
