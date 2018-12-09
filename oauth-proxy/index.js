@@ -59,7 +59,7 @@ const smartCapabilities = [
   "client-confidential-symmetric",
   "context-standalone-patient",
   "permission-offline",
-  "permission-patient", 
+  "permission-patient",
 ]
 
 const dynamo = dynamoClient.createClient(
@@ -87,8 +87,8 @@ function startApp(issuer) {
       meta[key] = baseMetadata[key];
       return meta;
     }, {});
-    
-    res.send(filteredMetadata);
+
+    res.json(filteredMetadata);
   });
 
   app.get(well_known_base_path + '/.well-known/smart-configuration.json', (req, res) => {
@@ -98,7 +98,7 @@ function startApp(issuer) {
       return meta;
     }, {});
     filteredMetadata['capabilities'] = smartCapabilities;
-    res.send(filteredMetadata);
+    res.json(filteredMetadata);
   });
 
   app.get(appRoutes.jwks, async (req, res) => {
