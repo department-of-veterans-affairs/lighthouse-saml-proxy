@@ -3,26 +3,64 @@ const { Issuer } = require('openid-client');
 const process = require('process');
 const { URL, URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
+const request = require('request');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli')
 
 const config = processArgs();
-const { redirect_uri } = config;
+const { redirect_uri, well_known_base_path } = config;
 const metadataRewrite = {
   authorization_endpoint: config.authorization_endpoint,
   token_endpoint: config.token_endpoint,
+  userinfo_endpoint: config.userinfo_endpoint,
+  introspection_endpoint: config.introspection_endpoint,
+  jwks_uri: config.jwks_uri,
 }
 const appRoutes = {
   authorize: new URL(config.authorization_endpoint).pathname,
   token: new URL(config.token_endpoint).pathname,
+  userinfo: new URL(config.userinfo_endpoint).pathname,
+  introspection: new URL(config.introspection_endpoint).pathname,
+  jwks: new URL(config.jwks_uri).pathname,
   redirect: new URL(config.redirect_uri).pathname,
 }
-const metadataRemove = [
-  "request_uri_parameter_supported",
-  "require_request_uri_registration",
-  "claim_types_supported",
-  "claims_parameter_supported",
+const openidMetadataWhitelist = [
+  "issuer",
+  "authorization_endpoint",
+  "token_endpoint",
+  "userinfo_endpoint",
+  "introspection_endpoint",
+  "jwks_uri",
+  "scopes_supported",
+  "response_types_supported",
+  "response_modes_supported",
+  "grant_types_supported",
+  "subject_types_supported",
+  "id_token_signing_alg_values_supported",
+  "scopes_supported",
+  "token_endpoint_auth_methods_supported",
+  "claims_supported",
+  "code_challenge_methods_supported",
+  "introspection_endpoint_auth_methods_supported",
+  "request_parameter_supported",
+  "request_object_signing_alg_values_supported",
 ]
+
+const smartMetadataWhitelist = [
+  "authorization_endpoint",
+  "token_endpoint",
+  "introspection_endpoint",
+  "scopes_supported",
+  "response_types_supported",
+]
+const smartCapabilities = [
+  "launch-standalone",
+  "client-confidential-symmetric",
+  "context-standalone-patient",
+  "permission-offline",
+  "permission-patient", 
+]
+
 const dynamo = dynamoClient.createClient(
   {
     accessKeyId: config.aws_id,
@@ -39,30 +77,55 @@ async function createIssuer() {
 function startApp(issuer) {
   const app = express();
   const { port } = config;
-  app.use(bodyParser.urlencoded());
+  app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/.well-known/openid-configuration.json', (req, res) => {
-    const metadata = {...issuer.metadata, ...metadataRewrite }
-    res.send(issuer.metadata);
+  app.get(well_known_base_path + '/.well-known/openid-configuration.json', (req, res) => {
+    const baseMetadata = {...issuer.metadata, ...metadataRewrite }
+    const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
+      meta[key] = baseMetadata[key];
+      return meta;
+    }, {});
+    
+    res.send(filteredMetadata);
   });
 
-  app.get('/.well-known/smart-configuration.json', (req, res) => {
-    const metadata = {...issuer.metadata, ...metadataRewrite }
-    res.send(metadataRemove.reduce((meta, keyToRemove) => {
-      delete meta[keyToRemove];
+  app.get(well_known_base_path + '/.well-known/smart-configuration.json', (req, res) => {
+    const baseMetadata = {...issuer.metadata, ...metadataRewrite }
+    const filteredMetadata = smartMetadataWhitelist.reduce((meta, key) => {
+      meta[key] = baseMetadata[key];
       return meta;
-    }, metadata));
+    }, {});
+    filteredMetadata['capabilities'] = smartCapabilities;
+    res.send(filteredMetadata);
+  });
+
+  app.get(appRoutes.jwks, async (req, res) => {
+    req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
+  });
+
+  app.get(appRoutes.userinfo, async (req, res) => {
+    console.log(req.url, req.query);
+    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
+  });
+
+  app.get(appRoutes.introspection, async (req, res) => {
+    console.log(req.url, req.query);
+    req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
   app.get(appRoutes.redirect, async (req, res) => {
+    console.log(req.url, req.query);
     const { state } = req.query;
-    await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
-    const params = new URLSearchParams(req.query);
+    if (!req.query.hasOwnProperty('error')) {
+      await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
+    }
     const document = await dynamoClient.getFromDynamoByState(dynamo, state);
+    const params = new URLSearchParams(req.query);
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
   });
 
   app.get(appRoutes.authorize, async (req, res) => {
+    console.log(req.url, req.query);
     const { state } = req.query;
     await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", req.query.redirect_uri)
     const params = new URLSearchParams(req.query);
@@ -71,6 +134,8 @@ function startApp(issuer) {
   });
 
   app.post(appRoutes.token, async (req, res) => {
+    console.log(req.url, req.query);
+    debugger;
     const [ client_id, client_secret ] = Buffer.from(
       req.headers.authorization.match(/^Basic\s(.*)$/)[1], 'base64'
     ).toString('utf-8').split(':');
@@ -93,6 +158,7 @@ function startApp(issuer) {
       tokens = await client.grant(
         {...req.body, redirect_uri }
       );
+      debugger;
       const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
       state = document.state.S;
       await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
