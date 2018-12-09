@@ -5,6 +5,7 @@ WORKDIR /opt/app/
 
 RUN apk add git python make g++
 RUN git config --global url."https://".insteadOf git://
+RUN git config --global url."https://".insteadOf ssh://git@
 ADD ./package.json package.json
 ADD ./package-lock.json package-lock.json
 RUN npm install

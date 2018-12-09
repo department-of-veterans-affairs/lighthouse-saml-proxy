@@ -11,7 +11,7 @@ services:
     volumes: 
       - .:/opt/
     command: sh -c "cd /opt && npm install && node dynamo_schema.js"
-  app:
+  oauth-proxy:
     build: .
     depends_on:
       - dynamodb
