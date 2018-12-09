@@ -111,17 +111,23 @@ function startApp(issuer) {
   });
 
   app.post(appRoutes.introspection, async (req, res) => {
-    console.log(req.url, req.query);
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
   app.get(appRoutes.redirect, async (req, res) => {
-    console.log(req.url, req.query);
     const { state } = req.query;
     if (!req.query.hasOwnProperty('error')) {
-      await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
+      try {
+        await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
+      } catch (error) {
+        console.log(error);
+      }
     }
-    const document = await dynamoClient.getFromDynamoByState(dynamo, state);
+    try {
+      const document = await dynamoClient.getFromDynamoByState(dynamo, state);
+    } catch (error) {
+      console.log(error);
+    }
     const params = new URLSearchParams(req.query);
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
   });
@@ -129,14 +135,17 @@ function startApp(issuer) {
   app.get(appRoutes.authorize, async (req, res) => {
     console.log(req.url, req.query);
     const { state } = req.query;
-    await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", req.query.redirect_uri)
+    try {
+      await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", req.query.redirect_uri)
+    } catch (error) {
+      console.error(error);
+    }
     const params = new URLSearchParams(req.query);
     params.set('redirect_uri', redirect_uri);
     res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
   });
 
   app.post(appRoutes.token, async (req, res) => {
-    console.log(req.url, req.query);
     const [ client_id, client_secret ] = Buffer.from(
       req.headers.authorization.match(/^Basic\s(.*)$/)[1], 'base64'
     ).toString('utf-8').split(':');
@@ -152,16 +161,26 @@ function startApp(issuer) {
     let tokens, state;
     if (req.body.grant_type === 'refresh_token') {
       tokens = await client.refresh(req.body.refresh_token);
-      const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
-      state = document.state.S;
-      await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+      try {
+        const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
+        state = document.state.S;
+        await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+      } catch (error) {
+        console.error(error);
+        state = null;
+      }
     } else if (req.body.grant_type === 'authorization_code') {
       tokens = await client.grant(
         {...req.body, redirect_uri }
       );
-      const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
-      state = document.state.S;
-      await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+      try {
+        const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
+        state = document.state.S;
+        await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+      } catch (error) {
+        console.error(error);
+        state = null;
+      }
     } else {
       throw Error('Unsupported Grant Type');
     }
