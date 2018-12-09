@@ -21,7 +21,7 @@ const appRoutes = {
   authorize: '/authorization',
   token: '/token',
   userinfo: '/userinfo',
-  introspection: 'introspect',
+  introspection: '/introspect',
   jwks: '/keys',
   redirect: '/redirect'
 };
