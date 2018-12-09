@@ -69,6 +69,7 @@ const dynamo = dynamoClient.createClient(
     secretAccessKey: config.aws_secret,
   },
   config.dynamo_local,
+  config.dynamo_table_name,
 );
 
 async function createIssuer() {
