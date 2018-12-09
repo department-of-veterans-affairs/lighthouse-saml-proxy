@@ -138,7 +138,7 @@ function startApp(issuer) {
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
       console.error(error);
-      throw error; // This error is actually unrecoverable because we can't look up the original redirect.
+      throw error; // This error is unrecoverable because we can't look up the original redirect.
     }
   });
 
@@ -164,6 +164,7 @@ function startApp(issuer) {
       await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
       console.error(error);
+      throw error; // This error is unrecoverable because we can't create a record to lookup the requested redirect
     }
     const params = new URLSearchParams(req.query);
     params.set('redirect_uri', redirect_uri);
