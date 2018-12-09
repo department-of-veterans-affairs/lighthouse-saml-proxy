@@ -8,6 +8,7 @@ const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli')
 const okta = require('@okta/okta-sdk-nodejs');
+const morgan = require('morgan');
 
 const config = processArgs();
 const oktaClient = new okta.Client({
@@ -87,6 +88,7 @@ function startApp(issuer) {
   const app = express();
   const { port } = config;
   const router = new express.Router();
+  app.use(morgan('combined'));
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
   router.get('/.well-known/openid-configuration.json', (req, res) => {
@@ -114,7 +116,6 @@ function startApp(issuer) {
   });
 
   router.get(appRoutes.userinfo, async (req, res) => {
-    console.log(req.url, req.query);
     req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
@@ -128,7 +129,7 @@ function startApp(issuer) {
       try {
         await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     try {
@@ -142,7 +143,6 @@ function startApp(issuer) {
   });
 
   router.get(appRoutes.authorize, async (req, res) => {
-    console.log(req.url, req.query);
     const { state, client_id, redirect_uri: client_redirect } = req.query;
     try {
       const oktaApp = await oktaClient.getApplication(client_id);
@@ -211,7 +211,6 @@ function startApp(issuer) {
     }
 
     var decoded = jwtDecode(tokens.access_token);
-    // const tokenData = await client.introspect(tokens.access_token);
     if (decoded.scp.indexOf('launch/patient') > -1) {
       const patient = decoded.patient;
       res.json({...tokens, patient, state});
