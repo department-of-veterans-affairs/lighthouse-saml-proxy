@@ -20,13 +20,13 @@ function processArgs() {
       },
       aws_secret: {
         description: "AWS Secret Access Key",
-        required: true,
-        default: 'NONE',
+        required: false,
+        default: null,
       },
       aws_id: {
         description: "AWS Access ID",
-        required: true,
-        default: 'NONE',
+        required: false,
+        default: null,
       },
       aws_region: {
         description: "AWS Region",
