@@ -1,0 +1,7 @@
+version: '2.1'
+services:
+  saml-proxy:
+    build: .
+    ports:
+      - "7000:7000"
+    net: "host"

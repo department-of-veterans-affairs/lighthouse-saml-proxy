@@ -1,0 +1,22 @@
+version: '2.1'
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - 8000:8000
+  dynamodb-migration:
+    image: node:alpine
+    depends_on:
+      - dynamodb
+    volumes: 
+      - .:/opt/
+    command: sh -c "cd /opt && npm install && node dynamo_schema.js"
+  oauth-proxy:
+    build: .
+    depends_on:
+      - dynamodb
+    ports:
+      - "7100:7100"
+    volumes:
+      - .:/opt/app
+    command: "--config dev-config.json"
