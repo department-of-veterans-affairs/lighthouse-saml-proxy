@@ -71,11 +71,11 @@ const smartCapabilities = [
 ]
 
 const dynamo = dynamoClient.createClient(
-  {
-    accessKeyId: config.aws_id,
-    region: config.aws_region,
-    secretAccessKey: config.aws_secret,
-  },
+  Object.assign({},
+    { region: config.aws_region },
+    config.aws_id === null ? null : { accessKeyId: config.aws_id },
+    config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
+  ),
   config.dynamo_local,
   config.dynamo_table_name,
 );
