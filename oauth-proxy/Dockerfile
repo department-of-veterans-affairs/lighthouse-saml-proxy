@@ -13,6 +13,6 @@ ADD ./ .
 
 EXPOSE 7100 7100
 HEALTHCHECK --interval=1m --timeout=4s \
-  CMD curl -f http://localhost:7100/.well-known/smart-configuration.json || exit 1
+  CMD curl -f http://localhost:7100/oauth2/.well-known/openid-configuration || exit 1
 
 ENTRYPOINT ["node", "index.js"]
