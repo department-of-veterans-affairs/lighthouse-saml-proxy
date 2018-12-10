@@ -91,7 +91,7 @@ function startApp(issuer) {
   app.use(morgan('combined'));
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
-  router.get('/.well-known/openid-configuration.json', (req, res) => {
+  router.get('/.well-known/openid-configuration', (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
