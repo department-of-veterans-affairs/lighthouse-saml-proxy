@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>ReferenceError: metatada is not defined<br> &nbsp; &nbsp;at app.get (/home/edward/Projects/oauth-proxy/index.js:34:8)<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/layer.js:95:5)<br> &nbsp; &nbsp;at next (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/route.js:137:13)<br> &nbsp; &nbsp;at Route.dispatch (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/route.js:112:3)<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/layer.js:95:5)<br> &nbsp; &nbsp;at /home/edward/Projects/oauth-proxy/node_modules/express/lib/router/index.js:281:22<br> &nbsp; &nbsp;at Function.process_params (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/index.js:335:12)<br> &nbsp; &nbsp;at next (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/index.js:275:10)<br> &nbsp; &nbsp;at session (/home/edward/Projects/oauth-proxy/node_modules/express-session/index.js:454:7)<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (/home/edward/Projects/oauth-proxy/node_modules/express/lib/router/layer.js:95:5)</pre>
+</body>
+</html>

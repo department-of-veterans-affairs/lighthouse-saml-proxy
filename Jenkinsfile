@@ -18,19 +18,19 @@ pipeline {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
+          dir "saml-proxy"
         }
       }
 
       steps {
         withEnv(['CI=true']) {
-          sh 'pwd'
-          sh 'npm install'
-          sh 'npm run-script ci'
+          sh 'cd saml-proxy && npm install'
+          sh 'cd saml-proxy && npm run-script ci'
         }
       }
       post {
         always {
-          junit 'test-report.xml'
+          junit 'saml-proxy/test-report.xml'
         }
       }
     }

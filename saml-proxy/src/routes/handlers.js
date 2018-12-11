@@ -186,7 +186,6 @@ const processAcs = (acsUrl) => [
     const authOptions = assignIn({}, req.idp.options);
     authOptions.RelayState = req.session.ssoResponse.state;
     authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-    console.log(req.user);
     samlp.auth(authOptions)(req, res);
   }
 ];
