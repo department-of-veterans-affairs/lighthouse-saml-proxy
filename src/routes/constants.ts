@@ -5,3 +5,4 @@ export const IDP_SIGN_IN = '/samlproxy/idp/signin';
 export const SP_LOGIN_URL ='/samlproxy/sp/login';
 export const SP_METADATA_URL = '/samlproxy/sp/metadata';
 export const SP_ERROR_URL = '/samlproxy/sp/error';
+export const SP_NOT_SUFFICIANT_LOA = '/samlproxy/sp/not_sufficiant_loa';

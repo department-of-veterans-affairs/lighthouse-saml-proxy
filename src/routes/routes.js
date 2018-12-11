@@ -2,6 +2,7 @@ import { IDP_SSO,
          IDP_METADATA,
          IDP_REDIRECT,
          SP_METADATA_URL,
+         SP_NOT_SUFFICIANT_LOA,
          IDP_SIGN_IN } from "./constants";
 
 import { acsFactory,
@@ -37,8 +38,8 @@ export default function addRoutes(app, idpConfig, spConfig) {
     res.send(xml);
   });
 
-  app.get('/identity-verification', function(req, res){
-    res.render('verification', { title: 'my other page', layout: 'layout' });
+  app.get(SP_NOT_SUFFICIANT_LOA, function(req, res){
+    res.render('verification', { title: 'Verify Your Identity', layout: 'layout' });
   })
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
