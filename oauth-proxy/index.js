@@ -172,13 +172,15 @@ function startApp(issuer) {
   });
 
   router.post(appRoutes.token, async (req, res, next) => {
-    const authHeaderCheck = req.headers.authorization.match(/^Basic\s(.*)$/);
     let client_id, client_secret;
 
-    if (authHeaderCheck) {
-      ([ client_id, client_secret ] = Buffer.from(authHeaderCheck[1], 'base64').toString('utf-8').split(':'));
+    if (req.headers.authorization) {
+      const authHeader = req.headers.authorization.match(/^Basic\s(.*)$/);
+      ([ client_id, client_secret ] = Buffer.from(authHeader[1], 'base64').toString('utf-8').split(':'));
     } else if (req.body.client_id && req.body.client_secret) {
       ({ client_id, client_secret } = req.body);
+      delete req.body.client_id;
+      delete req.body.client_secret;
     } else {
       return res.status(401).json({
         error: "invalid_client",
@@ -212,7 +214,9 @@ function startApp(issuer) {
       try {
         const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
         state = document.state.S;
-        await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+        if (tokens.refresh_token) {
+          await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+        }
       } catch (error) {
         console.error(error);
         state = null;
