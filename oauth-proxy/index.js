@@ -123,7 +123,7 @@ function startApp(issuer) {
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
-  router.get(appRoutes.redirect, async (req, res) => {
+  router.get(appRoutes.redirect, async (req, res, next) => {
     const { state } = req.query;
     if (!req.query.hasOwnProperty('error')) {
       try {
@@ -138,11 +138,11 @@ function startApp(issuer) {
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
       console.error(error);
-      throw error; // This error is unrecoverable because we can't look up the original redirect.
+      next(error); // This error is unrecoverable because we can't look up the original redirect.
     }
   });
 
-  router.get(appRoutes.authorize, async (req, res) => {
+  router.get(appRoutes.authorize, async (req, res, next) => {
     const { state, client_id, redirect_uri: client_redirect } = req.query;
     try {
       const oktaApp = await oktaClient.getApplication(client_id);
@@ -151,30 +151,40 @@ function startApp(issuer) {
           error: 'invalid_client',
           error_description: 'The specified client is not valid',
         });
-        res.redirect(`${client_redirect}?${errorParams.toString()}`);
+        return res.redirect(`${client_redirect}?${errorParams.toString()}`);
       }
     } catch (error) {
       console.error(error);
       // This error is unrecoverable because we would be unable to verify
       // that we are redirecting to a whitelisted client url
-      throw error;
+      next(error);
     }
 
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
       console.error(error);
-      throw error; // This error is unrecoverable because we can't create a record to lookup the requested redirect
+      next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
     }
     const params = new URLSearchParams(req.query);
     params.set('redirect_uri', redirect_uri);
     res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
   });
 
-  router.post(appRoutes.token, async (req, res) => {
-    const [ client_id, client_secret ] = Buffer.from(
-      req.headers.authorization.match(/^Basic\s(.*)$/)[1], 'base64'
-    ).toString('utf-8').split(':');
+  router.post(appRoutes.token, async (req, res, next) => {
+    const authHeaderCheck = req.headers.authorization.match(/^Basic\s(.*)$/);
+    let client_id, client_secret;
+
+    if (authHeaderCheck) {
+      ([ client_id, client_secret ] = Buffer.from(authHeaderCheck[1], 'base64').toString('utf-8').split(':'));
+    } else if (req.body.client_id && req.body.client_secret) {
+      ({ client_id, client_secret } = req.body);
+    } else {
+      return res.status(401).json({
+        error: "invalid_client",
+        error_description: "Client authentication failed",
+      });
+    }
 
     const client = new issuer.Client({
       client_id,
@@ -208,7 +218,10 @@ function startApp(issuer) {
         state = null;
       }
     } else {
-      throw Error('Unsupported Grant Type');
+      return res.status(400).json({
+        error: "unsupported_grant_type",
+        error_description: "Only authorization and refresh_token grant types are supported",
+      });
     }
 
     var decoded = jwtDecode(tokens.access_token);
