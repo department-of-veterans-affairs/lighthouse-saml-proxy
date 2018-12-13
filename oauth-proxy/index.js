@@ -9,6 +9,7 @@ const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli')
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
+const requestPromise = require('request-promise-native');
 
 const config = processArgs();
 const oktaClient = new okta.Client({
@@ -230,8 +231,27 @@ function startApp(issuer) {
 
     var decoded = jwtDecode(tokens.access_token);
     if (decoded.scp.indexOf('launch/patient') > -1) {
-      const patient = decoded.patient;
-      res.json({...tokens, patient, state});
+      try {
+        const response = await requestPromise({
+          method: 'GET',
+          uri: config.validate_endpoint,
+          json: true,
+          headers: {
+            apiKey: config.validate_apiKey,
+            authorization: `Bearer ${tokens.access_token}`,
+          }
+        });
+        const patient = response.data.attributes.va_identifiers.icn;
+        console.log({...tokens, patient, state});
+        res.json({...tokens, patient, state});
+      } catch (err) {
+        console.error(err):
+
+        res.status(400).json({
+          error: "invalid_grant",
+          error_description: "We were unable to find a valid patient identifier for the provided authorization code.",
+        });
+      }
     } else {
       res.json({...tokens, state});
     }
