@@ -245,7 +245,7 @@ function startApp(issuer) {
         console.log({...tokens, patient, state});
         res.json({...tokens, patient, state});
       } catch (err) {
-        console.error(err):
+        console.error(err);
 
         res.status(400).json({
           error: "invalid_grant",
