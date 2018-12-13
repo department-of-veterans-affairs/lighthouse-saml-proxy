@@ -240,9 +240,17 @@ function startApp(issuer) {
           authorization: `Bearer ${tokens.access_token}`,
         }
       });
-      const patient = response.data.attributes.va_identifiers.icn;
-      console.log({...tokens, patient, state});
-      res.json({...tokens, patient, state});
+      if (response.errors) {
+        // This isn't right
+        res.json({ errors: response.errors });
+      } else if (response.data && response.data.attributes.va_identifiers.icn) {
+        const patient = response.data.attributes.va_identifiers.icn;
+        console.log({...tokens, patient, state});
+        res.json({...tokens, patient, state});
+      } else {
+        // This isn't right
+        next(new Error('Failure??'))
+      }
     } else {
       res.json({...tokens, state});
     }
