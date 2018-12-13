@@ -44,6 +44,14 @@ function processArgs() {
       okta_token: {
         description: "okta API token",
         required: true,
+      },
+      validate_endpoint: {
+        description: 'va.gov token validation endpoint',
+        required: true,
+        default: 'https://dev-api.va.gov/internal/auth/v0/validation'
+      },
+      validate_apiKey: {
+        description: 'apiKey permitting access to validate endpoint',
       }
     })
     .wrap(yargs.terminalWidth())
