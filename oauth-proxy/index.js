@@ -241,15 +241,15 @@ function startApp(issuer) {
         }
       });
       if (response.errors) {
-        // This isn't right
-        res.json({ errors: response.errors });
-      } else if (response.data && response.data.attributes.va_identifiers.icn) {
+        res.status(400).json({
+          error: "invalid_grant",
+          error_description: "We were unable to find a valid patient identifier for the provided authorization code.",
+        });
+
+      } else { // If the request doesn't error we have a valid icn
         const patient = response.data.attributes.va_identifiers.icn;
         console.log({...tokens, patient, state});
         res.json({...tokens, patient, state});
-      } else {
-        // This isn't right
-        next(new Error('Failure??'))
       }
     } else {
       res.json({...tokens, state});
