@@ -67,6 +67,7 @@ function runServer(argv) {
 
       console.log('starting proxy server on port %s', app.get('port'));
 
+      httpServer.keepAliveTimeout = 75000;
       httpServer.listen(app.get('port'), function() {
         const scheme   = argv.idpHttps ? 'https' : 'http',
               address  = httpServer.address(),
