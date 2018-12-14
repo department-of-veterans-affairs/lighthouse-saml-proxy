@@ -274,7 +274,8 @@ function startApp(issuer) {
   });
 
   app.use(well_known_base_path, router)
-  app.listen(port, () => console.log(`OAuth Proxy listening on port ${port}!`));
+  server = app.listen(port, () => console.log(`OAuth Proxy listening on port ${port}!`));
+  server.keepAliveTimeout = 75000;
   return app;
 }
 
