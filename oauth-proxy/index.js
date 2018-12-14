@@ -199,7 +199,15 @@ function startApp(issuer) {
 
     let tokens, state;
     if (req.body.grant_type === 'refresh_token') {
-      tokens = await client.refresh(req.body.refresh_token);
+      try {
+        tokens = await client.refresh(req.body.refresh_token);
+      } catch (error) {
+        console.log(error);
+        res.status(error.response.statusCode).json({
+          error: error.error,
+          error_description: error.error_description,
+        });
+      }
       try {
         const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
         state = document.state.S;
@@ -209,9 +217,17 @@ function startApp(issuer) {
         state = null;
       }
     } else if (req.body.grant_type === 'authorization_code') {
-      tokens = await client.grant(
-        {...req.body, redirect_uri }
-      );
+      try {
+        tokens = await client.grant(
+          {...req.body, redirect_uri }
+        );
+      } catch (error) {
+        console.log(error.response);
+        res.status(error.response.statusCode).json({
+          error: error.error,
+          error_description: error.error_description,
+        });
+      }
       try {
         const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
         state = document.state.S;
