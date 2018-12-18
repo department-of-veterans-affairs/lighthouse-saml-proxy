@@ -2,6 +2,7 @@ import { IDP_SSO,
          IDP_METADATA,
          IDP_REDIRECT,
          SP_METADATA_URL,
+         SP_VERIFY,
          IDP_SIGN_IN } from "./constants";
 
 import { acsFactory,
@@ -21,8 +22,8 @@ const METADATA_TEMPLATE = template(
 );
 
 export default function addRoutes(app, idpConfig, spConfig) {
-  app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
-  app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
+  app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin('login_selection'));
+  app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin('login_selection'));
 
   app.post(IDP_SIGN_IN, idpSignIn);
 
@@ -35,6 +36,8 @@ export default function addRoutes(app, idpConfig, spConfig) {
     res.set('Content-Type', 'text/xml');
     res.send(xml);
   });
+
+  app.get(SP_VERIFY, parseSamlRequest, samlLogin('verify'));
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
 

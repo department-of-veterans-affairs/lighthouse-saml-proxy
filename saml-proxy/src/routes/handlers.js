@@ -1,4 +1,4 @@
-import { IDP_SSO } from "./constants";
+import { IDP_SSO, SP_VERIFY } from "./constants";
 import { getPath, getReqUrl } from "../utils";
 import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
@@ -18,45 +18,48 @@ export const getHashCode = (str) => {
   return hash;
 };
 
-export const samlLogin = function(req, res, next) {
-  const acsUrl = req.query.acsUrl ?
-        getReqUrl(req, req.query.acsUrl) :
-        getReqUrl(req, req.sp.options.requestAcsUrl);
-  const authnRequest = req.authnRequest ? req.authnRequest : req.session.authnRequest;
-  req.authnRequest = authnRequest;
-  const samlp = new _samlp(req.sp.options.getResponseParams(), new SAML.SAML(req.sp.options.getResponseParams()));
 
-  [
-    ['id_me_login_link', 'http://idmanagement.gov/ns/assurance/loa/3'],
-    ['dslogon_login_link', 'dslogon'],
-    ['mhv_login_link', 'myhealthevet'],
-    ['id_me_signup_link', 'http://idmanagement.gov/ns/assurance/loa/3', '&op=signup']
-  ].reduce((memo, [key, authnContext, exParams = null]) => {
-    const params = req.sp.options.getAuthnRequestParams(
-      acsUrl,
-      req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
-      (req.authnRequest && req.authnRequest.relayState) || '/',
-      authnContext
-    );
-    return memo.then((m) => {
-      return new Promise((resolve, reject) => {
-        samlp.getSamlRequestUrl(params, (err, url) => {
-          if (err) {
-            reject(err);
-          }
+export const samlLogin = function(template) {
+  return function(req, res, next) {
+    const acsUrl = req.query.acsUrl ?
+          getReqUrl(req, req.query.acsUrl) :
+          getReqUrl(req, req.sp.options.requestAcsUrl);
+    const authnRequest = req.authnRequest ? req.authnRequest : req.session.authnRequest;
+    req.authnRequest = authnRequest;
+    const samlp = new _samlp(req.sp.options.getResponseParams(), new SAML.SAML(req.sp.options.getResponseParams()));
 
-          if (exParams) {
-            m[key] = url + exParams;
-          } else {
-            m[key] = url;
-          }
-          resolve(m);
+    [
+      ['id_me_login_link', 'http://idmanagement.gov/ns/assurance/loa/3'],
+      ['dslogon_login_link', 'dslogon'],
+      ['mhv_login_link', 'myhealthevet'],
+      ['id_me_signup_link', 'http://idmanagement.gov/ns/assurance/loa/3', '&op=signup']
+    ].reduce((memo, [key, authnContext, exParams = null]) => {
+      const params = req.sp.options.getAuthnRequestParams(
+        acsUrl,
+        req.query.forceauthn === '' || req.query.forceAuthn === '' || req.query.forceauthn || req.query.forceAuthn,
+        (req.authnRequest && req.authnRequest.relayState) || '/',
+        authnContext
+      );
+      return memo.then((m) => {
+        return new Promise((resolve, reject) => {
+          samlp.getSamlRequestUrl(params, (err, url) => {
+            if (err) {
+              reject(err);
+            }
+
+            if (exParams) {
+              m[key] = url + exParams;
+            } else {
+              m[key] = url;
+            }
+            resolve(m);
+          });
         });
       });
-    });
-  }, Promise.resolve({})).then(
-    (authOptions) => res.render('login_selection', authOptions)
-  ).catch(next);
+    }, Promise.resolve({})).then(
+      (authOptions) => res.render(template, authOptions)
+    ).catch(next);
+  }
 };
 
 /**
@@ -156,25 +159,25 @@ const processAcs = (acsUrl) => [
   function (req, res, next) {
     if ((req.method === 'GET' || req.method === 'POST')
         && (req.query && req.query.SAMLResponse)
-        || (req.body && req.body.SAMLResponse)) {
-      const ssoResponse = {
-        state: req.query.RelayState || req.body.RelayState,
-        url: getReqUrl(req, acsUrl)
-      };
-      req.session.ssoResponse = ssoResponse;
+          || (req.body && req.body.SAMLResponse)) {
+            const ssoResponse = {
+              state: req.query.RelayState || req.body.RelayState,
+              url: getReqUrl(req, acsUrl)
+            };
+            req.session.ssoResponse = ssoResponse;
 
-      const params = req.sp.options.getResponseParams(ssoResponse.url);
-      assignIn(req.strategy.options, params);
-      req.passport.authenticate('wsfed-saml2', params)(req, res, next);
-    } else {
-      res.redirect(SP_LOGIN_URL);
-    }
+            const params = req.sp.options.getResponseParams(ssoResponse.url);
+            assignIn(req.strategy.options, params);
+            req.passport.authenticate('wsfed-saml2', params)(req, res, next);
+          } else {
+            res.redirect(SP_LOGIN_URL);
+          }
   },
   function(req, res, next) {
     if (req.user && req.user.claims &&
         !sufficientLevelOfAssurance(req.user.claims)) {
       res.redirect(url.format({
-        pathname: IDP_SSO,
+        pathname: SP_VERIFY,
         query: {
           authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
         }
@@ -200,3 +203,7 @@ export const acsFactory = (app, acsUrl) => {
     processAcs(acsUrl)
   );
 };
+
+const setUpSaml = function(req, res, view) {
+
+}
