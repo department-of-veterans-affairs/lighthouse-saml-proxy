@@ -2,7 +2,7 @@ import { IDP_SSO,
          IDP_METADATA,
          IDP_REDIRECT,
          SP_METADATA_URL,
-         SP_NOT_SUFFICIANT_LOA,
+         SP_VERIFY,
          IDP_SIGN_IN } from "./constants";
 
 import { acsFactory,
