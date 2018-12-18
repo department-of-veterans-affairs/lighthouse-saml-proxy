@@ -37,8 +37,8 @@ export default function addRoutes(app, idpConfig, spConfig) {
     res.send(xml);
   });
 
-  app.get(SP_NOT_SUFFICIANT_LOA, function(req, res){
-    res.render('verification', { title: 'Verify Your Identity', layout: 'layout' });
+  app.get(SP_VERIFY, function(req, res){
+    res.render('verify', { title: 'Verify Your Identity', layout: 'layout' });
   })
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
