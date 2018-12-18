@@ -20,13 +20,13 @@ export function processArgs() {
       idpCert: {
         description: 'IdP Signature PublicKey Certificate',
         required: true,
-        default: path.resolve(cwd(), './idp-public-cert.pem'),
+        default: path.resolve(cwd(), './idp-cert.pem'),
         coerce: makeCertFileCoercer('certificate', 'IdP Signature PublicKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpKey: {
         description: 'IdP Signature PrivateKey Certificate',
         required: true,
-        default: path.resolve(cwd(), './idp-private-key.pem'),
+        default: path.resolve(cwd(), './idp-key.pem'),
         coerce: makeCertFileCoercer('RSA private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpIssuer: {
@@ -254,18 +254,30 @@ export function processArgs() {
         default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
       },
       spCert: {
-        description: 'SP/RP Public Key Signature & Encryption Certificate (PEM)',
+        description: 'SP/RP Public Key Signature Certificate (PEM)',
         string: true,
         required: false,
         default: path.resolve(cwd(), './sp-cert.pem'),
         coerce: makeCertFileCoercer('certificate', 'SP Signing Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
       },
       spKey: {
-        description: 'SP/RP Private Key Signature & Decryption Certificate(PEM)',
+        description: 'SP/RP Private Key Signature Certificate(PEM)',
         string: true,
         required: false,
         default: path.resolve(cwd(), './sp-key.pem'),
         coerce: makeCertFileCoercer('privateKey', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
+      },
+      spEncryptionCert: {
+        description: 'SP/RP Public Key Encryption Certificate (PEM)',
+        string: true,
+        required: false,
+        coerce: makeCertFileCoercer('certificate', 'SP Encryption Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
+      },
+      spEncryptionKey: {
+        description: 'SP/RP Private Key Decryption Certificate(PEM)',
+        string: true,
+        required: false,
+        coerce: makeCertFileCoercer('privateKey', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spHttpsPrivateKey: {
         description: 'Web Server TLS/SSL Private Key (PEM)',

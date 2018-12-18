@@ -35,6 +35,8 @@ export default class SPConfig {
     this.authnContextClassRef = argv.spAuthnContextClassRef;
     this.spCert = argv.spCert;
     this.spKey = argv.spKey;
+    this.spEncryptionCert = argv.spEncryptionCert || argv.spCert;
+    this.spEncryptionKey = argv.spEncryptionKey || argv.spKey;
     this.httpsPrivateKey = argv.spHttpsPrivateKey;
     this.httpsCert = argv.spHttpsCert;
     this.https = argv.spHttps;
@@ -51,6 +53,7 @@ export default class SPConfig {
       entityID: this.audience,
       realm: this.audience,
       cert: removeHeaders(this.spCert),
+      encryptionCert: removeHeaders(this.spEncryptionCert),
       acsUrls: this.acsUrls.map(url => getReqUrl(req, url)),
       sloUrl: getReqUrl(req, SP_SLO_URL),
       nameIDFormat: this.nameIDFormat
@@ -109,7 +112,7 @@ export default class SPConfig {
       recipientUrl: destinationUrl,
       destinationUrl: destinationUrl,
       protocolBinding: this.idpSsoBinding,
-      decryptionKey: this.spKey,
+      decryptionKey: this.spEncryptionKey,
       checkResponseID: true,
       checkDestination: true,
       checkInResponseTo: true,
