@@ -1,4 +1,4 @@
-import { IDP_SSO, SP_NOT_SUFFICIANT_LOA } from "./constants";
+import { IDP_SSO, SP_VERIFY } from "./constants";
 import { getPath, getReqUrl } from "../utils";
 import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
@@ -174,7 +174,7 @@ const processAcs = (acsUrl) => [
     if (req.user && req.user.claims &&
         !sufficientLevelOfAssurance(req.user.claims)) {
       res.redirect(url.format({
-        pathname: SP_NOT_SUFFICIANT_LOA,
+        pathname: SP_VERIFY,
         query: {
           authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
         }
