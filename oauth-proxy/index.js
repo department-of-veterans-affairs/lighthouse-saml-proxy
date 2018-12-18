@@ -258,7 +258,6 @@ function startApp(issuer) {
           }
         });
         const patient = response.data.attributes.va_identifiers.icn;
-        console.log({...tokens, patient, state});
         res.json({...tokens, patient, state});
       } catch (err) {
         console.error(err);

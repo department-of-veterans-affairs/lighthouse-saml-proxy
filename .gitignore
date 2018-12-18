@@ -120,3 +120,4 @@ $RECYCLE.BIN/
 build/
 /test-report.xml
 /public/core.css
+/saml-proxy/public/core.css
