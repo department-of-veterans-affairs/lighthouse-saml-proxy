@@ -22,8 +22,8 @@ const METADATA_TEMPLATE = template(
 );
 
 export default function addRoutes(app, idpConfig, spConfig) {
-  app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
-  app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin);
+  app.get(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin('login_selection'));
+  app.post(['/', '/idp', IDP_SSO], parseSamlRequest, samlLogin('login_selection'));
 
   app.post(IDP_SIGN_IN, idpSignIn);
 
@@ -37,9 +37,7 @@ export default function addRoutes(app, idpConfig, spConfig) {
     res.send(xml);
   });
 
-  app.get(SP_VERIFY, function(req, res){
-    res.render('verify', { title: 'Verify Your Identity', layout: 'layout' });
-  })
+  app.get(SP_VERIFY, parseSamlRequest, samlLogin('verify'));
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
 
