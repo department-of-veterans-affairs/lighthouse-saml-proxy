@@ -217,7 +217,7 @@ const processAcs = (acsUrl) => [
   }
 ];
 
-function mviErrorTemplate(error): string {
+function mviErrorTemplate(error) {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
 
