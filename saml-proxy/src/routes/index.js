@@ -15,7 +15,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from 'express-prom-bundle';
 
-export default function configureExpress(app, argv, idpOptions, spOptions) {
+export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
   const [ passport, strategy ] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
@@ -77,6 +77,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
     req.metadata = argv.idpConfig.metadata;
     req.passport = passport;
     req.strategy = strategy;
+    req.vetsAPIClient = new VetsAPIClient(vetsAPIOptions.token, vetsAPIOptions.apiHost);
     req.sp = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);

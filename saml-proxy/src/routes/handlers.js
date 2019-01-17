@@ -4,6 +4,7 @@ import assignIn from "lodash.assignin";
 import SessionParticipants from "samlp/lib/sessionParticipants";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
+import { SAMLUser, VetsAPIClient } from '../VetsAPIClient';
 import * as url from "url";
 
 export const getHashCode = (str) => {
@@ -155,6 +156,7 @@ export const sufficientLevelOfAssurance = (claims) => {
     return claims.level_of_assurance == '3';
   }
 };
+
 const processAcs = (acsUrl) => [
   function (req, res, next) {
     if ((req.method === 'GET' || req.method === 'POST')
@@ -185,6 +187,28 @@ const processAcs = (acsUrl) => [
     }
     next();
   },
+  async function(req, res, next) {
+    if ((req.user.claim.icn != null) && (req.user.claim.icn !== '')) {
+      // If the user already has an ICN, there's no need to lookup their ICN.
+      // MHV is the only provider that sends back a ICN. They don't send back
+      // the name/DOB/etc attributes that would be required to lookup the ICN
+      // so it's also hard to verify.
+      next();
+    } else {
+      try {
+        const icn = await req.vetsAPIClient.getICN({
+          dateOfBirth: req.user.claim.dateOfBirth,
+          firstName: req.user.claim.firstName,
+          gender: req.user.claim.gender,
+          lastName: req.user.claim.lastName,
+          middleName: req.user.claim.middleName,
+          ssn: req.user.claim.ssn,
+        });
+      } catch (error) {
+        res.render(mviErrorTemplate(error), {});
+      }
+    }
+  },
   function(req, res, next) {
     const authOptions = assignIn({}, req.idp.options);
     authOptions.RelayState = req.session.ssoResponse.state;
@@ -192,6 +216,17 @@ const processAcs = (acsUrl) => [
     samlp.auth(authOptions)(req, res);
   }
 ];
+
+function mviErrorTemplate(error): string {
+  // `error` comes from:
+  // https://github.com/request/promise-core/blob/master/lib/errors.js
+
+  if ((error.name == 'StatusCodeError') && (error.statusCode.toString() === '404')) {
+    return 'icnLookupFailure.hbs';
+  } else {
+    return 'icnError.hbs';
+  }
+}
 
 export const acsFactory = (app, acsUrl) => {
   app.get(

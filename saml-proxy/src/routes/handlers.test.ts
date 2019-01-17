@@ -1,8 +1,8 @@
 import "jest";
-import { getHashCode } from "./handlers"
+import { getHashCode } from "./handlers.js"
 
 describe("getHashCode", () => {
-  test("It should get hash code for a string", () => {
+  it("should get hash code for a string", () => {
     expect(getHashCode("test-string")).toEqual(-1666277972);
   });
 });

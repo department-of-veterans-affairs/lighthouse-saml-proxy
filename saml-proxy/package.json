@@ -45,7 +45,12 @@
       "js",
       "json",
       "node"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    }
   },
   "bin": "./bin/run.js",
   "engines": {
@@ -53,6 +58,8 @@
   },
   "dependencies": {
     "@department-of-veterans-affairs/formation": "^1.12.0",
+    "@types/request": "^2.48.1",
+    "@types/request-promise-native": "^1.0.15",
     "body-parser": "~1.18.3",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
@@ -72,7 +79,8 @@
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",
     "passport-wsfed-saml2": "git+https://github.com/edpaget/passport-wsfed-saml2.git",
-    "request": "^2.87.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
     "samlp": "git+https://github.com/edpaget/node-samlp.git",
     "uswds": "^1.6.8",
     "xml-formatter": "^1.0.1",

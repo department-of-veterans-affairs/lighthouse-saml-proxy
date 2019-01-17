@@ -301,7 +301,17 @@ export function processArgs() {
         description: 'Default Relay State',
         required: false,
         string: true
-      }
+      },
+      vetsAPIHost: {
+        description: 'The URL prefix for the vets-api host used to perform MVI lookups.',
+        required: true,
+        string: true,
+      },
+      vetsAPIToken: {
+        description: 'Token used to authorize calls to vets-api while performing MVI lookups.',
+        required: true,
+        string: true,
+      },
     })
     .example('\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV', '')
     .check(checkEncryptionCerts)
