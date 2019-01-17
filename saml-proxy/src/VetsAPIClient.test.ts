@@ -3,7 +3,7 @@ import * as request from 'request-promise-native';
 import { VetsAPIClient } from './VetsAPIClient';
 jest.mock('request-promise-native', () => {
   return {
-    get: jest.fn((_) => Promise.resovle({})),
+    get: jest.fn((_) => Promise.resolve({})),
   };
 });
 
