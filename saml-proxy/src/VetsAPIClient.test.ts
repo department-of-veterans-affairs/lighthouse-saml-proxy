@@ -22,6 +22,15 @@ beforeEach(() => {
 
 describe('getICN', () => {
   it('should call the mvi-lookup endpoint with the Veteran\'s PII in headers', async () => {
+    request.get.mockImplementation((_) => Promise.resolve({
+      data: {
+        id: 'fakeICN',
+        type: "user-mvi-icn",
+        attributes: {
+          icn: 'fakeICN',
+        }
+      }
+    }));
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getICN(samlTraits);
     expect(request.get).toHaveBeenCalledWith({
