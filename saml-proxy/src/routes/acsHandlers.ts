@@ -16,7 +16,7 @@ const mviErrorTemplate = (error: any) => {
   } else {
     return 'icnError.hbs';
   }
-}
+};
 
 export const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_profile) {
@@ -31,7 +31,7 @@ export const sufficientLevelOfAssurance = (claims: any) => {
   }
 };
 
-export const passportLogin = (acsURL: string) => {
+export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     if ((req.method === 'GET' || req.method === 'POST')
         && (req.query && req.query.SAMLResponse)
@@ -54,7 +54,7 @@ export const passportLogin = (acsURL: string) => {
 };
 
 export const loadICN = async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
-  if ((req.user.claims.icn != null) && (req.user.claims.icn !== '')) {
+  if (req.user.claims.icn && (req.user.claims.icn !== '')) {
     // If the user already has an ICN, there's no need to lookup their ICN.
     // MHV is the only provider that sends back a ICN. They don't send back
     // the name/DOB/etc attributes that would be required to lookup the ICN
@@ -63,11 +63,13 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
   } else {
     try {
       const icn = await req.vetsAPIClient.getICN(req.user.claims);
+      req.user.claims.icn = icn;
+      next();
     } catch (error) {
       res.render(mviErrorTemplate(error), {});
     }
   }
-}
+};
 
 export const scrubUserClaims = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   // Makes sure we're only serializing user claims as SAML Assertions
@@ -81,7 +83,7 @@ export const scrubUserClaims = (req: IConfiguredRequest, res: Response, next: Ne
     uuid: req.user.claims.uuid,
   };
   next();
-}
+};
 
 export const testLevelOfAssuranceOrRedirect = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   if (req.user && req.user.claims &&
@@ -94,7 +96,7 @@ export const testLevelOfAssuranceOrRedirect = (req: IConfiguredRequest, res: Res
     }));
   }
   next();
-}
+};
 
 export const serializeAssertions = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   const authOptions = assignIn({}, req.idp.options);

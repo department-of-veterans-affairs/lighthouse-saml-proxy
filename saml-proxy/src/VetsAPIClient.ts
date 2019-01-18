@@ -21,7 +21,7 @@ export class VetsAPIClient {
     this.apiHost = apiHost;
   }
 
-  public async getICN(user: SAMLUser) {
+  public async getICN(user: SAMLUser) : Promise<string> {
     const headers = (user.edipi) ?
       {
         'apiKey': this.token,

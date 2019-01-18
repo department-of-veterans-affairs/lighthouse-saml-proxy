@@ -7,7 +7,7 @@ import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import { SAMLUser, VetsAPIClient } from '../VetsAPIClient';
 import * as url from "url";
 import {
-  passportLogin,
+  buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
   loadICN,
   scrubUserClaims,
@@ -151,7 +151,7 @@ export const idpSignIn = function(req, res) {
 };
 
 const processAcs = (acsUrl) => [
-  passportLogin(acsUrl),
+  buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
   loadICN,
   scrubUserClaims,
