@@ -6,6 +6,13 @@ import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import { SAMLUser, VetsAPIClient } from '../VetsAPIClient';
 import * as url from "url";
+import {
+  passportLogin,
+  testLevelOfAssuranceOrRedirect,
+  loadICN,
+  scrubUserClaims,
+  serializeAssertions,
+} from './acsHandlers';
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -18,7 +25,6 @@ export const getHashCode = (str) => {
   }
   return hash;
 };
-
 
 export const samlLogin = function(template) {
   return function(req, res, next) {
@@ -144,89 +150,13 @@ export const idpSignIn = function(req, res) {
   samlp.auth(authOptions)(req, res);
 };
 
-export const sufficientLevelOfAssurance = (claims) => {
-  if (claims.mhv_profile) {
-    var profile = JSON.parse(claims.mhv_profile);
-    return (profile.accountType == 'Premium');
-  }
-  else if (claims.dslogon_assurance) {
-    return (claims.dslogon_assurance == '2' || claims.dslogon_assurance == '3');
-  }
-  else {
-    return claims.level_of_assurance == '3';
-  }
-};
-
 const processAcs = (acsUrl) => [
-  function (req, res, next) {
-    if ((req.method === 'GET' || req.method === 'POST')
-        && (req.query && req.query.SAMLResponse)
-          || (req.body && req.body.SAMLResponse)) {
-            const ssoResponse = {
-              state: req.query.RelayState || req.body.RelayState,
-              url: getReqUrl(req, acsUrl)
-            };
-            req.session.ssoResponse = ssoResponse;
-
-            const params = req.sp.options.getResponseParams(ssoResponse.url);
-            assignIn(req.strategy.options, params);
-            req.passport.authenticate('wsfed-saml2', params)(req, res, next);
-          } else {
-            res.redirect(SP_LOGIN_URL);
-          }
-  },
-  function(req, res, next) {
-    if (req.user && req.user.claims &&
-        !sufficientLevelOfAssurance(req.user.claims)) {
-      res.redirect(url.format({
-        pathname: SP_VERIFY,
-        query: {
-          authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
-        }
-      }));
-    }
-    next();
-  },
-  async function(req, res, next) {
-    if ((req.user.claim.icn != null) && (req.user.claim.icn !== '')) {
-      // If the user already has an ICN, there's no need to lookup their ICN.
-      // MHV is the only provider that sends back a ICN. They don't send back
-      // the name/DOB/etc attributes that would be required to lookup the ICN
-      // so it's also hard to verify.
-      next();
-    } else {
-      try {
-        const icn = await req.vetsAPIClient.getICN({
-          dateOfBirth: req.user.claim.dateOfBirth,
-          firstName: req.user.claim.firstName,
-          gender: req.user.claim.gender,
-          lastName: req.user.claim.lastName,
-          middleName: req.user.claim.middleName,
-          ssn: req.user.claim.ssn,
-        });
-      } catch (error) {
-        res.render(mviErrorTemplate(error), {});
-      }
-    }
-  },
-  function(req, res, next) {
-    const authOptions = assignIn({}, req.idp.options);
-    authOptions.RelayState = req.session.ssoResponse.state;
-    authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-    samlp.auth(authOptions)(req, res);
-  }
+  passportLogin(acsUrl),
+  testLevelOfAssuranceOrRedirect,
+  loadICN,
+  scrubUserClaims,
+  serializeAssertions,
 ];
-
-function mviErrorTemplate(error) {
-  // `error` comes from:
-  // https://github.com/request/promise-core/blob/master/lib/errors.js
-
-  if ((error.name == 'StatusCodeError') && (error.statusCode.toString() === '404')) {
-    return 'icnLookupFailure.hbs';
-  } else {
-    return 'icnError.hbs';
-  }
-}
 
 export const acsFactory = (app, acsUrl) => {
   app.get(
