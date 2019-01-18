@@ -16,25 +16,48 @@ const samlTraits = {
   ssn: '333-99-8988',
 };
 
+const samlTraitsEDIPI = {
+  dateOfBirth: '1990-01-01',
+  edipi: 'asdfasdfasdf',
+  firstName: 'Edward',
+  gender: 'male',
+  lastName: 'Paget',
+  middleName: 'John',
+  ssn: '333-99-8988',
+}
+
 beforeEach(() => {
   request.get.mockReset();
+  request.get.mockImplementation((_) => Promise.resolve({
+    data: {
+      id: 'fakeICN',
+      type: "user-mvi-icn",
+      attributes: {
+        icn: 'fakeICN',
+      }
+    }
+  }));
 });
 
 describe('getICN', () => {
-  it('should call the mvi-lookup endpoint with the Veteran\'s PII in headers', async () => {
-    request.get.mockImplementation((_) => Promise.resolve({
-      data: {
-        id: 'fakeICN',
-        type: "user-mvi-icn",
-        attributes: {
-          icn: 'fakeICN',
-        }
-      }
-    }));
+  it('should call the mvi-users endpoint with the Veteran\'s EIDPI in a header', async () => {
+    const client = new VetsAPIClient('faketoken', 'https://example.gov');
+    await client.getICN(samlTraitsEDIPI);
+    expect(request.get).toHaveBeenCalledWith({
+      url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
+      json: true,
+      headers: {
+        apiKey: 'faketoken',
+        'x-va-edipi': expect.any(String),
+      },
+    });
+  });
+
+  it('should call the mvi-users endpoint with the Veteran\'s PII in headers', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getICN(samlTraits);
     expect(request.get).toHaveBeenCalledWith({
-      url: 'https://example.gov/internal/openid_auth/v0/mvi-lookup',
+      url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
       json: true,
       headers: expect.objectContaining({
         apiKey: 'faketoken',
@@ -44,20 +67,11 @@ describe('getICN', () => {
         'x-va-last-name': expect.any(String),
         'x-va-dob': expect.any(String),
         'x-va-gender': expect.any(String),
-      })
+      }),
     });
   });
 
   it('should return the Veteran\'s ICN if the request is successful', async () => {
-    request.get.mockImplementation((_) => Promise.resolve({
-      data: {
-        id: 'fakeICN',
-        type: "user-mvi-icn",
-        attributes: {
-          icn: 'fakeICN',
-        }
-      }
-    }));
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     const icn = await client.getICN(samlTraits);
     expect(icn).toEqual('fakeICN');

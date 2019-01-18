@@ -7,8 +7,10 @@ export interface SAMLUser {
   lastName: string;
   middleName: string;
   ssn: string;
+  edipi?: string;
 }
 
+const LOOKUP_PATH = '/internal/openid_auth/v0/mvi-users';
 
 export class VetsAPIClient {
   token: string;
@@ -20,10 +22,12 @@ export class VetsAPIClient {
   }
 
   public async getICN(user: SAMLUser) {
-    const response = await request.get({
-      url: `${this.apiHost}/internal/openid_auth/v0/mvi-lookup`,
-      json: true,
-      headers: {
+    const headers = (user.edipi) ?
+      {
+        'apiKey': this.token,
+        'x-va-edipi': user.edipi
+      } :
+      {
         'apiKey': this.token,
         'x-va-ssn': user.ssn,
         'x-va-first-name': user.firstName,
@@ -31,7 +35,11 @@ export class VetsAPIClient {
         'x-va-last-name': user.lastName,
         'x-va-dob': user.dateOfBirth,
         'x-va-gender': user.gender,
-      },
+      };
+    const response = await request.get({
+      url: `${this.apiHost}${LOOKUP_PATH}`,
+      json: true,
+      headers,
     });
     return response.data.attributes.icn;
   }
