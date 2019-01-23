@@ -18,7 +18,7 @@ const mviErrorTemplate = (error: any) => {
   }
 };
 
-export const sufficientLevelOfAssurance = (claims: any) => {
+const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_profile) {
     var profile = JSON.parse(claims.mhv_profile);
     return (profile.accountType == 'Premium');
@@ -62,7 +62,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     next();
   } else {
     try {
-      const icn = await req.vetsAPIClient.getICN(req.user.claims);
+      const icn = await req.vetsAPIClient.getICNForLoa3User(req.user.claims);
       req.user.claims.icn = icn;
       next();
     } catch (error) {

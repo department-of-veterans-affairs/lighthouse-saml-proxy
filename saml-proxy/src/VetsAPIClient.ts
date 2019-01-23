@@ -21,7 +21,7 @@ export class VetsAPIClient {
     this.apiHost = apiHost;
   }
 
-  public async getICN(user: SAMLUser) : Promise<string> {
+  public async getICNForLoa3User(user: SAMLUser) : Promise<string> {
     const headers = (user.edipi) ?
       {
         'apiKey': this.token,
@@ -35,6 +35,8 @@ export class VetsAPIClient {
         'x-va-last-name': user.lastName,
         'x-va-dob': user.dateOfBirth,
         'x-va-gender': user.gender,
+        // This header is provided only to conform to the vets-api user modeling expectations:
+        'x-va-level-of-assurance': '3',
       };
     const response = await request.get({
       url: `${this.apiHost}${LOOKUP_PATH}`,

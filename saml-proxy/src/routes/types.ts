@@ -8,6 +8,7 @@ interface IExtendedStrategy extends Strategy {
 }
 
 export interface IConfiguredRequest extends Request {
+  session: any;
   vetsAPIClient: VetsAPIClient;
   passport: PassportStatic;
   strategy: IExtendedStrategy;

@@ -67,7 +67,7 @@ describe('scrubUserClaims', () => {
 
 describe('loadICN', () => {
   beforeEach(() => {
-    client.getICN.mockReset();
+    client.getICNForLoa3User.mockReset();
   });
 
   it('should call next and not make any vetsAPIClient calls when ICN Exists', async () => {
@@ -79,7 +79,7 @@ describe('loadICN', () => {
       }
     };
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICN).not.toHaveBeenCalled();
+    expect(req.vetsAPIClient.getICNForLoa3User).not.toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
   });
 
@@ -92,9 +92,9 @@ describe('loadICN', () => {
       }
     };
 
-    req.vetsAPIClient.getICN.mockResolvedValueOnce('anICN');
+    req.vetsAPIClient.getICNForLoa3User.mockResolvedValueOnce('anICN');
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICN).toHaveBeenCalled();
+    expect(req.vetsAPIClient.getICNForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual('anICN');
   });
@@ -107,14 +107,14 @@ describe('loadICN', () => {
         claims: {...claimsWithNoEDIPI }
       }
     };
-    req.vetsAPIClient.getICN.mockResolvedValueOnce('anICN');
+    req.vetsAPIClient.getICNForLoa3User.mockResolvedValueOnce('anICN');
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICN).toHaveBeenCalled();
+    expect(req.vetsAPIClient.getICNForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual('anICN');
   });
 
-  it('should render error page when getICN errors', async () => {
+  it('should render error page when getICNForLoa3User errors', async () => {
     const nextFn = jest.fn();
     const render = jest.fn();
     const req = {
@@ -126,7 +126,7 @@ describe('loadICN', () => {
     const err = new Error('Oops')
     err.name = 'StatusCodeError';
     err.statusCode = '404';
-    req.vetsAPIClient.getICN.mockRejectedValueOnce(err);
+    req.vetsAPIClient.getICNForLoa3User.mockRejectedValueOnce(err);
     await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
   });

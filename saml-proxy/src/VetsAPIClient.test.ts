@@ -39,10 +39,10 @@ beforeEach(() => {
   }));
 });
 
-describe('getICN', () => {
+describe('getICNForLoa3User', () => {
   it('should call the mvi-users endpoint with the Veteran\'s EIDPI in a header', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
-    await client.getICN(samlTraitsEDIPI);
+    await client.getICNForLoa3User(samlTraitsEDIPI);
     expect(request.get).toHaveBeenCalledWith({
       url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
       json: true,
@@ -55,7 +55,7 @@ describe('getICN', () => {
 
   it('should call the mvi-users endpoint with the Veteran\'s PII in headers', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
-    await client.getICN(samlTraits);
+    await client.getICNForLoa3User(samlTraits);
     expect(request.get).toHaveBeenCalledWith({
       url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
       json: true,
@@ -73,7 +73,7 @@ describe('getICN', () => {
 
   it('should return the Veteran\'s ICN if the request is successful', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
-    const icn = await client.getICN(samlTraits);
+    const icn = await client.getICNForLoa3User(samlTraits);
     expect(icn).toEqual('fakeICN');
   });
 });

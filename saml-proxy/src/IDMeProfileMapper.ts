@@ -191,6 +191,9 @@ const mhvConfiguration: IClaimDescriptions = {
   }
 }
 
+// ID.me will give us a wide variety of claims, based on which upstream identity provider was chosen
+// by the user. Some fields with a different name serve an identical purpose. This class maps those
+// attributes to a canonical set of fields.
 export class IDMeProfileMapper {
   samlAssertions: ISamlAssertions;
 
@@ -198,14 +201,17 @@ export class IDMeProfileMapper {
     this.samlAssertions = assertions;
   }
 
+  // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
+  // the canonical names, associated in the various IClaimDescriptions tables above.
   public getClaims() {
-    let claims = this.getClaimFields(commonConfiguration, {});
+    let claims = {};
+    this.getClaimFields(commonConfiguration, claims);
     if (this.samlAssertions.claims.mhv_uuid) {
-      claims = this.getClaimFields(mhvConfiguration, claims);
+      this.getClaimFields(mhvConfiguration, claims);
     } else if (this.samlAssertions.claims.dslogon_edipi) {
-      claims = this.getClaimFields(dsLogonConfiguration, claims);
+      this.getClaimFields(dsLogonConfiguration, claims);
     } else {
-      claims = this.getClaimFields(idmeConfiguration, claims);
+      this.getClaimFields(idmeConfiguration, claims);
     }
     return claims;
   }
@@ -220,18 +226,22 @@ export class IDMeProfileMapper {
     };
   }
 
+  // Updates the given `claims` object by inserting the fields described by `fields`. The value(s)
+  // for each fields are taken from the `samlAssertions` entry with the `id` field of the claim
+  // description. Returns nothing.
   private getClaimFields(fields: IClaimDescriptions, claims: { [key: string]: string | undefined }) {
-    return Object.keys(fields).reduce((_claims, claimKey) => {
+    Object.keys(fields).forEach((claimKey) => {
       const { id, multiValue, ...claimField } = fields[claimKey];
+      const upstreamValue = this.samlAssertions.claims[id];
+
       if (claimField.transformer) {
-        _claims[claimKey] = claimField.transformer(this.samlAssertions.claims[id]);
+        claims[claimKey] = claimField.transformer(upstreamValue);
+      } else if (multiValue) {
+        claims[claimKey] = upstreamValue.split(',');
       } else {
-        _claims[claimKey] = multiValue ?
-          this.samlAssertions.claims[id].split(',') :
-          this.samlAssertions.claims[id];
+        claims[claimKey] = upstreamValue;
       }
-      return _claims;
-    }, claims);
+    });
   }
 }
 
