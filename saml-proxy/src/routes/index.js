@@ -12,6 +12,7 @@ import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
+import { VetsAPIClient } from "../VetsAPIClient";
 
 import promBundle from 'express-prom-bundle';
 
