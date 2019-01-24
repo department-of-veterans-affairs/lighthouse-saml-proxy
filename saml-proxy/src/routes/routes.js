@@ -38,6 +38,12 @@ export default function addRoutes(app, idpConfig, spConfig) {
   });
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin('verify'));
+  app.get('/icnError', function(req, res, next) {
+    res.render('icnError.hbs');
+  });
+  app.get('/icnLookupFailure', function(req, res, next) {
+    res.render('icnLookupFailure.hbs');
+  });
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
 
