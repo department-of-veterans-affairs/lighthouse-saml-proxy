@@ -1,4 +1,5 @@
 import hbs from "hbs";
+import fs from 'fs';
 
 const blocks = {};
 
@@ -33,6 +34,8 @@ export default function configureHandlebars() {
   hbs.registerHelper('serialize', function(context) {
     return new Buffer(JSON.stringify(context)).toString('base64');
   });
+
+  hbs.registerPartial('deptva-formation-error', fs.readFileSync('views/partials/deptva-formation-error.hbs', {encoding: 'utf8'}));
 
   return hbs;
 }
