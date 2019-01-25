@@ -4,7 +4,9 @@
   "description": "Proxies requests to Okta to conform to FHIR API standard",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node index.js --config dev-config.json",
+    "help": "node index.js --help"
   },
   "repository": {
     "type": "git",

@@ -15,7 +15,7 @@ configure it as if it were running in a deployed environment.
 
 To begin, you'll want to create a file named `dev-config.json`. That file should contain a JSON object
 containing fields that correspond to the options documented by the `--help` option. Once you've created that
-config file you can run `npm run-script dev-start` in order to run the proxy with your code changes.
+config file you can run `npm run-script start-dev` in order to run the proxy with your code changes.
 
 If you're a VA developer looking for the specific values to use for the dev environment, see the documentation
 in the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/Developer%20Process/SAML%20Proxy)
@@ -27,3 +27,14 @@ The OAuth proxy sits between client applications (run by API consumers) and our 
 the SMART on FHIR spec, which is an OAuth overlay. This involves tracking a state value for the user across
 sessions, so that initial auth flows and refresh auth flows send the same state to the client application.
 
+### Running locally
+
+The OAuth proxy also requires configuration to run locally. It is tied pretty tightly with Okta and you'll need 
+to have access to an okta authorization server and an api key for the server. 
+
+To being you'll want to create a `dev-config.json` in the oauth-proxy subdirectory. That file should contain a 
+JSON object containing fields that corresponesd to the options document by the `--help` option. Once you've
+created that config you can run `npm start` to run the OAuth proxy with the code changes. 
+
+If you're a VA developer, you can look at the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/Developer%20Process/OAuth%20Proxy.md) repo for 
+specific values for using our dev Okta environment. 
