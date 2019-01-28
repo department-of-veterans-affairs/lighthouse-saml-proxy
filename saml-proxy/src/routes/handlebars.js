@@ -73,7 +73,7 @@ export default function configureHandlebars() {
     consumeDigits(999);
 
     var ariaLabelString = ariaLabelParts.join('');
-    return `<a href="tel:${justDigitsString}" ara-label="${ariaLabelString}">${digitString}</a>`;
+    return `<a href="tel:${justDigitsString}" aria-label="${ariaLabelString}">${digitString}</a>`;
   });
 
   hbs.registerPartial('deptva-formation-error', fs.readFileSync('views/partials/deptva-formation-error.hbs', {encoding: 'utf8'}));
