@@ -20,13 +20,13 @@ export function processArgs() {
       idpCert: {
         description: 'IdP Signature PublicKey Certificate',
         required: true,
-        default: path.resolve(cwd(), './idp-cert.pem'),
+        default: path.resolve(cwd(), './idp-public-cert.pem'),
         coerce: makeCertFileCoercer('certificate', 'IdP Signature PublicKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpKey: {
         description: 'IdP Signature PrivateKey Certificate',
         required: true,
-        default: path.resolve(cwd(), './idp-key.pem'),
+        default: path.resolve(cwd(), './idp-private-key.pem'),
         coerce: makeCertFileCoercer('RSA private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpIssuer: {
