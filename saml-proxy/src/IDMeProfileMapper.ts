@@ -289,4 +289,11 @@ createProfileMapper.prototype.metadata = [
     description: 'The middle name of the user',
     multiValue: false
   },
+  {
+    id: "icn",
+    optional: true,
+    displayName: 'ICN',
+    description: 'VA-Wide User Identifier',
+    multiValue: false
+  }
 ];
