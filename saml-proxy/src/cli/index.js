@@ -104,11 +104,6 @@ export function processArgs() {
         boolean: true,
         default: true
       },
-      idpConfigFile: {
-        description: 'Path to a SAML attribute config file',
-        required: true,
-        default: require.resolve('../../config.js')
-      },
       idpRollSession: {
         description: 'Create a new session for every authn request instead of reusing an existing session',
         required: false,
@@ -315,7 +310,6 @@ export function processArgs() {
     })
     .example('\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV', '')
     .check(checkEncryptionCerts)
-    .check(checkIdpProfileMapper)
     .check(checkWhenNoMetadata)
     .wrap(yargs.terminalWidth())
     .argv;
