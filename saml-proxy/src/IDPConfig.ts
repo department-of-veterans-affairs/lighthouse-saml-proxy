@@ -1,4 +1,3 @@
-import { createProfileMapper } from "./IDMeProfileMapper";
 import { IDP_SSO } from "./routes/constants";
 import { DOMParser } from "xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp"
@@ -68,7 +67,7 @@ export default class IDPConfig implements IdPOptions {
     this.authnContextClassRef = argv.idpAuthnContextClassRef;
     this.authnContextDecl = argv.idpAuthnContextDecl;
     this.includeAttributeNameFormat = true;
-    this.profileMapper = createProfileMapper;
+    this.profileMapper = (x: any) => x;
     this.postEndpointPath = IDP_SSO;
     this.redirectEndpointPath = IDP_SSO;
     this.logoutEndpointPaths = {};

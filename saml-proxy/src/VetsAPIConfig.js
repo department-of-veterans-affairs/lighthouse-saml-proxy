@@ -1,8 +1,6 @@
 export default class VetsApiConfig {
   constructor(argv) {
-    this.token = argv.token;
-    this.apiHost = argv.vetsApiHost;
+    this.token = argv.vetsAPIToken;
+    this.apiHost = argv.vetsAPIHost;
   }
 };
-
-

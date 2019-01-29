@@ -4,8 +4,7 @@ import { IConfiguredRequest } from './types';
 
 import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
-import samlp from "samlp";
-import * as url from "url";
+import samlp from "samlp"; import * as url from "url";
 
 const mviErrorTemplate = (error: any) => {
   // `error` comes from:

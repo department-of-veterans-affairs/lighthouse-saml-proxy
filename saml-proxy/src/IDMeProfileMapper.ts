@@ -233,7 +233,6 @@ export class IDMeProfileMapper {
     Object.keys(fields).forEach((claimKey) => {
       const { id, multiValue, ...claimField } = fields[claimKey];
       const upstreamValue = this.samlAssertions.claims[id];
-
       if (claimField.transformer) {
         claims[claimKey] = claimField.transformer(upstreamValue);
       } else if (multiValue) {
