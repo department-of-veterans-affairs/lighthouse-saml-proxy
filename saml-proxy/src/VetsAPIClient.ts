@@ -11,7 +11,7 @@ export interface SAMLUser {
   edipi?: string;
 }
 
-const LOOKUP_PATH = '/internal/openid_auth/v0/mvi-users';
+const LOOKUP_PATH = '/internal/auth/v0/mvi-user';
 
 export class VetsAPIClient {
   token: string;
@@ -41,7 +41,6 @@ export class VetsAPIClient {
         'x-va-gender': user.gender,
         'x-va-level-of-assurance': '3',
       };
-    console.log(headers);
     const response = await request.get({
       url: `${this.apiHost}${LOOKUP_PATH}`,
       json: true,
