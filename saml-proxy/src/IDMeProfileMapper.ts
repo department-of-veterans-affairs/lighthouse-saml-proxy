@@ -191,23 +191,34 @@ const mhvConfiguration: IClaimDescriptions = {
   }
 }
 
-// ID.me will give us a wide variety of claims, based on which upstream identity provider was chosen
-// by the user. Some fields with a different name serve an identical purpose. This class maps those
-// attributes to a canonical set of fields.
-export class IDMeProfileMapper {
+// If the samlp library was written in typescript, this is the interface it would likely export for
+// profile mappers.
+interface ISamlpProfileMapper {
+  getClaims(options: object): object;
+  getNameIdentifier(options: object): object | null;
+}
+
+// This class maps between the fields as they are known to our upstream identity provider to the
+// fields as they are known to our downstream service provider. Unfortunately our upstream identity
+// provider is ID.me, which is faily leaky. ID.me will give us a wide variety of field names, based
+// on which upstream identity provider was chosen by the user. Some fields with a different name
+// serve an identical purpose. This class maps those attributes to a canonical set of fields.
+export class IDMeProfileMapper implements ISamlpProfileMapper {
   samlAssertions: ISamlAssertions;
 
   constructor(assertions: ISamlAssertions) {
     this.samlAssertions = assertions;
   }
 
-  // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
-  // the canonical names, associated in the various IClaimDescriptions tables above.
-  public getClaims() {
+  // Returns the profile fields received from the upstream identity provider. This is part of the
+  // interface required by `samlp` library.
+  public getClaims(options: object): object {
     return this.samlAssertions.claims;
   }
 
-  public getSpClaims() {
+  // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
+  // the canonical names, associated in the various IClaimDescriptions tables above.
+  public getMappedClaims(): object {
     let claims = {};
     this.getClaimFields(commonConfiguration, claims);
     if (this.samlAssertions.claims.mhv_uuid) {
@@ -220,7 +231,7 @@ export class IDMeProfileMapper {
     return claims;
   }
 
-  public getNameIdentifier() {
+  public getNameIdentifier(options: object): object {
     return {
       nameIdentifier:                  this.samlAssertions.userName,
       nameIdentifierFormat:            this.samlAssertions.nameIdFormat,
@@ -252,6 +263,7 @@ export const createProfileMapper = (assertions: ISamlAssertions) => {
   return new IDMeProfileMapper(assertions);
 }
 
+// This represents the fields we expose as an identity provider.
 createProfileMapper.prototype.metadata = [
   {
     id: "email",

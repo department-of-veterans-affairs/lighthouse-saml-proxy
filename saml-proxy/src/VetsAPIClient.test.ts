@@ -14,6 +14,7 @@ const samlTraits = {
   lastName: 'Paget',
   middleName: 'John',
   ssn: '333-99-8988',
+  email: 'user@example.com'
 };
 
 const samlTraitsEDIPI = {
@@ -24,6 +25,7 @@ const samlTraitsEDIPI = {
   lastName: 'Paget',
   middleName: 'John',
   ssn: '333-99-8988',
+  email: 'user@example.com'
 }
 
 beforeEach(() => {
@@ -40,24 +42,26 @@ beforeEach(() => {
 });
 
 describe('getICNForLoa3User', () => {
-  it('should call the mvi-users endpoint with the Veteran\'s EIDPI in a header', async () => {
+  it('should call the mvi-user endpoint with the Veteran\'s EIDPI in a header', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getICNForLoa3User(samlTraitsEDIPI);
     expect(request.get).toHaveBeenCalledWith({
-      url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
+      url: 'https://example.gov/internal/auth/v0/mvi-user',
       json: true,
       headers: {
         apiKey: 'faketoken',
         'x-va-edipi': expect.any(String),
+        'x-va-user-email': expect.any(String),
+        'x-va-level-of-assurance': '3',
       },
     });
   });
 
-  it('should call the mvi-users endpoint with the Veteran\'s PII in headers', async () => {
+  it('should call the mvi-user endpoint with the Veteran\'s PII in headers', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getICNForLoa3User(samlTraits);
     expect(request.get).toHaveBeenCalledWith({
-      url: 'https://example.gov/internal/openid_auth/v0/mvi-users',
+      url: 'https://example.gov/internal/auth/v0/mvi-user',
       json: true,
       headers: expect.objectContaining({
         apiKey: 'faketoken',
@@ -65,8 +69,10 @@ describe('getICNForLoa3User', () => {
         'x-va-first-name': expect.any(String),
         'x-va-middle-name': expect.any(String),
         'x-va-last-name': expect.any(String),
+        'x-va-level-of-assurance': '3',
         'x-va-dob': expect.any(String),
         'x-va-gender': expect.any(String),
+        'x-va-user-email': expect.any(String),
       }),
     });
   });

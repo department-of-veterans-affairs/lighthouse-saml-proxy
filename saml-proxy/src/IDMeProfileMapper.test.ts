@@ -41,16 +41,16 @@ const biographicInfo = expect.objectContaining({
 describe('IDMeProfileMapper', () => {
   it('should map basic info for ', () => {
     const profile = createProfileMapper(idmeAssertions);
-    expect(profile.getSpClaims()).toEqual(basicInfoCheck);
+    expect(profile.getMappedClaims()).toEqual(basicInfoCheck);
   });
 
   it('should map the Veteran\'s level_of_assurance', () => {
     const profile = createProfileMapper(idmeAssertions);
-    expect(profile.getSpClaims().level_of_assurance).toEqual('3');
+    expect(profile.getMappedClaims().level_of_assurance).toEqual('3');
   });
 
   it('should map idme specific info', () => {
     const profile = createProfileMapper(idmeAssertions);
-    expect(profile.getSpClaims()).toEqual(biographicInfo);
+    expect(profile.getMappedClaims()).toEqual(biographicInfo);
   });
 });
