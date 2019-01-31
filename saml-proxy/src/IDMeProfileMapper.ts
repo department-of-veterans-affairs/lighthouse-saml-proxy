@@ -204,7 +204,6 @@ export class IDMeProfileMapper {
   // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
   // the canonical names, associated in the various IClaimDescriptions tables above.
   public getClaims() {
-    console.log(this.samlAssertions.claims);
     return this.samlAssertions.claims;
   }
 
