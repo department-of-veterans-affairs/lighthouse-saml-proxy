@@ -201,7 +201,7 @@ interface ISamlpProfileMapper {
 // This class maps between the fields as they are known to our upstream identity provider to the
 // fields as they are known to our downstream service provider. Unfortunately our upstream identity
 // provider is ID.me, which is faily leaky. ID.me will give us a wide variety of field names, based
-// on which upstream identity provider was chosen by the user. Some fields with a different name
+// on which upstream credential provider was chosen by the user. Some fields with a different name
 // serve an identical purpose. This class maps those attributes to a canonical set of fields.
 export class IDMeProfileMapper implements ISamlpProfileMapper {
   samlAssertions: ISamlAssertions;
