@@ -1,14 +1,16 @@
 import * as request from 'request-promise-native';
 
 export interface SAMLUser {
-  dateOfBirth: string;
+  uuid: string;
+  dateOfBirth?: string;
   email: string;
-  firstName: string;
-  gender: string;
-  lastName: string;
-  middleName: string;
-  ssn: string;
+  firstName?: string;
+  gender?: string;
+  lastName?: string;
+  middleName?: string;
+  ssn?: string;
   edipi?: string;
+  icn?: string;
 }
 
 const LOOKUP_PATH = '/internal/auth/v0/mvi-user';
@@ -22,30 +24,26 @@ export class VetsAPIClient {
     this.apiHost = apiHost;
   }
 
-  public async getICNForLoa3User(user: SAMLUser) : Promise<string> {
-    const headers = (user.edipi) ?
-      {
-        'apiKey': this.token,
-        'x-va-edipi': user.edipi,
-        'x-va-user-email': user.email,
-        'x-va-level-of-assurance': '3',
-      } :
-      {
-        'apiKey': this.token,
-        'x-va-user-email': user.email,
-        'x-va-ssn': user.ssn,
-        'x-va-first-name': user.firstName,
-        'x-va-middle-name': user.middleName,
-        'x-va-last-name': user.lastName,
-        'x-va-dob': user.dateOfBirth,
-        'x-va-gender': user.gender,
-        'x-va-level-of-assurance': '3',
-      };
+  public async getMVITraitsForLoa3User(user: SAMLUser) : Promise<{ icn: string, first_name: string, last_name: string }> {
+    const headers = {
+      'apiKey': this.token,
+      'x-va-idp-uuid': user.uuid,
+      'x-va-user-email': user.email,
+      'x-va-dslogon-edipi': user.edipi || null,
+      'x-va-mhv-icn': user.icn || null,
+      'x-va-ssn': user.ssn || null,
+      'x-va-first-name': user.firstName || null,
+      'x-va-middle-name': user.middleName || null,
+      'x-va-last-name': user.lastName || null,
+      'x-va-dob': user.dateOfBirth || null,
+      'x-va-gender': user.gender || null,
+      'x-va-level-of-assurance': '3',
+    };
     const response = await request.get({
       url: `${this.apiHost}${LOOKUP_PATH}`,
       json: true,
       headers,
     });
-    return response.data.attributes.icn;
+    return response.data.attributes;
   }
 }

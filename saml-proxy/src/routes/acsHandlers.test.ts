@@ -67,10 +67,10 @@ describe('scrubUserClaims', () => {
 
 describe('loadICN', () => {
   beforeEach(() => {
-    client.getICNForLoa3User.mockReset();
+    client.getMVITraitsForLoa3User.mockReset();
   });
 
-  it('should call next and not make any vetsAPIClient calls when ICN Exists', async () => {
+  it('should call getMVITraits... calls when ICN Exists', async () => {
     const nextFn = jest.fn();
     const req = {
       vetsAPIClient: client,
@@ -78,9 +78,16 @@ describe('loadICN', () => {
         claims: {...claimsWithICN }
       }
     };
+
+    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+      icn: 'anICN',
+      first_name: 'Edward',
+      last_name: 'Paget',
+    });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICNForLoa3User).not.toHaveBeenCalled();
+    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
+    expect(req.user.claims.icn).toEqual('anICN');
   });
 
   it('should load ICN and assign it as a user claim when edipi exists and no icn', async () => {
@@ -92,9 +99,13 @@ describe('loadICN', () => {
       }
     };
 
-    req.vetsAPIClient.getICNForLoa3User.mockResolvedValueOnce('anICN');
+    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+      icn: 'anICN',
+      first_name: 'Edward',
+      last_name: 'Paget',
+    });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICNForLoa3User).toHaveBeenCalled();
+    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual('anICN');
   });
@@ -107,14 +118,18 @@ describe('loadICN', () => {
         claims: {...claimsWithNoEDIPI }
       }
     };
-    req.vetsAPIClient.getICNForLoa3User.mockResolvedValueOnce('anICN');
+    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+      icn: 'anICN',
+      first_name: 'Edward',
+      last_name: 'Paget',
+    });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getICNForLoa3User).toHaveBeenCalled();
+    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual('anICN');
   });
 
-  it('should render error page when getICNForLoa3User errors', async () => {
+  it('should render error page when getMVITraitsForLoa3User errors', async () => {
     const nextFn = jest.fn();
     const render = jest.fn();
     const req = {
@@ -126,7 +141,7 @@ describe('loadICN', () => {
     const err = new Error('Oops')
     err.name = 'StatusCodeError';
     err.statusCode = '404';
-    req.vetsAPIClient.getICNForLoa3User.mockRejectedValueOnce(err);
+    req.vetsAPIClient.getMVITraitsForLoa3User.mockRejectedValueOnce(err);
     await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
   });

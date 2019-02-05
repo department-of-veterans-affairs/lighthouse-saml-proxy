@@ -53,20 +53,14 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 };
 
 export const loadICN = async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
-  if (req.user.claims.icn && (req.user.claims.icn !== '')) {
-    // If the user already has an ICN, there's no need to lookup their ICN.
-    // MHV is the only provider that sends back a ICN. They don't send back
-    // the name/DOB/etc attributes that would be required to lookup the ICN
-    // so it's also hard to verify.
+  try {
+    const { icn, first_name, last_name }= await req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
+    req.user.claims.icn = icn;
+    req.user.claims.firstName = first_name;
+    req.user.claims.lastName = last_name;
     next();
-  } else {
-    try {
-      const icn = await req.vetsAPIClient.getICNForLoa3User(req.user.claims);
-      req.user.claims.icn = icn;
-      next();
-    } catch (error) {
-      res.render(mviErrorTemplate(error), {});
-    }
+  } catch (error) {
+    res.render(mviErrorTemplate(error), {});
   }
 };
 
