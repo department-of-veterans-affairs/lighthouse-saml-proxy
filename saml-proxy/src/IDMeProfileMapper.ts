@@ -44,6 +44,13 @@ const commonConfiguration: IClaimDescriptions = {
     description: 'IdP-generated UUID of the user',
     multiValue: false
   },
+  level_of_assurance: {
+    id: "level_of_assurance",
+    optional: false,
+    displayName: 'Level of Assurance',
+    description: 'Level of identify proofing available for the user',
+    multiValue: false
+  },
 };
 
 const idmeConfiguration: IClaimDescriptions  = {
@@ -59,13 +66,6 @@ const idmeConfiguration: IClaimDescriptions  = {
     optional: true,
     displayName: 'Last Name',
     description: 'The surname of the user',
-    multiValue: false
-  },
-  level_of_assurance: {
-    id: "level_of_assurance",
-    optional: false,
-    displayName: 'Level of Assurance',
-    description: 'Level of identify proofing available for the user',
     multiValue: false
   },
   middleName: {
@@ -310,6 +310,13 @@ createProfileMapper.prototype.metadata = [
     displayName: 'ICN',
     description: 'VA-Wide User Identifier',
     multiValue: false
+  },
+  {
+    id: "level_of_assurance",
+    optional: true,
+    displayName: 'MHV account type',
+    description: 'MHV account type',
+    multiValue: false,
   },
   {
     id: "mhv_account_type",
