@@ -18,15 +18,14 @@ const mviErrorTemplate = (error: any) => {
 };
 
 const sufficientLevelOfAssurance = (claims: any) => {
-  if (claims.mhv_profile) {
-    var profile = JSON.parse(claims.mhv_profile);
-    return (profile.accountType == 'Premium');
+  if (claims.mhv_account_type) {
+    return (claims.accountType === 'Premium');
   }
   else if (claims.dslogon_assurance) {
-    return (claims.dslogon_assurance == '2' || claims.dslogon_assurance == '3');
+    return (claims.dslogon_assurance === '2' || claims.dslogon_assurance === '3');
   }
   else {
-    return claims.level_of_assurance == '3';
+    return claims.level_of_assurance === '3';
   }
 };
 
@@ -74,6 +73,9 @@ export const scrubUserClaims = (req: IConfiguredRequest, res: Response, next: Ne
     email: req.user.claims.email,
     icn: req.user.claims.icn,
     uuid: req.user.claims.uuid,
+    dslogon_assurance: req.user.claims.dslogon_assurance,
+    mhv_account_type: req.user.claims.mhv_account_type,
+    level_of_assurance: req.user.claims.level_of_assurance,
   };
   next();
 };

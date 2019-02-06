@@ -11,16 +11,11 @@ const client = new VetsAPIClient('fakeToken', 'https://example.gov');
 // Since there's no way to make it work in tests with the mix of js and ts
 
 const claimsWithICN = {
-  dateOfBirth: '1990-01-01',
-  edipi: 'asdfasdfasdf',
-  firstName: 'Edward',
-  gender: 'male',
-  lastName: 'Paget',
-  middleName: 'John',
-  ssn: '333-99-8988',
   icn: 'asdfasdf',
   email: 'ed@example.gov',
   uuid: 'totally-uniq',
+  level_of_assurance: '0',
+  mhv_account_type: 'Premium',
 };
 
 const claimsWithEDIPI = {
@@ -30,9 +25,10 @@ const claimsWithEDIPI = {
   gender: 'male',
   lastName: 'Paget',
   middleName: 'John',
-  ssn: '333-99-8988',
   email: 'ed@example.gov',
   uuid: 'totally-uniq',
+  level_of_assurance: '0',
+  dslogon_assurance: '2',
 }
 
 const claimsWithNoEDIPI = {
@@ -44,11 +40,13 @@ const claimsWithNoEDIPI = {
   ssn: '333-99-8988',
   email: 'ed@example.gov',
   uuid: 'totally-uniq',
+  level_of_assurance: '3',
 }
 
 describe('scrubUserClaims', () => {
-  it('should return a user claims object with only permitted keys', () => {
-    const req = { user: { claims: { ...claimsWithICN } }};
+  it('should return a user claims object with only permitted keys for dslogon logins', () => {
+    // ICN will have been looked up before this function runs
+    const req = { user: { claims: { icn: 'anICN', ...claimsWithEDIPI } }};
     const nextFn = jest.fn();
     handlers.scrubUserClaims(req, {}, nextFn);
     expect(req.user.claims).toEqual(expect.objectContaining({
@@ -56,6 +54,59 @@ describe('scrubUserClaims', () => {
       lastName: expect.any(String),
       email: expect.any(String),
       middleName: expect.any(String),
+      level_of_assurance: expect.any(String),
+      icn: expect.any(String),
+      dslogon_assurance: '2',
+      mhv_account_type: undefined,
+      uuid: expect.any(String),
+    }));
+    expect(req.user.claims).toEqual(expect.not.objectContaining({
+      edipi: expect.any(String),
+      ssn: expect.any(String),
+      gender: expect.any(String),
+      dateOfBirth: expect.any(String),
+    }));
+  });
+
+
+  it('should return a user claims object with only permitted keys for idme logins', () => {
+    // ICN will have been looked up before this function runs
+    const req = { user: { claims: { icn: 'anICN', ...claimsWithNoEDIPI } }};
+    const nextFn = jest.fn();
+    handlers.scrubUserClaims(req, {}, nextFn);
+    expect(req.user.claims).toEqual(expect.objectContaining({
+      firstName: expect.any(String),
+      lastName: expect.any(String),
+      email: expect.any(String),
+      middleName: expect.any(String),
+      level_of_assurance: expect.any(String),
+      icn: expect.any(String),
+      dslogon_assurance: undefined,
+      mhv_account_type: undefined,
+      uuid: expect.any(String),
+    }));
+    expect(req.user.claims).toEqual(expect.not.objectContaining({
+      ssn: expect.any(String),
+      gender: expect.any(String),
+      dateOfBirth: expect.any(String),
+    }));
+  });
+
+  it('should return a user claims object with only permitted keys for mhv logins', () => {
+    // First and Last Name are looked up in MVI before this function runs
+    const req = { user: { claims: { firstName: 'Ed', lastName: 'Paget', ...claimsWithICN } }};
+    const nextFn = jest.fn();
+    handlers.scrubUserClaims(req, {}, nextFn);
+    expect(req.user.claims).toEqual(expect.objectContaining({
+      firstName: expect.any(String),
+      lastName: expect.any(String),
+      email: expect.any(String),
+      middleName: undefined,
+      level_of_assurance: expect.any(String),
+      icn: expect.any(String),
+      dslogon_assurance: undefined,
+      mhv_account_type: expect.any(String),
+      uuid: expect.any(String),
     }));
     expect(req.user.claims).toEqual(expect.not.objectContaining({
       ssn: expect.any(String),

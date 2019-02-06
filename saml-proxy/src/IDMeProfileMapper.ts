@@ -26,13 +26,6 @@ const commonConfiguration: IClaimDescriptions = {
     description: 'The e-mail address of the user',
     multiValue: false
   },
-  level_of_assurance: {
-    id: "level_of_assurance",
-    optional: false,
-    displayName: 'Level of Assurance',
-    description: 'Level of identify proofing available for the user',
-    multiValue: false
-  },
   multifactor: {
     id: "multifactor",
     optional: false,
@@ -62,6 +55,13 @@ const idmeConfiguration: IClaimDescriptions  = {
     optional: true,
     displayName: 'Last Name',
     description: 'The surname of the user',
+    multiValue: false
+  },
+  level_of_assurance: {
+    id: "level_of_assurance",
+    optional: false,
+    displayName: 'Level of Assurance',
+    description: 'Level of identify proofing available for the user',
     multiValue: false
   },
   middleName: {
@@ -176,7 +176,7 @@ const mhvConfiguration: IClaimDescriptions = {
     description: 'MHV-reported ICN',
     multiValue: false
   },
-  accountType: {
+  mhv_account_type: {
     id: "mhv_account_type",
     optional: true,
     displayName: 'MHV account type',
@@ -305,6 +305,20 @@ createProfileMapper.prototype.metadata = [
     optional: true,
     displayName: 'ICN',
     description: 'VA-Wide User Identifier',
+    multiValue: false
+  },
+  {
+    id: "mhv_account_type",
+    optional: true,
+    displayName: 'MHV account type',
+    description: 'MHV account type',
+    multiValue: false,
+  },
+  {
+    id: "dslogon_assurance",
+    optional: true,
+    displayName: 'Level of assurance',
+    description: 'DSLogon-reported level of assurance',
     multiValue: false
   }
 ];
