@@ -11,6 +11,7 @@ import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";
+import VetsAPIConfig from "./VetsAPIConfig";
 import configureExpress from "./routes";
 
 /**
@@ -63,7 +64,8 @@ function runServer(argv) {
 
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
-      configureExpress(app, argv, idpConfig, spConfig);
+      const vaConfig = new VetsAPIConfig(argv);
+      configureExpress(app, argv, idpConfig, spConfig, vaConfig);
 
       console.log('starting proxy server on port %s', app.get('port'));
 

@@ -12,10 +12,11 @@ import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
+import { VetsAPIClient } from "../VetsAPIClient";
 
 import promBundle from 'express-prom-bundle';
 
-export default function configureExpress(app, argv, idpOptions, spOptions) {
+export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
   const [ passport, strategy ] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
@@ -73,10 +74,10 @@ export default function configureExpress(app, argv, idpOptions, spOptions) {
   app.use('/fonts', express.static(path.join(process.cwd(), 'public/fonts')));
 
   app.use(function(req, res, next){
-    req.user = argv.idpConfig.user;
-    req.metadata = argv.idpConfig.metadata;
+    req.metadata = idpOptions.profileMapper.metadata;
     req.passport = passport;
     req.strategy = strategy;
+    req.vetsAPIClient = new VetsAPIClient(vetsAPIOptions.token, vetsAPIOptions.apiHost);
     req.sp = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);

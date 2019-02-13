@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "lib": ["es2016", "es5", "es6", "dom"],
     "module": "commonjs",
     "allowJs": true,
     "outDir": "./build",
@@ -10,5 +11,9 @@
   },
   "include": [
     "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "./src/**/*.test.ts"
   ]
 }
