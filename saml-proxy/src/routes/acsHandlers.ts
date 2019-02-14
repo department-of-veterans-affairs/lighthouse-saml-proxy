@@ -17,9 +17,11 @@ const mviErrorTemplate = (error: any) => {
   }
 };
 
+// This depends on being called after buildPassportLoginHandler because it uses
+// the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_account_type) {
-    return (claims.accountType === 'Premium');
+    return (claims.mhv_account_type === 'Premium');
   }
   else if (claims.dslogon_assurance) {
     return (claims.dslogon_assurance === '2' || claims.dslogon_assurance === '3');
