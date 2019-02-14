@@ -5,10 +5,6 @@ const idmeAssertions = {
   issuer: 'api.idmelabs.com',
   userName: 'ae9ff5f4e4b741389904087d94cd19b2',
   nameIdFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-  authnContext: {
-    sessionIndex: '_dda86128dbf14a9b8643daadab889d54',
-    authnMethod: 'http://idmanagement.gov/ns/assurance/loa/3'
-  },
   claims: {
     birth_date: '1998-01-23',
     email: 'vets.gov.user+20@gmail.com',
@@ -27,10 +23,6 @@ const mhvAssertions = {
   issuer: 'api.idmelabs.com',
   userName: 'ae9ff5f4e4b741389904087d94cd19b2',
   nameIdFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-  authnContext: {
-    sessionIndex: '_dda86128dbf14a9b8643daadab889d54',
-    authnMethod: 'myhealthevet'
-  },
   claims: {
     email: 'vets.gov.user+20@gmail.com',
     mhv_icn: 'anICN',
@@ -46,10 +38,6 @@ const dslogonAssertions = {
   issuer: 'api.idmelabs.com',
   userName: 'ae9ff5f4e4b741389904087d94cd19b2',
   nameIdFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-  authnContext: {
-    sessionIndex: '_dda86128dbf14a9b8643daadab889d54',
-    authnMethod: 'dslogon'
-  },
   claims: {
     dslogon_birth_date: '1998-01-23',
     email: 'vets.gov.user+20@gmail.com',

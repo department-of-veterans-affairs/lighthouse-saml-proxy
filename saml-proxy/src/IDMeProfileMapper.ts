@@ -10,10 +10,6 @@ interface IClaimField {
 interface IClaimDescriptions { [key: string]: IClaimField };
 
 interface ISamlAssertions {
-  authnContext: {
-    sessionIndex: string;
-    authnMethod: string;
-  };
   claims: any
   userName: string,
   nameIdFormat: string;
@@ -225,9 +221,9 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
   public getMappedClaims(): object {
     let claims = {};
     this.getClaimFields(commonConfiguration, claims);
-    if (this.samlAssertions.authnContext.authnMethod === 'myhealthevet') {
+    if (this.samlAssertions.claims.mhv_uuid) {
       this.getClaimFields(mhvConfiguration, claims);
-    } else if (this.samlAssertions.authnContext.authnMethod === 'dslogon') {
+    } else if (this.samlAssertions.claims.dslogon_uuid) {
       this.getClaimFields(dsLogonConfiguration, claims);
     } else {
       this.getClaimFields(idmeConfiguration, claims);
