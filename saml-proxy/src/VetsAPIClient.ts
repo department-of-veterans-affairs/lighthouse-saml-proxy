@@ -39,6 +39,8 @@ export class VetsAPIClient {
       'x-va-gender': user.gender || null,
       'x-va-level-of-assurance': '3',
     };
+    // @ts-ignore TS7017
+    Object.keys(headers).forEach((key) => (headers[key] == null) && delete headers[key]);
     const response = await request.get({
       url: `${this.apiHost}${LOOKUP_PATH}`,
       json: true,

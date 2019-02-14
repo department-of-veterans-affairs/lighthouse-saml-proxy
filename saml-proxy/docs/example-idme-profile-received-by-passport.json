@@ -1,0 +1,22 @@
+{
+   "http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" : "http://idmanagement.gov/ns/assurance/loa/3",
+   "uuid" : "88f572d491af46efa393cba6c351e252",
+   "social" : "796126859",
+   "level_of_assurance" : "3",
+   "gender" : "male",
+   "mname" : "J",
+   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" : "88f572d491af46efa393cba6c351e252",
+   "birth_date" : "1932-02-05",
+   "issuer" : "api.idmelabs.com",
+   "sessionIndex" : "_d1e7cbdda39943eda2529b86d95cffd1",
+   "multifactor" : "true",
+   "fname" : "HECTOR",
+   "nameIdAttributes" : {
+      "NameQualifier" : "api.idmelabs.com",
+      "value" : "88f572d491af46efa393cba6c351e252",
+      "Format" : "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "SPNameQualifier" : "samlproxy.vagov.dev"
+   },
+   "email" : "vets.gov.user+0@gmail.com",
+   "lname" : "ALLEN"
+}
