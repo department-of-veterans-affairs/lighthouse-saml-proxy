@@ -84,8 +84,6 @@ describe('getMVITraitsForLoa3User', () => {
         'x-va-idp-uuid': expect.any(String),
         'x-va-user-email': expect.any(String),
         'x-va-mhv-icn': expect.any(String),
-        'x-va-ssn': null,
-        'x-va-dslogon-edipi': null,
         'x-va-level-of-assurance': '3',
       }),
     });
@@ -107,8 +105,6 @@ describe('getMVITraitsForLoa3User', () => {
         'x-va-last-name': expect.any(String),
         'x-va-dob': expect.any(String),
         'x-va-gender': expect.any(String),
-        'x-va-mhv-icn': null,
-        'x-va-dslogon-edipi': null,
         'x-va-level-of-assurance': '3',
       }),
     });
