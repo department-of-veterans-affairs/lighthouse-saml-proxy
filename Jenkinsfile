@@ -19,6 +19,7 @@ pipeline {
         dockerfile {
           args "--entrypoint='' -u 0:0"
           dir "saml-proxy"
+          label 'vetsgov-general-purpose'
         }
       }
 
