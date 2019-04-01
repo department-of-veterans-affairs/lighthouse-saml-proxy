@@ -17,6 +17,11 @@ services:
       - dynamodb
     ports:
       - "7100:7100"
+    environment:
+      # The values here must match the values found in dynamo_schema.js.
+      - AWS_ACCESS_KEY_ID=NONE
+      - AWS_SECRET_ACCESS_KEY=NONE
+      - AWS_DEFAULT_REGION=us-west-2
     volumes:
       - .:/opt/app
     command: "--config dev-config.json"
