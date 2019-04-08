@@ -150,8 +150,8 @@ function startApp(issuer) {
       if (oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1) {
         const errorParams = new URLSearchParams({
           error: 'invalid_client',
-          error_description: 'The specified client is not valid. ' +
-                             'Client redirect URI does not match any application redirect URIs.',
+          error_description: 'The redirect URI specified by the application does not match any of the ' +
+                             `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`
         });
         return res.redirect(`${client_redirect}?${errorParams.toString()}`);
       }
