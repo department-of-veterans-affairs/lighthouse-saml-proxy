@@ -150,7 +150,8 @@ function startApp(issuer) {
       if (oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1) {
         const errorParams = new URLSearchParams({
           error: 'invalid_client',
-          error_description: 'The specified client is not valid',
+          error_description: 'The redirect URI specified by the application does not match any of the ' +
+                             `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`
         });
         return res.redirect(`${client_redirect}?${errorParams.toString()}`);
       }
@@ -273,6 +274,22 @@ function startApp(issuer) {
   });
 
   app.use(well_known_base_path, router)
+  // Error handlers. Keep as last middleware
+  // If we have error and description as query params display them, otherwise go to the
+  // catchall error handler
+  app.use(function (err, req, res, next) {
+    const { error, error_description } = req.query;
+    if (error && error_description) {
+      res.status(500).send(`${error}: ${error_description}`);
+    } else {
+      next(err);
+    }
+  });
+
+  app.use(function (err, req, res, next) {
+    res.status(500).send('An unknown error has occured');
+  })
+
   server = app.listen(port, () => console.log(`OAuth Proxy listening on port ${port}!`));
   server.keepAliveTimeout = 75000;
   return app;
