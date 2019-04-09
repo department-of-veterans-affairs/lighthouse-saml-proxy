@@ -3,7 +3,7 @@ import * as request from 'request-promise-native';
 import { VetsAPIClient } from './VetsAPIClient';
 jest.mock('request-promise-native', () => {
   return {
-    get: jest.fn((_) => Promise.resolve({})),
+    post: jest.fn((_) => Promise.resolve({})),
   };
 });
 
@@ -37,8 +37,8 @@ const samlTraitsICN = {
 };
 
 beforeEach(() => {
-  request.get.mockReset();
-  request.get.mockImplementation((_) => Promise.resolve({
+  request.post.mockReset();
+  request.post.mockImplementation((_) => Promise.resolve({
     data: {
       id: 'fakeICN',
       type: "user-mvi-icn",
@@ -52,60 +52,66 @@ beforeEach(() => {
 });
 
 describe('getMVITraitsForLoa3User', () => {
-  it('should call the mvi-user endpoint with the Veteran\'s EIDPI in a header', async () => {
+  it('should call the mvi-user endpoint with the Veteran\'s EIDPI in request body', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getMVITraitsForLoa3User(samlTraitsEDIPI);
-    expect(request.get).toHaveBeenCalledWith({
+    expect(request.post).toHaveBeenCalledWith({
       url: 'https://example.gov/internal/auth/v0/mvi-user',
       json: true,
       headers: expect.objectContaining({
         apiKey: 'faketoken',
-        'x-va-idp-uuid': expect.any(String),
-        'x-va-user-email': expect.any(String),
-        'x-va-dslogon-edipi': expect.any(String),
-        'x-va-first-name': expect.any(String),
-        'x-va-middle-name': expect.any(String),
-        'x-va-last-name': expect.any(String),
-        'x-va-dob': expect.any(String),
-        'x-va-gender': expect.any(String),
-        'x-va-level-of-assurance': '3',
+      }),
+      body: expect.objectContaining({
+        idp_uuid: samlTraitsEDIPI.uuid,
+        user_email: samlTraitsEDIPI.email,
+        dslogon_edipi: samlTraitsEDIPI.edipi,
+        first_name: samlTraitsEDIPI.firstName,
+        middle_name: samlTraitsEDIPI.middleName,
+        last_name: samlTraitsEDIPI.lastName,
+        dob: samlTraitsEDIPI.dateOfBirth,
+        gender: samlTraitsEDIPI.gender,
+        level_of_assurance: '3',
       }),
     });
   });
 
-  it('should call the mvi-user endpoint with the Veteran\'s icn in headers', async () => {
+  it('should call the mvi-user endpoint with the Veteran\'s icn in request body', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getMVITraitsForLoa3User(samlTraitsICN);
-    expect(request.get).toHaveBeenCalledWith({
+    expect(request.post).toHaveBeenCalledWith({
       url: 'https://example.gov/internal/auth/v0/mvi-user',
       json: true,
       headers: expect.objectContaining({
         apiKey: 'faketoken',
-        'x-va-idp-uuid': expect.any(String),
-        'x-va-user-email': expect.any(String),
-        'x-va-mhv-icn': expect.any(String),
-        'x-va-level-of-assurance': '3',
+      }),
+      body: expect.objectContaining({
+        idp_uuid: samlTraitsICN.uuid,
+        user_email: samlTraitsICN.email,
+        mhv_icn: samlTraitsICN.icn,
+        level_of_assurance: '3',
       }),
     });
   });
 
-  it('should call the mvi-user endpoint with the Veteran\'s PII in headers', async () => {
+  it('should call the mvi-user endpoint with the Veteran\'s PII in request body', async () => {
     const client = new VetsAPIClient('faketoken', 'https://example.gov');
     await client.getMVITraitsForLoa3User(samlTraits);
-    expect(request.get).toHaveBeenCalledWith({
+    expect(request.post).toHaveBeenCalledWith({
       url: 'https://example.gov/internal/auth/v0/mvi-user',
       json: true,
       headers: expect.objectContaining({
         apiKey: 'faketoken',
-        'x-va-idp-uuid': expect.any(String),
-        'x-va-user-email': expect.any(String),
-        'x-va-ssn': expect.any(String),
-        'x-va-first-name': expect.any(String),
-        'x-va-middle-name': expect.any(String),
-        'x-va-last-name': expect.any(String),
-        'x-va-dob': expect.any(String),
-        'x-va-gender': expect.any(String),
-        'x-va-level-of-assurance': '3',
+      }),
+      body: expect.objectContaining({
+        idp_uuid: samlTraits.uuid,
+        user_email: samlTraits.email,
+        ssn: samlTraits.ssn,
+        first_name: samlTraits.firstName,
+        middle_name: samlTraits.middleName,
+        last_name: samlTraits.lastName,
+        dob: samlTraits.dateOfBirth,
+        gender: samlTraits.gender,
+        level_of_assurance: '3',
       }),
     });
   });
