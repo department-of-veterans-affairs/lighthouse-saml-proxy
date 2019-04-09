@@ -27,24 +27,29 @@ export class VetsAPIClient {
   public async getMVITraitsForLoa3User(user: SAMLUser) : Promise<{ icn: string, first_name: string, last_name: string }> {
     const headers = {
       'apiKey': this.token,
-      'x-va-idp-uuid': user.uuid,
-      'x-va-user-email': user.email,
-      'x-va-dslogon-edipi': user.edipi || null,
-      'x-va-mhv-icn': user.icn || null,
-      'x-va-ssn': user.ssn || null,
-      'x-va-first-name': user.firstName || null,
-      'x-va-middle-name': user.middleName || null,
-      'x-va-last-name': user.lastName || null,
-      'x-va-dob': user.dateOfBirth || null,
-      'x-va-gender': user.gender || null,
-      'x-va-level-of-assurance': '3',
     };
+
+    const body = {
+      'idp_uuid': user.uuid,
+      'user_email': user.email,
+      'dslogon_edipi': user.edipi || null,
+      'mhv_icn': user.icn || null,
+      'ssn': user.ssn || null,
+      'first_name': user.firstName || null,
+      'middle_name': user.middleName || null,
+      'last_name': user.lastName || null,
+      'dob': user.dateOfBirth || null,
+      'gender': user.gender || null,
+      'level_of_assurance': '3',
+    };
+
     // @ts-ignore TS7017
     Object.keys(headers).forEach((key) => (headers[key] == null) && delete headers[key]);
-    const response = await request.get({
+    const response = await request.post({
       url: `${this.apiHost}${LOOKUP_PATH}`,
       json: true,
       headers,
+      body,
     });
     return response.data.attributes;
   }
