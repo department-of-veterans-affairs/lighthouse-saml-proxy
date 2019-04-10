@@ -67,7 +67,8 @@ function runServer(argv) {
       const vaConfig = new VetsAPIConfig(argv);
       configureExpress(app, argv, idpConfig, spConfig, vaConfig);
 
-      console.log('starting proxy server on port %s', app.get('port'));
+      const env = app.get('env');
+      console.log('starting proxy server on port %s in %s mode', app.get('port'), env);
 
       httpServer.keepAliveTimeout = 75000;
       httpServer.listen(app.get('port'), function() {
