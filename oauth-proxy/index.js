@@ -290,7 +290,8 @@ function startApp(issuer) {
     res.status(500).send('An unknown error has occured');
   })
 
-  server = app.listen(port, () => console.log(`OAuth Proxy listening on port ${port}!`));
+  const env = app.get('env');
+  server = app.listen(port, () => console.log(`OAuth Proxy listening on port ${port} in ${env} mode!`));
   server.keepAliveTimeout = 75000;
   return app;
 }
