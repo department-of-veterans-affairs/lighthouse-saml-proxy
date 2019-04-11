@@ -43,8 +43,6 @@ export class VetsAPIClient {
       'level_of_assurance': '3',
     };
 
-    // @ts-ignore TS7017
-    Object.keys(headers).forEach((key) => (headers[key] == null) && delete headers[key]);
     const response = await request.post({
       url: `${this.apiHost}${LOOKUP_PATH}`,
       json: true,
