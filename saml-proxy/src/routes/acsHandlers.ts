@@ -61,7 +61,16 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     req.user.claims.lastName = last_name;
     next();
   } catch (error) {
-    res.render(mviErrorTemplate(error), {});
+    const mviError = error;
+
+    try  {
+      const { poa } = await req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName);
+      req.user.claims.poa = poa;
+      next();
+    } catch (error) {
+      console.log(error);
+      res.render(mviErrorTemplate(mviError), {});
+    }
   }
 };
 
