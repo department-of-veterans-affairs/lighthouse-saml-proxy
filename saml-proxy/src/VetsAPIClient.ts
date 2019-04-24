@@ -54,7 +54,7 @@ export class VetsAPIClient {
     return response.data.attributes;
   }
 
-  public async getVSOSearch(firstName: String, lastName: String) : Promise<{poa: string}> {
+  public async getVSOSearch(firstName: string, lastName: string) : Promise<{poa: string}> {
 
     const body = {
       'first_name': firstName,
