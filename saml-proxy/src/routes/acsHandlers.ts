@@ -68,7 +68,6 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
       req.user.claims.poa = poa;
       next();
     } catch (error) {
-      console.log(error);
       res.render(mviErrorTemplate(mviError), {});
     }
   }
