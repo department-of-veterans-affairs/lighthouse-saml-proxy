@@ -13,7 +13,7 @@ export interface SAMLUser {
   icn?: string;
 }
 
-const LOOKUP_PATH = '/internal/auth/v0/mvi-user';
+const MVI_PATH = '/internal/auth/v0/mvi-user';
 
 export class VetsAPIClient {
   token: string;
@@ -44,7 +44,7 @@ export class VetsAPIClient {
     };
 
     const response = await request.post({
-      url: `${this.apiHost}${LOOKUP_PATH}`,
+      url: `${this.apiHost}${MVI_PATH}`,
       json: true,
       headers,
       body,
