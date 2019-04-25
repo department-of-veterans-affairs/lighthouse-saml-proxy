@@ -56,7 +56,7 @@ export class VetsAPIClient {
 
   public async getVSOSearch(firstName: string, lastName: string) : Promise<{poa: string}> {
 
-    const body = {
+    const qs = {
       'first_name': firstName,
       'last_name': lastName
     }
@@ -65,8 +65,8 @@ export class VetsAPIClient {
       url: `${this.apiHost}${VSO_SEARCH_PATH}`,
       json: true,
       headers: this.headers,
-      body,
+      qs,
     });
-    return response.data.attributes;
+    return response.data.attributes.power_of_attorney_code;
   }
 }
