@@ -14,7 +14,7 @@ export interface SAMLUser {
 }
 
 const MVI_PATH = '/internal/auth/v0/mvi-user';
-const VSO_SEARCH_PATH = '/services/veteran/v0/representatives/search';
+const VSO_SEARCH_PATH = '/services/veteran/v0/representatives/find_rep';
 
 export class VetsAPIClient {
   token: string;
@@ -67,6 +67,6 @@ export class VetsAPIClient {
       headers: this.headers,
       qs,
     });
-    return response.data.attributes.power_of_attorney_code;
+    return response.data.attributes
   }
 }
