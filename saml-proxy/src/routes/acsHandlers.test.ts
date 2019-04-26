@@ -180,7 +180,7 @@ describe('loadICN', () => {
     expect(req.user.claims.icn).toEqual('anICN');
   });
 
-  it('should render error page when getMVITraitsForLoa3User errors', async () => {
+  it('should render error page when getMVITraitsForLoa3User errors and getVSOSearch errors', async () => {
     const nextFn = jest.fn();
     const render = jest.fn();
     const req = {
@@ -193,6 +193,7 @@ describe('loadICN', () => {
     err.name = 'StatusCodeError';
     err.statusCode = '404';
     req.vetsAPIClient.getMVITraitsForLoa3User.mockRejectedValueOnce(err);
+    req.vetsAPIClient.getVSOSearch.mockRejectedValueOnce(err);
     await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
   });
