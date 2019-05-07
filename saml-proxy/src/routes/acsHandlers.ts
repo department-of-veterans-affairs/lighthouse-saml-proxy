@@ -6,7 +6,7 @@ import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
 import samlp from "samlp"; import * as url from "url";
 
-const mviErrorTemplate = (error: any) => {
+const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
 
@@ -61,7 +61,14 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     req.user.claims.lastName = last_name;
     next();
   } catch (error) {
-    res.render(mviErrorTemplate(error), {});
+    const mviError = error;
+
+    try  {
+      await req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName);
+      next();
+    } catch (error) {
+      res.render(unknownUsersErrorTemplate(mviError), {});
+    }
   }
 };
 
