@@ -170,6 +170,9 @@ function startApp(issuer) {
     }
     const params = new URLSearchParams(req.query);
     params.set('redirect_uri', redirect_uri);
+    if (!params.has('idp') && config.idp) {
+      params.set('idp', config.idp);
+    }
     res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
   });
 
