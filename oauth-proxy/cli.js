@@ -52,7 +52,10 @@ function processArgs() {
       },
       validate_apiKey: {
         description: 'apiKey permitting access to validate endpoint',
-      }
+      },
+      idp: {
+        description: 'Okta IDP identifier to be added as a query param (idp) if not specified by user in authorize request'
+      },
     })
     .wrap(yargs.terminalWidth())
     .argv;
