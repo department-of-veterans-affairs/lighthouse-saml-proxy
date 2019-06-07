@@ -64,6 +64,7 @@
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.15",
     "body-parser": "~1.18.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
     "event-stream": "^3.3.4",
