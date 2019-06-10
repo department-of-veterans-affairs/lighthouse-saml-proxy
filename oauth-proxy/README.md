@@ -1,6 +1,6 @@
 # OAuth Proxy
 
-This is a slim proxy for transforming and storing values from Okta's OpenID Connect service in order to be compatible with the SMART-on-FIHR auth specification.
+This is a slim proxy for transforming and storing values from Okta's OpenID Connect service in order to be compatible with the SMART-on-FHIR auth specification.
 
 ## Requirements
 
