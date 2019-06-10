@@ -123,3 +123,7 @@ build/
 
 # Local config
 /saml-proxy/dev-config.json
+
+# Coverage data for the test suite
+/oauth-proxy/tests/coverage
+
