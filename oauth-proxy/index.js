@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { Issuer } = require('openid-client');
 const process = require('process');
 const { URL, URLSearchParams } = require('url');
@@ -80,7 +81,14 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   app.use(morgan('combined'));
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
-  router.get('/.well-known/openid-configuration', (req, res) => {
+  const corsHandler = cors({
+    origin: true,
+    optionsSuccessStatus: 200,
+    preflightContinue: true,
+  });
+  router.options('/.well-known/*', corsHandler);
+
+  router.get('/.well-known/openid-configuration', corsHandler, (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
@@ -90,7 +98,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
     res.json(filteredMetadata);
   });
 
-  router.get('/.well-known/smart-configuration.json', (req, res) => {
+  router.get('/.well-known/smart-configuration.json', corsHandler, (req, res) => {
     const baseMetadata = {...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = smartMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
@@ -127,7 +135,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
       console.error(error);
-      next(error); // This error is unrecoverable because we can't look up the original redirect.
+      return next(error); // This error is unrecoverable because we can't look up the original redirect.
     }
   });
 
@@ -147,14 +155,14 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       console.error(error);
       // This error is unrecoverable because we would be unable to verify
       // that we are redirecting to a whitelisted client url
-      next(error);
+      return next(error);
     }
 
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
       console.error(error);
-      next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
+      return next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
     }
     const params = new URLSearchParams(req.query);
     params.set('redirect_uri', redirect_uri);
@@ -194,7 +202,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       try {
         tokens = await client.refresh(req.body.refresh_token);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(error.response.statusCode).json({
           error: error.error,
           error_description: error.error_description,
@@ -265,6 +273,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   });
 
   app.use(well_known_base_path, router)
+
   // Error handlers. Keep as last middleware
   // If we have error and description as query params display them, otherwise go to the
   // catchall error handler
@@ -273,7 +282,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
     } else {
-      next(err);
+      return next(err);
     }
   });
 
