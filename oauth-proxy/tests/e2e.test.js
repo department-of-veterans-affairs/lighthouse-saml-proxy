@@ -148,12 +148,14 @@ describe('OpenID Connect Conformance', () => {
       jwks_uri: expect.any(String),
     });
 
-    const expectedUrlPattern = `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`;
-    expect(parsedMeta.jwks_uri).toEqual(expect.stringMatching(expectedUrlPattern));
-    expect(parsedMeta.authorization_endpoint).toEqual(expect.stringMatching(expectedUrlPattern));
-    expect(parsedMeta.userinfo_endpoint).toEqual(expect.stringMatching(expectedUrlPattern));
-    expect(parsedMeta.token_endpoint).toEqual(expect.stringMatching(expectedUrlPattern));
-    expect(parsedMeta.introspection_endpoint).toEqual(expect.stringMatching(expectedUrlPattern));
+    const expectedUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
+    expect(parsedMeta).toMatchObject({
+      jwks_uri: expect.stringMatching(expectedUrlPattern),
+      authorization_endpoint: expect.stringMatching(expectedUrlPattern),
+      userinfo_endpoint: expect.stringMatching(expectedUrlPattern),
+      token_endpoint: expect.stringMatching(expectedUrlPattern),
+      introspection_endpoint: expect.stringMatching(expectedUrlPattern),
+    });
 
     await request({ method: 'get', uri: parsedMeta.jwks_uri });
     await request({
@@ -200,11 +202,11 @@ describe('OpenID Connect Conformance', () => {
       uri: 'http://localhost:9090/testServer/.well-known/smart-configuration.json',
     });
     const parsedMeta = JSON.parse(resp);
-    const expectedUrlPattern = `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`;
+    const expectedUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
     expect(parsedMeta).toMatchObject({
-      authorization_endpoint: expect.any(String),
-      token_endpoint: expect.any(String),
-      introspection_endpoint: expect.any(String),
+      authorization_endpoint: expect.stringMatching(expectedUrlPattern),
+      token_endpoint: expect.stringMatching(expectedUrlPattern),
+      introspection_endpoint: expect.stringMatching(expectedUrlPattern),
       scopes_supported: expect.any(Array),
       response_types_supported: expect.any(Array),
       capabilities: expect.any(Array),
