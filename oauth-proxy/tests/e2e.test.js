@@ -137,7 +137,7 @@ describe('OpenID Connect Conformance', () => {
     // much more difficult to use the metadata response to drive the requests
     // for the subsequent requests.
     const resp = await request({
-      methdod: 'get',
+      method: 'get',
       uri: 'http://localhost:9090/f/.well-known/openid-configuration',
     });
     const parsedMeta = JSON.parse(resp);
@@ -196,7 +196,7 @@ describe('OpenID Connect Conformance', () => {
 
   it('responds to the SMART metadata endpoint', async () => {
     const resp = await request({
-      methdod: 'get',
+      method: 'get',
       uri: 'http://localhost:9090/f/.well-known/smart-configuration.json',
     });
     const parsedMeta = JSON.parse(resp);
@@ -216,7 +216,7 @@ describe('OpenID Connect Conformance', () => {
       followRedirect: false,
       simple: false,
       resolveWithFullResponse: true,
-      methdod: 'get',
+      method: 'get',
       uri: 'http://localhost:9090/f/redirect',
       qs: {
         state: 'abc123',
