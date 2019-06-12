@@ -99,6 +99,7 @@ describe('OpenID Connect Conformance', () => {
   let oktaClient;
   let dynamoClient;
   let dynamoHandle;
+  const testServerBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
 
   beforeAll(async () => {
     issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
@@ -148,13 +149,12 @@ describe('OpenID Connect Conformance', () => {
       jwks_uri: expect.any(String),
     });
 
-    const expectedUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
     expect(parsedMeta).toMatchObject({
-      jwks_uri: expect.stringMatching(expectedUrlPattern),
-      authorization_endpoint: expect.stringMatching(expectedUrlPattern),
-      userinfo_endpoint: expect.stringMatching(expectedUrlPattern),
-      token_endpoint: expect.stringMatching(expectedUrlPattern),
-      introspection_endpoint: expect.stringMatching(expectedUrlPattern),
+      jwks_uri: expect.stringMatching(testServerBaseUrlPattern),
+      authorization_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      userinfo_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
     });
 
     await request({ method: 'get', uri: parsedMeta.jwks_uri });
@@ -202,11 +202,10 @@ describe('OpenID Connect Conformance', () => {
       uri: 'http://localhost:9090/testServer/.well-known/smart-configuration.json',
     });
     const parsedMeta = JSON.parse(resp);
-    const expectedUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
     expect(parsedMeta).toMatchObject({
-      authorization_endpoint: expect.stringMatching(expectedUrlPattern),
-      token_endpoint: expect.stringMatching(expectedUrlPattern),
-      introspection_endpoint: expect.stringMatching(expectedUrlPattern),
+      authorization_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
       scopes_supported: expect.any(Array),
       response_types_supported: expect.any(Array),
       capabilities: expect.any(Array),
