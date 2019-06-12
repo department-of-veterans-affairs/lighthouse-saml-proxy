@@ -21,7 +21,7 @@ const TEST_SERVER_PORT = 9090;
 const FAKE_CLIENT_APP_REDIRECT_URL = 'http://localhost:8080/oauth/redirect';
 const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
-  well_known_base_path: '/f',
+  well_known_base_path: '/testServer',
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
 };
 
@@ -138,7 +138,7 @@ describe('OpenID Connect Conformance', () => {
     // for the subsequent requests.
     const resp = await request({
       method: 'get',
-      uri: 'http://localhost:9090/f/.well-known/openid-configuration',
+      uri: 'http://localhost:9090/testServer/.well-known/openid-configuration',
     });
     const parsedMeta = JSON.parse(resp);
     expect(parsedMeta).toMatchObject({
@@ -197,7 +197,7 @@ describe('OpenID Connect Conformance', () => {
   it('responds to the SMART metadata endpoint', async () => {
     const resp = await request({
       method: 'get',
-      uri: 'http://localhost:9090/f/.well-known/smart-configuration.json',
+      uri: 'http://localhost:9090/testServer/.well-known/smart-configuration.json',
     });
     const parsedMeta = JSON.parse(resp);
     const expectedUrlPattern = `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`;
@@ -217,7 +217,7 @@ describe('OpenID Connect Conformance', () => {
       simple: false,
       resolveWithFullResponse: true,
       method: 'get',
-      uri: 'http://localhost:9090/f/redirect',
+      uri: 'http://localhost:9090/testServer/redirect',
       qs: {
         state: 'abc123',
         code: 'xzy789',
