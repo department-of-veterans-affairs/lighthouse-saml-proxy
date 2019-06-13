@@ -11,13 +11,6 @@ const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
 
-const config = processArgs();
-const oktaClient = new okta.Client({
-  orgUrl: config.okta_url,
-  token: config.okta_token,
-  requestExecutor: new okta.DefaultRequestExecutor()
-});
-const { well_known_base_path } = config;
 const appRoutes = {
   authorize: '/authorization',
   token: '/token',
@@ -25,14 +18,6 @@ const appRoutes = {
   introspection: '/introspect',
   jwks: '/keys',
   redirect: '/redirect'
-};
-const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
-const metadataRewrite = {
-  authorization_endpoint: `${config.host}${well_known_base_path}${appRoutes.authorize}`,
-  token_endpoint: `${config.host}${well_known_base_path}${appRoutes.token}`,
-  userinfo_endpoint: `${config.host}${well_known_base_path}${appRoutes.userinfo}`,
-  introspection_endpoint: `${config.host}${well_known_base_path}${appRoutes.introspection}`,
-  jwks_uri: `${config.host}${well_known_base_path}${appRoutes.jwks}`,
 };
 const openidMetadataWhitelist = [
   "issuer",
@@ -71,23 +56,26 @@ const smartCapabilities = [
   "permission-patient",
 ]
 
-const dynamo = dynamoClient.createClient(
-  Object.assign({},
-    { region: config.aws_region },
-    config.aws_id === null ? null : { accessKeyId: config.aws_id },
-    config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
-  ),
-  config.dynamo_local,
-  config.dynamo_table_name,
-);
-
-async function createIssuer() {
+async function createIssuer(config) {
   return await Issuer.discover(config.upstream_issuer);
 }
 
-function startApp(issuer) {
+function buildMetadataRewriteTable(config, appRoutes) {
+  return {
+    authorization_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.authorize}`,
+    token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
+    userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
+    introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
+    jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
+  };
+}
+
+function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
+  const { well_known_base_path } = config;
+  const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
+  const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
+
   const app = express();
-  const { port } = config;
   const router = new express.Router();
   app.use(morgan('combined'));
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
@@ -250,7 +238,7 @@ function startApp(issuer) {
     }
 
     var decoded = jwtDecode(tokens.access_token);
-    if (decoded.scp.indexOf('launch/patient') > -1) {
+    if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
       try {
         const response = await requestPromise({
           method: 'GET',
@@ -291,25 +279,55 @@ function startApp(issuer) {
 
   app.use(function (err, req, res, next) {
     res.status(500).send('An unknown error has occured');
-  })
+  });
 
-  const env = app.get('env');
-  server = app.listen(port, () => console.log(`OAuth Proxy listening on port ${port} in ${env} mode!`));
-  server.keepAliveTimeout = 75000;
   return app;
 }
 
-(async () => {
-  try {
-    const issuer = await createIssuer();
-    startApp(issuer);
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
-})();
+function startApp(config, issuer) {
+  const oktaClient = new okta.Client({
+    orgUrl: config.okta_url,
+    token: config.okta_token,
+    requestExecutor: new okta.DefaultRequestExecutor()
+  });
+
+  const dynamoHandle = dynamoClient.createDynamoHandle(
+    Object.assign({},
+      { region: config.aws_region },
+      config.aws_id === null ? null : { accessKeyId: config.aws_id },
+      config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
+    ),
+    config.dynamo_local,
+    config.dynamo_table_name,
+  );
+
+  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient);
+  const env = app.get('env');
+  const server = app.listen(config.port, () => console.log(`OAuth Proxy listening on port ${config.port} in ${env} mode!`));
+  server.keepAliveTimeout = 75000;
+  return null;
+}
+
+
+// Only start the server if this is being run directly. This is to allow the
+// test suite to import this module without starting the server. We should be
+// able to get rid of this conditional once we break up this module but we
+// can't do that until we have more tests in place.
+if (require.main === module) {
+  (async () => {
+    try {
+      const config = processArgs();
+      const issuer = await createIssuer(config);
+      startApp(config, issuer);
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  })();
+}
 
 module.exports = {
+  buildApp,
   createIssuer,
   startApp,
 }

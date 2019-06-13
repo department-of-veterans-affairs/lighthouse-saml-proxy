@@ -1,0 +1,232 @@
+'use strict';
+
+require('jest');
+const request = require('request-promise-native');
+const { Issuer } = require('openid-client');
+
+const { buildBackgroundServerModule } = require('./backgroundServer');
+const upstreamOAuthTestServer = require('./upstreamOAuthTestServer');
+const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("oauth-proxy test app");
+const { buildApp } = require('../index');
+
+beforeAll(() => {
+  upstreamOAuthTestServer.start();
+});
+
+afterAll(() => {
+  upstreamOAuthTestServer.stop();
+});
+
+const TEST_SERVER_PORT = 9090;
+const FAKE_CLIENT_APP_REDIRECT_URL = 'http://localhost:8080/oauth/redirect';
+const defaultTestingConfig = {
+  host: `http://localhost:${TEST_SERVER_PORT}`,
+  well_known_base_path: '/testServer',
+  upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+};
+
+function buildFakeOktaClient(fakeRecord) {
+  const oktaClient = { getApplication: jest.fn() };
+  oktaClient.getApplication.mockImplementation(client_id => {
+    return new Promise((resolve, reject) => {
+      if (client_id === fakeRecord.client_id) {
+        resolve(fakeRecord);
+      } else {
+        reject(`no such client application '${client_id}'`);
+      }
+    });
+  });
+  return oktaClient;
+}
+
+function convertObjectToDynamoAttributeValues(obj) {
+  return Object.entries(obj).reduce((accum, pair) => {
+    accum[pair[0]] = buildDynamoAttributeValue(pair[1]);
+    return accum;
+  }, {});
+}
+
+function buildDynamoAttributeValue(value) {
+  // BEWARE: This doesn't work with number sets and a few other Dynamo types.
+  if (value.constructor === String) {
+    return { "S": value };
+  } else if (value.constructor === Number) {
+    return { "N": value.toString() };
+  } else if (value.constructor === Boolean) {
+    return { "BOOL": value };
+  } else if (value.constructor === Array) {
+    return { "L": value.map((x) => { buildDynamoAttributeValue(x) }) };
+  } else if (value.constructor === Object) {
+    return { "M": convertObjectToDynamoAttributeValues(value) };
+  } else {
+    throw new Error("Unknown type.");
+  }
+}
+
+function buildFakeDynamoClient(fakeDynamoRecord) {
+  const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
+  dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
+    return new Promise((resolve, reject) => {
+      // It's unclear whether this should resolve with a full records or just
+      // the identity field but thus far it has been irrelevant to the
+      // functional testing of the oauth-proxy.
+      resolve({ pk: state });
+    });
+  });
+  dynamoClient.getFromDynamoBySecondary.mockImplementation((handle, attr, value) => {
+    return new Promise((resolve, reject) => {
+      if (fakeDynamoRecord[attr] === value) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject(`no such ${attr} value`);
+      }
+    });
+  });
+  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
+    return new Promise((resolve, reject) => {
+      if (state === fakeDynamoRecord.state) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject('no such state value');
+      }
+    });
+  });
+  return dynamoClient;
+}
+
+describe('OpenID Connect Conformance', () => {
+  let issuer;
+  let oktaClient;
+  let dynamoClient;
+  let dynamoHandle;
+  const testServerBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
+  const upstreamOAuthTestServerBaseUrlPattern = new RegExp(`^${upstreamOAuthTestServer.baseUrl()}.*`);
+
+  beforeAll(async () => {
+    issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
+    oktaClient = buildFakeOktaClient({
+      client_id: 'clientId123',
+      client_secret: 'secretXyz',
+      settings: {
+        oauthClient: {
+          redirect_uris: ['http://localhost:8080/oauth/redirect'],
+        },
+      }
+    });
+    dynamoClient = buildFakeDynamoClient({
+      state: 'abc123',
+      code: 'xzy789',
+      refresh_token: 'jkl456',
+      redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
+    });
+    dynamoHandle = jest.mock();
+
+    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient);
+    // We're starting and stopping this server in a beforeAll/afterAll pair,
+    // rather than beforeEach/afterEach because this is an end-to-end
+    // functional. Since internal application state could affect functionality
+    // in production, we want to expose these tests to that same risk.
+    startServerInBackground(app, TEST_SERVER_PORT);
+  });
+
+  afterAll(() => {
+    stopBackgroundServer();
+  });
+
+  it('responds to the endpoints described in the OIDC metadata response', async () => {
+    // This test is making multiple requests. Theoretically it could be broken
+    // up, with each request being made in a separate test. That would make it
+    // much more difficult to use the metadata response to drive the requests
+    // for the subsequent requests.
+    const resp = await request({
+      method: 'get',
+      uri: 'http://localhost:9090/testServer/.well-known/openid-configuration',
+    });
+    const parsedMeta = JSON.parse(resp);
+    expect(parsedMeta).toMatchObject({
+      authorization_endpoint: expect.any(String),
+      token_endpoint: expect.any(String),
+      userinfo_endpoint: expect.any(String),
+      jwks_uri: expect.any(String),
+    });
+
+    expect(parsedMeta).toMatchObject({
+      jwks_uri: expect.stringMatching(testServerBaseUrlPattern),
+      authorization_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      userinfo_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+    });
+
+    await request({ method: 'get', uri: parsedMeta.jwks_uri });
+    await request({
+      method: 'get',
+      uri: parsedMeta.userinfo_endpoint,
+    });
+    await request({
+      method: 'post',
+      uri: parsedMeta.introspection_endpoint,
+    });
+    const authorizeResp = await request({
+      followRedirect: false,
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'get',
+      uri: parsedMeta.authorization_endpoint,
+      qs: {
+        client_id: 'clientId123',
+        state: 'abc123',
+        redirect_uri: 'http://localhost:8080/oauth/redirect',
+      },
+    });
+    expect(authorizeResp.statusCode).toEqual(302);
+    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
+    await request({
+      method: 'post',
+      headers: { Authorization: 'Basic clientId123:secretXyz' },
+      uri: parsedMeta.token_endpoint,
+      resolveWithFullResponse: true,
+      form: { grant_type: 'authorization_code', code: 'xzy789' },
+    });
+    // TODO: We should really call the token endpoint using the refresh_token
+    // grant type here. Right now the openid-client library makes this a little
+    // difficult. It automatically verifies the signature of the new access
+    // token. That's great, but doing full e2e testing would require making the
+    // upstream test server support constructing and signing proper JWTs. These
+    // tests should be enough to start breaking up the proxy app code into more
+    // easily testable parts and inject a fake openid client to side-step the
+    // signaure requirement.
+  });
+
+  it('responds to the SMART metadata endpoint', async () => {
+    const resp = await request({
+      method: 'get',
+      uri: 'http://localhost:9090/testServer/.well-known/smart-configuration.json',
+    });
+    const parsedMeta = JSON.parse(resp);
+    expect(parsedMeta).toMatchObject({
+      authorization_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
+      scopes_supported: expect.any(Array),
+      response_types_supported: expect.any(Array),
+      capabilities: expect.any(Array),
+    });
+  });
+
+  it('redirects the user back to the client app', async () => {
+    const resp = await request({
+      followRedirect: false,
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'get',
+      uri: 'http://localhost:9090/testServer/redirect',
+      qs: {
+        state: 'abc123',
+        code: 'xzy789',
+      }
+    });
+    expect(resp.statusCode).toEqual(302);
+    expect(resp.headers.location).toMatch(new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`));
+  });
+});

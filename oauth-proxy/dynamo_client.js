@@ -1,8 +1,14 @@
+'use strict';
+
+// This module is a bit confused re: it's purpose. It exports a method to
+// construct a DynamoDB handle and methods to use that handle. It should
+// probably export an object that ties methods to a particular handle. Alas
+// that will have to wait until we have a proper test suite in place.
 const { config, DynamoDB } = require('aws-sdk');
 
 var TableName;
 
-function createClient(awsConfig, local, tableName) {
+function createDynamoHandle(awsConfig, local, tableName) {
   config.update(awsConfig);
   TableName = tableName;
 
@@ -91,7 +97,7 @@ function saveToDynamo(client, state, key, value) {
 }
 
 module.exports = {
-  createClient,
+  createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
   getFromDynamoBySecondary,
