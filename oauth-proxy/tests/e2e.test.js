@@ -100,6 +100,7 @@ describe('OpenID Connect Conformance', () => {
   let dynamoClient;
   let dynamoHandle;
   const testServerBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
+  const upstreamOAuthTestServerBaseUrlPattern = new RegExp(`^${upstreamOAuthTestServer.baseUrl()}.*`);
 
   beforeAll(async () => {
     issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
@@ -194,6 +195,7 @@ describe('OpenID Connect Conformance', () => {
       },
     });
     expect(authorizeResp.statusCode).toEqual(302);
+    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
   });
 
   it('responds to the SMART metadata endpoint', async () => {
