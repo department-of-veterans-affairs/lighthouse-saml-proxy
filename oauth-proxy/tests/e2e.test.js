@@ -3,6 +3,7 @@
 require('jest');
 const request = require('request-promise-native');
 const { Issuer } = require('openid-client');
+const { randomBytes } = require('crypto');
 
 const { buildBackgroundServerModule } = require('./backgroundServer');
 const upstreamOAuthTestServer = require('./upstreamOAuthTestServer');
@@ -19,6 +20,7 @@ afterAll(() => {
 
 const TEST_SERVER_PORT = 9090;
 const FAKE_CLIENT_APP_REDIRECT_URL = 'http://localhost:8080/oauth/redirect';
+const FAKE_CLIENT_APP_URL_PATTERN = /http:[/][/]localhost:8080.*/;
 const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
   well_known_base_path: '/testServer',
@@ -131,6 +133,23 @@ describe('OpenID Connect Conformance', () => {
 
   afterAll(() => {
     stopBackgroundServer();
+  });
+
+  it('allows CORS on the OIDC metadata endpoint', async () => {
+    const randomHeaderName = randomBytes(20).toString('hex');
+    const resp = await request({
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'options',
+      uri: 'http://localhost:9090/testServer/.well-known/openid-configuration',
+      headers: {
+        'origin': 'http://localhost:8080',
+        'access-control-request-headers': randomHeaderName,
+      }
+    });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.headers['access-control-allow-headers']).toMatch(randomHeaderName);
+    expect(resp.headers['access-control-allow-origin']).toMatch(FAKE_CLIENT_APP_URL_PATTERN);
   });
 
   it('responds to the endpoints described in the OIDC metadata response', async () => {
