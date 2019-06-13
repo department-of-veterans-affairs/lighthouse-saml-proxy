@@ -311,7 +311,7 @@ function startApp(config, issuer) {
 
 // Only start the server if this is being run directly. This is to allow the
 // test suite to import this module without starting the server. We should be
-// able to get run of this conditional once we break up this module but we
+// able to get rid of this conditional once we break up this module but we
 // can't do that until we have more tests in place.
 if (require.main === module) {
   (async () => {

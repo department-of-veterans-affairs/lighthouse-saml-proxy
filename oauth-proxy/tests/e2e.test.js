@@ -167,6 +167,20 @@ describe('OpenID Connect Conformance', () => {
       method: 'post',
       uri: parsedMeta.introspection_endpoint,
     });
+    const authorizeResp = await request({
+      followRedirect: false,
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'get',
+      uri: parsedMeta.authorization_endpoint,
+      qs: {
+        client_id: 'clientId123',
+        state: 'abc123',
+        redirect_uri: 'http://localhost:8080/oauth/redirect',
+      },
+    });
+    expect(authorizeResp.statusCode).toEqual(302);
+    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
     await request({
       method: 'post',
       headers: { Authorization: 'Basic clientId123:secretXyz' },
@@ -182,20 +196,6 @@ describe('OpenID Connect Conformance', () => {
     // tests should be enough to start breaking up the proxy app code into more
     // easily testable parts and inject a fake openid client to side-step the
     // signaure requirement.
-    const authorizeResp = await request({
-      followRedirect: false,
-      simple: false,
-      resolveWithFullResponse: true,
-      method: 'get',
-      uri: parsedMeta.authorization_endpoint,
-      qs: {
-        client_id: 'clientId123',
-        state: 'abc123',
-        redirect_uri: 'http://localhost:8080/oauth/redirect',
-      },
-    });
-    expect(authorizeResp.statusCode).toEqual(302);
-    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
   });
 
   it('responds to the SMART metadata endpoint', async () => {
