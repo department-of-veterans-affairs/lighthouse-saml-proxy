@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
+import flash from 'connect-flash';
 import logger from "morgan";
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
@@ -60,6 +61,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     name: 'idp_sid',
     cookie: { maxAge: 60000 }
   }));
+  app.use(flash());
 
   app.use(sassMiddleware({
     src: path.join(process.cwd(), "styles"),
