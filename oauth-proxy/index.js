@@ -83,7 +83,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   app.use(promBundle({
     includeMethod: true,
     includePath: true,
-    customLables: {app: 'oauth_proxy'},
+    customLabels: {app: 'oauth_proxy'},
   }));
 
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
