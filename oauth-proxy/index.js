@@ -11,6 +11,7 @@ const { processArgs } = require('./cli')
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
+const promBundle = require('express-prom-bundle');
 
 const appRoutes = {
   authorize: '/authorization',
@@ -79,6 +80,12 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   const app = express();
   const router = new express.Router();
   app.use(morgan('combined'));
+  app.use(promBundle({
+    includeMethod: true,
+    includePath: true,
+    customLabels: {app: 'oauth_proxy'},
+  }));
+
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
 
   const corsHandler = cors({
