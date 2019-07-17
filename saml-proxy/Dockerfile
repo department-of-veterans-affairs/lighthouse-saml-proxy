@@ -17,4 +17,5 @@ RUN ./node_modules/.bin/tsc
 HEALTHCHECK --interval=1m --timeout=4s \
   CMD curl -f http://localhost:7000/samlproxy/idp/metadata || exit 1
 
+USER node
 ENTRYPOINT ["node", "build/app.js"]
