@@ -15,4 +15,5 @@ EXPOSE 7200 7200
 HEALTHCHECK --interval=1m --timeout=4s \
   CMD curl -f http://localhost:7200/health-check || exit 1
 
+USER node
 ENTRYPOINT ["node", "index.js"]
