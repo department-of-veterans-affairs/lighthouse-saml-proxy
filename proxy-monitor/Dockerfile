@@ -13,7 +13,7 @@ ADD ./ .
 
 EXPOSE 7200 7200
 HEALTHCHECK --interval=1m --timeout=4s \
-  CMD curl -f http://localhost:7200/health-check || exit 1
+  CMD wget localhost:7200/health-check -q -O - > /dev/null 2>&1
 
 USER node
 ENTRYPOINT ["node", "index.js"]
