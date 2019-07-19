@@ -15,7 +15,7 @@ EXPOSE 7000 7000
 
 RUN ./node_modules/.bin/tsc
 HEALTHCHECK --interval=1m --timeout=4s \
-  CMD curl -f http://localhost:7000/samlproxy/idp/metadata || exit 1
+  CMD wget localhost:7000/samlproxy/idp/metadata -q -O - > /dev/null 2>&1
 
 USER node
 ENTRYPOINT ["node", "build/app.js"]
