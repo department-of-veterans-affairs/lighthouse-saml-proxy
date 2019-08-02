@@ -50,12 +50,12 @@ pipeline {
           booleanParam(name: 'release', value: false),
         ], wait: true
 
-        build job: 'deploys/vets-saml-proxy-dev', parameters: [
+        build job: 'deploys/saml-proxy-dvp-dev', parameters: [
           booleanParam(name: 'notify_slack', value: true),
           stringParam(name: 'ref', value: commit),
         ], wait: false
 
-        build job: 'deploys/vets-saml-proxy-staging', parameters: [
+        build job: 'deploys/saml-proxy-dvp-staging', parameters: [
           booleanParam(name: 'notify_slack', value: true),
           stringParam(name: 'ref', value: commit),
         ], wait: false
