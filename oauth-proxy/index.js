@@ -321,6 +321,7 @@ function startApp(config, issuer) {
   const env = app.get('env');
   const server = app.listen(config.port, () => console.log(`OAuth Proxy listening on port ${config.port} in ${env} mode!`));
   server.keepAliveTimeout = 75000;
+  server.headersTimeout = 75000;
   return null;
 }
 
