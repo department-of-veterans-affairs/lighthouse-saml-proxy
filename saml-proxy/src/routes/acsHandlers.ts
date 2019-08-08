@@ -5,6 +5,7 @@ import { IConfiguredRequest } from './types';
 import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
 import samlp from "samlp"; import * as url from "url";
+import logger from './logger';
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -55,6 +56,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 
 export const loadICN = async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   try {
+    logger.info(`[loadICN] {session identifier} - Calling MVI`)
     const { icn, first_name, last_name }= await req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
     req.user.claims.icn = icn;
     req.user.claims.firstName = first_name;
@@ -67,6 +69,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
       await req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName);
       next();
     } catch (error) {
+      logger.error(`[loadICN] {session identifier} - Failed MVI lookup and VSO search: ${error}`)
       res.render(unknownUsersErrorTemplate(mviError), {});
     }
   }
