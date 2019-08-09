@@ -17,12 +17,12 @@ const logger = createLogger({
 const jsonFormat = (tokens: TokenIndexer, req: Request, res: Response) => (
   JSON.stringify({
     'remote-address': tokens['remote-addr'](req, res),
-    'time': tokens['date'](req, res, 'iso'),
-    'method': tokens['method'](req, res),
-    'url': tokens['url'](req, res),
-    'status-code': tokens['status'](req, res),
-    'content-length': tokens['res'](req, res, 'content-length'),
-    'referrer': tokens['referrer'](req, res),
+    time: tokens.date(req, res, 'iso'),
+    method: tokens.method(req, res),
+    url: tokens.url(req, res),
+    'status-code': tokens.status(req, res),
+    'content-length': tokens.res(req, res, 'content-length'),
+    referrer: tokens.referrer(req, res),
   })
 )
 
