@@ -57,20 +57,20 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 export const loadICN = async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   try {
     const { icn, first_name, last_name }= await req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
-    logger.info(`[loadICN] {session identifier} - Sucessfully retrieved traits for user from MVI`)
+    logger.info('Retrieved user traits from MVI', { action: 'loadICN', result: 'success', session: req.sessionID });
     req.user.claims.icn = icn;
     req.user.claims.firstName = first_name;
     req.user.claims.lastName = last_name;
     next();
   } catch (error) {
     const mviError = error;
-    logger.info(`[loadICN] {session identifier} - Failed MVI lookup; will try VSO search: ${error}`)
+    logger.info(`Failed MVI lookup; will try VSO search: ${error}`, { action: 'loadICN', result: 'failure', session: req.sessionID });
 
     try  {
       await req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName);
       next();
     } catch (error) {
-      logger.error(`[loadICN] {session identifier} - Failed MVI lookup and VSO search: ${error}`)
+      logger.error(`Failed MVI lookup and VSO search: ${error}`, { action: 'loadICN', result: 'failure', session: req.sessionID });
       res.render(unknownUsersErrorTemplate(mviError), {});
     }
   }

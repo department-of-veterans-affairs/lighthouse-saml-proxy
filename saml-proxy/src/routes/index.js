@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import flash from 'connect-flash';
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
+import uuidv4 from 'uuid/v4';
 
 import { loggingMiddleware } from './logger'
 import createPassport from "./passport";
@@ -59,6 +60,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     resave: false,
     saveUninitialized: true,
     name: 'idp_sid',
+    genid: uuidv4,
     cookie: { maxAge: 60000 }
   }));
   app.use(flash());

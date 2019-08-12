@@ -1,11 +1,6 @@
-import { IDP_SSO, SP_VERIFY } from "./constants";
 import { getPath, getReqUrl } from "../utils";
-import assignIn from "lodash.assignin";
-import SessionParticipants from "samlp/lib/sessionParticipants";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
-import { SAMLUser, VetsAPIClient } from '../VetsAPIClient';
-import * as url from "url";
 import {
   buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
@@ -13,6 +8,7 @@ import {
   scrubUserClaims,
   serializeAssertions,
 } from './acsHandlers';
+import logger from "./logger";
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -64,7 +60,10 @@ export const samlLogin = function(template) {
         });
       });
     }, Promise.resolve({})).then(
-      (authOptions) => res.render(template, authOptions)
+      (authOptions) => {
+        logger.info('User arrived from Okta. Rendering IDP login template.', { action: 'parseSamlRequest', result: 'success', session: req.sessionID })
+        res.render(template, authOptions)
+      }
     ).catch(next);
   }
 };
