@@ -44,7 +44,7 @@ pipeline {
           commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
         }
 
-        build job: 'builds/vets-saml-proxy', parameters: [
+        build job: 'builds/saml-proxy', parameters: [
           booleanParam(name: 'notify_slack', value: true),
           stringParam(name: 'ref', value: commit),
           booleanParam(name: 'release', value: false),
