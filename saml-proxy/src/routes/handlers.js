@@ -61,8 +61,8 @@ export const samlLogin = function(template) {
       });
     }, Promise.resolve({})).then(
       (authOptions) => {
-        logger.info('User arrived from Okta. Rendering IDP login template.', { action: 'parseSamlRequest', result: 'success', session: req.sessionID })
         res.render(template, authOptions)
+        logger.info('User arrived from Okta. Rendering IDP login template.', { action: 'parseSamlRequest', result: 'success', session: req.sessionID })
       }
     ).catch(next);
   }
