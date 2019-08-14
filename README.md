@@ -18,7 +18,7 @@ containing fields that correspond to the options documented by the `--help` opti
 config file you can run `npm run-script start-dev` in order to run the proxy with your code changes.
 
 If you're a VA developer looking for the specific values to use for the dev environment, see the documentation
-in the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/Developer%20Process/SAML%20Proxy)
+in the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/practice-areas/engineering/Developer%20Process/SAML%20Proxy)
 
 
 ## OAuth Proxy
