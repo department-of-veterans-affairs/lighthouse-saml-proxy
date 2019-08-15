@@ -5,10 +5,11 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from 'connect-flash';
-import logger from "morgan";
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
+import uuidv4 from 'uuid/v4';
 
+import { loggingMiddleware } from './logger'
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
@@ -46,7 +47,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
    * Middleware
    */
 
-  app.use(logger(':date> :method :url - {:referrer} => :status (:response-time ms)', {
+  app.use(loggingMiddleware({
     skip: function (req, res)
     {
       return req.path.startsWith('/samlproxy/idp/bower_components') || req.path.startsWith('/samlproxy/idp/css');
@@ -59,6 +60,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     resave: false,
     saveUninitialized: true,
     name: 'idp_sid',
+    genid: uuidv4,
     cookie: { maxAge: 60000 }
   }));
   app.use(flash());
