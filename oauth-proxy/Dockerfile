@@ -9,6 +9,9 @@ ADD ./package.json package.json
 ADD ./package-lock.json package-lock.json
 RUN npm install
 
+ADD ./certs/* /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
 ADD ./ .
 
 EXPOSE 7100 7100
