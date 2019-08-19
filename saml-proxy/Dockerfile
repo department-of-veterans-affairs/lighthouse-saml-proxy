@@ -20,5 +20,5 @@ RUN ./node_modules/.bin/tsc
 HEALTHCHECK --interval=1m --timeout=4s \
   CMD wget localhost:7000/samlproxy/idp/metadata -q -O - > /dev/null 2>&1
 
-USER root
+USER node
 ENTRYPOINT ["node", "build/app.js"]
