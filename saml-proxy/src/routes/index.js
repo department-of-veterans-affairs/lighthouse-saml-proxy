@@ -32,6 +32,9 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   });
   app.set('port', process.env.PORT || argv.port);
   app.set('views', path.join(process.cwd(), './views'));
+  // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
+  // but notably sets req.ip = 'X-Forwarded-for'. See http://expressjs.com/en/guide/behind-proxies.html
+  app.set('trust proxy', true)
 
   /**
    * View Engine
