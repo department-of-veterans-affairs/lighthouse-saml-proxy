@@ -79,6 +79,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
 
   const app = express();
   const router = new express.Router();
+  // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
+  // but notably sets req.ip = 'X-Forwarded-for'. See http://expressjs.com/en/guide/behind-proxies.html
+  app.set('trust proxy', true)
   app.use(morgan('combined'));
   app.use(promBundle({
     includeMethod: true,

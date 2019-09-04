@@ -36,8 +36,7 @@ To being you'll want to create a `dev-config.json` in the oauth-proxy subdirecto
 JSON object containing fields that corresponesd to the options document by the `--help` option. Once you've
 created that config you can run `npm start` to run the OAuth proxy with the code changes. 
 
-If you're a VA developer, you can look at the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/Developer%20Process/SAML%20Proxy/OAuthSetup.md) repo for 
-specific values for using our dev Okta environment. 
+If you're a VA developer, you can look at the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/blob/master/practice-areas/engineering/Developer%20Process/SAML%20Proxy/OAuthSetup.md) repo for specific values for using our dev Okta environment.
 
 You'll also want to setup a local instance of DynamoDB either by running `docker-compose` to start the proxy or 
 by downloading and running it following [Amazon's instructions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html).
