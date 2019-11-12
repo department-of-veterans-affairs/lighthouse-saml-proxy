@@ -17,8 +17,44 @@ import { getParticipant } from "./handlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 
 import promBundle from 'express-prom-bundle';
+import * as Sentry from '@sentry/node';
+
+function filterProperty(object, property) {
+  if (property in object) {
+    object[property] = '[Filtered]';
+  }
+}
 
 export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENVIRONMENT,
+    beforeSend(event) {
+      filterProperty(event.request, 'cookies');
+      filterProperty(event.request.headers, 'cookie');
+      filterProperty(event.request.headers, 'authorization');
+
+      let data;
+      try {
+        data = JSON.parse(event.request.data);
+        filterProperty(data, 'SAMLResponse');
+        filterProperty(data, 'SAMLRequest');
+      } catch (err) {
+        data = event.request.data;
+      }
+
+      event.request.data = data;
+      return event;
+    },
+    shouldHandleError(error) {
+      // This is the default for Sentry (above 500s are sent to Sentry). I think there is a discussion to be had on what
+      // errors we want to make it to Sentry. I could see us passing all errors through to Sentry, 4xx and 5xx
+      if (error.status >= 500) {
+        return true
+      }
+      return false
+    }
+  });
   const [ passport, strategy ] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
@@ -43,6 +79,9 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.set('view engine', 'hbs');
   app.set('view options', { layout: 'layout' });
   app.engine('handlebars', hbs.__express);
+  app.use(Sentry.Handlers.requestHandler({
+    user: false,
+  }));
   app.use(metricsMiddleware);
   app.use(passport.initialize());
 
@@ -103,6 +142,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
 
   addRoutes(app, idpOptions, spOptions);
 
+  app.use(Sentry.Handlers.errorHandler());
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     const err = new Error('Route Not Found');

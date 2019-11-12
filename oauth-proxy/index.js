@@ -12,6 +12,7 @@ const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
+const Sentry = require('@sentry/node');
 
 const appRoutes = {
   authorize: '/authorization',
@@ -72,7 +73,31 @@ function buildMetadataRewriteTable(config, appRoutes) {
   };
 }
 
+function filterProperty(object, property) {
+  if (property in object) {
+    object[property] = '[Filtered]';
+  }
+}
+
 function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENVIRONMENT,
+    beforeSend(event) {
+      filterProperty(event.request, 'cookies');
+      filterProperty(event.request.headers, 'cookie');
+      filterProperty(event.request.headers, 'authorization');
+      return event;
+    },
+    shouldHandleError(error) {
+      // This is the default for Sentry (above 500s are sent to Sentry). I think there is a discussion to be had on what
+      // errors we want to make it to Sentry. I could see us passing all errors through to Sentry, 4xx and 5xx
+      if (error.status >= 500) {
+        return true
+      }
+      return false
+    }
+  });
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
@@ -82,6 +107,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
   // but notably sets req.ip = 'X-Forwarded-for'. See http://expressjs.com/en/guide/behind-proxies.html
   app.set('trust proxy', true)
+  app.use(Sentry.Handlers.requestHandler({
+    user: false,
+  }));
   app.use(morgan('combined'));
   app.use(promBundle({
     includeMethod: true,
@@ -287,6 +315,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   // Error handlers. Keep as last middleware
   // If we have error and description as query params display them, otherwise go to the
   // catchall error handler
+  app.use(Sentry.Handlers.errorHandler());
   app.use(function (err, req, res, next) {
     const { error, error_description } = req.query;
     if (error && error_description) {
