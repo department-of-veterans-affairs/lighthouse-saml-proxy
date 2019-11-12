@@ -80,15 +80,17 @@ function filterProperty(object, property) {
 }
 
 function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
-  const useSentry = typeof process.env.SENTRY_DSN !== 'undefined' && typeof process.env.SENTRY_ENVIRONMENT !== 'undefined';
+  const useSentry = typeof config.sentry_dsn !== 'undefined' && typeof config.sentry_environment !== 'undefined';
   if (useSentry) {
     Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment: process.env.SENTRY_ENVIRONMENT,
+      dsn: config.sentry_dsn,
+      environment: config.sentry_environment,
       beforeSend(event) {
-        filterProperty(event.request, 'cookies');
-        filterProperty(event.request.headers, 'cookie');
-        filterProperty(event.request.headers, 'authorization');
+        if (event.request) {
+          filterProperty(event.request, 'cookies');
+          filterProperty(event.request.headers, 'cookie');
+          filterProperty(event.request.headers, 'authorization');
+        }
         return event;
       },
       shouldHandleError(error) {

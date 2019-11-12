@@ -56,6 +56,16 @@ function processArgs() {
       idp: {
         description: 'Okta IDP identifier to be added as a query param (idp) if not specified by user in authorize request'
       },
+      sentry_dsn: {
+        description: 'URL of the sentry project to send errors',
+        required: false,
+        string: true
+      },
+      sentry_environment: {
+        description: 'Environment of the Sentry project',
+        required: false,
+        string: true
+      },
     })
     .wrap(yargs.terminalWidth())
     .argv;

@@ -26,26 +26,28 @@ function filterProperty(object, property) {
 }
 
 export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
-  const useSentry = typeof process.env.SENTRY_DSN !== 'undefined' && typeof process.env.SENTRY_ENVIRONMENT !== 'undefined';
+  const useSentry = typeof argv.sentryDSN !== 'undefined' && typeof argv.sentryEnvironment !== 'undefined';
   if (useSentry) {
     Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment: process.env.SENTRY_ENVIRONMENT,
+      dsn: argv.sentryDSN,
+      environment: argv.sentryEnvironment,
       beforeSend(event) {
-        filterProperty(event.request, 'cookies');
-        filterProperty(event.request.headers, 'cookie');
-        filterProperty(event.request.headers, 'authorization');
+        if (event.request) {
+          filterProperty(event.request, 'cookies');
+          filterProperty(event.request.headers, 'cookie');
+          filterProperty(event.request.headers, 'authorization');
 
-        let data;
-        try {
-          data = JSON.parse(event.request.data);
-          filterProperty(data, 'SAMLResponse');
-          filterProperty(data, 'SAMLRequest');
-        } catch (err) {
-          data = event.request.data;
+          let data;
+          try {
+            data = JSON.parse(event.request.data);
+            filterProperty(data, 'SAMLResponse');
+            filterProperty(data, 'SAMLRequest');
+          } catch (err) {
+            data = event.request.data;
+          }
+
+          event.request.data = data;
         }
-
-        event.request.data = data;
         return event;
       },
       shouldHandleError(error) {
