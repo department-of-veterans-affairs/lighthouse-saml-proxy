@@ -53,7 +53,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
       shouldHandleError(error) {
         // This is the default for Sentry (above 500s are sent to Sentry). I think there is a discussion to be had on what
         // errors we want to make it to Sentry. I could see us passing all errors through to Sentry, 4xx and 5xx
-        if (error.status >= 500) {
+        if (error.status >= 400) {
           return true
         }
         return false
