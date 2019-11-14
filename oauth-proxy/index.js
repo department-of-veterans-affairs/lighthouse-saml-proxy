@@ -80,7 +80,7 @@ function filterProperty(object, property) {
 }
 
 function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
-  const useSentry = typeof config.sentry_dsn !== 'undefined' && typeof config.sentry_environment !== 'undefined';
+  const useSentry = config.sentry_dsn !== undefined && config.sentry_environment !== undefined;
   if (useSentry) {
     Sentry.init({
       dsn: config.sentry_dsn,

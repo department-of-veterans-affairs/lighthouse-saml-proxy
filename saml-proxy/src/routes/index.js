@@ -26,7 +26,7 @@ function filterProperty(object, property) {
 }
 
 export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
-  const useSentry = typeof argv.sentryDSN !== 'undefined' && typeof argv.sentryEnvironment !== 'undefined';
+  const useSentry = argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
   if (useSentry) {
     Sentry.init({
       dsn: argv.sentryDSN,
