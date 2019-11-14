@@ -127,6 +127,16 @@ export function processArgs() {
         required: false,
         string: true
       },
+      sentryDSN: {
+        description: 'URL of the sentry project to send errors',
+        required: false,
+        string: true
+      },
+      sentryEnvironment: {
+        description: 'Environment of the Sentry project',
+        required: false,
+        string: true
+      },
       spProtocol: {
         description: 'Federation Protocol',
         required: true,
