@@ -105,8 +105,9 @@ export const testLevelOfAssuranceOrRedirect = (req: IConfiguredRequest, res: Res
         authnContext: "http://idmanagement.gov/ns/assurance/loa/3"
       }
     }));
+  } else {
+    next();
   }
-  next();
 };
 
 export const serializeAssertions = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
