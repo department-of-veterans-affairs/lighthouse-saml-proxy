@@ -1,4 +1,4 @@
-import { getPath, getReqUrl } from "../utils";
+import { getPath, getReqUrl, logRelayState } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import {
@@ -73,6 +73,7 @@ export const samlLogin = function(template) {
  */
 
 export const parseSamlRequest = function(req, res, next) {
+  logRelayState(req, logger, 'from Okta');
   samlp.parseRequest(req, function(err, data) {
     if (err) {
       console.warn("Allowing login with no final redirect.");
