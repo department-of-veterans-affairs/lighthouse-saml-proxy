@@ -115,9 +115,19 @@ export const serializeAssertions = (req: IConfiguredRequest, res: Response, next
   const authOptions = assignIn({}, req.idp.options);
   if (req.session) {
     authOptions.RelayState = req.session.ssoResponse.state;
+    const logObj = {
+      session: req.sessionID,
+      stateFromSession: true,
+      step: 'to Okta',
+      datetime: new Date().toISOString(),
+      relayState: authOptions.RelayState
+    };
+
+    logger.info(`Relay state to Okta (from session): ${authOptions.RelayState}`, logObj);
+  } else {
+    logRelayState(req, logger, 'to Okta');
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  logger.info(`Relay state to Okta: ${authOptions.RelayState}`, {session: req.sessionID, step: 'to Okta', datetime: new Date().toISOString(), relayState: authOptions.RelayState});
   samlp.auth(authOptions)(req, res, next);
 };
 
