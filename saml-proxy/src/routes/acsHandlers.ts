@@ -113,19 +113,28 @@ export const testLevelOfAssuranceOrRedirect = (req: IConfiguredRequest, res: Res
 
 export const serializeAssertions = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   const authOptions = assignIn({}, req.idp.options);
+  const datetime = new Date().toISOString();
   if (req.session) {
     authOptions.RelayState = req.session.ssoResponse.state;
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
       step: 'to Okta',
-      datetime: new Date().toISOString(),
+      datetime,
       relayState: authOptions.RelayState
     };
 
     logger.info(`Relay state to Okta (from session): ${authOptions.RelayState}`, logObj);
   } else {
     logRelayState(req, logger, 'to Okta');
+    const relayState = req.query.RelayState;
+    const logObj = {
+      session: req.sessionID,
+      step: 'to Okta',
+      datetime,
+      relayState
+    };
+    logger.info(`Relay state to Okta (query params): ${req.query.RelayState}`, logObj);
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
   samlp.auth(authOptions)(req, res, next);
