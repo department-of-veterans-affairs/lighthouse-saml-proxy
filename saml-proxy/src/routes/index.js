@@ -27,9 +27,6 @@ function filterProperty(object, property) {
 
 export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
   const useSentry = argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
-  // The default secret is temporary while we move to having an actual secret for session signing. Having the secret
-  // default to the current hardcoded secret helps by allowing us to not worry about deployment schedules
-  const sessionSecret = argv.sessionSecret ? argv.sessionSecret : 'The universe works on a math equation that never even ever really ends in the end';
   if (useSentry) {
     Sentry.init({
       dsn: argv.sentryDSN,
@@ -108,7 +105,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(cookieParser());
   app.use(session({
-    secret: sessionSecret,
+    secret: argv.sessionSecret,
     resave: false,
     saveUninitialized: true,
     name: 'idp_sid',

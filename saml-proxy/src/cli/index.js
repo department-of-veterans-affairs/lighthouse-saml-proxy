@@ -139,9 +139,7 @@ export function processArgs() {
       },
       sessionSecret: {
         description: 'Secret used to sign the session cookie',
-        // Required will need to be flipped to true once the saml-proxy is deployed
-        // with sessionSecret populated.
-        required: false,
+        required: true,
         string: true
       },
       spProtocol: {
