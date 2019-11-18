@@ -110,7 +110,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     saveUninitialized: true,
     name: 'idp_sid',
     genid: uuidv4,
-    cookie: { maxAge: 1000 * 60 * 2 }
+    cookie: { maxAge: 1000 * 60 * 5 }
   }));
   app.use(flash());
 
