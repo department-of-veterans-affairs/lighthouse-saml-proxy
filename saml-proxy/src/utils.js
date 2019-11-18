@@ -17,3 +17,8 @@ export function removeHeaders(cert) {
   }
   return cert;
 };
+
+export function logRelayState(req, logger, step) {
+  const relayState = req.body.RelayState;
+  logger.info(`Relay state ${step}: ${relayState}`, { datetime: new Date().toISOString(), relayState, step: step, session: req.sessionID })
+}

@@ -1,5 +1,5 @@
 import { IDP_SSO, SP_VERIFY, SP_LOGIN_URL } from "./constants";
-import { getReqUrl } from '../utils';
+import { getReqUrl, logRelayState } from '../utils';
 import { IConfiguredRequest } from './types';
 
 import { NextFunction, Response } from "express";
@@ -34,6 +34,7 @@ const sufficientLevelOfAssurance = (claims: any) => {
 
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+    logRelayState(req, logger, 'from IDP');
     if ((req.method === 'GET' || req.method === 'POST')
         && (req.query && req.query.SAMLResponse)
         || (req.body && req.body.SAMLResponse)) {
@@ -112,8 +113,28 @@ export const testLevelOfAssuranceOrRedirect = (req: IConfiguredRequest, res: Res
 
 export const serializeAssertions = (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   const authOptions = assignIn({}, req.idp.options);
+  const datetime = new Date().toISOString();
   if (req.session) {
     authOptions.RelayState = req.session.ssoResponse.state;
+    const logObj = {
+      session: req.sessionID,
+      stateFromSession: true,
+      step: 'to Okta',
+      datetime,
+      relayState: authOptions.RelayState
+    };
+
+    logger.info(`Relay state to Okta (from session): ${authOptions.RelayState}`, logObj);
+  } else {
+    logRelayState(req, logger, 'to Okta');
+    const relayState = req.query.RelayState;
+    const logObj = {
+      session: req.sessionID,
+      step: 'to Okta',
+      datetime,
+      relayState
+    };
+    logger.info(`Relay state to Okta (query params): ${req.query.RelayState}`, logObj);
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
   samlp.auth(authOptions)(req, res, next);
