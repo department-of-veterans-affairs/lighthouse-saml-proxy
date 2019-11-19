@@ -6,6 +6,7 @@ import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
 import samlp from "samlp"; import * as url from "url";
 import logger from './logger';
+import { MVILookupBucket, MVIAttempt, MVIFailure, VSOLookupBucket, VSOAttempt, VSOFailure, requestWithMetrics } from "../metrics";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -60,7 +61,11 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
   const action = 'loadICN';
   
   try {
-    const { icn, first_name, last_name }= await req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
+    const {
+      icn,
+      first_name,
+      last_name
+    } = await requestWithMetrics(MVILookupBucket, MVIAttempt, MVIFailure, req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims));
     logger.info('Retrieved user traits from MVI', { session, action, result: 'success' });
     req.user.claims.icn = icn;
     req.user.claims.firstName = first_name;
@@ -71,7 +76,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     logger.info(`Failed MVI lookup; will try VSO search: ${error}`, { session, action, result: 'failure' });
 
     try  {
-      await req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName);
+      await requestWithMetrics(VSOLookupBucket, VSOAttempt, VSOFailure, req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName));
       next();
     } catch (error) {
       logger.error(`Failed MVI lookup and VSO search: ${error}`, { session, action, result: 'failure' });
