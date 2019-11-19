@@ -105,7 +105,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(cookieParser());
   app.use(session({
-    secret: 'The universe works on a math equation that never even ever really ends in the end',
+    secret: argv.sessionSecret,
     resave: false,
     saveUninitialized: true,
     name: 'idp_sid',

@@ -137,6 +137,11 @@ export function processArgs() {
         required: false,
         string: true
       },
+      sessionSecret: {
+        description: 'Secret used to sign the session cookie',
+        required: true,
+        string: true
+      },
       spProtocol: {
         description: 'Federation Protocol',
         required: true,
