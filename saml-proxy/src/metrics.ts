@@ -7,7 +7,7 @@ const bucketLabels = ['status_code'];
 
 export const MVILookupBucket = new client.Histogram({
   name: 'mvi_lookup_bucket',
-  help: 'durtation histogram of duration of MVI lookup requests',
+  help: 'durtation histogram of duration of MVI lookup requests labeled with: app, status_code',
   buckets: latencyBuckets,
   labelNames: bucketLabels,
 });
@@ -24,7 +24,7 @@ export const MVIFailure = new client.Counter({
 
 export const VSOLookupBucket = new client.Histogram({
   name: 'vso_lookup_bucket',
-  help: 'durtation histogram of duration of VSO lookup requests',
+  help: 'durtation histogram of duration of VSO lookup requests labeled with: app, status_code',
   buckets: latencyBuckets,
   labelNames: bucketLabels,
 });
