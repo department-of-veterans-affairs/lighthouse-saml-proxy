@@ -59,13 +59,16 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 export const loadICN = async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
   const session = req.sessionID;
   const action = 'loadICN';
-  
+
   try {
     const {
       icn,
       first_name,
       last_name
-    } = await requestWithMetrics(MVILookupBucket, MVIAttempt, MVIFailure, req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims));
+    } = await requestWithMetrics(MVILookupBucket, MVIAttempt, MVIFailure, (): Promise<any> => {
+      return req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
+    });
+
     logger.info('Retrieved user traits from MVI', { session, action, result: 'success' });
     req.user.claims.icn = icn;
     req.user.claims.firstName = first_name;
@@ -76,7 +79,9 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     logger.info(`Failed MVI lookup; will try VSO search: ${error}`, { session, action, result: 'failure' });
 
     try  {
-      await requestWithMetrics(VSOLookupBucket, VSOAttempt, VSOFailure, req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName));
+      await requestWithMetrics(VSOLookupBucket, VSOAttempt, VSOFailure, (): Promise<any> => {
+        return req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName)
+      });
       next();
     } catch (error) {
       logger.error(`Failed MVI lookup and VSO search: ${error}`, { session, action, result: 'failure' });
