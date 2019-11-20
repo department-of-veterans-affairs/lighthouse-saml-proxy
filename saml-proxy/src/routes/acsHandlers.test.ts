@@ -4,7 +4,6 @@ import { Response, Request, NextFunction } from 'express';
 import * as handlers from './acsHandlers';
 import { VetsAPIClient } from '../VetsAPIClient';
 import { MVIRequestMetrics } from '../metrics';
-import { default as promclient } from 'prom-client';
 jest.mock('../VetsAPIClient');
 
 const client = new VetsAPIClient('fakeToken', 'https://example.gov');
@@ -205,7 +204,7 @@ describe('requestWithMetrics', () => {
   it('should call the passed in functions promise', async () => {
     let called = false;
     const func = () => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, _) => {
         called = true;
         resolve();
       });
@@ -213,5 +212,16 @@ describe('requestWithMetrics', () => {
 
     await handlers.requestWithMetrics(MVIRequestMetrics, func);
     expect(called).toBeTruthy();
+  });
+
+  it('should bubble rejections up as an exception', async () => {
+    const func = () => {
+      return new Promise((_, reject) => {
+        reject(new Error('error'));
+      });
+    };
+
+    // For expect sytax explination checkout https://github.com/facebook/jest/issues/1700
+    await expect(handlers.requestWithMetrics(MVIRequestMetrics, func)).rejects.toThrowError();
   });
 });
