@@ -6,7 +6,7 @@ import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
 import samlp from "samlp"; import * as url from "url";
 import logger from './logger';
-import { MVILookupBucket, MVIAttempt, MVIFailure, VSOLookupBucket, VSOAttempt, VSOFailure, requestWithMetrics } from "../metrics";
+import { MVIRequestMetrics, VSORequestMetrics, IRequestMetrics } from "../metrics";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -65,7 +65,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
       icn,
       first_name,
       last_name
-    } = await requestWithMetrics(MVILookupBucket, MVIAttempt, MVIFailure, (): Promise<any> => {
+    } = await requestWithMetrics(MVIRequestMetrics, (): Promise<any> => {
       return req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
     });
 
@@ -79,7 +79,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     logger.info(`Failed MVI lookup; will try VSO search: ${error}`, { session, action, result: 'failure' });
 
     try  {
-      await requestWithMetrics(VSOLookupBucket, VSOAttempt, VSOFailure, (): Promise<any> => {
+      await requestWithMetrics(VSORequestMetrics, (): Promise<any> => {
         return req.vetsAPIClient.getVSOSearch(req.user.claims.firstName, req.user.claims.lastName)
       });
       next();
@@ -142,3 +142,16 @@ export const serializeAssertions = (req: IConfiguredRequest, res: Response, next
   samlp.auth(authOptions)(req, res, next);
 };
 
+export async function requestWithMetrics(metrics: IRequestMetrics, promiseFunc: () => Promise<any>) {
+  const timer = metrics.histogram.startTimer();
+  metrics.attempt.inc();
+  try {
+    var res = await promiseFunc();
+    timer({status_code: '200'});
+    return res;
+  } catch(err) {
+    metrics.failure.inc();
+    timer({status_code: err.statusCode || 'unknown'});
+    throw err;
+  }
+}

@@ -3,6 +3,8 @@ import { Response, Request, NextFunction } from 'express';
 
 import * as handlers from './acsHandlers';
 import { VetsAPIClient } from '../VetsAPIClient';
+import { MVIRequestMetrics } from '../metrics';
+import { default as promclient } from 'prom-client';
 jest.mock('../VetsAPIClient');
 
 const client = new VetsAPIClient('fakeToken', 'https://example.gov');
@@ -196,5 +198,20 @@ describe('loadICN', () => {
     req.vetsAPIClient.getVSOSearch.mockRejectedValueOnce(err);
     await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
+  });
+});
+
+describe('requestWithMetrics', () => {
+  it('should call the passed in functions promise', async () => {
+    let called = false;
+    const func = () => {
+      return new Promise((resolve, reject) => {
+        called = true;
+        resolve();
+      });
+    }
+
+    await handlers.requestWithMetrics(MVIRequestMetrics, func);
+    expect(called).toBeTruthy();
   });
 });
