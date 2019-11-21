@@ -14,6 +14,8 @@ const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 
+const { loginBegin, loginEnd } = require('./metrics');
+
 const appRoutes = {
   authorize: '/authorization',
   token: '/token',
@@ -177,6 +179,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
     try {
       const document = await dynamoClient.getFromDynamoByState(dynamo, state);
       const params = new URLSearchParams(req.query);
+      loginEnd.inc();
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
       console.error(error);
@@ -185,6 +188,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   });
 
   router.get(appRoutes.authorize, async (req, res, next) => {
+    loginBegin.inc();
     const { state, client_id, redirect_uri: client_redirect } = req.query;
     try {
       const oktaApp = await oktaClient.getApplication(client_id);
