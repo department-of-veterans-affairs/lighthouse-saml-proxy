@@ -9,7 +9,7 @@ const latencyBucketsSecs = [0.05, 0.1, 0.25, 0.5, 1, 2.5, 5];
 const bucketLabels = ['status_code'];
 
 const MVILookupBucket = new client.Histogram({
-  name: 'mvi_lookup_request_duration_seconds_bucket',
+  name: 'mvi_lookup_request_duration_seconds',
   help: 'histogram of duration of MVI lookup requests labeled with: app, status_code',
   buckets: latencyBucketsSecs,
   labelNames: bucketLabels,
@@ -26,7 +26,7 @@ const MVIFailure = new client.Counter({
 });
 
 const VSOLookupBucket = new client.Histogram({
-  name: 'vso_lookup_request_duration_seconds_bucket',
+  name: 'vso_lookup_request_duration_seconds',
   help: 'histogram of duration of VSO lookup requests labeled with: app, status_code',
   buckets: latencyBucketsSecs,
   labelNames: bucketLabels,
