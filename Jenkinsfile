@@ -14,7 +14,7 @@ pipeline {
       }
     }
 
-    stage('Run tests') {
+    stage('Run saml-proxy tests') {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
@@ -32,6 +32,22 @@ pipeline {
       post {
         always {
           junit 'saml-proxy/test-report.xml'
+        }
+      }
+    }
+
+    stage('Run oauth-proxy tests') {
+      agent {
+        dockerfile {
+          args "--entrypoint='' -u 0:0"
+          dir "oauth-proxy"
+          label 'vetsgov-general-purpose'
+        }
+      }
+
+      steps {
+        dir 'oauth-proxy' {
+          sh 'node_modules/.bin/jest'
         }
       }
     }
