@@ -2,9 +2,14 @@ import morgan, { TokenIndexer, Options } from 'morgan';
 import { format, createLogger, transports } from 'winston';
 import { Request, Response } from 'express';
 
+const logFormat = format.combine(
+  format.timestamp(),
+  format.json({ space: 2 })
+);
+
 const logger = createLogger({
   level: 'info',
-  format: format.json(),
+  format: logFormat,
   defaultMeta: { service: 'saml-proxy' },
   transports: [
     new transports.Console({
@@ -14,18 +19,30 @@ const logger = createLogger({
   ]
 });
 
-const jsonFormat = (tokens: TokenIndexer, req: Request, res: Response) => (
-  JSON.stringify({
+const sassLogger = createLogger({
+  level: 'info',
+  format: logFormat,
+  defaultMeta: { service: 'saml-proxy', tag: 'sass' },
+  transports: [new transports.Console()],
+});
+
+const middlewareJsonFormat = (tokens: TokenIndexer, req: Request, res: Response) => {
+  return JSON.stringify({
     'remote-address': tokens['remote-addr'](req, res),
-    time: tokens.date(req, res, 'iso'),
+    timestamp: tokens.date(req, res, 'iso'),
     method: tokens.method(req, res),
     url: tokens.url(req, res),
     'status-code': tokens.status(req, res),
     'content-length': tokens.res(req, res, 'content-length'),
     referrer: tokens.referrer(req, res),
-  })
-)
+  });
+};
 
-export const loggingMiddleware = (options: Options) => morgan(jsonFormat, options);
+const loggingMiddleware = (options: Options) => morgan(middlewareJsonFormat, options);
+
+export {
+  loggingMiddleware,
+  sassLogger,
+};
 
 export default logger;

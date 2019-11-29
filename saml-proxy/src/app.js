@@ -13,6 +13,7 @@ import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";
 import VetsAPIConfig from "./VetsAPIConfig";
 import configureExpress from "./routes";
+import logger from "./logger";
 
 /**
  * Globals
@@ -67,9 +68,7 @@ function runServer(argv) {
       const vaConfig = new VetsAPIConfig(argv);
       configureExpress(app, argv, idpConfig, spConfig, vaConfig);
 
-      const env = app.get('env');
-      console.log('starting proxy server on port %s in %s mode', app.get('port'), env);
-
+      logger.info(`Starting proxy server on port ${app.get('port')} in ${app.get('env')} mode`);
       httpServer.keepAliveTimeout = 75000;
       httpServer.headersTimeout = 75000;
       httpServer.listen(app.get('port'), function() {

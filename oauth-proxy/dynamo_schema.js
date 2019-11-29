@@ -1,4 +1,7 @@
 const { config, DynamoDB } = require('aws-sdk');
+const { processSchemaArgs } = require('./cli'); 
+
+const migrationConfig = processSchemaArgs();
 
 // The credenials set here must match those found in docker-compose.yml, oauth-proxy
 config.update({
@@ -7,9 +10,9 @@ config.update({
   secretAccessKey: 'NONE',
 });
 
-const dynamo = new DynamoDB({
-  endpoint: 'http://dynamodb:8000',
-});
+const endpoint = migrationConfig.local ? 'http://localhost:8000' : 'http://dynamodb:8000';
+console.log(`Running migration to create DynamoDB schema for OAuth proxy against the DynamoDB instance at ${endpoint}...`);
+const dynamo = new DynamoDB({ endpoint });
 
 const tableParams = {
   AttributeDefinitions: [

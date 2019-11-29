@@ -9,7 +9,7 @@ import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
 
-import { loggingMiddleware } from './logger'
+import { loggingMiddleware, sassLogger } from '../logger';
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
@@ -121,6 +121,9 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     importer: tildeImporter,
     outputStyle: 'expanded',
     prefix: '/samlproxy/idp',
+    log: (severity, key, value, message) => {
+      sassLogger.log(severity, { key, value, message });
+    },
   }));
 
   app.use('/samlproxy/idp', express.static(path.join(process.cwd(), 'public')));

@@ -3,6 +3,7 @@
 const util     = require('util'),
       request  = require("request"),
       xml2js   = require('xml2js');
+const logger = require('./logger');
 
 function getBindingLocation(serviceEl, bindingUri) {
   var location;
@@ -99,7 +100,7 @@ export function fetch(url) {
               metadata.signingKeys.push(getFirstCert(keyEl));
             });
           } catch(e) {
-            console.log('unable to parse RoleDescriptor metadata', e);
+            logger.error('unable to parse RoleDescriptor metadata', e);
           }
         }
         return resolve(metadata);

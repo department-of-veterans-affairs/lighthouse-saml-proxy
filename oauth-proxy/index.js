@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { Issuer } = require('openid-client');
 const process = require('process');
-const { URL, URLSearchParams } = require('url');
+const { URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
 const request = require('request');
 const jwtDecode = require('jwt-decode');
@@ -13,6 +13,7 @@ const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
+const logger = require('./logger');
 
 const appRoutes = {
   authorize: '/authorization',
@@ -171,7 +172,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       try {
         await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       }
     }
     try {
@@ -179,7 +180,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       const params = new URLSearchParams(req.query);
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return next(error); // This error is unrecoverable because we can't look up the original redirect.
     }
   });
@@ -197,7 +198,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         return res.redirect(`${client_redirect}?${errorParams.toString()}`);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       // This error is unrecoverable because we would be unable to verify
       // that we are redirecting to a whitelisted client url
       return next(error);
@@ -206,7 +207,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
     }
     const params = new URLSearchParams(req.query);
@@ -247,7 +248,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       try {
         tokens = await client.refresh(req.body.refresh_token);
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(error.response.statusCode).json({
           error: error.error,
           error_description: error.error_description,
@@ -258,7 +259,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         state = document.state.S;
         await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         state = null;
       }
     } else if (req.body.grant_type === 'authorization_code') {
@@ -267,7 +268,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           {...req.body, redirect_uri }
         );
       } catch (error) {
-        console.log(error.response);
+        logger.error(error.response, error);
         res.status(error.response.statusCode).json({
           error: error.error,
           error_description: error.error_description,
@@ -280,7 +281,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         state = null;
       }
     } else {
@@ -305,7 +306,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         const patient = response.data.attributes.va_identifiers.icn;
         res.json({...tokens, patient, state});
       } catch (err) {
-        console.error(err);
+        logger.error(error);
 
         res.status(400).json({
           error: "invalid_grant",
@@ -360,7 +361,12 @@ function startApp(config, issuer) {
 
   const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient);
   const env = app.get('env');
-  const server = app.listen(config.port, () => console.log(`OAuth Proxy listening on port ${config.port} in ${env} mode!`));
+  const server = app.listen(config.port, () => {
+    logger.info(`OAuth Proxy listening on port ${config.port} in ${env} mode!`, {
+      env,
+      port: config.port,
+    });
+  });
   server.keepAliveTimeout = 75000;
   server.headersTimeout = 75000;
   return null;
@@ -378,7 +384,7 @@ if (require.main === module) {
       const issuer = await createIssuer(config);
       startApp(config, issuer);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       process.exit(1);
     }
   })();
