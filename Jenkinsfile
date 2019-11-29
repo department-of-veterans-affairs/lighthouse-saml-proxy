@@ -46,7 +46,7 @@ pipeline {
       }
 
       steps {
-        dir 'oauth-proxy' {
+        dir('oauth-proxy') {
           sh 'node_modules/.bin/jest'
         }
       }
