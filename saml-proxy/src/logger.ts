@@ -6,7 +6,7 @@ const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
   format.json({ 
     space: 2,
-    replacer: (key: string, value: {}) => {
+    replacer: (key: string, value: any) => {
       if (typeof value === "object" && key === "" && "timestamp" in value) {
         delete value["timestamp"];
       }
