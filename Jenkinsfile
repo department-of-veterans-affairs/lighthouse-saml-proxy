@@ -48,7 +48,7 @@ pipeline {
       steps {
         sh '''
           cd /opt/app
-          node_modules/.bin/jest
+          npm run test
         '''
       }
     }
