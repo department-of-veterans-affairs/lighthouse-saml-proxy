@@ -252,7 +252,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         tokens = await client.refresh(req.body.refresh_token);
       } catch (error) {
         console.error(error);
-        res.status(error.response.statusCode).json({
+        const statusCode = statusCodeFromError(error);
+        res.status(statusCode).json({
           error: error.error,
           error_description: error.error_description,
         });
@@ -271,8 +272,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           {...req.body, redirect_uri }
         );
       } catch (error) {
-        console.log(error.response);
-        res.status(error.response.statusCode).json({
+        console.log(error);
+        const statusCode = statusCodeFromError(error);
+        res.status(statusCode).json({
           error: error.error,
           error_description: error.error_description,
         });
@@ -343,6 +345,13 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   });
 
   return app;
+}
+
+function statusCodeFromError(error) {
+  if(error.response && error.response.statusCode) {
+    return error.response.statusCode;
+  }
+  return 500;
 }
 
 function startApp(config, issuer) {
