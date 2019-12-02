@@ -1,7 +1,17 @@
 const { config, DynamoDB } = require('aws-sdk');
-const { processSchemaArgs } = require('./cli'); 
+const yargs = require('yargs');
 
-const migrationConfig = processSchemaArgs();
+const migrationConfig = yargs.usage("DynamoDB schema migration to set up the OAuth Proxy")
+  .options({
+    local: {
+      boolean: true,
+      default: false,
+      description: 'Flag to use localhost instead of Docker container hostname',
+      required: false,
+    }
+  })
+  .wrap(yargs.terminalWidth())
+  .argv;
 
 // The credenials set here must match those found in docker-compose.yml, oauth-proxy
 config.update({

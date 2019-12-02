@@ -71,23 +71,7 @@ function processArgs() {
     .argv;
 }
 
-function processSchemaArgs() {
-  return yargs
-    .usage("DynamoDB schema migration to set up the OAuth Proxy")
-    .options({
-      local: {
-        boolean: true,
-        default: false,
-        description: 'Flag to use localhost instead of Docker container hostname',
-        required: false,
-      }
-    })
-    .wrap(yargs.terminalWidth())
-    .argv;
-}
-
 module.exports = {
   processArgs,
-  processSchemaArgs,
-}
+};
 
