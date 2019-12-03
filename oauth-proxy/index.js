@@ -172,7 +172,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       try {
         await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
       } catch (error) {
-        logger.error(error);
+        logger.error(`Failed to save authorization code in ${appRoutes.redirect} handler`, error);
       }
     }
     try {
@@ -180,7 +180,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       const params = new URLSearchParams(req.query);
       res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
     } catch (error) {
-      logger.error(error);
+      logger.error("Failed to redirect to the OAuth client application", error);
       return next(error); // This error is unrecoverable because we can't look up the original redirect.
     }
   });
@@ -198,7 +198,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         return res.redirect(`${client_redirect}?${errorParams.toString()}`);
       }
     } catch (error) {
-      logger.error(error);
+      logger.error("Unrecoverable error: could not get the Okta client app", error);
       // This error is unrecoverable because we would be unable to verify
       // that we are redirecting to a whitelisted client url
       return next(error);
@@ -207,7 +207,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "redirect_uri", client_redirect);
     } catch (error) {
-      logger.error(error);
+      logger.error(`Failed to save client redirect URI ${client_redirect} in ${appRoutes.authorize} handler`, error);
       return next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
     }
     const params = new URLSearchParams(req.query);
@@ -248,7 +248,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       try {
         tokens = await client.refresh(req.body.refresh_token);
       } catch (error) {
-        logger.error(error);
+        logger.error("Could not refresh the client session with the provided refresh token", error);
         res.status(error.response.statusCode).json({
           error: error.error,
           error_description: error.error_description,
@@ -259,7 +259,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         state = document.state.S;
         await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
       } catch (error) {
-        logger.error(error);
+        logger.error("Could not update the refresh token in DynamoDB", error);
         state = null;
       }
     } else if (req.body.grant_type === 'authorization_code') {
@@ -268,7 +268,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           {...req.body, redirect_uri }
         );
       } catch (error) {
-        logger.error(error.response, error);
+        logger.error("Failed to retrieve tokens using the OpenID client", error);
         res.status(error.response.statusCode).json({
           error: error.error,
           error_description: error.error_description,
@@ -281,7 +281,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
         }
       } catch (error) {
-        logger.error(error);
+        logger.error("Failed to save the new refresh token to DynamoDB", error);
         state = null;
       }
     } else {
@@ -306,7 +306,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         const patient = response.data.attributes.va_identifiers.icn;
         res.json({...tokens, patient, state});
       } catch (err) {
-        logger.error(error);
+        logger.error("Could not find a valid patient identifier for the provided authorization code", err);
 
         res.status(400).json({
           error: "invalid_grant",
@@ -384,7 +384,7 @@ if (require.main === module) {
       const issuer = await createIssuer(config);
       startApp(config, issuer);
     } catch (error) {
-      logger.error(error);
+      logger.error("Could not start the OAuth proxy", error);
       process.exit(1);
     }
   })();
