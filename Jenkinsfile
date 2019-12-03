@@ -26,7 +26,7 @@ pipeline {
       steps {
         sh '''
           cd /opt/app
-          npm run test:ci'
+          npm run test:ci
         '''
       }
       post {
