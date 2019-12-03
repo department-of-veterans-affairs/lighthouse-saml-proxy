@@ -24,8 +24,10 @@ pipeline {
       }
 
       steps {
-        sh 'cd saml-proxy && npm install'
-        sh 'cd saml-proxy && npm run-script ci'
+        sh '''
+          cd /opt/app
+          npm run-script ci'
+        '''
       }
       post {
         always {
