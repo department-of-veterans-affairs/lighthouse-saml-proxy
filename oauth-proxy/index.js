@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const request = require('request');
 const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
-const { processArgs } = require('./cli')
+const { processArgs } = require('./cli');
+const { statusCodeFromError } = require('./utils');
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
@@ -345,13 +346,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   });
 
   return app;
-}
-
-function statusCodeFromError(error) {
-  if(error.response && error.response.statusCode) {
-    return error.response.statusCode;
-  }
-  return 500;
 }
 
 function startApp(config, issuer) {
