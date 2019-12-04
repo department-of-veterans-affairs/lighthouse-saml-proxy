@@ -31,7 +31,7 @@ pipeline {
       }
       post {
         always {
-          junit 'saml-proxy/test-report.xml'
+          junit 'test-report.xml'
         }
       }
     }
