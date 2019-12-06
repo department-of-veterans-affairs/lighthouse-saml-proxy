@@ -5,7 +5,7 @@ import { IConfiguredRequest } from './types';
 import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
 import samlp from "samlp"; import * as url from "url";
-import logger from './logger';
+import logger from '../logger';
 import { MVIRequestMetrics, VSORequestMetrics, IRequestMetrics } from "../metrics";
 
 const unknownUsersErrorTemplate = (error: any) => {
@@ -74,9 +74,8 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     req.user.claims.firstName = first_name;
     req.user.claims.lastName = last_name;
     next();
-  } catch (error) {
-    const mviError = error;
-    logger.info(`Failed MVI lookup; will try VSO search: ${error}`, { session, action, result: 'failure' });
+  } catch (mviError) {
+    logger.warn("Failed MVI lookup; will try VSO search", { mviError, session, action, result: 'failure' });
 
     try  {
       await requestWithMetrics(VSORequestMetrics, (): Promise<any> => {
@@ -84,7 +83,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
       });
       next();
     } catch (error) {
-      logger.error(`Failed MVI lookup and VSO search: ${error}`, { session, action, result: 'failure' });
+      logger.error("Failed MVI lookup and VSO search", { error, session, action, result: 'failure' });
       res.render(unknownUsersErrorTemplate(mviError), {});
     }
   }

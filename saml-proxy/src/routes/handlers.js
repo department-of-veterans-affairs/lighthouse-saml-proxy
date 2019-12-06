@@ -8,7 +8,7 @@ import {
   scrubUserClaims,
   serializeAssertions,
 } from './acsHandlers';
-import logger from "./logger";
+import logger from "../logger";
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -76,7 +76,7 @@ export const parseSamlRequest = function(req, res, next) {
   logRelayState(req, logger, 'from Okta');
   samlp.parseRequest(req, function(err, data) {
     if (err) {
-      console.warn("Allowing login with no final redirect.");
+      logger.warn("Allowing login with no final redirect.")
       next();
     };
     if (data) {

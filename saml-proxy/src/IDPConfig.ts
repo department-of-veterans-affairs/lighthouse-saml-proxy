@@ -3,6 +3,7 @@ import { IDP_SSO } from "./routes/constants";
 import { DOMParser } from "xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp"
 import { Response, Request, NextFunction } from "express"
+import logger from "./logger";
 
 interface IdPRequest extends Request {
   authnRequest?: {
@@ -88,7 +89,7 @@ export default class IDPConfig implements IdPOptions {
       try {
         declDoc = new DOMParser().parseFromString(this.authnContextDecl);
       } catch(err){
-        console.log('Unable to parse Authentication Context Declaration XML', err);
+        logger.error('Unable to parse Authentication Context Declaration XML', err);
       }
       if (declDoc) {
         const authnContextDeclEl = assertionDom.createElementNS('urn:oasis:names:tc:SAML:2.0:assertion', 'saml:AuthnContextDecl');

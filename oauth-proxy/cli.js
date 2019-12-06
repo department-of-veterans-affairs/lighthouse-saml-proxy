@@ -73,5 +73,5 @@ function processArgs() {
 
 module.exports = {
   processArgs,
-}
+};
 
