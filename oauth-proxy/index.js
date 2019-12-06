@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const request = require('request');
 const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
-const { processArgs } = require('./cli')
+const { processArgs } = require('./cli');
+const { statusCodeFromError } = require('./utils');
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
@@ -253,7 +254,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         tokens = await client.refresh(req.body.refresh_token);
       } catch (error) {
         logger.error("Could not refresh the client session with the provided refresh token", error);
-        res.status(error.response.statusCode).json({
+        const statusCode = statusCodeFromError(error);
+        res.status(statusCode).json({
           error: error.error,
           error_description: error.error_description,
         });
@@ -273,7 +275,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
         );
       } catch (error) {
         logger.error("Failed to retrieve tokens using the OpenID client", error);
-        res.status(error.response.statusCode).json({
+        const statusCode = statusCodeFromError(error);
+        res.status(statusCode).json({
           error: error.error,
           error_description: error.error_description,
         });

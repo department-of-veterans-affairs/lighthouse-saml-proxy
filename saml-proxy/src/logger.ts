@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
-  format.json({ 
+  format.json({
     space: 2,
     replacer: (key: string, value: any) => {
       // timestamp format's alias is in addition to "timestamp", this deduplicates the info object

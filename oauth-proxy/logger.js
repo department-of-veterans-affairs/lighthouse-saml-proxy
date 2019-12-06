@@ -2,7 +2,7 @@ const { createLogger, format, transports } = require("winston");
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
-  format.json({ 
+  format.json({
     space: 2,
     replacer: (key, value) => {
       // timestamp format's alias is in addition to "timestamp", this deduplicates the info object
