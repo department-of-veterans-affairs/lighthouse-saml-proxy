@@ -14,7 +14,7 @@ pipeline {
       }
     }
 
-    stage('Run tests') {
+    stage('Run saml-proxy tests') {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
@@ -24,15 +24,27 @@ pipeline {
       }
 
       steps {
-        withEnv(['CI=true']) {
-          sh 'cd saml-proxy && npm install'
-          sh 'cd saml-proxy && npm run-script ci'
+        sh '''
+          cd /opt/app
+          npm run test:ci
+        '''
+      }
+    }
+
+    stage('Run oauth-proxy tests') {
+      agent {
+        dockerfile {
+          args "--entrypoint='' -u 0:0"
+          dir "oauth-proxy"
+          label 'vetsgov-general-purpose'
         }
       }
-      post {
-        always {
-          junit 'saml-proxy/test-report.xml'
-        }
+
+      steps {
+        sh '''
+          cd /opt/app
+          npm run test
+        '''
       }
     }
 
