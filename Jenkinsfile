@@ -29,11 +29,6 @@ pipeline {
           npm run test:ci
         '''
       }
-      post {
-        always {
-          junit 'test-report.xml'
-        }
-      }
     }
 
     stage('Run oauth-proxy tests') {
