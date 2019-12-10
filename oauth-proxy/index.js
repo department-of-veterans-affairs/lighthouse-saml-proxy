@@ -14,7 +14,7 @@ const morgan = require('morgan');
 const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
-const logger = require('./logger');
+const { logger, middlewareLogFormat } = require('./logger');
 
 const { loginBegin, loginEnd } = require('./metrics');
 
@@ -121,7 +121,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
       user: false,
     }));
   }
-  app.use(morgan('combined'));
+  app.use(morgan(middlewareLogFormat));
   app.use(promBundle({
     includeMethod: true,
     includePath: true,
