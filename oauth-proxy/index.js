@@ -96,14 +96,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
           filterProperty(event.request.headers, 'authorization');
         }
         return event;
-      },
-      shouldHandleError(error) {
-        // This is the default for Sentry (above 500s are sent to Sentry). I think there is a discussion to be had on what
-        // errors we want to make it to Sentry. I could see us passing all errors through to Sentry, 4xx and 5xx
-        if (error.status >= 400) {
-          return true
-        }
-        return false
       }
     });
   }
@@ -331,19 +323,25 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   // If we have error and description as query params display them, otherwise go to the
   // catchall error handler
   if (useSentry) {
-    app.use(Sentry.Handlers.errorHandler());
+    if (useSentry) {
+      app.use(Sentry.Handlers.errorHandler({
+        shouldHandleError(error) {
+          if (error.status >= 400) {
+            return true
+          }
+          return false
+        }
+      }));
+    }
   }
+
   app.use(function (err, req, res, next) {
     const { error, error_description } = req.query;
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
     } else {
-      return next(err);
+      res.status(500).send('An unknown error has occured');
     }
-  });
-
-  app.use(function (err, req, res, next) {
-    res.status(500).send('An unknown error has occured');
   });
 
   return app;
