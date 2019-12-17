@@ -11,10 +11,11 @@ RUN npm install
 
 ADD ./certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
-RUN cat certs/*.pem > certs/combined.pem
-ENV NODE_EXTRA_CA_CERTS /opt/app/certs/combined.pem
 
 ADD ./ .
+
+RUN cat certs/*.pem > certs/combined.pem
+ENV NODE_EXTRA_CA_CERTS /opt/app/certs/combined.pem
 
 EXPOSE 7100 7100
 HEALTHCHECK --interval=1m --timeout=4s \
