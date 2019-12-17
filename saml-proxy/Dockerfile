@@ -14,6 +14,9 @@ RUN update-ca-certificates
 
 ADD ./ .
 
+RUN cat certs/*.pem > certs/combined.pem
+ENV NODE_EXTRA_CA_CERTS /opt/app/certs/combined.pem
+
 EXPOSE 7000 7000
 
 RUN ./node_modules/.bin/tsc
