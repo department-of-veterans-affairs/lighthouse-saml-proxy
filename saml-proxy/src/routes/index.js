@@ -49,14 +49,6 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
           event.request.data = data;
         }
         return event;
-      },
-      shouldHandleError(error) {
-        // This is the default for Sentry (above 500s are sent to Sentry). I think there is a discussion to be had on what
-        // errors we want to make it to Sentry. I could see us passing all errors through to Sentry, 4xx and 5xx
-        if (error.status >= 400) {
-          return true
-        }
-        return false
       }
     });
   }
@@ -152,15 +144,23 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
 
   addRoutes(app, idpOptions, spOptions);
 
-  if (useSentry) {
-    app.use(Sentry.Handlers.errorHandler());
-  }
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     const err = new Error('Route Not Found');
     err.status = 404;
     next(err);
   });
+
+  if (useSentry) {
+    app.use(Sentry.Handlers.errorHandler({
+      shouldHandleError(error) {
+        if (error.status >= 400) {
+          return true
+        }
+        return false
+      }
+    }));
+  }
 
   // development error handler
   app.use(function(err, req, res, next) {
