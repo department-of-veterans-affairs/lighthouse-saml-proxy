@@ -21,8 +21,14 @@ const rethrowIfRuntimeError = (err) => {
   }
 };
 
+function encodeBasicAuthHeader(username, password) {
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
+  return `Basic ${encodedCredentials}`;
+}
+
 module.exports = {
   isRuntimeError,
   rethrowIfRuntimeError,
   statusCodeFromError,
+  encodeBasicAuthHeader,
 }
