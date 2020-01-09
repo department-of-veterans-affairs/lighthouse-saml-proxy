@@ -1,7 +1,9 @@
 const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
 
-const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, req, res, next) => {
+const { rethrowIfRuntimeError } = require('../utils');
+
+const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
 
   if (req.headers.authorization) {
@@ -31,18 +33,23 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     try {
       tokens = await client.refresh(req.body.refresh_token);
     } catch (error) {
+      rethrowIfRuntimeError(error);
+
       logger.error("Could not refresh the client session with the provided refresh token", error);
       const statusCode = statusCodeFromError(error);
       res.status(statusCode).json({
         error: error.error,
         error_description: error.error_description,
       });
+      return;
     }
     try {
       const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
       state = document.state.S;
       await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
     } catch (error) {
+      rethrowIfRuntimeError(error);
+
       logger.error("Could not update the refresh token in DynamoDB", error);
       state = null;
     }
@@ -52,6 +59,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         {...req.body, redirect_uri }
       );
     } catch (error) {
+      rethrowIfRuntimeError(error);
+
       logger.error("Failed to retrieve tokens using the OpenID client", error);
       const statusCode = statusCodeFromError(error);
       res.status(statusCode).json({
@@ -66,6 +75,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
       }
     } catch (error) {
+      rethrowIfRuntimeError(error);
+
       logger.error("Failed to save the new refresh token to DynamoDB", error);
       state = null;
     }
@@ -79,20 +90,13 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
     try {
-      const response = await requestPromise({
-        method: 'GET',
-        uri: config.validate_endpoint,
-        json: true,
-        headers: {
-          apiKey: config.validate_apiKey,
-          authorization: `Bearer ${tokens.access_token}`,
-        }
-      });
-      const patient = response.data.attributes.va_identifiers.icn;
+      const validation_result = await validateToken(tokens.access_token);
+      const patient = validation_result.va_identifiers.icn;
       res.json({...tokens, patient, state});
-    } catch (err) {
-      logger.error("Could not find a valid patient identifier for the provided authorization code", err);
+    } catch (error) {
+      rethrowIfRuntimeError(error);
 
+      logger.error("Could not find a valid patient identifier for the provided authorization code", error);
       res.status(400).json({
         error: "invalid_grant",
         error_description: "We were unable to find a valid patient identifier for the provided authorization code.",
