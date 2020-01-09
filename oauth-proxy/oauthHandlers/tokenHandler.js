@@ -1,4 +1,5 @@
 const jwtDecode = require('jwt-decode');
+const requestPromise = require('request-promise-native');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, req, res, next) => {
   let client_id, client_secret;
