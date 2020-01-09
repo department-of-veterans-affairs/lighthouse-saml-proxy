@@ -122,7 +122,7 @@ describe('OpenID Connect Conformance', () => {
     });
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
-      code: 'xzy789',
+      code: 'xyz789',
       refresh_token: 'jkl456',
       redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
     });
@@ -266,7 +266,7 @@ describe('OpenID Connect Conformance', () => {
       },
       form: {
         grant_type: 'authorization_code',
-        code: 'xyz123',
+        code: 'xyz789',
       }
     });
 
