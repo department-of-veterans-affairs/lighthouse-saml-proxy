@@ -27,6 +27,11 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
 };
 
+function encodeAuthHeader(username, password) {
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
+  return `Basic ${encodedCredentials}`;
+}
+
 function buildFakeOktaClient(fakeRecord) {
   const oktaClient = { getApplication: jest.fn() };
   oktaClient.getApplication.mockImplementation(client_id => {
@@ -117,7 +122,7 @@ describe('OpenID Connect Conformance', () => {
     });
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
-      code: 'xzy789',
+      code: 'xyz789',
       refresh_token: 'jkl456',
       redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
     });
@@ -247,5 +252,34 @@ describe('OpenID Connect Conformance', () => {
     });
     expect(resp.statusCode).toEqual(302);
     expect(resp.headers.location).toMatch(new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`));
+  });
+
+  it('returns an OIDC conformant token response', async () => {
+    const resp = await request({
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'post',
+      uri: 'http://localhost:9090/testServer/token',
+      headers: {
+        'authorization': encodeAuthHeader('user', 'pass'),
+        'origin': 'http://localhost:8080',
+      },
+      form: {
+        grant_type: 'authorization_code',
+        code: 'xyz789',
+      }
+    });
+
+    expect(resp.statusCode).toEqual(200);
+    const parsedResp = JSON.parse(resp.body);
+    const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
+    expect(parsedResp).toMatchObject({
+      access_token: expect.stringMatching(JWT_PATTERN),
+      expires_at: expect.any(Number),
+      id_token: expect.stringMatching(JWT_PATTERN),
+      refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
+      scope: expect.stringMatching(/.+/),
+      token_type: 'Bearer',
+    });
   });
 });
