@@ -17,7 +17,7 @@ pipeline {
     stage('Run saml-proxy tests') {
       agent {
         dockerfile {
-          args "--entrypoint='' -u 0:0"
+          args "--entrypoint=''"
           dir "saml-proxy"
           label 'vetsgov-general-purpose'
         }
@@ -34,7 +34,7 @@ pipeline {
     stage('Run oauth-proxy tests') {
       agent {
         dockerfile {
-          args "--entrypoint='' -u 0:0"
+          args "--entrypoint=''"
           dir "oauth-proxy"
           label 'vetsgov-general-purpose'
         }
