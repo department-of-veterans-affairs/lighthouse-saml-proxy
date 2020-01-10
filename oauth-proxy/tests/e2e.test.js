@@ -25,6 +25,8 @@ const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
   well_known_base_path: '/testServer',
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+  validate_endpoint: "http://localhost",
+  validate_apiKey: "fakeApiKey",
 };
 
 function encodeAuthHeader(username, password) {
@@ -128,7 +130,15 @@ describe('OpenID Connect Conformance', () => {
     });
     dynamoHandle = jest.mock();
 
-    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient);
+    const tokenValidator = (access_token) => {
+      return {
+        va_identifiers: {
+          icn: '0000000000000'
+        }
+      };
+    };
+
+    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, tokenValidator);
     // We're starting and stopping this server in a beforeAll/afterAll pair,
     // rather than beforeEach/afterEach because this is an end-to-end
     // functional. Since internal application state could affect functionality

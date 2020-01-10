@@ -4,5 +4,7 @@
   "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
   "dynamo_local": "dynamodb:8000",
   "dynamo_table_name": "OAuthRequests",
-  "okta_url": "https://deptva-eval.okta.com"
+  "okta_url": "https://deptva-eval.okta.com",
+  "validate_endpoint": "https://dev-api.va.gov/services/auth/v0/validate",
+  "validate_apiKey": "<FIX ME>"
 }

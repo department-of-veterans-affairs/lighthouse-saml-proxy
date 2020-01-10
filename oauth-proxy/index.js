@@ -17,6 +17,7 @@ const Sentry = require('@sentry/node');
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
+const { configureTokenValidator } = require('./tokenValidation');
 
 const appRoutes = {
   authorize: '/authorization',
@@ -83,7 +84,7 @@ function filterProperty(object, property) {
   }
 }
 
-function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
+function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToken) {
   const useSentry = config.sentry_dsn !== undefined && config.sentry_environment !== undefined;
   if (useSentry) {
     Sentry.init({
@@ -170,7 +171,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient) {
   });
 
   router.post(appRoutes.token, async (req, res, next) => {
-    await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, req, res, next)
+    await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
   });
 
   app.use(well_known_base_path, router)
@@ -220,7 +221,8 @@ function startApp(config, issuer) {
     config.dynamo_table_name,
   );
 
-  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient);
+  const validateToken = configureTokenValidator(config.validate_endpoint, config.validate_apiKey);
+  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken);
   const env = app.get('env');
   const server = app.listen(config.port, () => {
     logger.info(`OAuth Proxy listening on port ${config.port} in ${env} mode!`, {
