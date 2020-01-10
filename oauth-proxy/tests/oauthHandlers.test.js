@@ -3,6 +3,8 @@
 require('jest');
 
 const { TokenSet } = require('openid-client');
+const timekeeper = require('timekeeper');
+
 const { translateTokenSet } = require('../oauthHandlers/tokenResponse');
 
 describe('translateTokenSet', () => {
@@ -31,18 +33,22 @@ describe('translateTokenSet', () => {
   });
 
   it('translates absolute timestamps to relative timestamps', async () => {
-    const abs_oauth_set = new TokenSet({
-      access_token: 'oauth.is.cool',
-      refresh_token: 'refresh.later',
-      expires_in: 7200,
-    });
-    const now_sec = Math.floor(Date.now() / 1000);
-    expect(abs_oauth_set.expires_at - now_sec).toBeGreaterThanOrEqual(7200);
-    expect(abs_oauth_set.expires_at - now_sec).toBeLessThan(7201);
+    try {
+      timekeeper.freeze(Date.now());
+      const abs_oauth_set = new TokenSet({
+        access_token: 'oauth.is.cool',
+        refresh_token: 'refresh.later',
+        expires_in: 7200,
+      });
+      const now_sec = Math.floor(Date.now() / 1000);
+      expect(abs_oauth_set.expires_at - now_sec).toEqual(7200);
 
-    const translated = translateTokenSet(abs_oauth_set);
-    expect(translated).toHaveProperty('expires_in');
-    expect(translated.expires_in).toEqual(7200);
+      const translated = translateTokenSet(abs_oauth_set);
+      expect(translated).toHaveProperty('expires_in');
+      expect(translated.expires_in).toEqual(7200);
+    } finally {
+      timekeeper.reset();
+    }
   });
 });
 

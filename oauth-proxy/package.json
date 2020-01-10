@@ -37,7 +37,8 @@
     "yargs": "^12.0.5"
   },
   "devDependencies": {
+    "crypto": "^1.0.1",
     "jest": "^24.8.0",
-    "crypto": "^1.0.1"
+    "timekeeper": "^2.2.0"
   }
 }
