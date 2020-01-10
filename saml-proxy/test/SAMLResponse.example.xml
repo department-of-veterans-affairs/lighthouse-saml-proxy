@@ -1,0 +1,68 @@
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_27d324cd784b30f06faa" Version="2.0" IssueInstant="2020-01-10T16:55:08Z" Destination="https://localhost:1111/samlproxy/sp/saml/sso">
+  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">samlproxy-idp.vetsgov.dev</saml:Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
+  </samlp:Status>
+  <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="_4v2j8j3nCt80xCf6buYwgkEYMlZlA7gp" IssueInstant="2020-01-10T16:55:08.862Z">
+    <saml:Issuer>samlproxy-idp.vetsgov.dev</saml:Issuer>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+        <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+        <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+        <Reference URI="#_4v2j8j3nCt80xCf6buYwgkEYMlZlA7gp">
+          <Transforms>
+            <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+            <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+          </Transforms>
+          <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+          <DigestValue>4DApCRttgxH5mAQFVliNZZcKyh+jONMj6mUHo9BHlTo=</DigestValue>
+        </Reference>
+      </SignedInfo>
+      <SignatureValue>jigY3+HuueC6bTcwBNqNFgc6uU1kFan305H5KmlY8yIQSaBsdzJhIAdLTdzUI9fKmM7sZk2XgWLssM8G1WS6zpgYJPjBOyBauWb7PjnvIp/0lVIUpVKkFbm8rjA/sxHfsWCbnNjp+CsdC0l5tEihqXVksLobBNKG2EFXTFv/3QHhAVdR6v/Ee/L5DvLZot6UGiWaFRHBAwMfo3Za8IW8wcAHLajZ285JK/jMOKqVqbnRyX17gfQaAVvC9jLwAjmD5aFEeDNMXTAtnvhPR3E9tNob7qMaa7JY7FUx3UTSutZ15DsBQJU3W7cOIIeBjy5jjs6g1iDWQVyJCe7oMXlXOg==</SignatureValue>
+      <KeyInfo>
+        <X509Data>
+          <X509Certificate>null</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </Signature>
+    <saml:Subject>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">ae9ff5f4e4b741389904087d94cd19b2</saml:NameID>
+      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml:SubjectConfirmationData NotOnOrAfter="2020-01-10T17:55:08.862Z" Recipient="https://localhost:1111/samlproxy/sp/saml/sso" />
+      </saml:SubjectConfirmation>
+    </saml:Subject>
+    <saml:Conditions NotBefore="2020-01-10T16:55:08.862Z" NotOnOrAfter="2020-01-10T17:55:08.862Z">
+      <saml:AudienceRestriction>
+        <saml:Audience>test</saml:Audience>
+      </saml:AudienceRestriction>
+    </saml:Conditions>
+    <saml:AuthnStatement AuthnInstant="2020-01-10T16:55:08.862Z">
+      <saml:AuthnContext>
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef>
+      </saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <saml:Attribute Name="firstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">mvi</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="lastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">CARROLL</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="middleName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">D</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">vets.gov.user+20@gmail.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="icn" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">123</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="uuid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">ae9ff5f4e4b741389904087d94cd19b2</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="level_of_assurance" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <saml:AttributeValue xsi:type="xs:string">3</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>
