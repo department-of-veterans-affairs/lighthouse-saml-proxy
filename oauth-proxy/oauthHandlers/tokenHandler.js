@@ -2,6 +2,7 @@ const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
 
 const { rethrowIfRuntimeError } = require('../utils');
+const { translateTokenSet } = require('./tokenResponse');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
@@ -87,12 +88,13 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     });
   }
 
+  const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
     try {
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
-      res.json({...tokens, patient, state});
+      res.json({...tokenResponseBase, patient, state});
     } catch (error) {
       rethrowIfRuntimeError(error);
 
@@ -103,7 +105,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       });
     }
   } else {
-    res.json({...tokens, state});
+    res.json({...tokenResponseBase, state});
   }
 };
 

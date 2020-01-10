@@ -130,7 +130,7 @@ describe('OpenID Connect Conformance', () => {
     });
     dynamoHandle = jest.mock();
 
-    const tokenValidator = (access_token) => {
+    const fakeTokenValidator = (access_token) => {
       return {
         va_identifiers: {
           icn: '0000000000000'
@@ -138,7 +138,7 @@ describe('OpenID Connect Conformance', () => {
       };
     };
 
-    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, tokenValidator);
+    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator);
     // We're starting and stopping this server in a beforeAll/afterAll pair,
     // rather than beforeEach/afterEach because this is an end-to-end
     // functional. Since internal application state could affect functionality
@@ -285,7 +285,7 @@ describe('OpenID Connect Conformance', () => {
     const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
     expect(parsedResp).toMatchObject({
       access_token: expect.stringMatching(JWT_PATTERN),
-      expires_at: expect.any(Number),
+      expires_in: expect.any(Number),
       id_token: expect.stringMatching(JWT_PATTERN),
       refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
       scope: expect.stringMatching(/.+/),
