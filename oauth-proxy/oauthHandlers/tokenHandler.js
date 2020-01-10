@@ -1,7 +1,7 @@
 const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
 
-const { rethrowIfRuntimeError } = require('../utils');
+const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
