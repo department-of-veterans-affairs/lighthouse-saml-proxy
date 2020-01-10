@@ -18,7 +18,8 @@ pipeline {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
-          dir "saml-proxy"
+          dir "."
+          filename "saml-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
         }
       }
@@ -35,7 +36,8 @@ pipeline {
       agent {
         dockerfile {
           args "--entrypoint='' -u 0:0"
-          dir "oauth-proxy"
+          dir "."
+          filename "oauth-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
         }
       }

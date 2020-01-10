@@ -4,7 +4,7 @@ import request from 'request-promise-native';
 import { getSamlResponse } from 'samlp';
 import { DOMParser } from 'xmldom';
 
-import { buildBackgroundServerModule } from '../../oauth-proxy/tests/backgroundServer';
+import { buildBackgroundServerModule } from '../../common/backgroundServer';
 import { getApp, idpConfig } from './testServer';
 
 const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("saml-proxy test app");

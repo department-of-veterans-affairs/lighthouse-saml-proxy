@@ -5,14 +5,15 @@ WORKDIR /opt/app/
 
 RUN apk add git
 RUN git config --global url."https://".insteadOf git://
-ADD ./package.json package.json
-ADD ./package-lock.json package-lock.json
+ADD ./oauth-proxy/package.json package.json
+ADD ./oauth-proxy/package-lock.json package-lock.json
 RUN npm install
 
-ADD ./certs/* /usr/local/share/ca-certificates/
+ADD ./oauth-proxy/certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
-ADD ./ .
+ADD ./oauth-proxy .
+ADD ./common ../common
 
 RUN cat certs/*.pem > certs/combined.pem
 ENV NODE_EXTRA_CA_CERTS /opt/app/certs/combined.pem
