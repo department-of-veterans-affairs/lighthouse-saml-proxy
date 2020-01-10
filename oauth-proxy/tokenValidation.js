@@ -22,7 +22,7 @@ const validateToken = async (endpoint, api_key, access_token) => {
 // parameters.
 const configureTokenValidator = (endpoint, api_key) => {
   return (access_token) => {
-    validateToken(endpoint, api_key, access_token);
+    return validateToken(endpoint, api_key, access_token);
   };
 };
 
