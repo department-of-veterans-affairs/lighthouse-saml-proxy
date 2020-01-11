@@ -13,7 +13,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t dvp/saml-proxy:$CODEBUILD_SOURCE_VERSION .
+      - docker build -t dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION .
       - docker tag dvp/saml-proxy:$CODEBUILD_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/dvp/saml-proxy:$CODEBUILD_SOURCE_VERSION
   post_build:
     commands:
