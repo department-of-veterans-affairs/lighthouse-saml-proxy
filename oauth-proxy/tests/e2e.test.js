@@ -5,10 +5,12 @@ const request = require('request-promise-native');
 const { Issuer } = require('openid-client');
 const { randomBytes } = require('crypto');
 
+const { buildDynamoAttributeValue, convertObjectToDynamoAttributeValues } = require('./testUtils');
 const { buildBackgroundServerModule } = require('./backgroundServer');
 const upstreamOAuthTestServer = require('./upstreamOAuthTestServer');
 const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("oauth-proxy test app");
 const { buildApp } = require('../index');
+const { encodeBasicAuthHeader } = require('../utils');
 
 beforeAll(() => {
   upstreamOAuthTestServer.start();
@@ -29,11 +31,6 @@ const defaultTestingConfig = {
   validate_apiKey: "fakeApiKey",
 };
 
-function encodeAuthHeader(username, password) {
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
-  return `Basic ${encodedCredentials}`;
-}
-
 function buildFakeOktaClient(fakeRecord) {
   const oktaClient = { getApplication: jest.fn() };
   oktaClient.getApplication.mockImplementation(client_id => {
@@ -48,29 +45,6 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
-function convertObjectToDynamoAttributeValues(obj) {
-  return Object.entries(obj).reduce((accum, pair) => {
-    accum[pair[0]] = buildDynamoAttributeValue(pair[1]);
-    return accum;
-  }, {});
-}
-
-function buildDynamoAttributeValue(value) {
-  // BEWARE: This doesn't work with number sets and a few other Dynamo types.
-  if (value.constructor === String) {
-    return { "S": value };
-  } else if (value.constructor === Number) {
-    return { "N": value.toString() };
-  } else if (value.constructor === Boolean) {
-    return { "BOOL": value };
-  } else if (value.constructor === Array) {
-    return { "L": value.map((x) => { buildDynamoAttributeValue(x) }) };
-  } else if (value.constructor === Object) {
-    return { "M": convertObjectToDynamoAttributeValues(value) };
-  } else {
-    throw new Error("Unknown type.");
-  }
-}
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
@@ -271,7 +245,7 @@ describe('OpenID Connect Conformance', () => {
       method: 'post',
       uri: 'http://localhost:9090/testServer/token',
       headers: {
-        'authorization': encodeAuthHeader('user', 'pass'),
+        'authorization': encodeBasicAuthHeader('user', 'pass'),
         'origin': 'http://localhost:8080',
       },
       form: {
