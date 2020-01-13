@@ -30,14 +30,14 @@ function buildSamlResponse(firstname, level_of_assurance) {
     userName: 'ae9ff5f4e4b741389904087d94cd19b2',
     nameIdFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
     claims: {
-      birth_date: '1998-01-23',
-      email: 'vets.gov.user+20@gmail.com',
+      birth_date: '1967-06-19',
+      email: 'va.api.user+idme.001@gmail.com',
       fname: firstname,
       social: '123456789',
       gender: 'female',
-      lname: 'CARROLL',
+      lname: 'ELLIS',
       level_of_assurance: level_of_assurance,
-      mname: 'D',
+      mname: 'E',
       multifactor: 'true',
       uuid: 'ae9ff5f4e4b741389904087d94cd19b2'
     }
@@ -170,7 +170,7 @@ describe('Logins for idp', () => {
     stopBackgroundServer();
   });
 
-  it('uses the proper RelayState', async () => {
+  it('uses the RelayState from the request', async () => {
     const expectedState = 'expectedState';
     const requestSamlResponse = await buildSamlResponse('mvi', '3');
     const response = await ssoRequest(requestSamlResponse, expectedState);
@@ -185,13 +185,13 @@ describe('Logins for idp', () => {
   });
 
   describe('idme', () => {
-    it('properly redirects if user is not loa3', async () => {
+    it('redirects to the verify identity page the if user is not loa3 verified', async () => {
       const requestSamlResponse = await buildSamlResponse('mvi', '2');
       const response = await ssoRequest(requestSamlResponse);
       expect(responseResultType(response)).toEqual(LOA_REDIRECT);
     });
 
-    it('properly looks up user from mvi', async () => {
+    it('looks up the user from mvi, responding with their ICN in the SAMLResponse', async () => {
       const requestSamlResponse = await buildSamlResponse('mvi', '3');
       const response = await ssoRequest(requestSamlResponse);
 
@@ -202,7 +202,7 @@ describe('Logins for idp', () => {
       expect(icn).toEqual('123');
     });
 
-    it('properly looks up user from vso', async () => {
+    it('looks up user from vso if the lookup from mvi fails', async () => {
       const requestSamlResponse = await buildSamlResponse('vso', '3');
       const response = await ssoRequest(requestSamlResponse);
 
@@ -213,7 +213,7 @@ describe('Logins for idp', () => {
       expect(icn).toBeUndefined();
     });
 
-    it('properly handles user not found in mvi or vso', async () => {
+    it('returns a user not found page when the user is not found in mvi or vso', async () => {
       const requestSamlResponse = await buildSamlResponse('user', '3');
       const response = await ssoRequest(requestSamlResponse);
       expect(responseResultType(response)).toEqual(USER_NOT_FOUND);

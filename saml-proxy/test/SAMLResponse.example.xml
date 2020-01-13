@@ -43,16 +43,16 @@
     </saml:AuthnStatement>
     <saml:AttributeStatement xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <saml:Attribute Name="firstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">mvi</saml:AttributeValue>
+        <saml:AttributeValue xsi:type="xs:string">TAMARA</saml:AttributeValue>
       </saml:Attribute>
       <saml:Attribute Name="lastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">CARROLL</saml:AttributeValue>
+        <saml:AttributeValue xsi:type="xs:string">ELLIS</saml:AttributeValue>
       </saml:Attribute>
       <saml:Attribute Name="middleName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">D</saml:AttributeValue>
+        <saml:AttributeValue xsi:type="xs:string">E</saml:AttributeValue>
       </saml:Attribute>
       <saml:Attribute Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">vets.gov.user+20@gmail.com</saml:AttributeValue>
+        <saml:AttributeValue xsi:type="xs:string">va.api.user+idme.001@gmail.com</saml:AttributeValue>
       </saml:Attribute>
       <saml:Attribute Name="icn" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
         <saml:AttributeValue xsi:type="xs:string">123</saml:AttributeValue>
