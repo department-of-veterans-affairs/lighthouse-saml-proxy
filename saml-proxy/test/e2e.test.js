@@ -65,8 +65,15 @@ function ssoRequest(samlResponse, state = 'state') {
   return request(reqOpts);
 }
 
-// These are the HTML parsers. See https://github.com/auth0/node-samlp/blob/master/templates/form.ejs
-// for the html document being parsed
+// These are the HTML parsers. The SSO endpoint renders HTML/javascript that automatically
+// submits a form of the SAMLResponse and RelayState back to Okta. It doesn't simply redirect
+// because it would need to do a 307 redirect to stay a POST. The user would need to "approve"
+// this redirect (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). The `samlp`
+// library we use allows the form template to be specified via config. We define the template
+// to use in in the function `responseHandler` in  `src/IDPConfig`. See `src/views/samlresponse.hbs`
+// for the html we are parsing. We decided to get the SAMLResponse and RelayState by parsing the
+// resulting HTML instead of mocking out the response handler. Parsing the HTML keeps the
+// functionality of these tests closer to what users actually experience.
 function stateFromHtml(html) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(html, MIME_HTML);
@@ -81,7 +88,7 @@ function SAMLResponseFromHtml(html) {
   return elementValue(inputs, 'SAMLResponse');
 }
 
-// This function looks for the userNotFoundText in src/views/icnError.hbs
+// This function looks for the userNotFoundText in `src/views/icnError.hbs`
 function isUserNotFound(body) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(body, MIME_HTML);
@@ -102,7 +109,7 @@ function elementValue(elements, name) {
   }
 }
 
-// These are the SAMLResponse parsers. See SAMLResponse.example.xml in the current dir (test)
+// These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
 // for an example of the xml document we are parsing
 function assertionValueFromSAMLResponse(samlResponse, assertion) {
   const element = findAssertionInSamlResponse(samlResponse, assertion);
