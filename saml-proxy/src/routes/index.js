@@ -14,7 +14,6 @@ import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
-import { VetsAPIClient } from "../VetsAPIClient";
 
 import promBundle from 'express-prom-bundle';
 import * as Sentry from '@sentry/node';
@@ -25,7 +24,7 @@ function filterProperty(object, property) {
   }
 }
 
-export default function configureExpress(app, argv, idpOptions, spOptions, vetsAPIOptions) {
+export default function configureExpress(app, argv, idpOptions, spOptions, vetsApiClient) {
   const useSentry = argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
   if (useSentry) {
     Sentry.init({
@@ -125,7 +124,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     req.metadata = idpOptions.profileMapper.metadata;
     req.passport = passport;
     req.strategy = strategy;
-    req.vetsAPIClient = new VetsAPIClient(vetsAPIOptions.token, vetsAPIOptions.apiHost);
+    req.vetsAPIClient = vetsApiClient;
     req.sp = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);

@@ -14,6 +14,7 @@ import SPConfig from "./SPConfig";
 import VetsAPIConfig from "./VetsAPIConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
+import { VetsAPIClient } from "./VetsAPIClient";
 
 /**
  * Globals
@@ -66,7 +67,8 @@ function runServer(argv) {
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
-      configureExpress(app, argv, idpConfig, spConfig, vaConfig);
+      const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
+      configureExpress(app, argv, idpConfig, spConfig, vetsApiClient);
 
       const env = app.get('env'), port = app.get("port");
       logger.info(`Starting proxy server on port ${port} in ${env} mode`, { env, port });

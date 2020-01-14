@@ -1,7 +1,10 @@
 version: '2.1'
 services:
   saml-proxy:
-    build: .
+    build:
+      context: ../.
+      dockerfile: saml-proxy/Dockerfile
     ports:
       - "7000:7000"
-    net: "host"
+    network_mode: "host"
+    command: '--config dev-config.json'

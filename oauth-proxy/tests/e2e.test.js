@@ -5,8 +5,8 @@ const request = require('request-promise-native');
 const { Issuer } = require('openid-client');
 const { randomBytes } = require('crypto');
 
-const { buildDynamoAttributeValue, convertObjectToDynamoAttributeValues } = require('./testUtils');
-const { buildBackgroundServerModule } = require('./backgroundServer');
+const { convertObjectToDynamoAttributeValues } = require('./testUtils');
+const { buildBackgroundServerModule } = require('../../common/backgroundServer');
 const upstreamOAuthTestServer = require('./upstreamOAuthTestServer');
 const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("oauth-proxy test app");
 const { buildApp } = require('../index');
