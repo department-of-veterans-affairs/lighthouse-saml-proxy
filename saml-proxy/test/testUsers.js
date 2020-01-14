@@ -1,6 +1,6 @@
 export const MHV_USER = 'mhv';
 export const IDME_USER = 'idme';
-export const DSLOGIN_USER = 'dslogin';
+export const DSLOGON_USER = 'dslogon';
 
 function mhvUser(level_of_assurance) {
   const loa = level_of_assurance === '3' ? 'Premium' : 'Standard';
@@ -19,7 +19,7 @@ function mhvUser(level_of_assurance) {
   }
 }
 
-function dsloginUser(level_of_assurance) {
+function dslogonUser(level_of_assurance) {
   const loa = level_of_assurance === '3' ? '3' : '1'
   return {
     issuer: 'test',
@@ -65,8 +65,8 @@ export function getUser(type, level_of_assurance) {
   switch(type) {
     case IDME_USER:
       return idmeUser(level_of_assurance);
-    case DSLOGIN_USER:
-      return dsloginUser(level_of_assurance);
+    case DSLOGON_USER:
+      return dslogonUser(level_of_assurance);
     case MHV_USER:
       return mhvUser(level_of_assurance);
   }

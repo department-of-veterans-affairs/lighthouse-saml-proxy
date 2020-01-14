@@ -6,7 +6,7 @@ import { DOMParser } from 'xmldom';
 
 import { buildBackgroundServerModule } from '../../common/backgroundServer';
 import { getTestExpressApp, idpConfig } from './testServer';
-import { MHV_USER, DSLOGIN_USER, IDME_USER, getUser } from './testUsers';
+import { MHV_USER, DSLOGON_USER, IDME_USER, getUser } from './testUsers';
 import MockVetsApiClient from './mockVetsApiClient';
 
 const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("saml-proxy test app");
@@ -182,7 +182,7 @@ describe('Logins for idp', () => {
     expect(state).toEqual(expectedState);
   });
 
-  for(const idp of [IDME_USER, MHV_USER, DSLOGIN_USER]) {
+  for(const idp of [IDME_USER, MHV_USER, DSLOGON_USER]) {
     describe(idp, () => {
       it('redirects to the verify identity page the if user is not loa3 verified', async () => {
         const requestSamlResponse = await buildSamlResponse(idp, '2');
