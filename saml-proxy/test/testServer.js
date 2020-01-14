@@ -6,7 +6,6 @@ import configureExpress from "../src/routes";
 import SPConfig from "../src/SPConfig";
 import { removeHeaders } from '../src/utils';
 
-import MockVetsApiClient from './mockVetsApiClient';
 import {
   idpCert,
   idpKey,
@@ -46,10 +45,9 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
-export function getApp() {
+export function getTestExpressApp(vetsApiClient) {
   const app = express();
   const spConfig = new SPConfig(defaultTestingConfig);
-  const vetsApiClient = new MockVetsApiClient();
   configureExpress(app, defaultTestingConfig, idpConfig, spConfig, vetsApiClient);
   return app;
 }

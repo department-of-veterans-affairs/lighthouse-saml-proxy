@@ -1,8 +1,11 @@
 import { SAMLUser } from '../src/VetsAPIClient';
 
 export default class MockVetsApiClient {
+  public findUserInMVI = true;
+  public findUserInVSO = true;
+
   public async getMVITraitsForLoa3User(user: SAMLUser) : Promise<{ icn: string, first_name: string, last_name: string }> {
-    if(user.firstName == 'mvi') {
+    if(this.findUserInMVI) {
       return {
         icn: '123',
         first_name: user.firstName,
@@ -14,12 +17,17 @@ export default class MockVetsApiClient {
   }
 
   public async getVSOSearch(firstName: string, lastName: string) : Promise<{poa: string}> {
-    if(firstName == 'vso') {
+    if(this.findUserInVSO) {
       return {
         poa: 'poa'
       };
     }
 
     throw new Error('Not found');
+  }
+
+  public reset() {
+    this.findUserInMVI = true;
+    this.findUserInVSO = true;
   }
 }

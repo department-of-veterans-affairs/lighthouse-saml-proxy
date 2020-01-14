@@ -5,7 +5,9 @@ import { getSamlResponse } from 'samlp';
 import { DOMParser } from 'xmldom';
 
 import { buildBackgroundServerModule } from '../../common/backgroundServer';
-import { getApp, idpConfig } from './testServer';
+import { getTestExpressApp, idpConfig } from './testServer';
+import { MHV_USER, DSLOGIN_USER, IDME_USER, getUser } from './testUsers';
+import MockVetsApiClient from './mockVetsApiClient';
 
 const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("saml-proxy test app");
 
@@ -23,26 +25,10 @@ const UNKNOWN = 'unknown';
 // http://w3c.github.io/html-reference/syntax.html#void-elements)
 const MIME_HTML = 'text/html';
 const PORT = 1111;
+const vetsApiClient = new MockVetsApiClient();
 
-function buildSamlResponse(firstname, level_of_assurance) {
-  const user = {
-    issuer: 'test',
-    userName: 'ae9ff5f4e4b741389904087d94cd19b2',
-    nameIdFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-    claims: {
-      birth_date: '1967-06-19',
-      email: 'va.api.user+idme.001@gmail.com',
-      fname: firstname,
-      social: '123456789',
-      gender: 'female',
-      lname: 'ELLIS',
-      level_of_assurance: level_of_assurance,
-      mname: 'E',
-      multifactor: 'true',
-      uuid: 'ae9ff5f4e4b741389904087d94cd19b2'
-    }
-  };
-
+function buildSamlResponse(type, level_of_assurance) {
+  const user = getUser(type, level_of_assurance);
   return new Promise((resolve, _) => {
     getSamlResponse(idpConfig, user, (_, samlResponse) => {
       resolve(btoa(samlResponse));
@@ -169,7 +155,7 @@ function responseResultType(response) {
 
 describe('Logins for idp', () => {
   beforeAll(() => {
-    const app = getApp();
+    const app = getTestExpressApp(vetsApiClient);
     startServerInBackground(app, PORT);
   });
 
@@ -177,9 +163,14 @@ describe('Logins for idp', () => {
     stopBackgroundServer();
   });
 
+  beforeEach(() => {
+    vetsApiClient.reset();
+  });
+
   it('uses the RelayState from the request', async () => {
     const expectedState = 'expectedState';
-    const requestSamlResponse = await buildSamlResponse('mvi', '3');
+    const requestSamlResponse = await buildSamlResponse(IDME_USER, '3');
+    vetsApiClient.findUserInMVI = true;
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
     expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -191,75 +182,47 @@ describe('Logins for idp', () => {
     expect(state).toEqual(expectedState);
   });
 
-  describe('idme', () => {
-    it('redirects to the verify identity page the if user is not loa3 verified', async () => {
-      const requestSamlResponse = await buildSamlResponse('mvi', '2');
-      const response = await ssoRequest(requestSamlResponse);
-      expect(responseResultType(response)).toEqual(LOA_REDIRECT);
+  for(const idp of [IDME_USER, MHV_USER, DSLOGIN_USER]) {
+    describe(idp, () => {
+      it('redirects to the verify identity page the if user is not loa3 verified', async () => {
+        const requestSamlResponse = await buildSamlResponse(idp, '2');
+        vetsApiClient.findUserInMVI = true;
+        const response = await ssoRequest(requestSamlResponse);
+        expect(responseResultType(response)).toEqual(LOA_REDIRECT);
+      });
+
+      it('looks up the user from mvi, responding with their ICN in the SAMLResponse', async () => {
+        const requestSamlResponse = await buildSamlResponse(idp, '3');
+        vetsApiClient.findUserInMVI = true;
+        const response = await ssoRequest(requestSamlResponse);
+
+        expect(responseResultType(response)).toEqual(SAML_RESPONSE);
+
+        const responseSamlResponse = atob(SAMLResponseFromHtml(response.body));
+        const icn = assertionValueFromSAMLResponse(responseSamlResponse, 'icn');
+        expect(icn).toEqual('123');
+      });
+
+      it('looks up user from vso if the lookup from mvi fails', async () => {
+        const requestSamlResponse = await buildSamlResponse(idp, '3');
+        vetsApiClient.findUserInMVI = false;
+        vetsApiClient.findUserInVSO = true;
+        const response = await ssoRequest(requestSamlResponse);
+
+        expect(responseResultType(response)).toEqual(SAML_RESPONSE);
+
+        const responseSamlResponse = atob(SAMLResponseFromHtml(response.body));
+        const icn = assertionValueFromSAMLResponse(responseSamlResponse, 'icn');
+        expect(icn).toBeUndefined();
+      });
+
+      it('returns a user not found page when the user is not found in mvi or vso', async () => {
+        const requestSamlResponse = await buildSamlResponse(idp, '3');
+        vetsApiClient.findUserInMVI = false;
+        vetsApiClient.findUserInVSO = false;
+        const response = await ssoRequest(requestSamlResponse);
+        expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
+      });
     });
-
-    it('looks up the user from mvi, responding with their ICN in the SAMLResponse', async () => {
-      const requestSamlResponse = await buildSamlResponse('mvi', '3');
-      const response = await ssoRequest(requestSamlResponse);
-
-      expect(responseResultType(response)).toEqual(SAML_RESPONSE);
-
-      const responseSamlResponse = atob(SAMLResponseFromHtml(response.body));
-      const icn = assertionValueFromSAMLResponse(responseSamlResponse, 'icn');
-      expect(icn).toEqual('123');
-    });
-
-    it('looks up user from vso if the lookup from mvi fails', async () => {
-      const requestSamlResponse = await buildSamlResponse('vso', '3');
-      const response = await ssoRequest(requestSamlResponse);
-
-      expect(responseResultType(response)).toEqual(SAML_RESPONSE);
-
-      const responseSamlResponse = atob(SAMLResponseFromHtml(response.body));
-      const icn = assertionValueFromSAMLResponse(responseSamlResponse, 'icn');
-      expect(icn).toBeUndefined();
-    });
-
-    it('returns a user not found page when the user is not found in mvi or vso', async () => {
-      const requestSamlResponse = await buildSamlResponse('user', '3');
-      const response = await ssoRequest(requestSamlResponse);
-      expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
-    });
-  });
-
-  // describe.skip('dslogin', () => {
-  //   it('properly redirects if user is not loa3', () => {
-
-  //   });
-
-  //   it('properly looks up user from mvi', () => {
-
-  //   });
-
-  //   it('properly looks up user from vso', () => {
-
-  //   });
-
-  //   it('properly handles user not found in mvi or vso', () => {
-
-  //   });
-  // });
-
-  // describe.skip('mhv', () => {
-  //   it('properly redirects if user is not loa3', () => {
-
-  //   });
-
-  //   it('properly looks up user from mvi', () => {
-
-  //   });
-
-  //   it('properly looks up user from vso', () => {
-
-  //   });
-
-  //   it('properly handles user not found in mvi or vso', () => {
-
-  //   });
-  // });
+  }
 });
