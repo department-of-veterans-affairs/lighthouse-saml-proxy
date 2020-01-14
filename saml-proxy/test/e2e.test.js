@@ -203,10 +203,10 @@ describe('Logins for idp', () => {
         expect(icn).toEqual('123');
       });
 
-      it('looks up user from vso if the lookup from mvi fails', async () => {
+      it('treats the user as a VSO if the lookup from mvi fails', async () => {
         const requestSamlResponse = await buildSamlResponse(idp, '3');
         vetsApiClient.findUserInMVI = false;
-        vetsApiClient.findUserInVSO = true;
+        vetsApiClient.userIsVSO = true;
         const response = await ssoRequest(requestSamlResponse);
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -216,10 +216,10 @@ describe('Logins for idp', () => {
         expect(icn).toBeUndefined();
       });
 
-      it('returns a user not found page when the user is not found in mvi or vso', async () => {
+      it('returns a user not found page when the user is not found in mvi or is not a VSO', async () => {
         const requestSamlResponse = await buildSamlResponse(idp, '3');
         vetsApiClient.findUserInMVI = false;
-        vetsApiClient.findUserInVSO = false;
+        vetsApiClient.userIsVSO = false;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
       });
