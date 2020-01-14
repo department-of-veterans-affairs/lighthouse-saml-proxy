@@ -41,7 +41,7 @@ function dsloginUser(level_of_assurance) {
   }
 }
 
-function idmUser(level_of_assurance) {
+function idmeUser(level_of_assurance) {
   return {
     issuer: 'test',
     userName: 'ae9ff5f4e4b741389904087d94cd19b2',
@@ -64,7 +64,7 @@ function idmUser(level_of_assurance) {
 export function getUser(type, level_of_assurance) {
   switch(type) {
     case IDME_USER:
-      return idmUser(level_of_assurance);
+      return idmeUser(level_of_assurance);
     case DSLOGIN_USER:
       return dsloginUser(level_of_assurance);
     case MHV_USER:
