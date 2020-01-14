@@ -4,14 +4,14 @@ import { IConfiguredRequest } from './types';
 
 import { NextFunction, Response } from "express";
 import assignIn from 'lodash.assignin';
-import samlp from "samlp"; import * as url from "url";
+import samlp from "samlp";
+import * as url from "url";
 import logger from '../logger';
 import { MVIRequestMetrics, VSORequestMetrics, IRequestMetrics } from "../metrics";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-
   if ((error.name == 'StatusCodeError') && (error.statusCode.toString() === '404')) {
     return 'icnLookupFailure.hbs';
   } else {
