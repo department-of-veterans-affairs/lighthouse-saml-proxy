@@ -1,16 +1,30 @@
 import yargs from "yargs";
 import path from "path";
-import { cwd } from "process";
-import { makeCertFileCoercer, certToPEM, loadFileSync, KEY_CERT_HELP_TEXT } from "./coercing";
-import { checkEncryptionCerts, checkIdpProfileMapper, checkWhenNoMetadata } from "./checks";
-import { BINDINGS } from "../samlConstants";
+import {
+  cwd
+} from "process";
+import {
+  makeCertFileCoercer,
+  certToPEM,
+  loadFileSync,
+  KEY_CERT_HELP_TEXT
+} from "./coercing";
+import {
+  checkEncryptionCerts,
+  checkIdpProfileMapper,
+  checkWhenNoMetadata
+} from "./checks";
+import {
+  BINDINGS
+} from "../samlConstants";
 
 export function processArgs() {
   return yargs
     .usage('\nSimple IdP for SAML 2.0 WebSSO & SLO Profile\n\n' +
-           'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
-           'Usage:\n\t$0 -acs {url} -aud {uri}')
+      'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
+      'Usage:\n\t$0 -acs {url} -aud {uri}')
     .config()
+    .env(SAML_PROXY)
     .options({
       port: {
         description: 'IdP Web Server Listener Port',
@@ -233,31 +247,31 @@ export function processArgs() {
         string: true,
         default: 'sha256'
       },
-      spRequestNameIDFormat : {
+      spRequestNameIDFormat: {
         description: 'Request Subject NameID Format (SAMLP)',
         required: false,
         boolean: true,
         default: true
       },
-      spValidateNameIDFormat : {
+      spValidateNameIDFormat: {
         description: 'Validate format of Assertion Subject NameID',
         required: false,
         boolean: true,
         default: true
       },
-      spNameIDFormat : {
+      spNameIDFormat: {
         description: 'Assertion Subject NameID Format',
         required: false,
         string: true,
         default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
       },
-      spRequestAuthnContext : {
+      spRequestAuthnContext: {
         description: 'Request Authentication Context (SAMLP)',
         required: false,
         boolean: true,
         default: true
       },
-      spAuthnContextClassRef : {
+      spAuthnContextClassRef: {
         description: 'Authentication Context Class Reference',
         required: false,
         string: true,
@@ -330,4 +344,6 @@ export function processArgs() {
     .argv;
 }
 
-export { certToPEM };
+export {
+  certToPEM
+};
