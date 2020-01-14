@@ -1,7 +1,8 @@
 const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
 
-const { rethrowIfRuntimeError } = require('../utils');
+const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
+const { translateTokenSet } = require('./tokenResponse');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
@@ -14,10 +15,11 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     delete req.body.client_id;
     delete req.body.client_secret;
   } else {
-    return res.status(401).json({
+    res.status(401).json({
       error: "invalid_client",
       error_description: "Client authentication failed",
     });
+    return next();
   }
 
   const client = new issuer.Client({
@@ -41,7 +43,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         error: error.error,
         error_description: error.error_description,
       });
-      return;
+      return next();
     }
     try {
       const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
@@ -67,6 +69,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         error: error.error,
         error_description: error.error_description,
       });
+      return next();
     }
     try {
       const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'code', req.body.code);
@@ -81,18 +84,21 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       state = null;
     }
   } else {
-    return res.status(400).json({
+    res.status(400).json({
       error: "unsupported_grant_type",
       error_description: "Only authorization and refresh_token grant types are supported",
     });
+    return next();
   }
 
+  const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
     try {
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
-      res.json({...tokens, patient, state});
+      res.json({...tokenResponseBase, patient, state});
+      return next();
     } catch (error) {
       rethrowIfRuntimeError(error);
 
@@ -101,9 +107,11 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         error: "invalid_grant",
         error_description: "We were unable to find a valid patient identifier for the provided authorization code.",
       });
+      return next();
     }
   } else {
-    res.json({...tokens, state});
+    res.json({...tokenResponseBase, state});
+    return next();
   }
 };
 
