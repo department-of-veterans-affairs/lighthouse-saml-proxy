@@ -17,6 +17,8 @@ phases:
       - docker tag dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION
   post_build:
     commands:
+      - docker images
+      - docker run --rm -w "/opt/app" -i -t dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION npm run test
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION
