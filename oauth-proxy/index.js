@@ -150,28 +150,31 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  router.get(appRoutes.jwks, async (req, res) => {
+  router.get(appRoutes.jwks, (req, res) => {
     req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
   });
 
-  router.get(appRoutes.userinfo, async (req, res) => {
+  router.get(appRoutes.userinfo, (req, res) => {
     req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
-  router.post(appRoutes.introspection, async (req, res) => {
+  router.post(appRoutes.introspection, (req, res) => {
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
   router.get(appRoutes.redirect, async (req, res, next) => {
-    await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
+      .catch(next)
   });
 
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
+      .catch(next)
   });
 
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
+      .catch(next)
   });
 
   app.use(well_known_base_path, router)
