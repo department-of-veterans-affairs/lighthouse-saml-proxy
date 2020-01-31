@@ -180,8 +180,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   app.use(well_known_base_path, router)
 
   // Error handlers. Keep as last middleware
-  // If we have error and description as query params display them, otherwise go to the
-  // catchall error handler
   if (useSentry) {
     if (useSentry) {
       app.use(Sentry.Handlers.errorHandler({
@@ -196,6 +194,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }
 
   app.use(function (err, req, res, next) {
+    logger.error(err);
+
+    // If we have error and description as query params display them, otherwise go to the
+    // catchall error handler
     const { error, error_description } = req.query;
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
