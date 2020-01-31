@@ -179,18 +179,18 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   app.use(well_known_base_path, router)
 
-  // Error handlers. Keep as last middleware
+  // Error handlers. Keep as last middlewares
+
+  // Sentry error handler must be the first error handling middleware
   if (useSentry) {
-    if (useSentry) {
-      app.use(Sentry.Handlers.errorHandler({
-        shouldHandleError(error) {
-          if (error.status >= 400) {
-            return true
-          }
-          return false
-        }
-      }));
-    }
+    app.use(Sentry.Handlers.errorHandler({
+      shouldHandleError(error) {
+        // Report 4xx and 5xx errors to sentry.
+        // Including 4xx errors is a temporary change to get more insight
+        // into errors reported by our users
+        return error.status >= 400
+      }
+    }));
   }
 
   app.use(function (err, req, res, next) {
