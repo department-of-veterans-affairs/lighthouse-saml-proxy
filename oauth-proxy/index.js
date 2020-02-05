@@ -150,49 +150,54 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  router.get(appRoutes.jwks, async (req, res) => {
+  router.get(appRoutes.jwks, (req, res) => {
     req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
   });
 
-  router.get(appRoutes.userinfo, async (req, res) => {
+  router.get(appRoutes.userinfo, (req, res) => {
     req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
-  router.post(appRoutes.introspection, async (req, res) => {
+  router.post(appRoutes.introspection, (req, res) => {
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
   router.get(appRoutes.redirect, async (req, res, next) => {
-    await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
+      .catch(next)
   });
 
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
+      .catch(next)
   });
 
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
+      .catch(next)
   });
 
   app.use(well_known_base_path, router)
 
-  // Error handlers. Keep as last middleware
-  // If we have error and description as query params display them, otherwise go to the
-  // catchall error handler
+  // Error handlers. Keep as last middlewares
+
+  // Sentry error handler must be the first error handling middleware
   if (useSentry) {
-    if (useSentry) {
-      app.use(Sentry.Handlers.errorHandler({
-        shouldHandleError(error) {
-          if (error.status >= 400) {
-            return true
-          }
-          return false
-        }
-      }));
-    }
+    app.use(Sentry.Handlers.errorHandler({
+      shouldHandleError(error) {
+        // Report 4xx and 5xx errors to sentry.
+        // Including 4xx errors is a temporary change to get more insight
+        // into errors reported by our users
+        return error.status >= 400
+      }
+    }));
   }
 
   app.use(function (err, req, res, next) {
+    logger.error(err);
+
+    // If we have error and description as query params display them, otherwise go to the
+    // catchall error handler
     const { error, error_description } = req.query;
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);

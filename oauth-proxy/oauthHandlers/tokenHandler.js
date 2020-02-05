@@ -45,16 +45,26 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       });
       return next();
     }
-    try {
-      const document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
-      state = document.state.S;
-      await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
-    } catch (error) {
-      rethrowIfRuntimeError(error);
 
-      logger.error("Could not update the refresh token in DynamoDB", error);
-      state = null;
+    let document;
+    try {
+      document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
+    } catch (error) {
+      logger.error("Could not retrieve state from DynamoDB", error)
     }
+
+    if (document && document.state) {
+      try {
+        state = document.state.S;
+        await dynamoClient.saveToDynamo(dynamo, state, 'refresh_token', tokens.refresh_token);
+      } catch (error) {
+        logger.error("Could not update the refresh token in DynamoDB", error);
+      }
+    }
+    // Set state to null if we were unable to retrieve it for any reason.
+    // Token response will not include a state value, but ONLY Apple cares
+    // about this: it's not actually part of the SMART on FHIR spec.
+    state = state || null;
   } else if (req.body.grant_type === 'authorization_code') {
     try {
       tokens = await client.grant(
