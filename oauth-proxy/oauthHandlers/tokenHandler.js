@@ -113,7 +113,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
       end();
-      logger.info(JSON.stringify(gauge));
+      logger.info(JSON.stringify(tokenHandlerGauge));
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);
