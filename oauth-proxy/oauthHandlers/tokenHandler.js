@@ -4,8 +4,12 @@ const requestPromise = require('request-promise-native');
 const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
 
+const { tokenHandlerGauge } = require('../metrics');
+
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
+  tokenHandlerGauge.setToCurrentTime();
+  const end = tokenHandlerGauge.startTimer();
 
   if (req.headers.authorization) {
     const authHeader = req.headers.authorization.match(/^Basic\s(.*)$/);
@@ -108,6 +112,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
+      end();
+      logger.info(JSON.stringify(gauge));
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);
@@ -117,7 +123,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         error: "invalid_grant",
         error_description: "We were unable to find a valid patient identifier for the provided authorization code.",
       });
-      return next();
+      return next(error);
     }
   } else {
     res.json({...tokenResponseBase, state});

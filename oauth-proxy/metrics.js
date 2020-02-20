@@ -13,7 +13,13 @@ const loginEnd = new client.Counter({
   help: 'counter of number of times the OAuth login process has ended',
 });
 
+const tokenHandlerGauge = new client.Gauge({
+  name: 'oauth_proxy_token_handler_gauge',
+  help: 'metric for timing of token_handler flow'
+});
+
 module.exports = {
   loginBegin,
   loginEnd,
+  tokenHandlerGauge
 }
