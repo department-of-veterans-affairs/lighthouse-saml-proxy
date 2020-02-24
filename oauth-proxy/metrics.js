@@ -13,13 +13,25 @@ const loginEnd = new client.Counter({
   help: 'counter of number of times the OAuth login process has ended',
 });
 
-const tokenHandlerGauge = new client.Gauge({
-  name: 'oauth_proxy_token_handler_gauge',
-  help: 'metric for timing of token_handler flow'
+const refreshGauge = new client.Gauge({
+  name: 'oauth_proxy_token_refresh_gauge',
+  help: 'metric for timing of token_refresh flow'
+});
+
+const dynamodbGauge = new client.Gauge({
+  name: 'oauth_proxy_dynamodb_gauge',
+  help: 'metric for timing of dynamo_save flow'
+});
+
+const grantGauge = new client.Gauge({
+  name: 'oauth_proxy_grant_gauge',
+  help: 'metric for timing of grant flow'
 });
 
 module.exports = {
   loginBegin,
   loginEnd,
-  tokenHandlerGauge
+  refreshGauge,
+  dynamodbGauge,
+  grantGauge
 }

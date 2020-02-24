@@ -4,13 +4,13 @@ const requestPromise = require('request-promise-native');
 const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
 
-const { tokenHandlerGauge } = require('../metrics');
+const { refreshGauge } = require('../metrics');
+const { dynamodbGauge } = require('../metrics');
+const { grantGauge } = require('../metrics');
+
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
-  tokenHandlerGauge.setToCurrentTime();
-  const end = tokenHandlerGauge.startTimer();
-
   if (req.headers.authorization) {
     const authHeader = req.headers.authorization.match(/^Basic\s(.*)$/);
     ([ client_id, client_secret ] = Buffer.from(authHeader[1], 'base64').toString('utf-8').split(':'));
@@ -36,11 +36,14 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
 
   let tokens, state;
   if (req.body.grant_type === 'refresh_token') {
+    refreshGauge.setToCurrentTime();
+    const refreshEnd = refreshGauge.startTimer();
     try {
       tokens = await client.refresh(req.body.refresh_token);
+      refreshEnd();
+      logger.info(JSON.stringify(refreshGauge));
     } catch (error) {
       rethrowIfRuntimeError(error);
-
       logger.error("Could not refresh the client session with the provided refresh token", error);
       const statusCode = statusCodeFromError(error);
       res.status(statusCode).json({
@@ -49,7 +52,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       });
       return next();
     }
-
+    dynamodbGauge.setToCurrentTime();
+    const dynamoEnd = dynamodbGauge.startTimer();
     let document;
     try {
       document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
@@ -65,6 +69,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         logger.error("Could not update the refresh token in DynamoDB", error);
       }
     }
+    dynamoEnd();
+    logger.info(JSON.stringify(dynamodbGauge));
     // Set state to null if we were unable to retrieve it for any reason.
     // Token response will not include a state value, but ONLY Apple cares
     // about this: it's not actually part of the SMART on FHIR spec.
@@ -76,7 +82,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       );
     } catch (error) {
       rethrowIfRuntimeError(error);
-
       logger.error("Failed to retrieve tokens using the OpenID client", error);
       const statusCode = statusCodeFromError(error);
       res.status(statusCode).json({
@@ -93,7 +98,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       }
     } catch (error) {
       rethrowIfRuntimeError(error);
-
       logger.error("Failed to save the new refresh token to DynamoDB", error);
       state = null;
     }
@@ -104,7 +108,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     });
     return next();
   }
-
+  grantGauge.setToCurrentTime();
+  const grantEnd = grantGauge.startTimer();
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
@@ -112,12 +117,11 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
-      end();
-      logger.info(JSON.stringify(tokenHandlerGauge));
+      grantEnd();
+      logger.info(JSON.stringify(grantGauge));
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);
-
       logger.error("Could not find a valid patient identifier for the provided authorization code", error);
       res.status(400).json({
         error: "invalid_grant",
