@@ -49,21 +49,6 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ]
 
-const smartMetadataWhitelist = [
-  "authorization_endpoint",
-  "token_endpoint",
-  "introspection_endpoint",
-  "scopes_supported",
-  "response_types_supported",
-]
-const smartCapabilities = [
-  "launch-standalone",
-  "client-confidential-symmetric",
-  "context-standalone-patient",
-  "permission-offline",
-  "permission-patient",
-]
-
 async function createIssuer(config) {
   return await Issuer.discover(config.upstream_issuer);
 }
@@ -137,16 +122,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       return meta;
     }, {});
 
-    res.json(filteredMetadata);
-  });
-
-  router.get('/.well-known/smart-configuration.json', corsHandler, (req, res) => {
-    const baseMetadata = {...issuer.metadata, ...metadataRewrite }
-    const filteredMetadata = smartMetadataWhitelist.reduce((meta, key) => {
-      meta[key] = baseMetadata[key];
-      return meta;
-    }, {});
-    filteredMetadata['capabilities'] = smartCapabilities;
     res.json(filteredMetadata);
   });
 

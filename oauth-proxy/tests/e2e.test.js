@@ -206,22 +206,6 @@ describe('OpenID Connect Conformance', () => {
     // signaure requirement.
   });
 
-  it('responds to the SMART metadata endpoint', async () => {
-    const resp = await request({
-      method: 'get',
-      uri: 'http://localhost:9090/testServer/.well-known/smart-configuration.json',
-    });
-    const parsedMeta = JSON.parse(resp);
-    expect(parsedMeta).toMatchObject({
-      authorization_endpoint: expect.stringMatching(testServerBaseUrlPattern),
-      token_endpoint: expect.stringMatching(testServerBaseUrlPattern),
-      introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
-      scopes_supported: expect.any(Array),
-      response_types_supported: expect.any(Array),
-      capabilities: expect.any(Array),
-    });
-  });
-
   it('redirects the user back to the client app', async () => {
     const resp = await request({
       followRedirect: false,
