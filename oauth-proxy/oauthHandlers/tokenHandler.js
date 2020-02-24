@@ -6,7 +6,7 @@ const { translateTokenSet } = require('./tokenResponse');
 
 const { refreshGauge } = require('../metrics');
 const { dynamodbGauge } = require('../metrics');
-const { grantGauge } = require('../metrics');
+const { validationGauge } = require('../metrics');
 
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
@@ -53,7 +53,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       return next();
     }
     dynamodbGauge.setToCurrentTime();
-    const dynamoEnd = dynamodbGauge.startTimer();
+    const dynamodbEnd = dynamodbGauge.startTimer();
     let document;
     try {
       document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
@@ -69,7 +69,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         logger.error("Could not update the refresh token in DynamoDB", error);
       }
     }
-    dynamoEnd();
+    dynamodbEnd();
     logger.info(JSON.stringify(dynamodbGauge));
     // Set state to null if we were unable to retrieve it for any reason.
     // Token response will not include a state value, but ONLY Apple cares
@@ -108,8 +108,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     });
     return next();
   }
-  grantGauge.setToCurrentTime();
-  const grantEnd = grantGauge.startTimer();
+  validationGauge.setToCurrentTime();
+  const grantEnd = validationGauge.startTimer();
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
@@ -118,7 +118,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
       grantEnd();
-      logger.info(JSON.stringify(grantGauge));
+      logger.info(JSON.stringify(validationGauge));
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);

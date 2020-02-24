@@ -23,9 +23,9 @@ const dynamodbGauge = new client.Gauge({
   help: 'metric for timing of dynamo_save flow'
 });
 
-const grantGauge = new client.Gauge({
-  name: 'oauth_proxy_grant_gauge',
-  help: 'metric for timing of grant flow'
+const validationGauge = new client.Gauge({
+  name: 'oauth_proxy_validation_gauge',
+  help: 'metric for timing of validation flow'
 });
 
 module.exports = {
@@ -33,5 +33,5 @@ module.exports = {
   loginEnd,
   refreshGauge,
   dynamodbGauge,
-  grantGauge
+  validationGauge
 }
