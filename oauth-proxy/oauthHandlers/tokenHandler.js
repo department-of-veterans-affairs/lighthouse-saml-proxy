@@ -36,7 +36,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
 
   let tokens, state;
   if (req.body.grant_type === 'refresh_token') {
-    refreshGauge.setToCurrentTime();
     const refreshEnd = refreshGauge.startTimer();
     try {
       tokens = await client.refresh(req.body.refresh_token);
@@ -51,7 +50,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       });
       return next();
     }
-    dynamodbGauge.setToCurrentTime();
     const dynamodbEnd = dynamodbGauge.startTimer();
     let document;
     try {
@@ -106,7 +104,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     });
     return next();
   }
-  validationGauge.setToCurrentTime();
   const validationEnd = validationGauge.startTimer();
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
