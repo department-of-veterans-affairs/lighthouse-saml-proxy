@@ -41,7 +41,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     try {
       tokens = await client.refresh(req.body.refresh_token);
       refreshEnd();
-      logger.info(JSON.stringify(refreshGauge));
     } catch (error) {
       rethrowIfRuntimeError(error);
       logger.error("Could not refresh the client session with the provided refresh token", error);
@@ -70,7 +69,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       }
     }
     dynamodbEnd();
-    logger.info(JSON.stringify(dynamodbGauge));
     // Set state to null if we were unable to retrieve it for any reason.
     // Token response will not include a state value, but ONLY Apple cares
     // about this: it's not actually part of the SMART on FHIR spec.
@@ -109,7 +107,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     return next();
   }
   validationGauge.setToCurrentTime();
-  const grantEnd = validationGauge.startTimer();
+  const validationEnd = validationGauge.startTimer();
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
@@ -117,8 +115,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
-      grantEnd();
-      logger.info(JSON.stringify(validationGauge));
+      validationEnd();
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);
