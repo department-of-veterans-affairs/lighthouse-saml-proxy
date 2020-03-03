@@ -1,13 +1,11 @@
 const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
+const process = require('process');
 
 const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
 
-const { refreshGauge } = require('../metrics');
-const { dynamodbGauge } = require('../metrics');
-const { validationGauge } = require('../metrics');
-
+const { oktaTokenRefreshGauge } = require('../metrics');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
@@ -36,10 +34,13 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
 
   let tokens, state;
   if (req.body.grant_type === 'refresh_token') {
-    const refreshEnd = refreshGauge.startTimer();
+    const oktaTokenRefreshStart = process.hrtime.bigint();
     try {
       tokens = await client.refresh(req.body.refresh_token);
-      refreshEnd();
+      setTimeout(() => {
+        const oktaTokenRefreshEnd = process.hrtime.bigint();
+        oktaTokenRefreshGauge.set(Number(oktaTokenRefreshEnd - oktaTokenRefreshStart)/1000000000);
+      }, 1000);
     } catch (error) {
       rethrowIfRuntimeError(error);
       logger.error("Could not refresh the client session with the provided refresh token", error);
@@ -50,7 +51,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       });
       return next();
     }
-    const dynamodbEnd = dynamodbGauge.startTimer();
     let document;
     try {
       document = await dynamoClient.getFromDynamoBySecondary(dynamo, 'refresh_token', req.body.refresh_token);
@@ -66,7 +66,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         logger.error("Could not update the refresh token in DynamoDB", error);
       }
     }
-    dynamodbEnd();
     // Set state to null if we were unable to retrieve it for any reason.
     // Token response will not include a state value, but ONLY Apple cares
     // about this: it's not actually part of the SMART on FHIR spec.
@@ -104,7 +103,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     });
     return next();
   }
-  const validationEnd = validationGauge.startTimer();
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if ((decoded.scp != null) && (decoded.scp.indexOf('launch/patient') > -1)) {
@@ -112,7 +110,6 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
       const validation_result = await validateToken(tokens.access_token);
       const patient = validation_result.va_identifiers.icn;
       res.json({...tokenResponseBase, patient, state});
-      validationEnd();
       return next();
     } catch (error) {
       rethrowIfRuntimeError(error);

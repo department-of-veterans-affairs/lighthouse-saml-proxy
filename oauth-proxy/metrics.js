@@ -13,14 +13,9 @@ const loginEnd = new client.Counter({
   help: 'counter of number of times the OAuth login process has ended',
 });
 
-const refreshGauge = new client.Gauge({
-  name: 'oauth_proxy_token_refresh_gauge',
-  help: 'metric for timing of token_refresh flow'
-});
-
-const dynamodbGauge = new client.Gauge({
-  name: 'oauth_proxy_dynamodb_gauge',
-  help: 'metric for timing of dynamo_save flow'
+const oktaTokenRefreshGauge = new client.Gauge({
+  name: 'oauth_proxy_okta_token_refresh_gauge',
+  help: 'metric for timing of okta token_refresh flow'
 });
 
 const validationGauge = new client.Gauge({
@@ -31,7 +26,6 @@ const validationGauge = new client.Gauge({
 module.exports = {
   loginBegin,
   loginEnd,
-  refreshGauge,
-  dynamodbGauge,
+  oktaTokenRefreshGauge,
   validationGauge
 }
