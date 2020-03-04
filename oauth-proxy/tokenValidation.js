@@ -18,10 +18,8 @@ const validateToken = async (endpoint, api_key, access_token) => {
       authorization: `Bearer ${access_token}`,
     }
   });
-  setTimeout(() => {
-    const validateTokenEnd = process.hrtime.bigint();
-    validationGauge.set(Number(validateTokenEnd - validateTokenStart)/1000000000);
-  }, 1000);
+  const validateTokenEnd = process.hrtime.bigint();
+  validationGauge.set(Number(validateTokenEnd - validateTokenStart)/1000000000);
   return response.data.attributes;
 };
 

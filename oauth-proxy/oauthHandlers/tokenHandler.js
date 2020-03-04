@@ -37,10 +37,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     const oktaTokenRefreshStart = process.hrtime.bigint();
     try {
       tokens = await client.refresh(req.body.refresh_token);
-      setTimeout(() => {
-        const oktaTokenRefreshEnd = process.hrtime.bigint();
-        oktaTokenRefreshGauge.set(Number(oktaTokenRefreshEnd - oktaTokenRefreshStart)/1000000000);
-      }, 1000);
+      const oktaTokenRefreshEnd = process.hrtime.bigint();
+      oktaTokenRefreshGauge.set(Number(oktaTokenRefreshEnd - oktaTokenRefreshStart)/1000000000);
     } catch (error) {
       rethrowIfRuntimeError(error);
       logger.error("Could not refresh the client session with the provided refresh token", error);
