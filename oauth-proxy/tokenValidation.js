@@ -2,6 +2,7 @@ const requestPromise = require('request-promise-native');
 const process = require('process');
 const { validationGauge } = require('./metrics');
 const { stopTimer } = require('./utils');
+const axios = require('axios');
 
 
 // Calls the token validation API and returns the attributes provided in the
@@ -11,17 +12,15 @@ const { stopTimer } = require('./utils');
 
 const validateToken = async (endpoint, api_key, access_token) => {
   const validateTokenStart = process.hrtime.bigint();
-  const response = await requestPromise({
-    method: 'GET',
-    uri: endpoint,
-    json: true,
+  const config = {
     headers: {
       apiKey: api_key,
-      authorization: `Bearer ${access_token}`,
+      authorization: `Bearer ${access_token}`
     }
-  });
+  };
+  const response = await axios.get(endpoint, config);
   stopTimer(validationGauge, validateTokenStart)
-  return response.data.attributes;
+  return response.data.data.attributes;
 };
 
 // Returns a function that calls validateToken with the given configuration
