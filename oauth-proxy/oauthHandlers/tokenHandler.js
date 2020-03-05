@@ -2,7 +2,7 @@ const jwtDecode = require('jwt-decode');
 const requestPromise = require('request-promise-native');
 const process = require('process');
 
-const { rethrowIfRuntimeError, statusCodeFromError } = require('../utils');
+const { rethrowIfRuntimeError, statusCodeFromError, stopTimer } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
 
 const { oktaTokenRefreshGauge } = require('../metrics');
@@ -37,8 +37,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     const oktaTokenRefreshStart = process.hrtime.bigint();
     try {
       tokens = await client.refresh(req.body.refresh_token);
-      const oktaTokenRefreshEnd = process.hrtime.bigint();
-      oktaTokenRefreshGauge.set(Number(oktaTokenRefreshEnd - oktaTokenRefreshStart)/1000000000);
+      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
     } catch (error) {
       rethrowIfRuntimeError(error);
       logger.error("Could not refresh the client session with the provided refresh token", error);
@@ -47,6 +46,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
         error: error.error,
         error_description: error.error_description,
       });
+      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
       return next();
     }
     let document;

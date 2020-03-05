@@ -1,6 +1,8 @@
 const requestPromise = require('request-promise-native');
 const process = require('process');
 const { validationGauge } = require('./metrics');
+const { stopTimer } = require('./utils');
+
 
 // Calls the token validation API and returns the attributes provided in the
 // response. If an error occurs, the request-promise-native exception is
@@ -18,8 +20,7 @@ const validateToken = async (endpoint, api_key, access_token) => {
       authorization: `Bearer ${access_token}`,
     }
   });
-  const validateTokenEnd = process.hrtime.bigint();
-  validationGauge.set(Number(validateTokenEnd - validateTokenStart)/1000000000);
+  stopTimer(validationGauge, validateTokenStart)
   return response.data.attributes;
 };
 
