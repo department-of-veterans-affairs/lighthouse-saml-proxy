@@ -13,7 +13,19 @@ const loginEnd = new client.Counter({
   help: 'counter of number of times the OAuth login process has ended',
 });
 
+const oktaTokenRefreshGauge = new client.Gauge({
+  name: 'oauth_proxy_okta_token_refresh_gauge',
+  help: 'metric for timing of okta token_refresh flow'
+});
+
+const validationGauge = new client.Gauge({
+  name: 'oauth_proxy_validation_gauge',
+  help: 'metric for timing of validation flow'
+});
+
 module.exports = {
   loginBegin,
   loginEnd,
+  oktaTokenRefreshGauge,
+  validationGauge
 }
