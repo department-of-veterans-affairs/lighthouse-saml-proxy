@@ -4,7 +4,7 @@ const { Issuer } = require('openid-client');
 const process = require('process');
 const { URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
-const request = require('request');
+const axios = require('axios');
 const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli');
@@ -150,15 +150,15 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   });
 
   router.get(appRoutes.jwks, (req, res) => {
-    req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
+    req.pipe(axios(issuer.metadata.jwks_uri)).pipe(res)
   });
 
   router.get(appRoutes.userinfo, (req, res) => {
-    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
+    req.pipe(axios(issuer.metadata.userinfo_endpoint)).pipe(res)
   });
 
   router.post(appRoutes.introspection, (req, res) => {
-    req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
+    req.pipe(axios(issuer.metadata.introspection_endpoint)).pipe(res)
   });
 
   router.get(appRoutes.redirect, async (req, res, next) => {
