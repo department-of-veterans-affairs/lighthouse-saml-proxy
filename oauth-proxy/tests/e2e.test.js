@@ -2,7 +2,7 @@
 
 require('jest');
 const axios = require('axios');
-const querystring = require('querystring');
+const qs = require('qs');
 const FormData = require('form-data');
 const request = require('request-promise-native');
 const { Issuer } = require('openid-client');
@@ -168,6 +168,20 @@ describe('OpenID Connect Conformance', () => {
     await axios.get(parsedMeta.jwks_uri);
     await axios.get(parsedMeta.userinfo_endpoint);
     axios.post(parsedMeta.introspection_endpoint);
+
+    /*const authorizeResp = await request({
+      followRedirect: false,
+      simple: false,
+      resolveWithFullResponse: true,
+      method: 'get',
+      uri: parsedMeta.authorization_endpoint,
+      qs: {
+        client_id: 'clientId123',
+        state: 'abc123',
+        redirect_uri: 'http://localhost:8080/oauth/redirect',
+      },
+    });*/
+    
     const authorizeConfig = {
       followRedirect: false,
       simple: false,
@@ -191,18 +205,19 @@ describe('OpenID Connect Conformance', () => {
       form: { grant_type: 'authorization_code', code: 'xzy789' },
     });*/
 
-    /*const form = new FormData();
-    form.append(grant_type, 'authorization_code');
-    form.append(code, 'xzy789');*/
-    /*const tokenEndpointConfig = {
-      headers: { Authorization: 'Basic clientId123:secretXyz' },
+    const form = new FormData();
+    form.append('grant_type', 'authorization_code');
+    form.append('code', 'xzy789');
+    const tokenEndpointConfig = {
+      headers: { 
+        Authorization: 'Basic clientId123:secretXyz',
+        'content-type': `multipart/form-data; boundary=${form._boundary}`
+      },
       resolveWithFullResponse: true,
-      data: {
-        grant_type: 'authorization_code',
-        code: 'xzy789'
-      }
-    }
-    await axios.post(parsedMeta.token_endpoint, tokenEndpointConfig)*/
+      data: form
+    };
+    
+    await axios.post(parsedMeta.token_endpoint, tokenEndpointConfig);
 
 
     // TODO: We should really call the token endpoint using the refresh_token
