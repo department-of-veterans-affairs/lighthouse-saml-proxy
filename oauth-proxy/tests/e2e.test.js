@@ -2,9 +2,7 @@
 
 require('jest');
 const axios = require('axios');
-const qs = require('qs');
 const FormData = require('form-data');
-const request = require('request-promise-native');
 const { Issuer } = require('openid-client');
 const { randomBytes } = require('crypto');
 
@@ -169,23 +167,13 @@ describe('OpenID Connect Conformance', () => {
     await axios.get(parsedMeta.userinfo_endpoint);
     axios.post(parsedMeta.introspection_endpoint);
 
-    /*const authorizeResp = await request({
-      followRedirect: false,
-      simple: false,
-      resolveWithFullResponse: true,
-      method: 'get',
-      uri: parsedMeta.authorization_endpoint,
-      qs: {
-        client_id: 'clientId123',
-        state: 'abc123',
-        redirect_uri: 'http://localhost:8080/oauth/redirect',
-      },
-    });*/
-    
     const authorizeConfig = {
-      followRedirect: false,
+      maxRedirects: 0,
       simple: false,
       resolveWithFullResponse: true,
+      validateStatus: function(status) {
+        return status < 500;
+      },
       params: {
         client_id: 'clientId123',
         state: 'abc123',
@@ -196,7 +184,6 @@ describe('OpenID Connect Conformance', () => {
     expect(authorizeResp.status).toEqual(302);
     expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
     
-    
     /*await request({
       method: 'post',
       headers: { Authorization: 'Basic clientId123:secretXyz' },
@@ -205,19 +192,18 @@ describe('OpenID Connect Conformance', () => {
       form: { grant_type: 'authorization_code', code: 'xzy789' },
     });*/
 
-    const form = new FormData();
+  
+    /*const form = new FormData();
     form.append('grant_type', 'authorization_code');
     form.append('code', 'xzy789');
     const tokenEndpointConfig = {
       headers: { 
         Authorization: 'Basic clientId123:secretXyz',
-        'content-type': `multipart/form-data; boundary=${form._boundary}`
       },
       resolveWithFullResponse: true,
       data: form
     };
-    
-    await axios.post(parsedMeta.token_endpoint, tokenEndpointConfig);
+    await axios.post(parsedMeta.token_endpoint, tokenEndpointConfig);*/
 
 
     // TODO: We should really call the token endpoint using the refresh_token
@@ -230,23 +216,25 @@ describe('OpenID Connect Conformance', () => {
     // signaure requirement.
   });
 
-  /*it('redirects the user back to the client app', async () => {
-    const resp = await request({
-      followRedirect: false,
+  it('redirects the user back to the client app', async () => {
+    const config = {
+      maxRedirects: 0,
       simple: false,
       resolveWithFullResponse: true,
-      method: 'get',
-      uri: 'http://localhost:9090/testServer/redirect',
-      qs: {
+      validateStatus: function(status) {
+        return status < 500;
+      },
+      params: {
         state: 'abc123',
         code: 'xzy789',
       }
-    });
-    expect(resp.statusCode).toEqual(302);
+    }
+    const resp = await axios.get('http://localhost:9090/testServer/redirect', config);
+    expect(resp.status).toEqual(302);
     expect(resp.headers.location).toMatch(new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`));
   });
 
-  it('returns an OIDC conformant token response', async () => {
+  /*it('returns an OIDC conformant token response', async () => {
     const resp = await request({
       simple: false,
       resolveWithFullResponse: true,
