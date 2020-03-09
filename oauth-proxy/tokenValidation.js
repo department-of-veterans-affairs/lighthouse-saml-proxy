@@ -19,7 +19,7 @@ const validateToken = async (endpoint, api_key, access_token) => {
     }
   };
   const response = await axios.get(endpoint, config);
-  stopTimer(validationGauge, validateTokenStart)
+  stopTimer(validationGauge, validateTokenStart);
   return response.data.data.attributes;
 };
 
