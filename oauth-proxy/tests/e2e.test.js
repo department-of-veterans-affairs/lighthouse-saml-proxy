@@ -2,7 +2,7 @@
 
 require('jest');
 const axios = require('axios');
-const FormData = require('form-data');
+const qs = require('qs');
 const { Issuer } = require('openid-client');
 const { randomBytes } = require('crypto');
 
@@ -183,28 +183,14 @@ describe('OpenID Connect Conformance', () => {
     const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
     expect(authorizeResp.status).toEqual(302);
     expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
-    
-    /*await request({
-      method: 'post',
-      headers: { Authorization: 'Basic clientId123:secretXyz' },
-      uri: parsedMeta.token_endpoint,
-      resolveWithFullResponse: true,
-      form: { grant_type: 'authorization_code', code: 'xzy789' },
-    });*/
 
-  
-    /*const form = new FormData();
-    form.append('grant_type', 'authorization_code');
-    form.append('code', 'xzy789');
-    const tokenEndpointConfig = {
-      headers: { 
-        Authorization: 'Basic clientId123:secretXyz',
-      },
-      resolveWithFullResponse: true,
-      data: form
-    };
-    await axios.post(parsedMeta.token_endpoint, tokenEndpointConfig);*/
-
+    await axios.post(
+      parsedMeta.token_endpoint,
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
 
     // TODO: We should really call the token endpoint using the refresh_token
     // grant type here. Right now the openid-client library makes this a little
@@ -234,24 +220,21 @@ describe('OpenID Connect Conformance', () => {
     expect(resp.headers.location).toMatch(new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`));
   });
 
-  /*it('returns an OIDC conformant token response', async () => {
-    const resp = await request({
-      simple: false,
-      resolveWithFullResponse: true,
-      method: 'post',
-      uri: 'http://localhost:9090/testServer/token',
-      headers: {
-        'authorization': encodeBasicAuthHeader('user', 'pass'),
-        'origin': 'http://localhost:8080',
-      },
-      form: {
-        grant_type: 'authorization_code',
-        code: 'xyz789',
+  it('returns an OIDC conformant token response', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/token',
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
       }
-    });
+    );
 
-    expect(resp.statusCode).toEqual(200);
-    const parsedResp = JSON.parse(resp.body);
+    expect(resp.status).toEqual(200);
+    const parsedResp = resp.data;
     const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
     expect(parsedResp).toMatchObject({
       access_token: expect.stringMatching(JWT_PATTERN),
@@ -261,5 +244,5 @@ describe('OpenID Connect Conformance', () => {
       scope: expect.stringMatching(/.+/),
       token_type: 'Bearer',
     });
-  });*/
+  });
 });
