@@ -128,8 +128,6 @@ describe('OpenID Connect Conformance', () => {
   it('allows CORS on the OIDC metadata endpoint', async () => {
     const randomHeaderName = randomBytes(20).toString('hex');
     const options = {
-      simple: false,
-      resolveWithFullResponse: true,
       headers: {
         'origin': 'http://localhost:8080',
         'access-control-request-headers': randomHeaderName,
@@ -169,8 +167,6 @@ describe('OpenID Connect Conformance', () => {
 
     const authorizeConfig = {
       maxRedirects: 0,
-      simple: false,
-      resolveWithFullResponse: true,
       validateStatus: function(status) {
         return status < 500;
       },
@@ -205,8 +201,6 @@ describe('OpenID Connect Conformance', () => {
   it('redirects the user back to the client app', async () => {
     const config = {
       maxRedirects: 0,
-      simple: false,
-      resolveWithFullResponse: true,
       validateStatus: function(status) {
         return status < 500;
       },
