@@ -122,18 +122,17 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   });
 
   router.get(appRoutes.jwks, async (req, res) => {
-    const response = await axios.get(issuer.metadata.jwks_uri, { responseType: 'stream' });
+    const response = await axios(issuer.metadata.jwks_uri, { responseType: 'stream' });
     req.pipe(response.data, { end: false }).pipe(res);
 
   });
 
   router.get(appRoutes.userinfo, async (req, res) => {
-    const response = await axios.get(issuer.metadata.userinfo_endpoint, { responseType: 'stream' });
+    const response = await axios(issuer.metadata.userinfo_endpoint, { responseType: 'stream' });
     req.pipe(response.data, { end: false }).pipe(res)
   });
 
   router.post(appRoutes.introspection, async (req, res) => {
-    //const test = request(issuer.metadata.introspection_endpoint);
     const response = await axios.post(issuer.metadata.introspection_endpoint, {},{ responseType: 'stream' });
     req.pipe(response.data, { end: false} ).pipe(res);
   });
