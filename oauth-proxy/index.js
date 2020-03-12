@@ -2,16 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const { Issuer } = require('openid-client');
 const process = require('process');
-const { URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
-const request = require('request');
-const jwtDecode = require('jwt-decode');
+const axios = require('axios');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli');
-const { statusCodeFromError } = require('./utils');
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
-const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const { logger, middlewareLogFormat } = require('./logger');
@@ -125,16 +121,21 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  router.get(appRoutes.jwks, (req, res) => {
-    req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
+  router.get(appRoutes.jwks, async (req, res) => {
+    const response = await axios.get(issuer.metadata.jwks_uri, { responseType: 'stream' });
+    req.pipe(response.data, { end: false }).pipe(res);
+
   });
 
-  router.get(appRoutes.userinfo, (req, res) => {
-    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
+  router.get(appRoutes.userinfo, async (req, res) => {
+    const response = await axios.get(issuer.metadata.userinfo_endpoint, { responseType: 'stream' });
+    req.pipe(response.data, { end: false }).pipe(res)
   });
 
-  router.post(appRoutes.introspection, (req, res) => {
-    req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
+  router.post(appRoutes.introspection, async (req, res) => {
+    //const test = request(issuer.metadata.introspection_endpoint);
+    const response = await axios.post(issuer.metadata.introspection_endpoint, {},{ responseType: 'stream' });
+    req.pipe(response.data, { end: false} ).pipe(res);
   });
 
   router.get(appRoutes.redirect, async (req, res, next) => {
@@ -177,7 +178,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
     } else {
-      res.status(500).send('An unknown error has occured');
+      res.status(500).send('An unknown error has occurred');
     }
   });
 
