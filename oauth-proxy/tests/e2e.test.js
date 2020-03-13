@@ -181,11 +181,11 @@ describe('OpenID Connect Conformance', () => {
     expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
 
     await axios.post(
-        parsedMeta.token_endpoint,
-        qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
-        {
+      parsedMeta.token_endpoint,
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
           auth: { username: 'clientId123', password: 'secretXyz' }
-        }
+      }
     );
 
     // TODO: We should really call the token endpoint using the refresh_token
@@ -216,15 +216,15 @@ describe('OpenID Connect Conformance', () => {
 
   it('returns an OIDC conformant token response', async () => {
     const resp = await axios.post(
-        'http://localhost:9090/testServer/token',
-        qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
-        {
+      'http://localhost:9090/testServer/token',
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
           headers: {
             'authorization': encodeBasicAuthHeader('user', 'pass'),
             'origin': 'http://localhost:8080'
           },
           auth: { username: 'clientId123', password: 'secretXyz' }
-        }
+      }
     );
 
     expect(resp.status).toEqual(200);

@@ -1,5 +1,4 @@
 const jwtDecode = require('jwt-decode');
-const requestPromise = require('request-promise-native');
 const process = require('process');
 
 const { rethrowIfRuntimeError, statusCodeFromError, stopTimer } = require('../utils');
