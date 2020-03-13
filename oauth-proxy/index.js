@@ -11,7 +11,6 @@ const { processArgs } = require('./cli');
 const { statusCodeFromError } = require('./utils');
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
-const requestPromise = require('request-promise-native');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const { logger, middlewareLogFormat } = require('./logger');
