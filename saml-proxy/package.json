@@ -80,6 +80,7 @@
     "lodash.omit": "^4.5.0",
     "lodash.template": "^4.4.0",
     "morgan": "~1.9.0",
+    "node-sass": "^4.13.0",
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",

@@ -1,10 +1,11 @@
 {
   "host": "http://localhost:7100",
-  "well_known_base_path": "/services/oauth2",
+  "well_known_base_path": "/oauth2",
   "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
   "dynamo_local": "dynamodb:8000",
   "dynamo_table_name": "OAuthRequests",
   "okta_url": "https://deptva-eval.okta.com",
-  "validate_endpoint": "https://dev-api.va.gov/services/auth/v0/validate",
-  "validate_apiKey": "<FIX ME>"
+  "validate_endpoint": "https://dev-api.va.gov/internal/auth/v0/validation",
+  "validate_apiKey": "<FIX ME>",
+  "okta_token": "<FIX ME>"
 }

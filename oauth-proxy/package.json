@@ -22,6 +22,7 @@
     "@okta/okta-sdk-nodejs": "^1.2.0",
     "@sentry/node": "^5.7.1",
     "aws-sdk": "^2.372.0",
+    "axios": "^0.19.2",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
@@ -32,7 +33,6 @@
     "openid-client": "^2.4.5",
     "prom-client": "^11.5.2",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "winston": "^3.2.1",
     "yargs": "^12.0.5"
   },

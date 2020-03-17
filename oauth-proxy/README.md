@@ -15,7 +15,7 @@ This is a slim proxy for transforming and storing values from Okta's OpenID Conn
 
 ### Metadata
 
-The proxy transforms Okta's metadata at `/.well-known/smart-configuration.json` and `/.well-known/openid-configuration.json` to replace Okta's hostnames with the `protocol://host:port` configured with the `--host` option. 
+The proxy transforms Okta's metadata at `/.well-known/openid-configuration` to replace Okta's hostnames with the `protocol://host:port` configured with the `--host` option. 
 
 ### Authorization
 

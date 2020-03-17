@@ -5,6 +5,11 @@ function statusCodeFromError(error) {
   return 500;
 }
 
+function stopTimer(gauge, start) {
+  const end = process.hrtime.bigint();
+  gauge.set(Number(end - start)/1000000000);
+}
+
 const isRuntimeError = (err) => {
   return (
     (err instanceof EvalError)
@@ -31,4 +36,5 @@ module.exports = {
   rethrowIfRuntimeError,
   statusCodeFromError,
   encodeBasicAuthHeader,
+  stopTimer
 }
