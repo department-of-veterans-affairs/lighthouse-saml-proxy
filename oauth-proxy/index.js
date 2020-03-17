@@ -128,8 +128,13 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   });
 
   router.get(appRoutes.userinfo, async (req, res) => {
-    const response = await axios(issuer.metadata.userinfo_endpoint, { responseType: 'stream' });
-    req.pipe(response.data, { end: false }).pipe(res)
+    axios.get(issuer.metadata.userinfo_endpoint, { responseType: 'stream' })
+        .then(response => {
+          req.pipe(response.data, { end: false }).pipe(res);
+        })
+        .catch(error => {
+          console.log(error.response);
+        })
   });
 
   router.post(appRoutes.introspection, async (req, res) => {
@@ -139,17 +144,17 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
-      .catch(next)
+        .catch(next)
   });
 
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
-      .catch(next)
+        .catch(next)
   });
 
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
-      .catch(next)
+        .catch(next)
   });
 
   app.use(well_known_base_path, router)
@@ -192,13 +197,13 @@ function startApp(config, issuer) {
   });
 
   const dynamoHandle = dynamoClient.createDynamoHandle(
-    Object.assign({},
-      { region: config.aws_region },
-      config.aws_id === null ? null : { accessKeyId: config.aws_id },
-      config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
-    ),
-    config.dynamo_local,
-    config.dynamo_table_name,
+      Object.assign({},
+          { region: config.aws_region },
+          config.aws_id === null ? null : { accessKeyId: config.aws_id },
+          config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
+      ),
+      config.dynamo_local,
+      config.dynamo_table_name,
   );
 
   const validateToken = configureTokenValidator(config.validate_endpoint, config.validate_apiKey);
