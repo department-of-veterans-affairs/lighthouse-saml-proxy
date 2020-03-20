@@ -11,6 +11,8 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
+      - echo Linting...
+      # insert linting step here
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t dvp/saml-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION -f saml-proxy/Dockerfile .
