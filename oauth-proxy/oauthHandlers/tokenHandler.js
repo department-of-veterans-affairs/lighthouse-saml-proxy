@@ -7,7 +7,7 @@ const { oktaTokenRefreshGauge, stopTimer } = require('../metrics');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   let client_id, client_secret;
-  let basicAuth = parseBasicAuth(req);
+  const basicAuth = parseBasicAuth(req);
   if (basicAuth) {
     ([ client_id, client_secret ] = [ basicAuth.username, basicAuth.password ]);
   } else if (req.body.client_id && req.body.client_secret) {
