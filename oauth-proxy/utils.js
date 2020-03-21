@@ -26,8 +26,8 @@ function encodeBasicAuthHeader(username, password) {
   return `Basic ${encodedCredentials}`;
 }
 
-const CREDENTIALS_REGEXP = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/;
-const USER_PASS_REGEXP = /^([^:]*):(.*)$/;
+const BASIC_AUTH_REGEX = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/;
+const USER_PASS_REGEX = /^([^:]*):(.*)$/;
 
 function parseBasicAuth(req) {
   if (!req || typeof req !== 'object') {
@@ -42,12 +42,12 @@ function parseBasicAuth(req) {
     return undefined;
   }
 
-  const match = CREDENTIALS_REGEXP.exec(req.headers.authorization);
+  const match = BASIC_AUTH_REGEX.exec(req.headers.authorization);
   if (!match) {
     return undefined;
   }
 
-  const userPass = USER_PASS_REGEXP.exec(Buffer.from(match[1], 'base64').toString('utf-8'));
+  const userPass = USER_PASS_REGEX.exec(Buffer.from(match[1], 'base64').toString('utf-8'));
   if (!userPass) {
     return undefined;
   }
