@@ -2,13 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const { Issuer } = require('openid-client');
 const process = require('process');
-const { URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
 const request = require('request');
-const jwtDecode = require('jwt-decode');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli');
-const { statusCodeFromError } = require('./utils');
 const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
@@ -49,6 +46,9 @@ const openidMetadataWhitelist = [
 ]
 
 async function createIssuer(config) {
+  if (config.upstream_issuer_timeout_ms) {
+    Issuer.defaultHttpOptions = { timeout: config.upstream_issuer_timeout_ms };
+  }
   return await Issuer.discover(config.upstream_issuer);
 }
 
