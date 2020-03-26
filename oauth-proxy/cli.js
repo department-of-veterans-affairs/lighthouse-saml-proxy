@@ -20,7 +20,7 @@ function processArgs() {
       },
       upstream_issuer_timeout_ms: {
         description: 'Optional timeout (ms) for upstream requests',
-        required: false,
+        required: false
       },
       aws_secret: {
         description: "AWS Secret Access Key",
