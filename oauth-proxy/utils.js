@@ -5,11 +5,6 @@ function statusCodeFromError(error) {
   return 500;
 }
 
-function stopTimer(gauge, start) {
-  const end = process.hrtime.bigint();
-  gauge.set(Number(end - start)/1000000000);
-}
-
 const isRuntimeError = (err) => {
   return (
     (err instanceof EvalError)
@@ -31,10 +26,44 @@ function encodeBasicAuthHeader(username, password) {
   return `Basic ${encodedCredentials}`;
 }
 
+const BASIC_AUTH_REGEX = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/;
+const USER_PASS_REGEX = /^([^:]*):(.*)$/;
+
+function parseBasicAuth(req) {
+  if (!req || typeof req !== 'object') {
+    return undefined;
+  }
+
+  if (!req.headers || typeof req.headers !== 'object') {
+    return undefined;
+  }
+
+  if (typeof req.headers.authorization !== 'string') {
+    return undefined;
+  }
+
+  const match = BASIC_AUTH_REGEX.exec(req.headers.authorization);
+  if (!match) {
+    return undefined;
+  }
+
+  const userPass = USER_PASS_REGEX.exec(Buffer.from(match[1], 'base64').toString('utf-8'));
+  if (!userPass) {
+    return undefined;
+  }
+
+  return new Credentials(userPass[1], userPass[2]);
+}
+
+function Credentials(username, password) {
+  this.username = username;
+  this.password = password;
+}
+
 module.exports = {
   isRuntimeError,
   rethrowIfRuntimeError,
   statusCodeFromError,
   encodeBasicAuthHeader,
-  stopTimer
+  parseBasicAuth
 };
