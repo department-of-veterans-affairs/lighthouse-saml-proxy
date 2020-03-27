@@ -18,6 +18,10 @@ function processArgs() {
         description: 'URI of upstream issuer to be proxies',
         required: true,
       },
+      upstream_issuer_timeout_ms: {
+        description: 'Optional timeout (ms) for upstream requests',
+        required: false
+      },
       aws_secret: {
         description: "AWS Secret Access Key",
         required: false,
