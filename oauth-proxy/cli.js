@@ -70,6 +70,11 @@ function processArgs() {
         required: false,
         string: true
       },
+      enable_pkce_authorization_flow: {
+        description: "Enable PKCE authorization flow?",
+        required: false,
+        default: false,
+      }
     })
     .wrap(yargs.terminalWidth())
     .argv;

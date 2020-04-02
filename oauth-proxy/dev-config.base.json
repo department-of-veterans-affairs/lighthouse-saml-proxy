@@ -8,5 +8,6 @@
   "okta_url": "https://deptva-eval.okta.com",
   "validate_endpoint": "https://dev-api.va.gov/internal/auth/v0/validation",
   "validate_apiKey": "<FIX ME>",
-  "okta_token": "<FIX ME>"
+  "okta_token": "<FIX ME>",
+  "enable_pkce_authorization_flow": true
 }

@@ -6,14 +6,22 @@ const { translateTokenSet } = require('./tokenResponse');
 const { oktaTokenRefreshGauge } = require('../metrics');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
-  let client_id, client_secret;
+  const metadata = {
+    redirect_uris: [
+      redirect_uri
+    ]
+  };
+
   if (req.headers.authorization) {
     const authHeader = req.headers.authorization.match(/^Basic\s(.*)$/);
     ([ client_id, client_secret ] = Buffer.from(authHeader[1], 'base64').toString('utf-8').split(':'));
   } else if (req.body.client_id && req.body.client_secret) {
-    ({ client_id, client_secret } = req.body);
+    metadata.client_id = req.body.client_id;
+    metadata.client_secret = req.body.client_secret;
     delete req.body.client_id;
     delete req.body.client_secret;
+  } else if (config.enable_pkce_authorization_flow && req.body.client_id) {
+    metadata.token_endpoint_auth_method = "none";
   } else {
     res.status(401).json({
       error: "invalid_client",
@@ -22,13 +30,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     return next();
   }
 
-  const client = new issuer.Client({
-    client_id,
-    client_secret,
-    redirect_uris: [
-      redirect_uri
-    ],
-  });
+  const client = new issuer.Client(metadata);
 
   let tokens, state;
   if (req.body.grant_type === 'refresh_token') {
