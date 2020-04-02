@@ -52,7 +52,7 @@ function processArgs() {
       validate_endpoint: {
         description: 'va.gov token validation endpoint',
         required: true,
-        default: 'https://dev-api.va.gov/internal/auth/v0/validation'
+        default: 'https://sandbox-api.va.gov/internal/auth/v0/validation'
       },
       validate_apiKey: {
         description: 'apiKey permitting access to validate endpoint',

@@ -6,7 +6,7 @@ const { translateTokenSet } = require('./tokenResponse');
 const { oktaTokenRefreshGauge, stopTimer } = require('../metrics');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
-  const metadata = {
+  const clientMetadata = {
     redirect_uris: [
       redirect_uri
     ]
@@ -14,15 +14,15 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
 
   const basicAuth = parseBasicAuth(req);
   if (basicAuth) {
-    metadata.client_id = basicAuth.username;
-    metadata.client_secret = basicAuth.password;
+    clientMetadata.client_id = basicAuth.username;
+    clientMetadata.client_secret = basicAuth.password;
   } else if (req.body.client_id && req.body.client_secret) {
-    metadata.client_id = req.body.client_id;
-    metadata.client_secret = req.body.client_secret;
+    clientMetadata.client_id = req.body.client_id;
+    clientMetadata.client_secret = req.body.client_secret;
     delete req.body.client_id;
     delete req.body.client_secret;
   } else if (config.enable_pkce_authorization_flow && req.body.client_id) {
-    metadata.token_endpoint_auth_method = "none";
+    clientMetadata.token_endpoint_auth_method = "none";
   } else {
     res.status(401).json({
       error: "invalid_client",
@@ -31,7 +31,7 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     return next();
   }
 
-  const client = new issuer.Client(metadata);
+  const client = new issuer.Client(clientMetadata);
 
   let tokens, state;
   if (req.body.grant_type === 'refresh_token') {
