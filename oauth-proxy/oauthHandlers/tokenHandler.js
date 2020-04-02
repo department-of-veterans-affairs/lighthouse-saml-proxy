@@ -23,6 +23,8 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     delete req.body.client_secret;
   } else if (config.enable_pkce_authorization_flow && req.body.client_id) {
     clientMetadata.token_endpoint_auth_method = "none";
+    clientMetadata.client_id = req.body.client_id;
+    delete req.body.client_id;
   } else {
     res.status(401).json({
       error: "invalid_client",

@@ -147,7 +147,7 @@ describe('tokenHandler', () => {
         throw new RequestError(
           new Error("simulated upstream response error for expired refresh token"),
           {},
-          { statusCode: 400 },
+          { statusCode: 400 }
         );
       }
     });
@@ -159,14 +159,14 @@ describe('tokenHandler', () => {
         'grant_type': 'authorization_code',
         'code': 'the_fake_authorization_code',
         'client_id': 'client123',
-        'client_secret': 'secret789',
+        'client_secret': 'secret789'
       }
     });
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
       code: 'the_fake_authorization_code',
       refresh_token: '',
-      redirect_uri: "http://localhost/thisDoesNotMatter",
+      redirect_uri: "http://localhost/thisDoesNotMatter"
     });
     validateToken = (access_token) => {
       return { va_identifiers: { icn: '0000000000000' } };
@@ -192,14 +192,14 @@ describe('tokenHandler', () => {
         'grant_type': 'refresh_token',
         'refresh_token': 'the_fake_refresh_token',
         'client_id': 'client123',
-        'client_secret': 'secret789',
+        'client_secret': 'secret789'
       }
     });
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
       code: 'xyz789',
       refresh_token: 'the_fake_refresh_token',
-      redirect_uri: "http://localhost/thisDoesNotMatter",
+      redirect_uri: "http://localhost/thisDoesNotMatter"
     });
     validateToken = (access_token) => {
       return { va_identifiers: { icn: '0000000000000' } };
@@ -244,7 +244,7 @@ describe('tokenHandler', () => {
         'grant_type': 'refresh_token',
         'refresh_token': 'the_fake_refresh_token',
         'client_id': 'client123',
-        'client_secret': 'secret789',
+        'client_secret': 'secret789'
       }
     });
     let res = new MockExpressResponse();
@@ -255,14 +255,48 @@ describe('tokenHandler', () => {
     expect(res.statusCode).toEqual(400);
   });
 
-  it('errors properly for unauthorized requests', async () => {
+  it('supports none (PKCE) authentication', async () => {
+    let customConfig = {...config, "enable_pkce_authorization_flow": true};
+    let req = new MockExpressRequest({
+      body: {
+        'grant_type': 'refresh_token',
+        'refresh_token': 'the_fake_refresh_token',
+        'client_id': 'client123'
+      }
+    });
+    let res = new MockExpressResponse();
+    let client = buildExpiredRefreshTokenClient();
+    issuer = new FakeIssuer(client);
+    await tokenHandler(customConfig, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    expect(client.refresh).toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it('errors properly for unauthorized (blank) requests', async () => {
     let req = new MockExpressRequest({
       method: 'POST',
       url: '/oauth2/token',
-      body: {}, 
+      body: {}
     });
     let res = new MockExpressResponse();
     await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    expect(validateToken).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(401);
+  });
+
+  it('errors properly for unauthorized (no client_secret) requests', async () => {
+    let customConfig = {...config, "enable_pkce_authorization_flow": false};
+    let req = new MockExpressRequest({
+      method: 'POST',
+      url: '/oauth2/token',
+      body: {
+        'grant_type': 'refresh_token',
+        'refresh_token': 'the_fake_refresh_token',
+        'client_id': 'client123'
+      }
+    });
+    let res = new MockExpressResponse();
+    await tokenHandler(customConfig, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
     expect(validateToken).not.toHaveBeenCalled();
     expect(res.statusCode).toEqual(401);
   });
