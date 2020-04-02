@@ -1,9 +1,9 @@
 const jwtDecode = require('jwt-decode');
 const process = require('process');
 
-const { rethrowIfRuntimeError, statusCodeFromError, stopTimer } = require('../utils');
+const { rethrowIfRuntimeError, statusCodeFromError, parseBasicAuth } = require('../utils');
 const { translateTokenSet } = require('./tokenResponse');
-const { oktaTokenRefreshGauge } = require('../metrics');
+const { oktaTokenRefreshGauge, stopTimer } = require('../metrics');
 
 const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next) => {
   const metadata = {
@@ -12,9 +12,10 @@ const tokenHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamo
     ]
   };
 
-  if (req.headers.authorization) {
-    const authHeader = req.headers.authorization.match(/^Basic\s(.*)$/);
-    ([ client_id, client_secret ] = Buffer.from(authHeader[1], 'base64').toString('utf-8').split(':'));
+  const basicAuth = parseBasicAuth(req);
+  if (basicAuth) {
+    metadata.client_id = basicAuth.username;
+    metadata.client_secret = basicAuth.password;
   } else if (req.body.client_id && req.body.client_secret) {
     metadata.client_id = req.body.client_id;
     metadata.client_secret = req.body.client_secret;
