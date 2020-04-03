@@ -151,7 +151,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       .catch(next)
   });
 
-  app.use(well_known_base_path, router)
+  app.use(well_known_base_path, router);
 
   // Error handlers. Keep as last middlewares
 
