@@ -1,0 +1,56 @@
+version: 0.2
+
+env:
+  git-credential-helper: yes
+  parameter-store:
+    GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
+    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook"
+phases:
+  install:
+    commands:
+    - apt update
+    - apt-get install awscli jq python3-pip apt-transport-https ca-certificates software-properties-common gnupg
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    - echo "deb https://download.docker.com/linux/debian stretch stable" | tee /etc/apt/sources.list.d/docker.list
+    - apt update
+    - apt-get -y install docker-ce
+    - pip3 install --upgrade awscli
+    - pip3 install ecs-deploy
+    - curl -LOk https://github.com/github/hub/releases/download/v2.14.2/hub-linux-amd64-2.14.2.tgz
+    - tar zxvf hub-linux-amd64-2.14.2.tgz
+    - cp hub-linux-amd64-2.14.2/bin/hub /usr/local/bin
+  pre_build:
+    commands:
+    - set -o pipefail
+    - echo Logging into ECR
+    - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+    - echo Setting tag for new release...
+    - NEW_RELEASE_TAG=$(cicd/increment.sh $(hub tag|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
+    - cicd/slackpost.sh "Creating and tagging a new release for the SAML Proxy..."
+    - echo Creating release...
+    - |
+      if $(hub release create -m $NEW_RELEASE_TAG -t master $NEW_RELEASE_TAG|tee $CODEBUILD_SRC_DIR/release_output.txt); then
+        TAG_COMMIT_HASH=$(git rev-parse $NEW_RELEASE_TAG)
+        echo Tagging ECR image...
+        if $(python3 cicd/tag_containers.py -n saml-proxy -i ${TAG_COMMIT_HASH} -r dvp/saml-proxy -v $NEW_RELEASE_TAG|tee $CODEBUILD_SRC_DIR/tag_output.txt); then
+          cicd/slackpost.sh "Tagged dvp/saml-proxy:$NEW_RELEASE_TAG"
+        else
+          PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
+          BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
+          TAG_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/tag_output.txt)
+          cicd/slackpost.sh -d "$TAG_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Tagging failed."
+          exit 1
+        fi
+      else
+        PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
+        BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
+        RELEASE_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/release_output.txt)
+        cicd/slackpost.sh -d "$RELEASE_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
+        exit 1
+      fi
+  build:
+    commands:
+      - echo Triggering deploys...
+      - SRC_DIR=$CODEBUILD_SRC_DIR CODEBUILD_BUILD_ID=$CODEBUILD_BUILD_ID cicd/deploy_to_ecs.sh $NEW_RELEASE_TAG saml-proxy staging
+  post_build:
+    commands:
