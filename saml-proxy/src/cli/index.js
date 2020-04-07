@@ -24,6 +24,7 @@ export function processArgs() {
       'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
       'Usage:\n\t$0 -acs {url} -aud {uri}')
     .config()
+    .env()
     .options({
       port: {
         description: 'IdP Web Server Listener Port',
