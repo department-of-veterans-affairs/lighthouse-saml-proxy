@@ -27,6 +27,7 @@ pipeline {
 
       steps {
         sh '''
+          su - node
           cd /home/node
           npm run test:ci
         '''
