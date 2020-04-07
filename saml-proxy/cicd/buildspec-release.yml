@@ -21,7 +21,6 @@ phases:
     - cp hub-linux-amd64-2.14.2/bin/hub /usr/local/bin
   pre_build:
     commands:
-    - set -o pipefail
     - echo Logging into ECR
     - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
     - echo Setting tag for new release...
@@ -30,7 +29,12 @@ phases:
     - echo Creating release...
     - |
       if hub release create -m $NEW_RELEASE_TAG -t master $NEW_RELEASE_TAG; then
-        TAG_COMMIT_HASH=$(git rev-parse $NEW_RELEASE_TAG)
+        if TAG_COMMIT_HASH=$(git rev-parse $NEW_RELEASE_TAG); then
+          echo Got hash for $NEW_RELEASE_TAG: $TAG_COMMIT_HASH
+        else
+          echo Failed to get hash for $NEW_RELEASE_TAG
+          exit 1
+        fi
         echo Tagging ECR image...
         if python3 cicd/tag_containers.py -n saml-proxy -i ${TAG_COMMIT_HASH} -r dvp/saml-proxy -v $NEW_RELEASE_TAG -o $CODEBUILD_SRC_DIR/tag_output.txt; then
           cicd/slackpost.sh "Tagged dvp/saml-proxy:$NEW_RELEASE_TAG"
@@ -45,7 +49,7 @@ phases:
         PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
         BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
         RELEASE_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/release_output.txt)
-        cicd/slackpost.sh -d "$RELEASE_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
+        cicd/slackpost.sh -d "<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
         exit 1
       fi
   build:
