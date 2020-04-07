@@ -8,16 +8,11 @@ COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
 RUN npm install
 
 USER root
-RUN mkdir -p /home/common/certs && \
-  chown -R node:node /home/common/certs
-COPY ./common/certs/* /etc/pki/ca-trust/source/anchors/
-RUN update-ca-trust
+RUN mkdir -p /home/common && \
+  chown -R node:node /home/common
 
 COPY --chown=node:node ./saml-proxy ./
 COPY --chown=node:node ./common /home/common
-
-RUN cat /home/common/certs/*.pem > /home/common/certs/combined.pem
-ENV NODE_EXTRA_CA_CERTS /home/common/certs/combined.pem
 
 EXPOSE 7000 7000
 
