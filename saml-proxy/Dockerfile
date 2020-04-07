@@ -1,15 +1,15 @@
 FROM vasdvp/lighthouse-node-application-base:node12
 
 WORKDIR /home/node
-USER root
-RUN mkdir -p /home/common/certs && \
-  chown -R node:node /home/common/certs
+
 RUN git config --global url."https://".insteadOf git://
 COPY --chown=node:node ./saml-proxy/package.json package.json
 COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
 RUN npm install
 
-
+USER root
+RUN mkdir -p /home/common/certs && \
+  chown -R node:node /home/common/certs
 COPY ./common/certs/* /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
 
