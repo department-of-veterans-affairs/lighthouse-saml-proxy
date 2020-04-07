@@ -1,22 +1,23 @@
 FROM vasdvp/lighthouse-node-application-base:node12
 
 WORKDIR /home/node
-RUN mkdir -p /home/node/certs && \
-  chown -R node:node /home/node/certs
+USER root
+RUN mkdir -p /home/common/certs && \
+  chown -R node:node /home/common/certs
 RUN git config --global url."https://".insteadOf git://
 COPY --chown=node:node ./saml-proxy/package.json package.json
 COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
 RUN npm install
 
-USER root
+
 COPY ./common/certs/* /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
 
 COPY --chown=node:node ./saml-proxy ./
-COPY --chown=node:node ./common /home/node/common
+COPY --chown=node:node ./common /home/common
 
-RUN cat /home/node/common/certs/*.pem > /home/node/common/certs/combined.pem
-ENV NODE_EXTRA_CA_CERTS /home/node/common/certs/combined.pem
+RUN cat /home/common/certs/*.pem > /home/common/certs/combined.pem
+ENV NODE_EXTRA_CA_CERTS /home/common/certs/combined.pem
 
 EXPOSE 7000 7000
 
