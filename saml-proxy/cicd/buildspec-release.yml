@@ -29,10 +29,10 @@ phases:
     - cicd/slackpost.sh "Creating and tagging a new release for the SAML Proxy..."
     - echo Creating release...
     - |
-      if $(hub release create -m $NEW_RELEASE_TAG -t master $NEW_RELEASE_TAG|tee $CODEBUILD_SRC_DIR/release_output.txt); then
+      if hub release create -m $NEW_RELEASE_TAG -t master $NEW_RELEASE_TAG; then
         TAG_COMMIT_HASH=$(git rev-parse $NEW_RELEASE_TAG)
         echo Tagging ECR image...
-        if $(python3 cicd/tag_containers.py -n saml-proxy -i ${TAG_COMMIT_HASH} -r dvp/saml-proxy -v $NEW_RELEASE_TAG|tee $CODEBUILD_SRC_DIR/tag_output.txt); then
+        if python3 cicd/tag_containers.py -n saml-proxy -i ${TAG_COMMIT_HASH} -r dvp/saml-proxy -v $NEW_RELEASE_TAG -o $CODEBUILD_SRC_DIR/tag_output.txt; then
           cicd/slackpost.sh "Tagged dvp/saml-proxy:$NEW_RELEASE_TAG"
         else
           PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
