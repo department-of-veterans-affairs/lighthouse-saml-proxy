@@ -3,7 +3,7 @@ FROM vasdvp/lighthouse-node-application-base:node12
 WORKDIR /home/node
 RUN mkdir -p /home/node/certs && \
   chown -R node:node /home/node/certs
-RUN apt-get -y install git python make g++
+RUN yum -y install git python make g++
 RUN git config --global url."https://".insteadOf git://
 COPY --chown=node:node ./saml-proxy/package.json package.json
 COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
