@@ -22,12 +22,12 @@ pipeline {
           filename "saml-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
           additionalBuildArgs '--pull'
+          args '-u node'
         }
       }
 
       steps {
         sh '''
-          su - node
           cd /home/node
           npm run test:ci
         '''
