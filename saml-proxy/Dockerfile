@@ -9,7 +9,7 @@ COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
 RUN npm install
 
 USER root
-COPY ./common/certs/* /etc/pki/ca-trust/source/anchors
+COPY ./common/certs/* /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
 
 COPY --chown=node:node ./saml-proxy ./
