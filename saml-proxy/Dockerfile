@@ -2,7 +2,7 @@ FROM vasdvp/lighthouse-node-application-base:node12
 
 WORKDIR /home/node
 RUN mkdir -p /home/node/certs && \
-  chmod -r node:node /home/node/certs
+  chown -r node:node /home/node/certs
 RUN apk add git python make g++
 RUN git config --global url."https://".insteadOf git://
 COPY --chown=node:node ./saml-proxy/package.json package.json
