@@ -22,7 +22,7 @@ pipeline {
           filename "saml-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
           additionalBuildArgs '--pull'
-          args '-u node'
+          args '-u root'
         }
       }
 
