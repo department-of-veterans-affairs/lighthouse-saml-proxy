@@ -41,12 +41,14 @@ pipeline {
           dir "."
           filename "oauth-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
+          additionalBuildArgs '--pull'
+          args '-u root'
         }
       }
 
       steps {
         sh '''
-          cd /opt/app
+          cd /home/node
           npm run test
         '''
       }
