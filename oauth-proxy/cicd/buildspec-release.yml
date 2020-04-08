@@ -5,13 +5,13 @@ env:
   variables:
     # SERVICE_NAME should match the ECS service name without the project or environment
     # Example: ECS Service name: dvp-staging-saml-proxy = SERVICE_NAME: "saml-proxy"
-    SERVICE_NAME: "saml-proxy"
+    SERVICE_NAME: "oauth-proxy"
     # CI_JOB_NAME should match the Codebuild CI job's name
-    CI_JOB_NAME: "saml-proxy-ci"
+    CI_JOB_NAME: "oauth-proxy-ci"
     # REPOSITORY should be the ECR Repository where the container is stored
-    REPOSITORY: "dvp/saml-proxy"
+    REPOSITORY: "dvp/oauth-proxy"
     # FRIENDLY_NAME should be the name used in Parameter store, e.g.: /dvp/environment/friendly-name
-    FRIENDLY_NAME: "saml-proxy"
+    FRIENDLY_NAME: "oauth-proxy"
     # Set AUTO_DEPLOY_ENVS to match the environments you would like to deploy to when this buildspec is triggered. e.g.: "dev staging"
     AUTO_DEPLOY_ENVS: "staging"
   parameter-store:
