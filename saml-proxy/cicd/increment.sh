@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 # Get current release number, increment, and create a new release.
 
 increment_version() {
