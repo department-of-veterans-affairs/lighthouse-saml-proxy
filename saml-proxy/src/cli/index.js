@@ -41,7 +41,7 @@ export function processArgs() {
         description: 'IdP Signature PrivateKey Certificate',
         required: true,
         default: path.resolve(cwd(), './idp-private-key.pem'),
-        coerce: makeCertFileCoercer('RSA private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpIssuer: {
         description: 'IdP Issuer URI',
@@ -98,7 +98,7 @@ export function processArgs() {
         description: 'Web Server TLS/SSL Private Key (pem)',
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('RSA private key')
+        coerce: makeCertFileCoercer('private key')
       },
       idpHttpsCert: {
         description: 'Web Server TLS/SSL Certificate (pem)',
@@ -289,7 +289,7 @@ export function processArgs() {
         string: true,
         required: false,
         default: path.resolve(cwd(), './sp-key.pem'),
-        coerce: makeCertFileCoercer('privateKey', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spEncryptionCert: {
         description: 'SP/RP Public Key Encryption Certificate (PEM)',
@@ -301,13 +301,13 @@ export function processArgs() {
         description: 'SP/RP Private Key Decryption Certificate(PEM)',
         string: true,
         required: false,
-        coerce: makeCertFileCoercer('privateKey', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spHttpsPrivateKey: {
         description: 'Web Server TLS/SSL Private Key (PEM)',
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('privateKey', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spHttpsCert: {
         description: 'Web Server TLS/SSL Certificate (PEM)',

@@ -3,7 +3,7 @@ import { resolveFilePath } from "./utils";
 
 const cryptTypes = {
   certificate: /-----BEGIN CERTIFICATE-----[^-]*-----END CERTIFICATE-----/,
-  'RSA private key': /-----BEGIN RSA PRIVATE KEY-----\n[^-]*\n-----END RSA PRIVATE KEY-----/,
+  'private key': /-----BEGIN (RSA )?PRIVATE KEY-----\n[^-]*\n-----END (RSA )?PRIVATE KEY-----/,
   'public key': /-----BEGIN PUBLIC KEY-----\n[^-]*\n-----END PUBLIC KEY-----/
 };
 
