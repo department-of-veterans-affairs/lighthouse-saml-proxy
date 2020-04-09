@@ -327,11 +327,17 @@ export function processArgs() {
         string: true
       },
       vetsAPIHost: {
+        // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
+        // where it runs environment variables through a camelcase function that transforms
+        // API to Api. Without these aliases, yargs will complain that these arguments are
+        // missing.
+        alias: 'vetsApiHost',
         description: 'The URL prefix for the vets-api host used to perform MVI lookups.',
         required: true,
         string: true,
       },
       vetsAPIToken: {
+        alias: 'vetsApiToken',
         description: 'Token used to authorize calls to vets-api while performing MVI lookups.',
         required: true,
         string: true,
