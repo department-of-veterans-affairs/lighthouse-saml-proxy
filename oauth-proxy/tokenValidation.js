@@ -1,6 +1,5 @@
 const process = require('process');
-const { validationGauge } = require('./metrics');
-const { stopTimer } = require('./utils');
+const { validationGauge, stopTimer } = require('./metrics');
 const axios = require('axios');
 
 

@@ -23,9 +23,15 @@ const validationGauge = new client.Gauge({
   help: 'metric for timing of validation flow'
 });
 
+function stopTimer(gauge, start) {
+  const end = process.hrtime.bigint();
+  gauge.set(Number(end - start)/1000000000);
+}
+
 module.exports = {
   loginBegin,
   loginEnd,
   oktaTokenRefreshGauge,
-  validationGauge
-}
+  validationGauge,
+  stopTimer
+};

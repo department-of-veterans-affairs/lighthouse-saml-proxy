@@ -18,6 +18,10 @@ function processArgs() {
         description: 'URI of upstream issuer to be proxies',
         required: true,
       },
+      upstream_issuer_timeout_ms: {
+        description: 'Optional timeout (ms) for upstream requests',
+        required: false
+      },
       aws_secret: {
         description: "AWS Secret Access Key",
         required: false,
@@ -48,7 +52,7 @@ function processArgs() {
       validate_endpoint: {
         description: 'va.gov token validation endpoint',
         required: true,
-        default: 'https://dev-api.va.gov/internal/auth/v0/validation'
+        default: 'https://sandbox-api.va.gov/internal/auth/v0/validation'
       },
       validate_apiKey: {
         description: 'apiKey permitting access to validate endpoint',
@@ -66,6 +70,11 @@ function processArgs() {
         required: false,
         string: true
       },
+      enable_pkce_authorization_flow: {
+        description: "Enable PKCE authorization flow?",
+        required: false,
+        default: false,
+      }
     })
     .wrap(yargs.terminalWidth())
     .argv;
