@@ -3,15 +3,15 @@ FROM vasdvp/lighthouse-node-application-base:node12
 WORKDIR /home/node
 
 RUN git config --global url."https://".insteadOf git://
-COPY --chown=node:node ./saml-proxy/package.json package.json
-COPY --chown=node:node ./saml-proxy/package-lock.json package-lock.json
+COPY --chown=node:node ./oauth-proxy/package.json package.json
+COPY --chown=node:node ./oauth-proxy/package-lock.json package-lock.json
 RUN npm install
 
 USER root
 RUN mkdir -p /home/common && \
   chown -R node:node /home/common
 
-COPY --chown=node:node ./saml-proxy ./
+COPY --chown=node:node ./oauth-proxy ./
 COPY --chown=node:node ./common /home/common
 
 EXPOSE 7100 7100
