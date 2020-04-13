@@ -3,6 +3,7 @@ const yargs = require('yargs');
 function processArgs() {
   return yargs
     .usage('Proxy for OpenId Connect Server')
+    .env()
     .config()
     .options({
       port: {
@@ -83,4 +84,3 @@ function processArgs() {
 module.exports = {
   processArgs,
 };
-

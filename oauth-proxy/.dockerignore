@@ -1,0 +1,9 @@
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+buildspec.yml
+
+node_modules
+cicd
+dist

@@ -1,0 +1,68 @@
+version: 0.2
+
+env:
+  git-credential-helper: yes
+  variables:
+    # SERVICE_NAME should match the ECS service name without the project or environment
+    # Example: ECS Service name: dvp-staging-saml-proxy = SERVICE_NAME: "saml-proxy"
+    SERVICE_NAME: "oauth-proxy"
+    # CI_JOB_NAME should match the Codebuild CI job's name
+    CI_JOB_NAME: "oauth-proxy-ci"
+    # REPOSITORY should be the ECR Repository where the container is stored
+    REPOSITORY: "dvp/oauth-proxy"
+    # FRIENDLY_NAME should be the name used in Parameter store, e.g.: /dvp/environment/friendly-name
+    FRIENDLY_NAME: "oauth-proxy"
+    # Set AUTO_DEPLOY_ENVS to match the environments you would like to deploy to when this buildspec is triggered. e.g.: "dev staging"
+    AUTO_DEPLOY_ENVS: "staging"
+  parameter-store:
+    GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
+    # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
+    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook"
+phases:
+  pre_build:
+    commands:
+    - echo Logging into ECR
+    - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
+    - echo Setting tag for new release...
+    # To get the new release version, we will increment the last version number found in Github
+    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
+    - slackpost.sh "Creating and tagging a new release for ${FRIENDLY_NAME}..."
+    - echo Creating release...
+    # We use the 'hub' command to create a release here with the contents of 'master'. If the command exits successfully, we then
+    # git fetch to get the new tag created, and we use that tag to get a commit SHA for the new release.
+    # This is a WORKAROUND to Codebuild not having the 'git_commit_sha' from the webhook available.
+    # We then tag the image using tag_containers.py, if that command is successful, we are done with this section.
+    # Failures are noted and notifications are made with links to the Codebuild job.
+    - |
+      if hub release create -m ${NEW_RELEASE_TAG} -t master ${NEW_RELEASE_TAG}; then
+        git fetch origin
+        if TAG_COMMIT_HASH=$(git rev-parse ${NEW_RELEASE_TAG}); then
+          echo Got hash for ${NEW_RELEASE_TAG}: ${TAG_COMMIT_HASH}
+        else
+          echo Failed to get hash for ${NEW_RELEASE_TAG}
+          exit 1
+        fi
+        echo Tagging ECR image...
+        if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${NEW_RELEASE_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
+          slackpost.sh "Tagged ${REPOSITORY}:${NEW_RELEASE_TAG}"
+        else
+          PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
+          BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
+          TAG_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/tag_output.txt)
+          slackpost.sh -d "$TAG_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Tagging failed."
+          exit 1
+        fi
+      else
+        PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
+        BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
+        slackpost.sh -d "<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
+        exit 1
+      fi
+  build:
+    commands:
+      # We trigger the deploys here. The list of environments to automatically deploy to is placed at the end of the command below, separated
+      # by spaces, e.g.: deploy_to_ecs.sh <tag> <service> <friendly-name> [dev staging]
+      - echo Triggering deploys...
+      - SRC_DIR=${CODEBUILD_SRC_DIR} CODEBUILD_BUILD_ID=${CODEBUILD_BUILD_ID} deploy_to_ecs.sh ${NEW_RELEASE_TAG} ${SERVICE_NAME} ${FRIENDLY_NAME} "${AUTO_DEPLOY_ENVS}"
+  post_build:
+    commands:

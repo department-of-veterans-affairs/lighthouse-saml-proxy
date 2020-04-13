@@ -1,16 +1,30 @@
 import yargs from "yargs";
 import path from "path";
-import { cwd } from "process";
-import { makeCertFileCoercer, certToPEM, loadFileSync, KEY_CERT_HELP_TEXT } from "./coercing";
-import { checkEncryptionCerts, checkIdpProfileMapper, checkWhenNoMetadata } from "./checks";
-import { BINDINGS } from "../samlConstants";
+import {
+  cwd
+} from "process";
+import {
+  makeCertFileCoercer,
+  certToPEM,
+  loadFileSync,
+  KEY_CERT_HELP_TEXT
+} from "./coercing";
+import {
+  checkEncryptionCerts,
+  checkIdpProfileMapper,
+  checkWhenNoMetadata
+} from "./checks";
+import {
+  BINDINGS
+} from "../samlConstants";
 
 export function processArgs() {
   return yargs
     .usage('\nSimple IdP for SAML 2.0 WebSSO & SLO Profile\n\n' +
-           'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
-           'Usage:\n\t$0 -acs {url} -aud {uri}')
+      'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
+      'Usage:\n\t$0 -acs {url} -aud {uri}')
     .config()
+    .env()
     .options({
       port: {
         description: 'IdP Web Server Listener Port',
@@ -27,7 +41,7 @@ export function processArgs() {
         description: 'IdP Signature PrivateKey Certificate',
         required: true,
         default: path.resolve(cwd(), './idp-private-key.pem'),
-        coerce: makeCertFileCoercer('RSA private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
       },
       idpIssuer: {
         description: 'IdP Issuer URI',
@@ -84,7 +98,7 @@ export function processArgs() {
         description: 'Web Server TLS/SSL Private Key (pem)',
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('RSA private key')
+        coerce: makeCertFileCoercer('private key')
       },
       idpHttpsCert: {
         description: 'Web Server TLS/SSL Certificate (pem)',
@@ -233,31 +247,31 @@ export function processArgs() {
         string: true,
         default: 'sha256'
       },
-      spRequestNameIDFormat : {
+      spRequestNameIDFormat: {
         description: 'Request Subject NameID Format (SAMLP)',
         required: false,
         boolean: true,
         default: true
       },
-      spValidateNameIDFormat : {
+      spValidateNameIDFormat: {
         description: 'Validate format of Assertion Subject NameID',
         required: false,
         boolean: true,
         default: true
       },
-      spNameIDFormat : {
+      spNameIDFormat: {
         description: 'Assertion Subject NameID Format',
         required: false,
         string: true,
         default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
       },
-      spRequestAuthnContext : {
+      spRequestAuthnContext: {
         description: 'Request Authentication Context (SAMLP)',
         required: false,
         boolean: true,
         default: true
       },
-      spAuthnContextClassRef : {
+      spAuthnContextClassRef: {
         description: 'Authentication Context Class Reference',
         required: false,
         string: true,
@@ -275,7 +289,7 @@ export function processArgs() {
         string: true,
         required: false,
         default: path.resolve(cwd(), './sp-key.pem'),
-        coerce: makeCertFileCoercer('privateKey', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spEncryptionCert: {
         description: 'SP/RP Public Key Encryption Certificate (PEM)',
@@ -287,13 +301,13 @@ export function processArgs() {
         description: 'SP/RP Private Key Decryption Certificate(PEM)',
         string: true,
         required: false,
-        coerce: makeCertFileCoercer('privateKey', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spHttpsPrivateKey: {
         description: 'Web Server TLS/SSL Private Key (PEM)',
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('privateKey', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer('private key', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
       },
       spHttpsCert: {
         description: 'Web Server TLS/SSL Certificate (PEM)',
@@ -313,11 +327,17 @@ export function processArgs() {
         string: true
       },
       vetsAPIHost: {
+        // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
+        // where it runs environment variables through a camelcase function that transforms
+        // API to Api. Without these aliases, yargs will complain that these arguments are
+        // missing.
+        alias: 'vetsApiHost',
         description: 'The URL prefix for the vets-api host used to perform MVI lookups.',
         required: true,
         string: true,
       },
       vetsAPIToken: {
+        alias: 'vetsApiToken',
         description: 'Token used to authorize calls to vets-api while performing MVI lookups.',
         required: true,
         string: true,
@@ -330,4 +350,6 @@ export function processArgs() {
     .argv;
 }
 
-export { certToPEM };
+export {
+  certToPEM
+};
