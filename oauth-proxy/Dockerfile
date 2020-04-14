@@ -21,4 +21,4 @@ HEALTHCHECK --interval=1m --timeout=4s \
 
 USER node
 ENTRYPOINT ["/usr/local/bin/tini" "--"]
-ENTRYPOINT ["node", "index.js"]
+CMD ["node", "index.js"]
