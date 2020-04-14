@@ -43,7 +43,7 @@ phases:
           exit 1
         fi
         echo Tagging ECR image...
-        CLEAN_TAG=echo ${NEW_RELEASE_TAG}|awk -F"/" '{print $2}'
+        CLEAN_TAG=echo "${NEW_RELEASE_TAG}"|awk -F"/" '{print $2}'
         if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${CLEAN_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
           slackpost.sh "Tagged ${REPOSITORY}:${CLEAN_TAG}"
         else
