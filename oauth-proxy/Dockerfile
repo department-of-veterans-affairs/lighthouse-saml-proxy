@@ -16,8 +16,8 @@ COPY --chown=node:node ./common /home/common
 
 EXPOSE 7100 7100
 
-HEALTHCHECK --interval=1m --timeout=4s \
-  CMD wget localhost:7100/oauth2/.well-known/openid-configuration -q -O - > /dev/null 2>&1
+HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
+  CMD node bin/healthcheck.js
 
 USER node
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
