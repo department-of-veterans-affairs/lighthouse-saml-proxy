@@ -20,4 +20,5 @@ HEALTHCHECK --interval=1m --timeout=4s \
   CMD wget localhost:7100/oauth2/.well-known/openid-configuration -q -O - > /dev/null 2>&1
 
 USER node
-ENTRYPOINT ["node", "index.js"]
+ENTRYPOINT ["/usr/local/bin/tini", "--"]
+CMD ["node", "index.js"]

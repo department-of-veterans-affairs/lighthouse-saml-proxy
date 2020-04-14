@@ -7,4 +7,4 @@ services:
     ports:
       - "7000:7000"
     network_mode: "host"
-    command: '--config dev-config.json'
+    command: 'node build/app.js --config dev-config.json'
