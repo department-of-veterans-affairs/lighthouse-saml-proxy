@@ -23,5 +23,5 @@ HEALTHCHECK --interval=1m --timeout=4s \
 RUN chown -R node:node /home/node 
 
 USER node
-ENTRYPOINT ["/usr/local/bin/tini" "--"]
+ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["node", "build/app.js"]
