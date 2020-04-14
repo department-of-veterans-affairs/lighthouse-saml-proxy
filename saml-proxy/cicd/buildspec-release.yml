@@ -25,7 +25,7 @@ phases:
     - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
     - echo Setting tag for new release...
     # To get the new release version, we will increment the last version number found in Github
-    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|grep '^saml-proxy'|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
+    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|grep '^fargate-saml-proxy'|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
     - slackpost.sh "Creating and tagging a new release for ${FRIENDLY_NAME}..."
     - echo Creating release...
     # We use the 'hub' command to create a release here with the contents of 'master'. If the command exits successfully, we then
