@@ -13,7 +13,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t dvp/oauth-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION -f oauth-proxy/Dockerfile .
+      - docker build -t dvp/oauth-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION -f oauth-proxy/DockerfileFG .
       - docker tag dvp/oauth-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/dvp/oauth-proxy:$CODEBUILD_RESOLVED_SOURCE_VERSION
   post_build:
     commands:
