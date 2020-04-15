@@ -25,7 +25,7 @@ phases:
     - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
     - echo Setting tag for new release...
     # To get the new release version, we will increment the last version number found in Github
-    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
+    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|grep '^fargate-oauth-proxy'|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
     - slackpost.sh "Creating and tagging a new release for ${FRIENDLY_NAME}..."
     - echo Creating release...
     # We use the 'hub' command to create a release here with the contents of 'master'. If the command exits successfully, we then
@@ -43,8 +43,9 @@ phases:
           exit 1
         fi
         echo Tagging ECR image...
-        if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${NEW_RELEASE_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
-          slackpost.sh "Tagged ${REPOSITORY}:${NEW_RELEASE_TAG}"
+        CLEAN_TAG=$(echo "${NEW_RELEASE_TAG}"|awk -F"/" '{print $2}')
+        if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${CLEAN_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
+          slackpost.sh "Tagged ${REPOSITORY}:${CLEAN_TAG}"
         else
           PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
           BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
@@ -63,6 +64,6 @@ phases:
       # We trigger the deploys here. The list of environments to automatically deploy to is placed at the end of the command below, separated
       # by spaces, e.g.: deploy_to_ecs.sh <tag> <service> <friendly-name> [dev staging]
       - echo Triggering deploys...
-      - SRC_DIR=${CODEBUILD_SRC_DIR} CODEBUILD_BUILD_ID=${CODEBUILD_BUILD_ID} deploy_to_ecs.sh ${NEW_RELEASE_TAG} ${SERVICE_NAME} ${FRIENDLY_NAME} "${AUTO_DEPLOY_ENVS}"
+      - SRC_DIR=${CODEBUILD_SRC_DIR} CODEBUILD_BUILD_ID=${CODEBUILD_BUILD_ID} deploy_to_ecs.sh ${CLEAN_TAG} ${SERVICE_NAME} ${FRIENDLY_NAME} "${AUTO_DEPLOY_ENVS}"
   post_build:
     commands:
