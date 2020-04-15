@@ -17,8 +17,8 @@ COPY --chown=node:node ./common /home/common
 EXPOSE 7000 7000
 
 RUN ./node_modules/.bin/tsc
-HEALTHCHECK --interval=1m --timeout=4s \
-  CMD wget localhost:7000/samlproxy/idp/metadata -q -O - > /dev/null 2>&1
+HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
+  CMD node bin/healthcheck.js
 
 RUN chown -R node:node /home/node 
 
