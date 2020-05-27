@@ -173,9 +173,6 @@ const setUpSaml = function(req, res, view) {
 
 }
 
-export const handleError = (req, err) => {
-  logger.error("req == ")
-  logger.error(req);
-  logger.error("err == ")
-  logger.error(err);
+export const handleError = (err, req) => {
+  logger.error({idp_sid: err.cookies.idp_sid});
 };
