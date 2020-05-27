@@ -172,3 +172,10 @@ export const acsFactory = (app, acsUrl) => {
 const setUpSaml = function(req, res, view) {
 
 }
+
+export const handleError = (req, err) => {
+  logger.error("req == ")
+  logger.error(req);
+  logger.error("err == ")
+  logger.error(err);
+};

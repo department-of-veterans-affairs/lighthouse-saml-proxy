@@ -3,11 +3,13 @@ import { IDP_SSO,
          IDP_REDIRECT,
          SP_METADATA_URL,
          SP_VERIFY,
+         SP_ERROR_URL,
          IDP_SIGN_IN } from "./constants";
 
 import { acsFactory,
          parseSamlRequest,
          showLoginOptions,
+         handleError,
          samlLogin,
          idpSignIn } from "./handlers";
 
@@ -40,6 +42,8 @@ export default function addRoutes(app, idpConfig, spConfig) {
   app.get(SP_VERIFY, parseSamlRequest, samlLogin('verify'));
 
   spConfig.acsUrls.forEach((url) => acsFactory(app, url));
+
+  app.get(SP_ERROR_URL, handleError);
 
   return app;
 }
