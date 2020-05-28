@@ -19,6 +19,13 @@ const unknownUsersErrorTemplate = (error: any) => {
   }
 };
 
+export const urlUserErrorTemplate = (error: any) => {
+  // `error` comes from:
+  // https://github.com/request/promise-core/blob/master/lib/errors.js
+  logger.error({statusCode: error.statusCode});
+  return 'icnLookupFailure.hbs';
+};
+
 // This depends on being called after buildPassportLoginHandler because it uses
 // the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
