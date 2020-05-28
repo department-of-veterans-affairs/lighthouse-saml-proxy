@@ -13,7 +13,7 @@ const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   if ((error.name == 'StatusCodeError') && (error.statusCode.toString() === '404')) {
-    return 'icnLookupFailure.hbs';
+    return 'handleFailure.hbs';
   } else {
     return 'icnError.hbs';
   }
@@ -23,7 +23,7 @@ export const urlUserErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   logger.error({statusCode: error.statusCode});
-  return 'icnLookupFailure.hbs';
+  return 'handleFailure.hbs';
 };
 
 // This depends on being called after buildPassportLoginHandler because it uses
