@@ -6,5 +6,4 @@ services:
       dockerfile: saml-proxy/Dockerfile
     ports:
       - "7000:7000"
-    network_mode: "host"
     command: 'node build/app.js --config dev-config.json'

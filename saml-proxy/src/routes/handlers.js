@@ -174,7 +174,7 @@ const setUpSaml = function(req, res, view) {
 
 }
 
-export const handleError = (err) => {
-  logger.error({idp_sid: err.cookies.idp_sid});
-  urlUserErrorTemplate(err);
+export const handleError = (req, res) => {
+  logger.error({idp_sid: req.cookies.idp_sid});
+  res.render(urlUserErrorTemplate(req, {}));
 };
