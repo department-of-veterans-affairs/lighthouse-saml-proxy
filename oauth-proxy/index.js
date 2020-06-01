@@ -10,6 +10,7 @@ const okta = require('@okta/okta-sdk-nodejs');
 const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
+const axios = require('axios')
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
@@ -124,16 +125,56 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  router.get(appRoutes.jwks, (req, res) => {
+  /*router.get(appRoutes.jwks, (req, res) => {
     req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
+  });*/
+
+  router.get(appRoutes.jwks, (req, res) => {
+    axios({
+      method: 'GET',
+      data: req,
+      url: issuer.metadata.jwks_uri,
+      responseType: 'stream'
+    }).then((response) => {
+      response.data.pipe(res)
+    })
+    .catch(err => console.log(err.response))
+    .finally()
   });
+
+  /*router.get(appRoutes.userinfo, (req, res) => {
+    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
+  });*/
 
   router.get(appRoutes.userinfo, (req, res) => {
-    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
+    axios({
+      method: 'GET',
+      data: req,
+      url: issuer.metadata.userinfo_endpoint,
+      headers: { Authorization:  req.header('Authorization')},
+      responseType: 'stream'
+    }).then((response) => {
+      response.data.pipe(res)
+    })
+    .catch(err => console.log(err.response))
+    .finally()
   });
 
-  router.post(appRoutes.introspection, (req, res) => {
+  /*router.post(appRoutes.introspection, (req, res) => {
     req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
+  });*/
+
+  router.post(appRoutes.introspection, (req, res) => {
+    axios({
+      method: 'POST',
+      data: req,
+      url: issuer.metadata.introspection_endpoint,
+      responseType: 'stream'
+    }).then((response) => {
+      response.data.pipe(res)
+    })
+    .catch(console.log(err.response))
+    .finally()
   });
 
   router.get(appRoutes.redirect, async (req, res, next) => {
