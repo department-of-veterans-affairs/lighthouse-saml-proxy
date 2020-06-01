@@ -160,7 +160,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }).then((response) => {
       response.data.pipe(res)
     })
-    .catch(console.log(err.response))
+    .catch(err => console.log(err.response))
     .finally()
   });
 
