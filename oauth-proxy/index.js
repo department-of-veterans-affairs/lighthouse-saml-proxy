@@ -3,7 +3,6 @@ const cors = require('cors');
 const { Issuer } = require('openid-client');
 const process = require('process');
 const bodyParser = require('body-parser');
-const request = require('request');
 const dynamoClient = require('./dynamo_client');
 const { processArgs } = require('./cli');
 const okta = require('@okta/okta-sdk-nodejs');
@@ -125,10 +124,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  /*router.get(appRoutes.jwks, (req, res) => {
-    req.pipe(request(issuer.metadata.jwks_uri)).pipe(res)
-  });*/
-
   router.get(appRoutes.jwks, (req, res) => {
     axios({
       method: 'GET',
@@ -141,10 +136,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     .catch(err => console.log(err.response))
     .finally()
   });
-
-  /*router.get(appRoutes.userinfo, (req, res) => {
-    req.pipe(request(issuer.metadata.userinfo_endpoint)).pipe(res)
-  });*/
 
   router.get(appRoutes.userinfo, (req, res) => {
     axios({
@@ -159,10 +150,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     .catch(err => console.log(err.response))
     .finally()
   });
-
-  /*router.post(appRoutes.introspection, (req, res) => {
-    req.pipe(request(issuer.metadata.introspection_endpoint)).pipe(res)
-  });*/
 
   router.post(appRoutes.introspection, (req, res) => {
     axios({
