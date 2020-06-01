@@ -7,6 +7,7 @@ import {
   loadICN,
   scrubUserClaims,
   serializeAssertions,
+  urlUserErrorTemplate
 } from './acsHandlers';
 import logger from "../logger";
 
@@ -172,3 +173,8 @@ export const acsFactory = (app, acsUrl) => {
 const setUpSaml = function(req, res, view) {
 
 }
+
+export const handleError = (req, res) => {
+  logger.error({idp_sid: req.cookies.idp_sid});
+  res.render(urlUserErrorTemplate(req, {}));
+};
