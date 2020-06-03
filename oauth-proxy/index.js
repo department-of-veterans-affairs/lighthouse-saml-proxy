@@ -84,6 +84,30 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       }
     });
   }
+
+  const setProxyResponse = (response, targetResponse) => {
+    targetResponse.set(response.headers)
+    targetResponse.status(response.status)
+    response.data.pipe(targetResponse)
+  };
+
+  const proxyRequestToOkta = (req, res, redirectUrl, requestMethod) => {
+    delete req.headers.host
+
+    axios({
+      method: requestMethod,
+      data: req,
+      url: redirectUrl,
+      headers: req.headers,
+      responseType: 'stream'
+    }).then((response) => {
+      setProxyResponse(response, res)
+    })
+    .catch(err => {
+      setProxyResponse(err.response, res)
+    })
+  };
+
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
@@ -124,45 +148,14 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
-  router.get(appRoutes.jwks, (req, res) => {
-    axios({
-      method: 'GET',
-      data: req,
-      url: issuer.metadata.jwks_uri,
-      responseType: 'stream'
-    }).then((response) => {
-      response.data.pipe(res)
-    })
-    .catch(err => console.log(err.response))
-    .finally()
-  });
+  router.get(appRoutes.jwks, (req, res) => 
+    proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET"));
 
-  router.get(appRoutes.userinfo, (req, res) => {
-    axios({
-      method: 'GET',
-      data: req,
-      url: issuer.metadata.userinfo_endpoint,
-      headers: { Authorization:  req.header('Authorization')},
-      responseType: 'stream'
-    }).then((response) => {
-      response.data.pipe(res)
-    })
-    .catch(err => console.log(err.response))
-    .finally()
-  });
+  router.get(appRoutes.userinfo, (req, res) => 
+    proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET"));
 
-  router.post(appRoutes.introspection, (req, res) => {
-    axios({
-      method: 'POST',
-      data: req,
-      url: issuer.metadata.introspection_endpoint,
-      responseType: 'stream'
-    }).then((response) => {
-      response.data.pipe(res)
-    })
-    .catch(err => console.log(err.response))
-    .finally()
-  });
+  router.post(appRoutes.introspection, (req, res) => 
+    proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
