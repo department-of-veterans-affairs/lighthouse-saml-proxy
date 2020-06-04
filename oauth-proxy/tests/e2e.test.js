@@ -139,7 +139,7 @@ describe('OpenID Connect Conformance', () => {
     expect(resp.headers['access-control-allow-origin']).toMatch(FAKE_CLIENT_APP_URL_PATTERN);
   });
 
-  it('responds to the endpoints described in the OIDC metadata response', async () => {
+  it('responds to the endpoints described in the OIDC metadata response', async (done) => {
     // This test is making multiple requests. Theoretically it could be broken
     // up, with each request being made in a separate test. That would make it
     // much more difficult to use the metadata response to drive the requests
@@ -187,7 +187,7 @@ describe('OpenID Connect Conformance', () => {
           auth: { username: 'clientId123', password: 'secretXyz' }
       }
     );
-
+    done()
     // TODO: We should really call the token endpoint using the refresh_token
     // grant type here. Right now the openid-client library makes this a little
     // difficult. It automatically verifies the signature of the new access
