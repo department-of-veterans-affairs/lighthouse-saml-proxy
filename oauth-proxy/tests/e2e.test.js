@@ -162,11 +162,8 @@ describe('OpenID Connect Conformance', () => {
     });
 
     await axios.get(parsedMeta.jwks_uri);
-    done()
     await axios.get(parsedMeta.userinfo_endpoint);
-    done()
     axios.post(parsedMeta.introspection_endpoint);
-    done()
 
     const authorizeConfig = {
       maxRedirects: 0,
@@ -180,7 +177,6 @@ describe('OpenID Connect Conformance', () => {
       }
     };
     const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
-    done()
     expect(authorizeResp.status).toEqual(302);
     expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
 
