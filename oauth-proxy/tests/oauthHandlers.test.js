@@ -8,7 +8,7 @@ const { Client, Issuer, TokenSet } = require('openid-client');
 const { RequestError } = require('request-promise-native/errors');
 const timekeeper = require('timekeeper');
 
-const { tokenHandler } = require('../oauthHandlers');
+const { tokenHandler, authorizeHandler } = require('../oauthHandlers');
 const { translateTokenSet } = require('../oauthHandlers/tokenResponse');
 const { encodeBasicAuthHeader } = require('../utils');
 const { convertObjectToDynamoAttributeValues } = require('./testUtils');
@@ -302,3 +302,139 @@ describe('tokenHandler', () => {
   });
 });
 
+describe('authorizeHandler', () => {
+  let config;
+  let redirect_uri;
+  let issuer;
+  let logger;
+  let dynamo;
+  let dynamoClient;
+  let oktaClient;
+  let req;
+  let res;
+  let next;
+
+  function buildFakeOktaClient(fakeRecord) {
+    const oktaClient = { getApplication: jest.fn() };
+    oktaClient.getApplication.mockImplementation(client_id => {
+      return new Promise((resolve, reject) => {
+        if (client_id === fakeRecord.client_id) {
+          resolve(fakeRecord);
+        } else {
+          reject(`no such client application '${client_id}'`);
+        }
+      });
+    });
+    return oktaClient;
+  }
+
+  beforeEach(() => {
+    config = jest.mock();
+    redirect_uri = "http://localhost:8080/oauth/redirect";
+    issuer = jest.mock();
+    logger = { error: jest.fn(), info: jest.fn() };
+    dynamo = jest.mock();
+    dynamoClient = jest.mock();
+    next = jest.fn();
+    res = new MockExpressResponse();
+    req = new MockExpressRequest();
+  });
+
+  afterEach(() => {
+    expect(next).toHaveBeenCalled();
+  });
+
+  let buildOpenIDClient = (fns) => {
+    let client = {};
+    for (let [fn_name, fn_impl] of Object.entries(fns)) {
+      client[fn_name] = jest.fn().mockImplementation(async (_) => {
+        return new Promise((resolve, reject) => {
+          fn_impl(resolve, reject);
+        });
+      });
+    }
+    return client;
+  };
+
+  let buildExpiredRefreshTokenClient = () => {
+    return buildOpenIDClient({
+      refresh: (_resolve, _reject) => {
+        // This simulates an upstream error so that we don't have to test the full handler.
+        throw new RequestError(
+          new Error("simulated upstream response error for expired refresh token"),
+          {},
+          { statusCode: 400 }
+        );
+      }
+    });
+  };
+
+  function buildFakeDynamoClient(fakeDynamoRecord) {
+    const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
+    dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
+      return new Promise((resolve, reject) => {
+        // It's unclear whether this should resolve with a full records or just
+        // the identity field but thus far it has been irrelevant to the
+        // functional testing of the oauth-proxy.
+        resolve({ pk: state });
+      });
+    });
+    dynamoClient.getFromDynamoBySecondary.mockImplementation((handle, attr, value) => {
+      return new Promise((resolve, reject) => {
+        if (fakeDynamoRecord[attr] === value) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such ${attr} value`);
+        }
+      });
+    });
+    dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
+      return new Promise((resolve, reject) => {
+        if (state === fakeDynamoRecord.state) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject('no such state value');
+        }
+      });
+    });
+    return dynamoClient;
+  }
+
+  it('Happy Path 302', () => {
+    oktaClient = buildFakeOktaClient({
+      client_id: 'clientId123',
+      client_secret: 'secretXyz',
+      settings: {
+        oauthClient: {
+          redirect_uris: ['http://localhost:8080/oauth/redirect'],
+        },
+      }
+    });
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      client_redirect: "http://localhost:8080/oauth/redirect",
+      redirect_uri: "http://localhost:8080/oauth/redirect"
+    }
+
+    dynamoClient = buildFakeDynamoClient({
+      state: 'abc123',
+      code: 'the_fake_authorization_code',
+      refresh_token: '',
+      redirect_uri: "http://localhost/thisDoesNotMatter"
+    });
+    authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(200);
+  })
+
+  it('No state 400', () => {
+    authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+
+  it('State is empty 400', () => {
+    req.query = {state: null}
+    authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+});

@@ -4,6 +4,15 @@ const { loginBegin } = require('../metrics');
 const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next) => {
   loginBegin.inc();
   const { state, client_id, redirect_uri: client_redirect } = req.query;
+
+  if( state == null){
+    res.status(400).json({
+      error: "invalid_request",
+      error_description: "State parameter required",
+    })
+    return next()
+  }
+
   try {
     const oktaApp = await oktaClient.getApplication(client_id);
     if (oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1) {
