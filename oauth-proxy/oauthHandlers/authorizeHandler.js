@@ -41,9 +41,8 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   if (!params.has('idp') && config.idp) {
     params.set('idp', config.idp);
   }
-  let redirectUri = `${issuer.metadata.authorization_endpoint}?${params.toString()}`
+  
   res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
-  console.log("Made it here")
 };
 
 module.exports = authorizeHandler;
