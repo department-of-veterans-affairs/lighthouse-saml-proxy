@@ -6,4 +6,5 @@ services:
       dockerfile: saml-proxy/Dockerfile
     ports:
       - "7000:7000"
-    command: 'node build/app.js --inspect=0.0.0.0:9229 --config dev-config.json'
+      - "9230:9230"
+    command: 'node build/app.js --inspect=0.0.0.0:9230 --config dev-config.json'
