@@ -19,6 +19,7 @@ services:
       - dynamodb
     ports:
       - "7100:7100"
+      - "9229:9229"
     environment:
       # The values here must match the values found in dynamo_schema.js.
       - AWS_ACCESS_KEY_ID=NONE
@@ -26,4 +27,4 @@ services:
       - AWS_DEFAULT_REGION=us-west-2
     volumes:
       - .:/opt/app
-    command: "node index.js --config dev-config.json"
+    command: "node --inspect=0.0.0.0:9229 index.js --config dev-config.json"
