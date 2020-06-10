@@ -5,7 +5,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   loginBegin.inc();
   const { state, client_id, redirect_uri: client_redirect } = req.query;
 
-  if( state == null){
+  if(state == null) {
     res.status(400).json({
       error: "invalid_request",
       error_description: "State parameter required",
@@ -41,7 +41,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   if (!params.has('idp') && config.idp) {
     params.set('idp', config.idp);
   }
-  
+
   res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
 };
 
