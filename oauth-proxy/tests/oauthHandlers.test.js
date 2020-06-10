@@ -4,14 +4,58 @@ require('jest');
 
 const MockExpressRequest = require('mock-express-request');
 const MockExpressResponse = require('mock-express-response');
-const { Client, Issuer, TokenSet } = require('openid-client');
+const { TokenSet } = require('openid-client');
 const { RequestError } = require('request-promise-native/errors');
 const timekeeper = require('timekeeper');
 
-const { tokenHandler } = require('../oauthHandlers');
+const { tokenHandler, authorizeHandler, redirectHandler } = require('../oauthHandlers');
 const { translateTokenSet } = require('../oauthHandlers/tokenResponse');
 const { encodeBasicAuthHeader } = require('../utils');
 const { convertObjectToDynamoAttributeValues } = require('./testUtils');
+
+function buildFakeDynamoClient(fakeDynamoRecord) {
+  const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
+  dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
+    return new Promise((resolve, reject) => {
+      // It's unclear whether this should resolve with a full records or just
+      // the identity field but thus far it has been irrelevant to the
+      // functional testing of the oauth-proxy.
+      resolve({ pk: state });
+    });
+  });
+  dynamoClient.getFromDynamoBySecondary.mockImplementation((handle, attr, value) => {
+    return new Promise((resolve, reject) => {
+      if (fakeDynamoRecord[attr] === value) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject(`no such ${attr} value`);
+      }
+    });
+  });
+  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
+    return new Promise((resolve, reject) => {
+      if (state === fakeDynamoRecord.state) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject('no such state value');
+      }
+    });
+  });
+  return dynamoClient;
+}
+
+class FakeIssuer {
+  constructor(client) {
+    this.Client = class FakeInlineClient {
+      constructor(_) {
+        return client;
+      }
+    };
+    this.metadata = {
+      authorization_endpoint: "fake_enpoint"
+    }
+  }
+}
 
 describe('translateTokenSet', () => {
   it('omits id_token if not in TokenSet', async () => {
@@ -58,67 +102,90 @@ describe('translateTokenSet', () => {
   });
 });
 
-function buildFakeDynamoClient(fakeDynamoRecord) {
-  const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
-  dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
-    return new Promise((resolve, reject) => {
-      // It's unclear whether this should resolve with a full records or just
-      // the identity field but thus far it has been irrelevant to the
-      // functional testing of the oauth-proxy.
-      resolve({ pk: state });
+let buildOpenIDClient = (fns) => {
+  let client = {};
+  for (let [fn_name, fn_impl] of Object.entries(fns)) {
+    client[fn_name] = jest.fn().mockImplementation(async (_) => {
+      return new Promise((resolve, reject) => {
+        fn_impl(resolve, reject);
+      });
     });
+  }
+  return client;
+};
+
+let buildExpiredRefreshTokenClient = () => {
+  return buildOpenIDClient({
+    refresh: (_resolve, _reject) => {
+      // This simulates an upstream error so that we don't have to test the full handler.
+      throw new RequestError(
+        new Error("simulated upstream response error for expired refresh token"),
+        {},
+        { statusCode: 400 }
+      );
+    }
   });
-  dynamoClient.getFromDynamoBySecondary.mockImplementation((handle, attr, value) => {
+};
+
+function buildFakeOktaClient(fakeRecord) {
+  const oktaClient = { getApplication: jest.fn() };
+  oktaClient.getApplication.mockImplementation(client_id => {
     return new Promise((resolve, reject) => {
-      if (fakeDynamoRecord[attr] === value) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      if (client_id === fakeRecord.client_id) {
+        resolve(fakeRecord);
       } else {
-        reject(`no such ${attr} value`);
+        reject(`no such client application '${client_id}'`);
       }
     });
   });
-  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
-    return new Promise((resolve, reject) => {
-      if (state === fakeDynamoRecord.state) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-      } else {
-        reject('no such state value');
-      }
-    });
-  });
-  return dynamoClient;
+  return oktaClient;
 }
 
-class FakeIssuer {
-  constructor(client) {
-    this.Client = class FakeInlineClient {
-      constructor(_) {
-        return client;
-      }
-    };
-  }
-}
+let config;
+let redirect_uri;
+let issuer;
+let logger;
+let dynamo;
+let dynamoClient;
+let validateToken;
+let next;
+let oktaClient;
+let req;
+let res;
+
+beforeEach(() => {
+  config = jest.mock();
+  redirect_uri = jest.mock();
+  issuer = jest.mock();
+  logger = { error: jest.fn(), info: jest.fn() };
+  dynamo = jest.mock();
+  dynamoClient = jest.mock();
+  validateToken = jest.fn();
+  next = jest.fn();
+  req = new MockExpressRequest();
+  res = new MockExpressResponse();
+
+  oktaClient = buildFakeOktaClient({
+    client_id: 'clientId123',
+    client_secret: 'secretXyz',
+    settings: {
+      oauthClient: {
+        redirect_uris: ['http://localhost:8080/oauth/redirect'],
+      },
+    }
+  });
+
+  dynamoClient = buildFakeDynamoClient({
+    state: 'abc123',
+    code: 'the_fake_authorization_code',
+    refresh_token: '',
+    redirect_uri: "http://localhost/thisDoesNotMatter"
+  });
+
+  issuer = new FakeIssuer(dynamoClient);
+})
 
 describe('tokenHandler', () => {
-  let config;
-  let redirect_uri;
-  let issuer;
-  let logger;
-  let dynamo;
-  let dynamoClient;
-  let validateToken;
-  let next;
-
-  beforeEach(() => {
-    config = jest.mock();
-    redirect_uri = jest.mock();
-    issuer = jest.mock();
-    logger = { error: jest.fn(), info: jest.fn() };
-    dynamo = jest.mock();
-    dynamoClient = jest.mock();
-    validateToken = jest.fn();
-    next = jest.fn();
-  });
 
   afterEach(() => {
     // expressjs requires that all handlers call next() unless they want to
@@ -127,31 +194,6 @@ describe('tokenHandler', () => {
     // tokenHandler at all.
     expect(next).toHaveBeenCalled();
   });
-
-  let buildOpenIDClient = (fns) => {
-    let client = {};
-    for (let [fn_name, fn_impl] of Object.entries(fns)) {
-      client[fn_name] = jest.fn().mockImplementation(async (_) => {
-        return new Promise((resolve, reject) => {
-          fn_impl(resolve, reject);
-        });
-      });
-    }
-    return client;
-  };
-
-  let buildExpiredRefreshTokenClient = () => {
-    return buildOpenIDClient({
-      refresh: (_resolve, _reject) => {
-        // This simulates an upstream error so that we don't have to test the full handler.
-        throw new RequestError(
-          new Error("simulated upstream response error for expired refresh token"),
-          {},
-          { statusCode: 400 }
-        );
-      }
-    });
-  };
 
   it('handles the authorization_code flow', async () => {
     let req = new MockExpressRequest({
@@ -302,3 +344,61 @@ describe('tokenHandler', () => {
   });
 });
 
+describe('authorizeHandler', () => {
+  afterEach(() => { });
+
+  it('Happy Path Redirect', async () => {
+    res = {
+      redirect: jest.fn()
+    }
+
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      client_redirect: "http://localhost:8080/oauth/redirect",
+      redirect_uri: "http://localhost:8080/oauth/redirect"
+    }
+
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.redirect).toHaveBeenCalled()
+  })
+
+  it('No state, returns 400', async () => {
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+
+  it('State is empty, returns 400', async () => {
+    req.query = {state: null}
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+});
+
+describe('redirectHandler', () => {
+  afterEach(() => { });
+
+  it('Happy Path Redirect', async () => {
+    res = {
+      redirect: jest.fn()
+    }
+
+    req.query = {
+      state: "abc123"
+    }
+
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.redirect).toHaveBeenCalled()
+  })
+
+  it('No state, returns 400', async () => {
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+
+  it('State is empty, returns 400', async () => {
+    req.query = {state: null}
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+});

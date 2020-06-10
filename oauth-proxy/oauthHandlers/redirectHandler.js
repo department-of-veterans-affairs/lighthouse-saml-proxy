@@ -3,6 +3,15 @@ const { loginEnd } = require('../metrics');
 
 const redirectHandler = async (logger, dynamo, dynamoClient, req, res, next) => {
   const { state } = req.query;
+
+  if(state == null) {
+    res.status(400).json({
+      error: "invalid_request",
+      error_description: "State parameter required",
+    })
+    return next()
+  }
+
   if (!req.query.hasOwnProperty('error')) {
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
