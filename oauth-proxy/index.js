@@ -89,7 +89,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }
 
   const setProxyResponse = (response, targetResponse) => {
-    targetResponse.set(response.headers)
+    if (response.headers !== undefined) {
+      targetResponse.set(response.headers)
+    }
     targetResponse.status(response.status)
     response.data.pipe(targetResponse)
   };
