@@ -239,4 +239,22 @@ describe('OpenID Connect Conformance', () => {
       token_type: 'Bearer',
     });
   });
+
+  it('returns an OIDC conformant revocation of a token response', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/revoke',
+      qs.stringify({ token: 'xxxxxxxyyyyyzzzzz', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+
+    // expect(resp.status).toEqual(200);
+   
+  });
+
 });
