@@ -10,6 +10,7 @@ const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const axios = require('axios')
+const querystring= require('querystring')
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
@@ -113,6 +114,26 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     })
   };
 
+  const proxyRevokeTokenRequestToOkta = (req, res, redirectUrl) => {
+    delete req.headers.host
+
+    axios({
+      method: "POST",
+      url: redirectUrl,
+      headers: req.headers,
+      data: querystring.stringify({
+        token: req.query.token,
+        token_hint: req.query.token_hint
+      }),
+      responseType: 'stream'
+    }).then((response) => {
+      setProxyResponse(response, res)
+    })
+    .catch(err => {
+      setProxyResponse(err.response, res)
+    })
+  };
+
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
@@ -162,8 +183,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   router.post(appRoutes.introspection, (req, res) => 
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
-  router.post(appRoutes.revoke, (req, res) => 
-    proxyRequestToOkta(req, res, issuer.metadata.revoke_endpoint, "POST"));
+  router.post(appRoutes.revoke, (req, res) =>  {
+    proxyRevokeTokenRequestToOkta(req, res, issuer.metadata.revocation_endpoint)
+  });
+  
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
