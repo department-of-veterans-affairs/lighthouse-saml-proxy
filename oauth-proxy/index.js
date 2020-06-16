@@ -103,8 +103,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
     var payload;
     if (req.body !== undefined) {
-      if (req.headers['content-type'] !== undefined &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
-        payload = req.body;
+      if (req.headers['content-type'] !== undefined
+       &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
+        payload = querystring.stringify(req.body);
       } else {
         payload = JSON.stringify(req.body);
       }
