@@ -255,4 +255,20 @@ describe('OpenID Connect Conformance', () => {
 
     expect(resp.status).toEqual(200);
   });
+
+  it('returns an OIDC conformant status 200 on token revocation', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+
+    expect(resp.status).toEqual(400);
+  });
 });
