@@ -122,10 +122,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       method: "POST",
       url: redirectUrl,
       headers: req.headers,
-      data: querystring.stringify({
-        token: req.query.token,
-        token_hint: req.query.token_hint
-      }),
+      data: querystring.stringify(req.query),
       responseType: 'stream'
     }).then((response) => {
       setProxyResponse(response, res)
