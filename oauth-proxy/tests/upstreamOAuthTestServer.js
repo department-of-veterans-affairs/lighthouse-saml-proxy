@@ -5,7 +5,6 @@
 
 const express = require('express');
 const { buildBackgroundServerModule } = require('../../common/backgroundServer');
-
 const UPSTREAM_OAUTH_PORT = 9091;
 
 function prefixPath(path) {
@@ -15,7 +14,6 @@ function prefixPath(path) {
 // Builds the express app. Returns a reference to it.
 function buildUpstreamOAuthTestApp() {
   const app = express();
-
   app.get('/.well-known/openid-configuration', (req, res) => {
     res.json({
       issuer: "https://deptva-eval.okta.com/oauth2/default",
@@ -166,7 +164,7 @@ function buildUpstreamOAuthTestApp() {
 
   app.post('/revoke', (req, res) => {
     if (req.headers.authorization === undefined) {
-      res.status(400).statusMessage("Bad client_id").end();
+      res.status(400).send("invalid client_id");
     }
     res.end();
   });

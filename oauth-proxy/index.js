@@ -101,9 +101,17 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   const proxyRequestToOkta = (req, res, redirectUrl, requestMethod) => {
     delete req.headers.host
 
+    var payload;
+    if (req.body !== undefined) {
+      if (req.headers['content-type'] !== undefined &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
+        payload = req.body;
+      } else {
+        payload = JSON.stringify(req.body);
+      }
+    }
     axios({
       method: requestMethod,
-      data: req,
+      data: payload,
       url: redirectUrl,
       headers: req.headers,
       responseType: 'stream'
@@ -115,7 +123,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     })
   };
 
-  const proxyRevokeTokenRequestToOkta = (req, res, redirectUrl) => {
+  const proxyQueryRequestToOkta = (req, res, redirectUrl) => {
     delete req.headers.host
 
     axios({
@@ -154,6 +162,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }));
 
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
+  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }));
 
   const corsHandler = cors({
     origin: true,
@@ -182,7 +191,11 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
   router.post(appRoutes.revoke, (req, res) =>  {
-    proxyRevokeTokenRequestToOkta(req, res, issuer.metadata.revocation_endpoint)
+    if (req.body !== undefined) {
+      proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST");
+    } else {
+      proxyQueryRequestToOkta(req, res, issuer.metadata.revocation_endpoint);
+    }
   });
   
 
