@@ -240,10 +240,10 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
-  it('returns an OIDC conformant revocation of a token response', async () => {
+  it('returns an OIDC conformant status 200 on token revocation', async () => {
     const resp = await axios.post(
       'http://localhost:9090/testServer/revoke',
-      qs.stringify({ token: 'xxxxxxxyyyyyzzzzz', token_type_hint: 'access_token' }),
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
       {
           headers: {
             'authorization': encodeBasicAuthHeader('user', 'pass'),
@@ -253,8 +253,6 @@ describe('OpenID Connect Conformance', () => {
       }
     );
 
-    // expect(resp.status).toEqual(200);
-   
+    expect(resp.status).toEqual(200);
   });
-
 });

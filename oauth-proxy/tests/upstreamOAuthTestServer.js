@@ -24,6 +24,7 @@ function buildUpstreamOAuthTestApp() {
       userinfo_endpoint: prefixPath('/userinfo'),
       token_endpoint: prefixPath('/token'),
       introspection_endpoint: prefixPath('/introspection'),
+      revocation_endpoint: prefixPath('/revoke'),
       response_types_supported: [
         "code",
         "id_token",
@@ -161,6 +162,13 @@ function buildUpstreamOAuthTestApp() {
       "id_token": "eyJraWQiOiJDcnNSZDNpYnhIMUswSl9WYWd0TnlHaER2cFlRN0hLdVd6NFFibk5IQmlBIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiIwMHUycDlmYXI0aWhEQUVYODJwNyIsIm5hbWUiOiJTaGViYTcwMyBIYXJyaXM3ODkiLCJ2ZXIiOjEsImlzcyI6Imh0dHBzOi8vZGVwdHZhLWV2YWwub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiIwb2EzNXJsYjhwdEh1bGVGZjJwNyIsImlhdCI6MTU3ODU4NTQ1MSwiZXhwIjoxNTc4NTg5MDUxLCJqdGkiOiJJRC4wLXZ5blUzMy1UbWEza0lsa1dwWTRGODNYdjFVekJXcHltT2RuS2tjT193IiwiYW1yIjpbInB3ZCJdLCJpZHAiOiIwb2ExcGJubGttbFdwbzBxMjJwNyIsInByZWZlcnJlZF91c2VybmFtZSI6ImNmYTMyMjQ0NTY5ODQxYTA5MGFkOWQyZjA1MjRjZjM4IiwiYXV0aF90aW1lIjoxNTc4NTg1NDUxLCJhdF9oYXNoIjoiVnVfNXhkZkVmN1BoT1VfNllJSENFQSJ9.EXRka3_Xyk49D01rP-Di0OB0GFIA0GxXrkHm-HyiEJIZHiWOkXji985VaJyXktQtzAnGtRRpbfqJ1zWc-1lY0rfh_KIgLe8dklnqUSL0OrzBQSIQK-X9a0iIS8eLo_xDH2vCDtmKtXUb1ZTcYkwupwW4ITNpb8vXBh0VR8Bk5myAaTe2ROSggGgHqf2koBEhEGWu7ASgzL5l74PXXFhCamC1uespkHixKUThctG86GSdMGRU9f0fS0wtmpQ595J2bUVG0mhRD7akExgC1L7k8AHWcudXkumkri0uDBr8vo4iFsLVGSKoOv1ZVfvEykcQUqOAhhRzTOQ7iM-p0_-nMw",
       "state": "SXf66LG3ebuqD804HYX4GjLhfCJ5T8MtbuxsJ_Iwy9Q"
     });
+  });
+
+  app.post('/revoke', (req, res) => {
+    if (req.headers.authorization === undefined) {
+      res.status(400).statusMessage("Bad client_id").end();
+    }
+    res.end();
   });
 
   app.get('/authorize', (req, res) => {
