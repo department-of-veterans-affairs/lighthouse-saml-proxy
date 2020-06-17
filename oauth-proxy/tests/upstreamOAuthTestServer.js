@@ -164,9 +164,13 @@ function buildUpstreamOAuthTestApp() {
 
   app.post('/revoke', (req, res) => {
     if (req.headers.authorization === undefined) {
-      res.status(400).send("invalid client_id");
+      res.status(400);
+      // .send("invalid client_id");
+    } else if (req.body === undefined || req.body.token === undefined) {
+      res.status(400).send("invalid request, missing 'token'");
     }
     res.end();
+    
   });
 
   app.get('/authorize', (req, res) => {

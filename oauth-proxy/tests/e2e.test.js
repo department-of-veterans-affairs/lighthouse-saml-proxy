@@ -255,4 +255,41 @@ describe('OpenID Connect Conformance', () => {
 
     expect(resp.status).toEqual(200);
   });
+
+  it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
+    axios.post(
+      'http://localhost:9090/testServer/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'origin': 'http://localhost:8080'
+          },
+      }
+    ).then(resp => {
+      expect(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      console.error(err);
+      // expect(err.resp.status).toEqual(400);
+    });
+  });
+
+  // it('returns an OIDC conformant status 400 on token revocation, from missing `token` in the body', async () => {
+  //   axios.post(
+  //     'http://localhost:9090/testServer/revoke',
+  //     qs.stringify({token_type_hint: 'access_token' }),
+  //     {
+  //         headers: {
+  //           'authorization': encodeBasicAuthHeader('user', 'pass'),
+  //           'origin': 'http://localhost:8080'
+  //         },
+  //         auth: { username: 'clientId123', password: 'secretXyz' }
+  //     }
+  //   ).then(resp => {
+  //     // expect(false); // Don't expect to be here
+  //   }).catch(err => {
+  //     // Handle Error Here
+  //     expect(err.resp.status).toEqual(400);
+  //   });
+  // });
 });
