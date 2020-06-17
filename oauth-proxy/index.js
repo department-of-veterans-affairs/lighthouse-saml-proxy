@@ -124,23 +124,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     })
   };
 
-  const proxyQueryRequestToOkta = (req, res, redirectUrl) => {
-    delete req.headers.host
-
-    axios({
-      method: "POST",
-      url: redirectUrl,
-      headers: req.headers,
-      data: querystring.stringify(req.query),
-      responseType: 'stream'
-    }).then((response) => {
-      setProxyResponse(response, res)
-    })
-    .catch(err => {
-      setProxyResponse(err.response, res)
-    })
-  };
-
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
@@ -192,11 +175,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
   router.post(appRoutes.revoke, (req, res) =>  {
-    if (req.body !== undefined) {
       proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST");
-    } else {
-      proxyQueryRequestToOkta(req, res, issuer.metadata.revocation_endpoint);
-    }
+  
   });
   
 
