@@ -175,11 +175,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
   router.post(appRoutes.revoke, (req, res) =>  {
-      proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST");
-  
+      proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST"); 
   });
   
-
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
       .catch(next)
