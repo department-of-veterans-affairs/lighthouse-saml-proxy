@@ -103,12 +103,12 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
     var payload;
     if (req.body !== undefined) {
+      // Only supporting x-www-form-urlencoded for now. json my be supported in the future if
+      // the upport for the format is provided by the upstream oidc provider
       if (req.headers['content-type'] !== undefined
        &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
         payload = querystring.stringify(req.body);
-      } else {
-        payload = JSON.stringify(req.body);
-      }
+      } 
     }
     axios({
       method: requestMethod,
