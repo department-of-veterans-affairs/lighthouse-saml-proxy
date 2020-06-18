@@ -6,7 +6,7 @@
 const express = require('express');
 const { buildBackgroundServerModule } = require('../../common/backgroundServer');
 const UPSTREAM_OAUTH_PORT = 9091;
-
+const bodyParser = require('body-parser');
 function prefixPath(path) {
   return `${upstreamOAuthTestServerBaseUrl()}` + path;
 }
@@ -162,11 +162,31 @@ function buildUpstreamOAuthTestApp() {
     });
   });
 
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
+
+  app.use(bodyParser.raw({
+    extended: true
+  }));
+
+  app.use(bodyParser.json({
+    extended: true
+  }));
+
   app.post('/revoke', (req, res) => {
     if (req.headers.authorization === undefined) {
       res.status(400).send("invalid client_id");
     }
  
+    if (req.headers['content-type'].indexOf('application/x-www-form-urlencoded') == -1) {
+      res.status(400).send("invalid_request, unsupported type " + req.headers.content-type);
+    }
+
+    if (req.body.token === undefined) {
+      res.status(400).send("invalid_request, missing `token`");
+    }
+
     res.end();
   });
 
