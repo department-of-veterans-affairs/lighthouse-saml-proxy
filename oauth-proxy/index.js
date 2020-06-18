@@ -108,7 +108,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       if (req.headers['content-type'] !== undefined
        &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
         payload = querystring.stringify(req.body);
-      } 
+      } else {
+        payload = req.body;
+      }
     }
     axios({
       method: requestMethod,
@@ -146,7 +148,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }));
 
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
-  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }));
+  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }, bodyParser.raw));
 
   const corsHandler = cors({
     origin: true,
