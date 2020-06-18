@@ -178,9 +178,9 @@ function buildUpstreamOAuthTestApp() {
     if (req.headers.authorization === undefined) {
       res.status(400).send("invalid client_id");
     }
- 
+
     if (req.headers['content-type'].indexOf('application/x-www-form-urlencoded') == -1) {
-      res.status(400).send("invalid_request, unsupported type " + req.headers.content-type);
+      res.status(400).send("invalid_request, unsupported type " + req.headers.content - type);
     }
 
     if (req.body.token === undefined) {
@@ -190,11 +190,40 @@ function buildUpstreamOAuthTestApp() {
     res.end();
   });
 
+  app.post('/introspect', (req, res) => {
+    if (req.headers.authorization === undefined) {
+      res.status(400).send("invalid client_id");
+    }
+
+    if (req.headers['content-type'].indexOf('application/x-www-form-urlencoded') == -1) {
+      res.status(400).send("invalid_request, unsupported type " + req.headers.content - type);
+    }
+
+    if (req.body.token === undefined) {
+      res.status(400).send("invalid_request, missing `token`");
+    }
+
+    res.json({
+      "active": true,
+      "scope": "veteran_status.read openid profile claim.read",
+      "username": "cfa32244569841a090ad9d2f0524cf38",
+      "exp": 1592508064,
+      "iat": 1592504464,
+      "sub": "cfa32244569841a090ad9d2f0524cf38",
+      "aud": "api://default",
+      "iss": "https://deptva-eval.okta.com/oauth2/default",
+      "jti": "AT.JazNVWTn6QvaHTwpRxSCd6-oyhgV1uJhX5N9gLzqVZ4",
+      "token_type": "Bearer",
+      "client_id": "0oa78v02yyegqP7tt2p7",
+      "uid": "00u2p9far4ihDAEX82p7"
+    });
+  });
+
   app.get('/authorize', (req, res) => {
     res.redirect(req.query.redirect_uri);
   });
 
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.status(404).send(`Upstream issuer test server did not recognize URL: ${req.url}`);
   });
 

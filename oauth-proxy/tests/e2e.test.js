@@ -240,7 +240,28 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
-  
+  it('returns an OIDC conformant status 200 on token introspection', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/introspect',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    ).then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
+    }).catch(err => {
+      // Handle Error Here
+      console.error(err);
+      expect(false);
+    });
+
+  }); 
+
   it('returns an OIDC conformant status 200 on token revocation', async () => {
     const resp = await axios.post(
       'http://localhost:9090/testServer/revoke',
@@ -252,9 +273,13 @@ describe('OpenID Connect Conformance', () => {
           },
           auth: { username: 'clientId123', password: 'secretXyz' }
       }
-    );
-
-    expect(resp.status).toEqual(200);
+    ).then(resp => {
+      expect(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      console.error(err);
+      expect(err.resp.status).toEqual(400);
+    });
   });
 
   it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
