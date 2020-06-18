@@ -144,7 +144,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }));
 
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
-  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }, bodyParser.raw));
+  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json({ extended: true }));
   app.use(bodyParser.raw());

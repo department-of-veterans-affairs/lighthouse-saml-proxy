@@ -256,10 +256,7 @@ describe('OpenID Connect Conformance', () => {
       expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
     }).catch(err => {
       // Handle Error Here
-      console.error(err);
-      expect(false);
     });
-
   }); 
 
   it('returns an OIDC conformant status 200 on token revocation', async () => {
@@ -274,11 +271,9 @@ describe('OpenID Connect Conformance', () => {
           auth: { username: 'clientId123', password: 'secretXyz' }
       }
     ).then(resp => {
-      expect(false); // Don't expect to be here
+      expect(resp.status).toEqual(200);
     }).catch(err => {
-      // Handle Error Here
-      console.error(err);
-      expect(err.resp.status).toEqual(400);
+      // Handle Error 
     });
   });
 
@@ -295,7 +290,6 @@ describe('OpenID Connect Conformance', () => {
       expect(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      console.error(err);
       expect(err.resp.status).toEqual(400);
     });
   });
@@ -315,7 +309,6 @@ describe('OpenID Connect Conformance', () => {
       expect(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      console.error(err);
       expect(err.resp.status).toEqual(400);
     });
   });
@@ -336,7 +329,6 @@ describe('OpenID Connect Conformance', () => {
       expect(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      console.error(err);
       expect(err.resp.status).toEqual(400);
     });
   });
