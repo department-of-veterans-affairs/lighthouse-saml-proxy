@@ -98,20 +98,16 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     response.data.pipe(targetResponse)
   };
 
-  const proxyRequestToOkta = (req, res, redirectUrl, requestMethod) => {
+  const proxyRequestToOkta = (req, res, redirectUrl, requestMethod, bodyencoder) => {
     delete req.headers.host
+    var payload = req.body;
 
-    var payload;
-    if (req.body !== undefined) {
-      // Only supporting x-www-form-urlencoded for now. json my be supported in the future if
-      // the upport for the format is provided by the upstream oidc provider
-      if (req.headers['content-type'] !== undefined
-       &&  req.headers['content-type'].indexOf("application/x-www-form-urlencoded") > -1) {
-        payload = querystring.stringify(req.body);
-      } else {
-        payload = req.body;
-      }
+    // Only supporting x-www-form-urlencoded for now. json my be supported in the future if
+    // the upport for the format is provided by the upstream oidc provider    
+    if (bodyencoder !== undefined) {
+      payload = bodyencoder.stringify(req.body);
     }
+
     axios({
       method: requestMethod,
       data: payload,
@@ -149,6 +145,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
   router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }, bodyParser.raw));
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json({ extended: true }));
+  app.use(bodyParser.raw());
 
   const corsHandler = cors({
     origin: true,
@@ -177,7 +176,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
 
   router.post(appRoutes.revoke, (req, res) =>  {
-      proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST"); 
+    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring); 
   });
   
   router.get(appRoutes.redirect, async (req, res, next) => {

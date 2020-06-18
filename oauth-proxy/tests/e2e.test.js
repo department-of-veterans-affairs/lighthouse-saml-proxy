@@ -240,6 +240,7 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  
   it('returns an OIDC conformant status 200 on token revocation', async () => {
     const resp = await axios.post(
       'http://localhost:9090/testServer/revoke',
@@ -313,4 +314,5 @@ describe('OpenID Connect Conformance', () => {
       console.error(err);
       expect(err.resp.status).toEqual(400);
     });
-  });});
+  });
+});
