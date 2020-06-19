@@ -23,6 +23,7 @@ const appRoutes = {
   introspection: '/introspect',
   revoke: '/revoke',
   jwks: '/keys',
+  manage: "/manage",
   redirect: '/redirect'
 };
 const openidMetadataWhitelist = [
@@ -32,6 +33,7 @@ const openidMetadataWhitelist = [
   "userinfo_endpoint",
   "introspection_endpoint",
   "revocation_endpoint",
+  "manage_endpoint",
   "jwks_uri",
   "scopes_supported",
   "response_types_supported",
@@ -188,6 +190,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
       .catch(next)
+  });
+
+  router.get(appRoutes.manage, async (req, res) => {
+    res.redirect(config.manage);
   });
 
   app.use(well_known_base_path, router);
