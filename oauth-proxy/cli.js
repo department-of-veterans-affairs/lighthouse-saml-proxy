@@ -55,6 +55,11 @@ function processArgs() {
         required: true,
         default: 'https://sandbox-api.va.gov/internal/auth/v0/validation'
       },
+      manage_endpoint: {
+        description: 'URL where an end-user can view which applications currently have access to data and can make adjustments to these access rights',
+        required: false,
+        default: 'https://staging.va.gov/account'
+      },
       validate_apiKey: {
         description: 'apiKey permitting access to validate endpoint',
       },
