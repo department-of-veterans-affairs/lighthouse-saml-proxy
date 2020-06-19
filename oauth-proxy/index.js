@@ -10,6 +10,7 @@ const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const axios = require('axios')
+const querystring= require('querystring')
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
@@ -20,6 +21,7 @@ const appRoutes = {
   token: '/token',
   userinfo: '/userinfo',
   introspection: '/introspect',
+  revoke: '/revoke',
   jwks: '/keys',
   redirect: '/redirect'
 };
@@ -29,6 +31,7 @@ const openidMetadataWhitelist = [
   "token_endpoint",
   "userinfo_endpoint",
   "introspection_endpoint",
+  "revocation_endpoint",
   "jwks_uri",
   "scopes_supported",
   "response_types_supported",
@@ -38,6 +41,7 @@ const openidMetadataWhitelist = [
   "id_token_signing_alg_values_supported",
   "scopes_supported",
   "token_endpoint_auth_methods_supported",
+  "revocation_endpoint_auth_methods_supported",
   "claims_supported",
   "code_challenge_methods_supported",
   "introspection_endpoint_auth_methods_supported",
@@ -57,6 +61,7 @@ function buildMetadataRewriteTable(config, appRoutes) {
     authorization_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.authorize}`,
     token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
     userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
+    revocation_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.revoke}`,
     introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
     jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
   };
@@ -86,17 +91,24 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   }
 
   const setProxyResponse = (response, targetResponse) => {
-    targetResponse.set(response.headers)
+    if (response.headers !== undefined) {
+      targetResponse.set(response.headers)
+    }
     targetResponse.status(response.status)
     response.data.pipe(targetResponse)
   };
 
-  const proxyRequestToOkta = (req, res, redirectUrl, requestMethod) => {
+  const proxyRequestToOkta = (req, res, redirectUrl, requestMethod, bodyencoder) => {
     delete req.headers.host
+    var payload = req.body;
+
+    if (bodyencoder !== undefined) {
+      payload = bodyencoder.stringify(req.body);
+    }
 
     axios({
       method: requestMethod,
-      data: req,
+      data: payload,
       url: redirectUrl,
       headers: req.headers,
       responseType: 'stream'
@@ -129,7 +141,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     customLabels: {app: 'oauth_proxy'},
   }));
 
-  router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json({ extended: true }));
+  app.use(bodyParser.raw());
 
   const corsHandler = cors({
     origin: true,
@@ -155,8 +169,12 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET"));
 
   router.post(appRoutes.introspection, (req, res) => 
-    proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST"));
+    proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST", querystring));
 
+  router.post(appRoutes.revoke, (req, res) =>  {
+    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring); 
+  });
+  
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
       .catch(next)
