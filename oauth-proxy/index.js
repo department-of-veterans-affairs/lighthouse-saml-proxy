@@ -102,8 +102,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     delete req.headers.host
     var payload = req.body;
 
-    // Only supporting x-www-form-urlencoded for now. json my be supported in the future if
-    // the upport for the format is provided by the upstream oidc provider    
     if (bodyencoder !== undefined) {
       payload = bodyencoder.stringify(req.body);
     }
