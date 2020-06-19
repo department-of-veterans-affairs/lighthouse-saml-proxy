@@ -21,9 +21,9 @@ const appRoutes = {
   token: '/token',
   userinfo: '/userinfo',
   introspection: '/introspect',
+  manage: '/manage',
   revoke: '/revoke',
   jwks: '/keys',
-  manage: "/manage",
   redirect: '/redirect'
 };
 const openidMetadataWhitelist = [
@@ -31,9 +31,9 @@ const openidMetadataWhitelist = [
   "authorization_endpoint",
   "token_endpoint",
   "userinfo_endpoint",
+  "manage_endpoint",
   "introspection_endpoint",
   "revocation_endpoint",
-  "manage_endpoint",
   "jwks_uri",
   "scopes_supported",
   "response_types_supported",
@@ -64,6 +64,7 @@ function buildMetadataRewriteTable(config, appRoutes) {
     token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
     userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
     revocation_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.revoke}`,
+    manage_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.manage}`,
     introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
     jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
   };
@@ -164,6 +165,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
+  router.get(appRoutes.manage, (req, res) => {
+    res.redirect(config.manage_endpoint);
+  });
+
   router.get(appRoutes.jwks, (req, res) => 
     proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET"));
 
@@ -190,10 +195,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
       .catch(next)
-  });
-
-  router.get(appRoutes.manage, async (req, res) => {
-    res.redirect(config.manage);
   });
 
   app.use(well_known_base_path, router);

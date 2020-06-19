@@ -30,6 +30,7 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
+  manage_endpoint: 'http://localhost:9090/testServer/account'
 };
 
 function buildFakeOktaClient(fakeRecord) {
@@ -150,6 +151,7 @@ describe('OpenID Connect Conformance', () => {
       authorization_endpoint: expect.any(String),
       token_endpoint: expect.any(String),
       userinfo_endpoint: expect.any(String),
+      manage_endpoint: expect.any(String),
       jwks_uri: expect.any(String),
     });
 
@@ -163,6 +165,15 @@ describe('OpenID Connect Conformance', () => {
 
     await axios.get(parsedMeta.jwks_uri);
     await axios.get(parsedMeta.userinfo_endpoint);
+    // await axios.get(parsedMeta.manage_endpoint);
+    await axios.get(parsedMeta.manage_endpoint)
+    .then(resp => {
+      console.log(resp);
+    })
+    .catch(err => {
+      console.log(err);
+      // expect(err.response.status).toEqual(200);
+    });
     axios.post(parsedMeta.introspection_endpoint);
 
     const authorizeConfig = {
@@ -332,4 +343,9 @@ describe('OpenID Connect Conformance', () => {
       expect(err.resp.status).toEqual(400);
     });
   });
+
+  // it('returns a FHIR conformant status 302 on manage', async () => {
+  //   const resp = await axios.get('http://localhost:9090/testServer/xxx',);
+  //   console.log(resp);
+  // });  
 });
