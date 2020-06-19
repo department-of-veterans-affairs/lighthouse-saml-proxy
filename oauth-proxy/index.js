@@ -143,8 +143,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     customLabels: {app: 'oauth_proxy'},
   }));
 
-  router.use([appRoutes.token], bodyParser.urlencoded({ extended: true }));
-  router.use([appRoutes.revoke], bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json({ extended: true }));
   app.use(bodyParser.raw());
