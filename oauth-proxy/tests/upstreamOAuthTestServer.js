@@ -179,7 +179,7 @@ function buildUpstreamOAuthTestApp() {
     if (req.headers.authorization === undefined) {
       res.status(400).send("invalid session");
     }
-    res.end();
+    res.send('acls updated');
   });
 
   app.post('/revoke', (req, res) => {
