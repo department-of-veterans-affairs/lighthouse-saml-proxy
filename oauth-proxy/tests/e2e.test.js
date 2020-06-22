@@ -151,7 +151,6 @@ describe('OpenID Connect Conformance', () => {
       authorization_endpoint: expect.any(String),
       token_endpoint: expect.any(String),
       userinfo_endpoint: expect.any(String),
-      manage_endpoint: expect.any(String),
       jwks_uri: expect.any(String),
     });
 
@@ -165,15 +164,6 @@ describe('OpenID Connect Conformance', () => {
 
     await axios.get(parsedMeta.jwks_uri);
     await axios.get(parsedMeta.userinfo_endpoint);
-    // await axios.get(parsedMeta.manage_endpoint);
-    await axios.get(parsedMeta.manage_endpoint)
-    .then(resp => {
-      console.log(resp);
-    })
-    .catch(err => {
-      console.log(err);
-      // expect(err.response.status).toEqual(200);
-    });
     axios.post(parsedMeta.introspection_endpoint);
 
     const authorizeConfig = {
