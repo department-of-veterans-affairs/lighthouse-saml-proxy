@@ -31,7 +31,6 @@ const openidMetadataWhitelist = [
   "authorization_endpoint",
   "token_endpoint",
   "userinfo_endpoint",
-  "manage_endpoint",
   "introspection_endpoint",
   "revocation_endpoint",
   "jwks_uri",
