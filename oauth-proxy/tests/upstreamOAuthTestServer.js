@@ -176,9 +176,6 @@ function buildUpstreamOAuthTestApp() {
   }));
 
   app.get('/account', (req, res) => {
-    if (req.headers.authorization === undefined) {
-      res.status(400).send("invalid session");
-    }
     res.send('acls updated');
   });
 

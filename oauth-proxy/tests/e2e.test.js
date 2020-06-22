@@ -30,6 +30,7 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
+  manage_endpoint: 'http://localhost:9091/account'
 };
 
 function buildFakeOktaClient(fakeRecord) {
@@ -335,20 +336,15 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
-  // it('tests manage endponit redirect', async () => {
-  //   axios.get('http://localhost:9090/testServer/manage',
-  //   '',
-  //   {
-  //     headers: {
-  //       'authorization': 'some_token',
-  //       'origin': 'http://localhost:8080'
-  //     }
-  //   }
-  // ).then(resp => {
-  //     expect(resp.status).toEqual(200);
-  //   })
-  //   .catch(err => {
-  //     expect(true).toEqual(false);
-  //   });
-  // });
+  it('tests manage endponit redirect', async () => {
+    await axios.get('http://localhost:9090/testServer/manage').then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(resp.data).toEqual('acls updated');
+    })
+    .catch(err => {
+      console.info(err);
+      expect(true).toEqual(false);
+    });
+  });
+
 });
