@@ -63,7 +63,6 @@ function buildMetadataRewriteTable(config, appRoutes) {
     token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
     userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
     revocation_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.revoke}`,
-    manage_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.manage}`,
     introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
     jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
   };
