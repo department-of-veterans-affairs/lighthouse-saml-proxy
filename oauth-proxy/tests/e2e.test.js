@@ -30,6 +30,7 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
+  manage_endpoint: 'http://localhost:9091/account'
 };
 
 function buildFakeOktaClient(fakeRecord) {
@@ -278,7 +279,7 @@ describe('OpenID Connect Conformance', () => {
   });
 
   it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
-    axios.post(
+    await axios.post(
       'http://localhost:9090/testServer/revoke',
       qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
       {
@@ -287,15 +288,16 @@ describe('OpenID Connect Conformance', () => {
           },
       }
     ).then(resp => {
-      expect(false); // Don't expect to be here
+      expect(true).toEqual(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      expect(err.resp.status).toEqual(400);
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual('invalid client_id');
     });
   });
 
   it('returns an OIDC conformant status 400 on token revocation, from missing token', async () => {
-    axios.post(
+    await axios.post(
       'http://localhost:9090/testServer/revoke',
       qs.stringify({ token_type_hint: 'access_token' }),
       {
@@ -306,15 +308,16 @@ describe('OpenID Connect Conformance', () => {
         auth: { username: 'clientId123', password: 'secretXyz' }
     }
     ).then(resp => {
-      expect(false); // Don't expect to be here
+      expect(true).toEqual(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      expect(err.resp.status).toEqual(400);
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual("invalid_request, missing `token`")
     });
   });
 
   it('returns an OIDC conformant status 400 on sending json', async () => {
-    axios.post(
+    await axios.post(
       'http://localhost:9090/testServer/revoke',
       JSON.stringify({ token: 'token', token_type_hint: 'access_token' }),
       {
@@ -329,7 +332,19 @@ describe('OpenID Connect Conformance', () => {
       expect(false); // Don't expect to be here
     }).catch(err => {
       // Handle Error Here
-      expect(err.resp.status).toEqual(400);
+      expect(err.response.status).toEqual(400);
     });
   });
+
+  it('tests manage endponit redirect', async () => {
+    await axios.get('http://localhost:9090/testServer/manage').then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(resp.data).toEqual('acls updated');
+    })
+    .catch(err => {
+      console.info(err);
+      expect(true).toEqual(false);
+    });
+  });
+
 });

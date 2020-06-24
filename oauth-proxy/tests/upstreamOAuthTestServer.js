@@ -23,6 +23,7 @@ function buildUpstreamOAuthTestApp() {
       token_endpoint: prefixPath('/token'),
       introspection_endpoint: prefixPath('/introspection'),
       revocation_endpoint: prefixPath('/revoke'),
+      manage_endpoint: prefixPath('/account'),
       response_types_supported: [
         "code",
         "id_token",
@@ -173,6 +174,10 @@ function buildUpstreamOAuthTestApp() {
   app.use(bodyParser.json({
     extended: true
   }));
+
+  app.get('/account', (req, res) => {
+    res.send('acls updated');
+  });
 
   app.post('/revoke', (req, res) => {
     if (req.headers.authorization === undefined) {

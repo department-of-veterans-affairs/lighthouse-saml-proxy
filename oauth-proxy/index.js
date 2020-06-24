@@ -21,6 +21,7 @@ const appRoutes = {
   token: '/token',
   userinfo: '/userinfo',
   introspection: '/introspect',
+  manage: '/manage',
   revoke: '/revoke',
   jwks: '/keys',
   redirect: '/redirect'
@@ -160,6 +161,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }, {});
 
     res.json(filteredMetadata);
+  });
+
+  router.get(appRoutes.manage, (req, res) => {
+    res.redirect(config.manage_endpoint);
   });
 
   router.get(appRoutes.jwks, (req, res) => 
