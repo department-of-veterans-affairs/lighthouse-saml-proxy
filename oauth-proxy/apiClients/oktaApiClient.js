@@ -1,12 +1,10 @@
-const { processArgs } = require('../cli');
 const axios = require('axios');
 
-const config = processArgs();
-const apiUrl = config.okta_url+"/api/v1/"
 
-const deleteUserGrantOnClient = async (userId, ssws, clientId) => {
+const deleteUserGrantOnClient = async (config, userId, ssws, clientId) => {
   let error;
   let response;
+  const apiUrl = config.okta_url+"/api/v1/"
   await axios({
       method: "DELETE",
       url: apiUrl+"users/"+userId+"/clients/"+clientId+"/grants",
