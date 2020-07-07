@@ -1,13 +1,13 @@
 const axios = require('axios');
-
+const uriTemplates = require('uri-templates');
 
 const deleteUserGrantOnClient = async (config, userId, ssws, clientId) => {
   let error;
   let response;
-  const apiUrl = config.okta_url+"/api/v1/"
+  const template = uriTemplates(config.okta_url+"/api/v1/users/{userid}/clients/{clientid}/grants")
   await axios({
       method: "DELETE",
-      url: apiUrl+"users/"+userId+"/clients/"+clientId+"/grants",
+      url: template.fill({userid: userId, clientid: clientId}),
       headers: {Authorization: "SSWS "+ssws}
     }).then(res => {
       response = res})
