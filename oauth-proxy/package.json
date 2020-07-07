@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/department-of-veterans-affairs/oauth-proxy#readme",
   "dependencies": {
-    "@okta/okta-sdk-nodejs": "^1.2.0",
+    "@okta/okta-sdk-nodejs": "^3.3.1",
     "@sentry/node": "^5.7.1",
     "aws-sdk": "^2.372.0",
     "axios": "^0.19.2",
@@ -33,7 +33,7 @@
     "openid-client": "^2.4.5",
     "prom-client": "^11.5.2",
     "winston": "^3.2.1",
-    "yargs": "^12.0.5"
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "crypto": "^1.0.1",
