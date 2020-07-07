@@ -415,7 +415,9 @@ describe('revokeUserGrantHandler', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    config = jest.mock();
+    config = {
+      "enable_okta_consent_endpoint": true
+    };
     next = jest.fn();
     req = new MockExpressRequest();
     res = new MockExpressResponse();
@@ -427,6 +429,16 @@ describe('revokeUserGrantHandler', () => {
     req.query = {client_id: 'clientid123', user_id: 'userid123'}
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(200)
+  })
+
+  it('Revoke Grants Turned Off', async () => {
+    config = {
+      "enable_okta_consent_endpoint": false
+    };
+    deleteUserGrantOnClientMock.mockResolvedValue({status: 200})
+    req.query = {client_id: 'clientid123', user_id: 'userid123'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(403)
   })
 
   it('Client Id Empty', async () => {

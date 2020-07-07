@@ -2,6 +2,14 @@ const axios = require('axios');
 const { deleteUserGrantOnClient } = require('../apiClients/oktaApiClient');
 
 const revokeUserGrantHandler = async (config, req, res, next) => {
+    if(!config.enable_okta_consent_endpoint){
+        res.status(403).json({
+            error: "invalid_request",
+            error_description: "Revoking grants is disabled in this environment.",
+        })
+        return next()
+    }
+
     const { client_id, user_id } = req.query;
     const ssws = config.okta_token;
     let errorMessage = "";
