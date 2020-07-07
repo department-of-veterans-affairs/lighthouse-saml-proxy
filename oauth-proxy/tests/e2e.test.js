@@ -346,5 +346,4 @@ describe('OpenID Connect Conformance', () => {
       expect(true).toEqual(false);
     });
   });
-
 });

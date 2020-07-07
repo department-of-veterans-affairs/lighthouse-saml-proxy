@@ -18,7 +18,6 @@ const deleteUserGrantOnClient = async (config, userId, ssws, clientId) => {
   }
   
   return response;
-
 }
 
-module.exports = deleteUserGrantOnClient;
+module.exports = { deleteUserGrantOnClient };

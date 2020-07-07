@@ -1,6 +1,5 @@
 const axios = require('axios');
-const { isRuntimeError } = require('../utils');
-const deleteUserGrantOnClient = require('../apiClients/oktaApiClient');
+const { deleteUserGrantOnClient } = require('../apiClients/oktaApiClient');
 
 const revokeUserGrantHandler = async (config, req, res, next) => {
     const { client_id, user_id } = req.query;

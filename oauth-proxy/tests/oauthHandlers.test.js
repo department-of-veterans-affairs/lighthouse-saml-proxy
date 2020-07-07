@@ -8,10 +8,13 @@ const { TokenSet } = require('openid-client');
 const { RequestError } = require('request-promise-native/errors');
 const timekeeper = require('timekeeper');
 
-const { tokenHandler, authorizeHandler, redirectHandler } = require('../oauthHandlers');
+const { tokenHandler, authorizeHandler, redirectHandler, revokeUserGrantHandler } = require('../oauthHandlers');
 const { translateTokenSet } = require('../oauthHandlers/tokenResponse');
-const { encodeBasicAuthHeader } = require('../utils');
+const { encodeBasicAuthHeader, rethrowIfRuntimeError } = require('../utils');
 const { convertObjectToDynamoAttributeValues } = require('./testUtils');
+const oktaApiClient = require('../apiClients/oktaApiClient');
+jest.mock('../apiClients/oktaApiClient');
+const deleteUserGrantOnClientMock = oktaApiClient.deleteUserGrantOnClient;
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
@@ -400,5 +403,53 @@ describe('redirectHandler', () => {
     req.query = {state: null}
     await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
     expect(res.statusCode).toEqual(400);
+  })
+});
+
+describe('revokeUserGrantHandler', () => {
+  afterEach(() => { jest.unmock('../apiClients/oktaApiClient');});
+  let res;
+  let req;
+  let config;
+  let next;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    config = jest.mock();
+    next = jest.fn();
+    req = new MockExpressRequest();
+    res = new MockExpressResponse();
+    deleteUserGrantOnClientMock.mockReset();
+  })  
+
+  it('Happy Path', async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({status: 200})
+    req.query = {client_id: 'clientid123', user_id: 'userid123'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(200)
+  })
+
+  it('Client Id Empty', async () => {
+    req.query = {client_id: '', user_id: 'userid123'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(400)
+  })
+
+  it('User Id Empty', async () => {
+    req.query = {client_id: 'clientid123', user_id: ''}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(400)
+  })
+
+  it('Client Id Null', async () => {
+    req.query = {user_id: 'userid123'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(400)
+  })
+
+  it('User Id Null', async () => {
+    req.query = {client_id: 'clientid123'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(400)
   })
 });
