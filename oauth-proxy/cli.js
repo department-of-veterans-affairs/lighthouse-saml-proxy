@@ -80,6 +80,11 @@ function processArgs() {
         description: "Enable PKCE authorization flow?",
         required: false,
         default: false,
+      },
+      enable_okta_consent_endpoint: {
+        description: "Enable Delete Grants endpoint (Okta Consent)?",
+        required: false,
+        default: false,
       }
     })
     .wrap(yargs.terminalWidth())
