@@ -10,5 +10,6 @@
   "manage_endpoint": "https://staging.va.gov/account",
   "validate_apiKey": "<FIX ME>",
   "okta_token": "<FIX ME>",
-  "enable_pkce_authorization_flow": true
+  "enable_pkce_authorization_flow": true,
+  "enable_okta_consent_endpoint": true
 }
