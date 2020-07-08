@@ -1,5 +1,6 @@
 const axios = require('axios');
 const uriTemplates = require('uri-templates');
+const URI = require('urijs');
 
 const deleteUserGrantOnClient = async (config, userId, clientId) => {
   let error;
@@ -21,6 +22,7 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
 }
 
 const getUserInfo = async (config, email) => {
+  //Assume that the email is passed into this method unencoded.
   let uri = URI(config.okta_url+"/api/v1/users");
   uri.search({q: email})
   
