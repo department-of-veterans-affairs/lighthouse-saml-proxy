@@ -1,54 +1,45 @@
 const axios = require('axios');
-const { deleteUserGrantOnClient, getUserInfo } = require('../apiClients/oktaApiClient');
+const { deleteUserGrantOnClient, getUserInfo, getClientInfo } = require('../apiClients/oktaApiClient');
 
 const revokeUserGrantHandler = async (config, req, res, next) => {
-    if(!config.enable_okta_consent_endpoint){
-        res.status(403).json({
-            error: "invalid_request",
-            error_description: "Revoking grants is disabled in this environment.",
-        })
-        return next()
-    }
-
     let client_id = req.body.client_id;
     let email = req.body.email;
-    let errorMessage = "";
-
-    if(!client_id || client_id == ""){
-        errorMessage += "Client Id is a required parameter. "
-    }
-
-    if(!email || email == ""){
-        errorMessage += "User Id is a required parameter. "
-    }
-
-    if(errorMessage.length > 0){
-        res.status(400).json({
-            error: "invalid_request",
-            error_description: errorMessage,
-        })
-        return next()
+    
+    try{
+        await checkForValidParams(config, client_id, email);
+    }catch(error){
+        setErrorResponse(res, error.status, error.errorMessage);
+        return next();
     }
 
     let userIds;
 
-    await getUserInfo(config, email)
-    .then(response => userIds = grabUserIds(response.data))
-    .catch(() => errorMessage += "Could not find user from email address: "+email)
-
-    if(errorMessage.length > 0 || userIds == null){
-        res.status(404).json({
-            error: "invalid_request",
-            error_description: errorMessage,
-        })
+    try {
+        userIds = await getUserIds(config, email);
+    }catch(error){
+        setErrorResponse(res, error.status, error.errorMessage);
         return next();
     }
 
+    if(userIds.length < 1){
+        setErrorResponse(res, 404, "No Okta userIds associated with the email: "+email);
+        return next();
+    }
+
+    let revokeGrantsResponse = await revokeGrantsOnClientsAndUserIds(config, userIds, client_id);
+    res.status(revokeGrantsResponse.status).json({"email": email, "responses": revokeGrantsResponse.responses});
+}
+
+module.exports = revokeUserGrantHandler;
+
+//Helper Methods
+
+const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
     let responses = [];
     let status = 200;
 
     for (var i = 0; i < userIds.length; i++){
-        await deleteGrantsOnClientAndUserId(config, userIds[i], client_id)
+        await deleteGrantsOnClientAndUserId(config, userIds[i], clientId)
         .then(response => responses.push(response))
         .catch(err => {
             status = 400;
@@ -56,7 +47,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
         })
     }
 
-    res.status(status).json({"email": email, "responses": responses});
+    return {"status": status, "responses": responses}
 }
 
 const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
@@ -71,7 +62,21 @@ const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
     return retValue;
 }
 
-const grabUserIds = (data) => {
+const getUserIds = async (config, email) => {
+    let errorMessage;
+    let userIds;
+    await getUserInfo(config, email)
+        .then(response => userIds = grabUserIdsFromUserInfo(response.data))
+        .catch(() => errorMessage += "Could not find user from email address: "+email)
+
+    if(errorMessage){
+        throw {"status": 404, "errorMessage": errorMessage}
+    }
+
+    return userIds;
+}
+
+const grabUserIdsFromUserInfo = (data) => {
     let userIds = [];
     data.forEach((obj) => {
         userIds.push(obj.id);
@@ -79,4 +84,46 @@ const grabUserIds = (data) => {
     return userIds;
 }
 
-module.exports = revokeUserGrantHandler;
+const checkForValidParams = async (config, clientId, email) => {
+    if(!config.enable_okta_consent_endpoint){
+        throw {"status": 403, "errorMessage": "Revoking grants is disabled in this environment."}
+    }
+
+    checkIfParamsExist(clientId, email);
+    await checkForValidClient(config, clientId);
+}
+
+const checkForValidClient = async (config, clientId) => {
+    let clientError;
+    await getClientInfo(config, clientId)
+        .catch(err =>{
+            clientError = err;
+        })
+    
+    if(clientError){
+        throw {"status": clientError.response.status, "errorMessage": clientError.response.data.error_description}
+    }
+}
+
+const checkIfParamsExist = (clientId, email) => {
+    let errorMessage = "";
+
+    if(!clientId || clientId == ""){
+        errorMessage += "Client Id is a required parameter. "
+    }
+
+    if(!email || email == ""){
+        errorMessage += "User Id is a required parameter. "
+    }
+
+    if(errorMessage){
+        throw {"status": 403, "errorMessage": errorMessage}
+    }
+}
+
+const setErrorResponse = (response, status, message) => {
+    response.status(status).json({
+        error: "invalid_request",
+        error_description: message,
+    })
+}
