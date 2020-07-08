@@ -20,4 +20,26 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
   return response;
 }
 
-module.exports = { deleteUserGrantOnClient };
+const getUserInfo = async (config, email) => {
+  let uri = URI(config.okta_url+"/api/v1/users");
+  uri.search({q: email})
+  
+  let response;
+  let error;
+
+  await axios({
+    method: "GET",
+    url: uri.toString(),
+    headers: {Authorization: "SSWS "+config.okta_token}
+  }).then(res => {
+    response = res})
+  .catch(err => {error = err})
+
+  if(response == null){
+    throw error;
+  }
+  
+  return response;
+}
+
+module.exports = { deleteUserGrantOnClient, getUserInfo };
