@@ -11,7 +11,6 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
     }
 
     const { client_id, user_id } = req.query;
-    const ssws = config.okta_token;
     let errorMessage = "";
 
     if(!client_id || client_id == ""){
@@ -30,7 +29,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
         return next()
     }
 
-    await deleteUserGrantOnClient(config, user_id, ssws, client_id)
+    await deleteUserGrantOnClient(config, user_id, client_id)
         .then((response) => {
             res.status(response.status)
                 .json({message: "Okta grants succesfully revoked for user: "+user_id})
