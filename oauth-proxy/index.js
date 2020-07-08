@@ -197,7 +197,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   });
 
   router.delete(appRoutes.grants, async (req, res, next) => {
-    oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
+    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
   })
 
   app.use(well_known_base_path, router);
