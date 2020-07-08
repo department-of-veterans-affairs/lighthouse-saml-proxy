@@ -44,4 +44,24 @@ const getUserInfo = async (config, email) => {
   return response;
 }
 
-module.exports = { deleteUserGrantOnClient, getUserInfo };
+const getClientInfo = async (config, clientId) => {
+  let error;
+  let response;
+  const template = uriTemplates(config.okta_url+"/oauth2/v1/clients/{clientid}")
+
+  await axios({
+    method: "GET",
+    url: template.fill({clientid: clientId}),
+    headers: {Authorization: "SSWS "+config.okta_token}
+  }).then(res => {
+    response = res})
+  .catch(err => {error = err})
+
+  if(response == null){
+    throw error;
+  }
+
+  return response;
+}
+
+module.exports = { deleteUserGrantOnClient, getUserInfo, getClientInfo };
