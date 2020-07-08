@@ -117,7 +117,7 @@ const checkIfParamsExist = (clientId, email) => {
     }
 
     if(errorMessage){
-        throw {"status": 403, "errorMessage": errorMessage}
+        throw {"status": 400, "errorMessage": errorMessage}
     }
 }
 
