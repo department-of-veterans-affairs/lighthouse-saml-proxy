@@ -22,7 +22,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
     }
 
     if(userIds.length < 1){
-        setErrorResponse(res, 404, "No Okta userIds associated with the email: "+email);
+        setErrorResponse(res, 404, "No userIds associated with the email: "+email);
         return next();
     }
 
