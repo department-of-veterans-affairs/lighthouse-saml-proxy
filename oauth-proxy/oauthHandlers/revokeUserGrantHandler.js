@@ -109,11 +109,11 @@ const checkIfParamsExist = (clientId, email) => {
     let errorMessage = "";
 
     if(!clientId || clientId == ""){
-        errorMessage += "Client Id is a required parameter. "
+        errorMessage += "client_id is a required parameter. "
     }
 
     if(!email || email == ""){
-        errorMessage += "User Id is a required parameter. "
+        errorMessage += "email is a required parameter. "
     }
 
     if(errorMessage){
