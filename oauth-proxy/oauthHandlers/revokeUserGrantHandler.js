@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { deleteUserGrantOnClient, getUserInfo, getClientInfo } = require('../apiClients/oktaApiClient');
+const validator = require('validator');
 
 const revokeUserGrantHandler = async (config, req, res, next) => {
     let client_id = req.body.client_id;
@@ -22,7 +23,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
     }
 
     if(userIds.length < 1){
-        setErrorResponse(res, 404, "No userIds associated with the email: "+email);
+        setErrorResponse(res, 400, "Invalid email address.");
         return next();
     }
 
@@ -67,10 +68,10 @@ const getUserIds = async (config, email) => {
     let userIds;
     await getUserInfo(config, email)
         .then(response => userIds = grabUserIdsFromUserInfo(response.data))
-        .catch(() => errorMessage += "Could not find user from email address: "+email)
+        .catch(() => errorMessage += "Invalid email address.")
 
     if(errorMessage){
-        throw {"status": 404, "errorMessage": errorMessage}
+        throw {"status": 400, "errorMessage": errorMessage}
     }
 
     return userIds;
@@ -90,7 +91,14 @@ const checkForValidParams = async (config, clientId, email) => {
     }
 
     checkIfParamsExist(clientId, email);
+    checkForValidEmail(email)
     await checkForValidClient(config, clientId);
+}
+
+const checkForValidEmail = (email) => {
+    if(!validator.isEmail(email)){
+        throw {"status": 400, "errorMessage": "Invalid email address."}
+    }
 }
 
 const checkForValidClient = async (config, clientId) => {
@@ -109,11 +117,11 @@ const checkIfParamsExist = (clientId, email) => {
     let errorMessage = "";
 
     if(!clientId || clientId == ""){
-        errorMessage += "client_id is a required parameter. "
+        errorMessage += "Invalide client_id. "
     }
 
     if(!email || email == ""){
-        errorMessage += "email is a required parameter. "
+        errorMessage += "Invalid email address. "
     }
 
     if(errorMessage){
