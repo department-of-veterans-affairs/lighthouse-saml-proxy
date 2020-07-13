@@ -22,7 +22,6 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
 }
 
 const getUserInfo = async (config, email) => {
-  //Assume that the email is passed into this method unencoded.
   let uri = URI(config.okta_url+"/api/v1/users");
   let emailFilter = `profile.email eq "${email}"`
   uri.search({filter: emailFilter})
