@@ -119,7 +119,7 @@ const checkIfParamsExist = (clientId, email) => {
     let errorMessage = "";
 
     if(!clientId || clientId == ""){
-        errorMessage += "Invalide client_id. "
+        errorMessage += "Invalid client_id. "
     }
 
     if(!email || email == ""){
