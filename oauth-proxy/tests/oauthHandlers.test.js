@@ -471,6 +471,15 @@ describe('revokeUserGrantHandler', () => {
     expect(res.statusCode).toEqual(400);
   })
 
+  it('Invalid Client Id', async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
+    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
+    getUserInfoMock.mockResolvedValue({"data": [{id: "id1"}, {id: "id2"}]});
+    req.body = {client_id: 'clientid123!', email: 'email@example.com'}
+    await revokeUserGrantHandler(config, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+
   it('No User Ids associated with Email', async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
     getClientInfoMock.mockResolvedValue({client_id: "clientid123"});

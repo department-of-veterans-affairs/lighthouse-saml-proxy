@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { deleteUserGrantOnClient, getUserInfo, getClientInfo } = require('../apiClients/oktaApiClient');
+const { parseClientId } = require('../utils')
 const validator = require('validator');
 
 const revokeUserGrantHandler = async (config, req, res, next) => {
@@ -102,14 +103,15 @@ const checkForValidEmail = (email) => {
 }
 
 const checkForValidClient = async (config, clientId) => {
-    let clientError;
-    await getClientInfo(config, clientId)
-        .catch(err =>{
-            clientError = err;
-        })
+    let clientError = true;
+    if(parseClientId(clientId)){
+        await getClientInfo(config, clientId)
+        .then(() => clientError = false)
+        .catch()
+    }
     
     if(clientError){
-        throw {"status": clientError.response.status, "errorMessage": clientError.response.data.error_description}
+        throw {"status": 400, "errorMessage": "Invalid client_id."}
     }
 }
 
