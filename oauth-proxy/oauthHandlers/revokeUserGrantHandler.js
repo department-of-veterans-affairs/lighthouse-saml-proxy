@@ -107,7 +107,7 @@ const checkForValidClient = async (config, clientId) => {
     if(parseClientId(clientId)){
         await getClientInfo(config, clientId)
         .then(() => clientError = false)
-        .catch()
+        .catch(() => clientError = true)
     }
     
     if(clientError){
