@@ -4,4 +4,5 @@ module.exports = {
   'authorizeHandler': require('./authorizeHandler'),
   'tokenHandler': require('./tokenHandler'),
   'redirectHandler': require('./redirectHandler'),
+  'revokeUserGrantHandler': require('./revokeUserGrantHandler'),
 };

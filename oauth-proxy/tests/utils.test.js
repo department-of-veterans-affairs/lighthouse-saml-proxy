@@ -1,5 +1,7 @@
+'use strict';
+
 require('jest');
-const { statusCodeFromError, parseBasicAuth } = require('../utils');
+const { statusCodeFromError, parseBasicAuth, parseClientId } = require('../utils');
 
 describe('statusCodeFromError', () => {
   describe('returns the default', () => {
@@ -58,5 +60,34 @@ describe('parseBasicAuth', () => {
     let credentials = parseBasicAuth({headers: {authorization: `Basic ${usernamePassword}`}});
     expect(credentials.username).toEqual("user1");
     expect(credentials.password).toEqual("pass1");
+  });
+});
+
+describe('parseClientId', () => {
+  const validClientId = "1";
+  const specialCharacters = [ ' ','`', '~', '!', '@', '#', '$', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', '{', ']', '}', '\\', '|', ';', ':', '\'', '"', ',', '<',  '.', '>', '/', '?']; 
+  it('Valid Client Id', () => {
+    let result = parseClientId(validClientId);
+    expect(result).toEqual(true)
+  });
+
+  it('Query Client Id', () => {
+    let clientId = '?q=name';
+    let result = parseClientId(clientId);
+    expect(result).toEqual(false)
+  });
+
+  it('Filter Client Id', () => {
+    let clientId = '?filter=client_name eq "name"';
+    let result = parseClientId(clientId);
+    expect(result).toEqual(false)
+  });
+
+  it('Special Characters', () => {
+    specialCharacters.forEach(specialCharacter => {
+      let clientId = validClientId+specialCharacter;
+      let result = parseClientId(clientId);
+      expect(result).toEqual(false);
+    })
   });
 });

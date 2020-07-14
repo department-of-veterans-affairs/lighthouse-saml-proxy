@@ -60,10 +60,19 @@ function Credentials(username, password) {
   this.password = password;
 }
 
+
+function parseClientId(clientId) {
+  var regex = /^[A-Za-z0-9]+$/
+  var isValid = regex.test(clientId);
+
+  return isValid;
+}
+
 module.exports = {
   isRuntimeError,
   rethrowIfRuntimeError,
   statusCodeFromError,
   encodeBasicAuthHeader,
-  parseBasicAuth
+  parseBasicAuth,
+  parseClientId
 };

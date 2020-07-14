@@ -24,7 +24,8 @@ const appRoutes = {
   manage: '/manage',
   revoke: '/revoke',
   jwks: '/keys',
-  redirect: '/redirect'
+  redirect: '/redirect',
+  grants: '/grants'
 };
 const openidMetadataWhitelist = [
   "issuer",
@@ -194,6 +195,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
       .catch(next)
   });
+
+  router.delete(appRoutes.grants, async (req, res, next) => {
+    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
+  })
 
   app.use(well_known_base_path, router);
 
