@@ -360,7 +360,6 @@ describe('authorizeHandler', () => {
     req.query = {
       state: "fake_state", 
       client_id: "clientId123", 
-      client_redirect: "http://localhost:8080/oauth/redirect",
       redirect_uri: "http://localhost:8080/oauth/redirect"
     }
 
@@ -383,7 +382,6 @@ describe('authorizeHandler', () => {
     req.query = {
       state: "fake_state", 
       client_id: "clientId123", 
-      client_redirect: "http://localhost:8080/oauth/redirect",
       redirect_uri: "https://www.google.com"
     }
 
