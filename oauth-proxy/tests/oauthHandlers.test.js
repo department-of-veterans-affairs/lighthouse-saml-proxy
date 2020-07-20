@@ -378,6 +378,18 @@ describe('authorizeHandler', () => {
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
     expect(res.statusCode).toEqual(400);
   })
+
+  it('Bad redirect_uri', async () => {
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      client_redirect: "http://localhost:8080/oauth/redirect",
+      redirect_uri: "https://www.google.com"
+    }
+
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
 });
 
 describe('redirectHandler', () => {
