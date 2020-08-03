@@ -29,7 +29,7 @@ sessions, so that initial auth flows and refresh auth flows send the same state 
 
 ### Running locally
 
-The OAuth proxy also requires configuration to run locally. It is tied pretty tightly with Okta and you'll need 
+The OAuth proxy also requires configuration to run locally. It is tied tightly with Okta and you'll need 
 to have access to an okta authorization server and an api key for the server. 
 
 To being you'll want to create a `dev-config.json` in the oauth-proxy subdirectory. That file should contain a 
