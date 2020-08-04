@@ -163,9 +163,9 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
 
   app.use(function(err, req, res, next) {
     if (err) {
-      res.status(400);
+      res.status(err.status || 500);
       res.render('error', {
-        message: "Request could not be processed"
+        message: err.message,
       });
     }
   });
