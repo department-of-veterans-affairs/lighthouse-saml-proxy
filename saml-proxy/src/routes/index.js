@@ -161,13 +161,11 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     }));
   }
 
-  // development error handler
   app.use(function(err, req, res, next) {
     if (err) {
-      res.status(err.status || 500);
+      res.status(400);
       res.render('error', {
-        message: err.message,
-        error: err
+        message: "Request could not be processed"
       });
     }
   });
