@@ -58,17 +58,6 @@ const openidMetadataWhitelist = [
   return await Issuer.discover(upstream_issuer);
 }
 
- function createIsolatedIssuers(config) {
-  if (config.routes === undefined) return;
-  const routesConfig = config.routes;
-  const upstreamIssuers = {};
-  Object.entries(routesConfig.service).forEach(
-   ([key, service_config]) => {
-       upstreamIssuers[service_config.slug] =  createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
-    })
-  return upstreamIssuers;
-}
-
 function buildMetadataRewriteTable(config, appRoutes) {
   return {
     authorization_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.authorize}`,
@@ -311,8 +300,15 @@ if (require.main === module) {
     try {
       const config = processArgs();
       const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
-      // const isolatedIssuers =  createIsolatedIssuers(config);
-      startApp(config, issuer, undefined);
+      const isolatedIssuers = {};
+      if (config.routes) {
+        if (config.routes.service) {
+          for (const service_config of config.routes.service) {
+            isolatedIssuers[service_config.slug] = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
+          }
+        }
+      }
+      startApp(config, issuer, isolatedIssuers);
     } catch (error) {
       logger.error("Could not start the OAuth proxy", error);
       process.exit(1);
