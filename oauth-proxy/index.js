@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const axios = require('axios')
-const querystring= require('querystring')
+const querystring = require('querystring')
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
@@ -117,9 +117,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }).then((response) => {
       setProxyResponse(response, res)
     })
-    .catch(err => {
-      setProxyResponse(err.response, res)
-    })
+      .catch(err => {
+        setProxyResponse(err.response, res)
+      })
   };
 
   const { well_known_base_path } = config;
@@ -140,7 +140,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   app.use(promBundle({
     includeMethod: true,
     includePath: true,
-    customLabels: {app: 'oauth_proxy'},
+    customLabels: { app: 'oauth_proxy' },
   }));
 
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -155,7 +155,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   router.options('/.well-known/*', corsHandler);
 
   router.get('/.well-known/openid-configuration', corsHandler, (req, res) => {
-    const baseMetadata = {...issuer.metadata, ...metadataRewrite }
+    const baseMetadata = { ...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
       return meta;
@@ -168,19 +168,19 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.redirect(config.manage_endpoint);
   });
 
-  router.get(appRoutes.jwks, (req, res) => 
+  router.get(appRoutes.jwks, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET"));
 
-  router.get(appRoutes.userinfo, (req, res) => 
+  router.get(appRoutes.userinfo, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET"));
 
-  router.post(appRoutes.introspection, (req, res) => 
+  router.post(appRoutes.introspection, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST", querystring));
 
-  router.post(appRoutes.revoke, (req, res) =>  {
-    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring); 
+  router.post(appRoutes.revoke, (req, res) => {
+    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring);
   });
-  
+
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
       .catch(next)
@@ -239,6 +239,18 @@ function startApp(config, issuer) {
     requestExecutor: new okta.DefaultRequestExecutor()
   });
 
+  const isolatedOktaClients = {};
+  if (config.routes !== undefined) {
+    Object.entries(config.routes.service).forEach(
+      ([key, isolatedOktaConfig]) => {
+        isolatedOktaClients[isolatedOktaConfig.slug] = new okta.Client({
+          orgUrl: isolatedOktaConfig.okta_url,
+          token: isolatedOktaConfig.okta_token,
+          requestExecutor: new okta.DefaultRequestExecutor()
+        });
+      })
+  }
+  
   const dynamoHandle = dynamoClient.createDynamoHandle(
     Object.assign({},
       { region: config.aws_region },
