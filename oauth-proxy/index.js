@@ -248,10 +248,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   });
 
   function serviceRoutes(routesConfig, isolatedServiceIssuers) {
-    console.log(routesConfig.app_routes);
     Object.entries(routesConfig.service).forEach(
       ([key, isolatedConfig]) => {
-        console.log(key, isolatedConfig);
         const app_routes = routesConfig.app_routes;
         routeIsolatedServiceEndpoints(isolatedConfig.slug, app_routes, isolatedServiceIssuers[isolatedConfig.slug], isolatedOktaClients[isolatedConfig.slug]);
       }
