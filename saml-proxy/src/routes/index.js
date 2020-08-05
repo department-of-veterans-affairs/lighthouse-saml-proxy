@@ -164,8 +164,9 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.use(function(err, req, res, next) {
     if (err) {
       res.status(err.status || 500);
+      let errMessage = res.statusCode < 500 ? err.message : "Error processing SAML request";
       res.render('error', {
-        message: err.message,
+        message: errMessage,
       });
     }
   });
