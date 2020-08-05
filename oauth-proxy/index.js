@@ -191,20 +191,18 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       .catch(next)
   });
 
-  // if (config.routes) {
-  //   const app_routes = config.routes.app_routes;
-  //   Object.entries(config.routes.service).forEach(
-  //     ([key, isolatedOktaConfig]) => {
-  //       // const okta_client = isolatedOktaClients[isolatedOktaConfig.slug];
-  //       const okta_client = oktaClient;
-  //       // const service_issuer = isolatedIssuers[isolatedOktaConfig.slug];
-  //       const service_issuer = issuer;
-  //       router.get(isolatedOktaConfig.slug + app_routes.authorize, async (req, res, next) => {
-  //         await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
-  //           .catch(next);
-  //       });
-  //     })
-  // }
+  if (config.routes) {
+    const app_routes = config.routes.app_routes;
+    Object.entries(config.routes.service).forEach(
+      ([key, isolatedOktaConfig]) => {
+        const okta_client = isolatedOktaClients[isolatedOktaConfig.slug];
+        const service_issuer = isolatedIssuers[isolatedOktaConfig.slug];
+        router.get(isolatedOktaConfig.slug + app_routes.authorize, async (req, res, next) => {
+          await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+            .catch(next);
+        });
+      })
+  }
 
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
@@ -247,7 +245,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   return app;
 }
 
-function startApp(config, issuer) {
+function startApp(config, issuer, isolatedIssuers) {
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
@@ -277,7 +275,7 @@ function startApp(config, issuer) {
   );
 
   const validateToken = configureTokenValidator(config.validate_endpoint, config.validate_apiKey);
-  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken, undefined, isolatedOktaClients);
+  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken, isolatedIssuers, isolatedOktaClients);
   const env = app.get('env');
   const server = app.listen(config.port, () => {
     logger.info(`OAuth Proxy listening on port ${config.port} in ${env} mode!`, {
