@@ -51,11 +51,22 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ]
 
-async function createIssuer(config) {
-  if (config.upstream_issuer_timeout_ms) {
+ async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
+  if (upstream_issuer_timeout_ms) {
     Issuer.defaultHttpOptions = { timeout: config.upstream_issuer_timeout_ms };
   }
-  return await Issuer.discover(config.upstream_issuer);
+  return await Issuer.discover(upstream_issuer);
+}
+
+ function createIsolatedIssuers(config) {
+  if (config.routes === undefined) return;
+  const routesConfig = config.routes;
+  const upstreamIssuers = {};
+  Object.entries(routesConfig.service).forEach(
+   ([key, service_config]) => {
+       upstreamIssuers[service_config.slug] =  createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
+    })
+  return upstreamIssuers;
 }
 
 function buildMetadataRewriteTable(config, appRoutes) {
@@ -75,7 +86,7 @@ function filterProperty(object, property) {
   }
 }
 
-function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToken) {
+function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToken, isolatedIssuers, isolatedOktaClients) {
   const useSentry = config.sentry_dsn !== undefined && config.sentry_environment !== undefined;
   if (useSentry) {
     Sentry.init({
@@ -191,6 +202,21 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       .catch(next)
   });
 
+  // if (config.routes) {
+  //   const app_routes = config.routes.app_routes;
+  //   Object.entries(config.routes.service).forEach(
+  //     ([key, isolatedOktaConfig]) => {
+  //       // const okta_client = isolatedOktaClients[isolatedOktaConfig.slug];
+  //       const okta_client = oktaClient;
+  //       // const service_issuer = isolatedIssuers[isolatedOktaConfig.slug];
+  //       const service_issuer = issuer;
+  //       router.get(isolatedOktaConfig.slug + app_routes.authorize, async (req, res, next) => {
+  //         await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+  //           .catch(next);
+  //       });
+  //     })
+  // }
+
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
       .catch(next)
@@ -262,7 +288,7 @@ function startApp(config, issuer) {
   );
 
   const validateToken = configureTokenValidator(config.validate_endpoint, config.validate_apiKey);
-  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken);
+  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken, undefined, isolatedOktaClients);
   const env = app.get('env');
   const server = app.listen(config.port, () => {
     logger.info(`OAuth Proxy listening on port ${config.port} in ${env} mode!`, {
@@ -284,8 +310,9 @@ if (require.main === module) {
   (async () => {
     try {
       const config = processArgs();
-      const issuer = await createIssuer(config);
-      startApp(config, issuer);
+      const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
+      // const isolatedIssuers =  createIsolatedIssuers(config);
+      startApp(config, issuer, undefined);
     } catch (error) {
       logger.error("Could not start the OAuth proxy", error);
       process.exit(1);
