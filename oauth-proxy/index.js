@@ -58,14 +58,17 @@ const openidMetadataWhitelist = [
   return await Issuer.discover(upstream_issuer);
 }
 
-function buildMetadataRewriteTable(config, appRoutes) {
+function buildMetadataRewriteTable(config, appRoutes, slug) {
+  if (slug === undefined) {
+    slug = '';
+  }
   return {
-    authorization_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.authorize}`,
-    token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
-    userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
-    revocation_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.revoke}`,
-    introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
-    jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
+    authorization_endpoint: `${config.host}${config.well_known_base_path}${slug}${appRoutes.authorize}`,
+    token_endpoint: `${config.host}${config.well_known_base_path}${slug}${appRoutes.token}`,
+    userinfo_endpoint: `${config.host}${config.well_known_base_path}${slug}${appRoutes.userinfo}`,
+    revocation_endpoint: `${config.host}${config.well_known_base_path}${slug}${appRoutes.revoke}`,
+    introspection_endpoint: `${config.host}${config.well_known_base_path}${slug}${appRoutes.introspection}`,
+    jwks_uri: `${config.host}${config.well_known_base_path}${slug}${appRoutes.jwks}`,
   };
 }
 
@@ -202,6 +205,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
             .catch(next);
         });
       })
+
+      serviceRoutes(config.routes, isolatedIssuers);
   }
 
   router.post(appRoutes.token, async (req, res, next) => {
@@ -241,6 +246,52 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       res.status(500).send('An unknown error has occured');
     }
   });
+
+  function serviceRoutes(routesConfig, isolatedServiceIssuers) {
+    console.log(routesConfig.app_routes);
+    Object.entries(routesConfig.service).forEach(
+      ([key, isolatedConfig]) => {
+        console.log(key, isolatedConfig);
+        const app_routes = routesConfig.app_routes;
+        routeIsolatedServiceEndpoints(isolatedConfig.slug, app_routes, isolatedServiceIssuers[isolatedConfig.slug], isolatedOktaClients[isolatedConfig.slug]);
+      }
+    );
+
+    function routeIsolatedServiceEndpoints(slug, app_routes, service_issuer, okta_client) {
+      var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, slug);
+      router.get(slug + '/.well-known/openid-configuration', corsHandler, (req, res) => {
+        const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite }
+        const filteredServiceMetadata = openidMetadataWhitelist.reduce((meta, key) => {
+          meta[key] = baseServiceMetadata[key];
+          return meta;
+        }, {});
+
+        res.json(filteredServiceMetadata);
+      });
+      router.get(slug + app_routes.manage, (req, res) => res.redirect(config.manage_endpoint));
+      router.get(slug + app_routes.jwks, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET"));
+      router.get(slug + app_routes.userinfo, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.userinfo_endpoint, "GET"));
+      router.post(slug + app_routes.introspection, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.introspection_endpoint, "POST", querystring));
+
+      router.post(slug + app_routes.revoke, (req, res) => {
+        proxyRequestToOkta(req, res, service_issuer.metadata.revocation_endpoint, "POST", querystring);
+      });
+
+      router.get(slug + app_routes.redirect, async (req, res, next) => {
+        await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
+          .catch(next);
+      });
+
+      router.post(slug + app_routes.token, async (req, res, next) => {
+        await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
+          .catch(next);
+      });
+
+      router.delete(slug + app_routes.grants, async (req, res, next) => {
+        await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
+      });
+    }
+  }
 
   return app;
 }
