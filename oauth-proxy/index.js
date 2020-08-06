@@ -200,8 +200,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.slug];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.slug];
+        const service_redirect_uri = `${config.host}${well_known_base_path}${isolatedOktaConfig.slug}${app_routes.redirect}`;  
         router.get(isolatedOktaConfig.slug + app_routes.authorize, async (req, res, next) => {
-          await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+          await oauthHandlers.authorizeHandler(config, service_redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
             .catch(next);
         });
       })
@@ -351,7 +352,7 @@ if (require.main === module) {
       if (config.routes) {
         if (config.routes.service) {
           for (const service_config of config.routes.service) {
-            isolatedIssuers[service_config.slug] = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
+            isolatedIssuers[service_config.slug] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
           }
         }
       }
