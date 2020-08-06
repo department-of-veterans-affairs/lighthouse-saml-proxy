@@ -198,10 +198,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     const app_routes = config.routes.app_routes;
     Object.entries(config.routes.service).forEach(
       ([key, isolatedOktaConfig]) => {
-        const okta_client = isolatedOktaClients[isolatedOktaConfig.slug];
-        const service_issuer = isolatedIssuers[isolatedOktaConfig.slug];
-        const service_redirect_uri = `${config.host}${well_known_base_path}${isolatedOktaConfig.slug}${app_routes.redirect}`;  
-        router.get(isolatedOktaConfig.slug + app_routes.authorize, async (req, res, next) => {
+        const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
+        const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
+        const service_redirect_uri = `${config.host}${well_known_base_path}${isolatedOktaConfig.api_category}${app_routes.redirect}`;  
+        router.get(isolatedOktaConfig.api_category + app_routes.authorize, async (req, res, next) => {
           await oauthHandlers.authorizeHandler(config, service_redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
             .catch(next);
         });
@@ -252,7 +252,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     Object.entries(routesConfig.service).forEach(
       ([key, isolatedConfig]) => {
         const app_routes = routesConfig.app_routes;
-        routeIsolatedServiceEndpoints(isolatedConfig.slug, app_routes, isolatedServiceIssuers[isolatedConfig.slug], isolatedOktaClients[isolatedConfig.slug]);
+        routeIsolatedServiceEndpoints(isolatedConfig.api_category, app_routes, isolatedServiceIssuers[isolatedConfig.api_category], isolatedOktaClients[isolatedConfig.api_category]);
       }
     );
 
@@ -306,7 +306,7 @@ function startApp(config, issuer, isolatedIssuers) {
   if (config.routes !== undefined) {
     Object.entries(config.routes.service).forEach(
       ([key, isolatedOktaConfig]) => {
-        isolatedOktaClients[isolatedOktaConfig.slug] = new okta.Client({
+        isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
           orgUrl: isolatedOktaConfig.okta_url,
           token: isolatedOktaConfig.okta_token,
           requestExecutor: new okta.DefaultRequestExecutor()
@@ -352,7 +352,7 @@ if (require.main === module) {
       if (config.routes) {
         if (config.routes.service) {
           for (const service_config of config.routes.service) {
-            isolatedIssuers[service_config.slug] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
+            isolatedIssuers[service_config.api_category] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
           }
         }
       }
