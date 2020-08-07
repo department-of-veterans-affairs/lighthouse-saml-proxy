@@ -225,6 +225,60 @@ describe('OpenID Connect Conformance', () => {
     // signaure requirement.
   });
 
+  it('responds to the issolated api category endpoints described in the OIDC metadata response', async (done) => {
+    // This test is making multiple requests. Theoretically it could be broken
+    // up, with each request being made in a separate test. That would make it
+    // much more difficult to use the metadata response to drive the requests
+    // for the subsequent requests.
+    const testServerIssolatedBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}/veteran-verification-apis/v1.*`);
+ 
+    const resp = await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/.well-known/openid-configuration');
+    const parsedMeta = resp.data;
+    expect(parsedMeta).toMatchObject({
+      authorization_endpoint: expect.any(String),
+      token_endpoint: expect.any(String),
+      userinfo_endpoint: expect.any(String),
+      jwks_uri: expect.any(String),
+    });
+
+    expect(parsedMeta).toMatchObject({
+      jwks_uri: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      authorization_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      userinfo_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+    });
+
+    await axios.get(parsedMeta.jwks_uri);
+    await axios.get(parsedMeta.userinfo_endpoint);
+    axios.post(parsedMeta.introspection_endpoint);
+
+    const authorizeConfig = {
+      maxRedirects: 0,
+      validateStatus: function(status) {
+        return status < 500;
+      },
+      params: {
+        client_id: 'clientId123',
+        state: 'abc123',
+        redirect_uri: 'http://localhost:8080/oauth/redirect'
+      }
+    };
+    const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
+    expect(authorizeResp.status).toEqual(302);
+    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
+
+    await axios.post(
+      parsedMeta.token_endpoint,
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+    done()
+  });
+
+
   it('redirects the user back to the client app', async () => {
     const config = {
       maxRedirects: 0,
