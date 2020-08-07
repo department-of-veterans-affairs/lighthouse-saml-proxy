@@ -280,7 +280,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   return app;
 }
-
 function startApp(config, issuer, isolatedIssuers) {
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
@@ -293,8 +292,8 @@ function startApp(config, issuer, isolatedIssuers) {
     Object.entries(config.routes.service).forEach(
       ([key, isolatedOktaConfig]) => {
         isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
-          orgUrl: isolatedOktaConfig.okta_url,
-          token: isolatedOktaConfig.okta_token,
+          orgUrl: config.okta_url,
+          token: config.okta_token,
           requestExecutor: new okta.DefaultRequestExecutor()
         });
       })
