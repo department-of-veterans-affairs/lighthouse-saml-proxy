@@ -51,7 +51,7 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ]
 
- async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
+async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
   if (upstream_issuer_timeout_ms) {
     Issuer.defaultHttpOptions = { timeout: config.upstream_issuer_timeout_ms };
   }
@@ -194,6 +194,16 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       .catch(next)
   });
 
+
+  router.post(appRoutes.token, async (req, res, next) => {
+    await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
+      .catch(next)
+  });
+
+  router.delete(appRoutes.grants, async (req, res, next) => {
+    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
+  });
+
   if (config.routes) {
     const app_routes = config.routes.app_routes;
     Object.entries(config.routes.service).forEach(
@@ -208,19 +218,9 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
           await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
             .catch(next);
         });
+        apiCategoryRouteEndpoints(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client)
       })
-
-      serviceRoutes(config.routes, isolatedIssuers);
   }
-
-  router.post(appRoutes.token, async (req, res, next) => {
-    await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
-      .catch(next)
-  });
-
-  router.delete(appRoutes.grants, async (req, res, next) => {
-    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
-  })
 
   app.use(well_known_base_path, router);
 
@@ -251,39 +251,32 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }
   });
 
-  function serviceRoutes(routesConfig, isolatedServiceIssuers) {
-    Object.entries(routesConfig.service).forEach(
-      ([key, isolatedConfig]) => {
-        const app_routes = routesConfig.app_routes;
-        routeIsolatedServiceEndpoints(isolatedConfig.api_category, app_routes, isolatedServiceIssuers[isolatedConfig.api_category], isolatedOktaClients[isolatedConfig.api_category]);
-      }
-    );
 
-    function routeIsolatedServiceEndpoints(api_category, app_routes, service_issuer, okta_client) {
-      var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
-      router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
-        const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite }
-        const filteredServiceMetadata = openidMetadataWhitelist.reduce((meta, key) => {
-          meta[key] = baseServiceMetadata[key];
-          return meta;
-        }, {});
+  function apiCategoryRouteEndpoints(api_category, app_routes, service_issuer, okta_client) {
+    var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
+    router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
+      const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite }
+      const filteredServiceMetadata = openidMetadataWhitelist.reduce((meta, key) => {
+        meta[key] = baseServiceMetadata[key];
+        return meta;
+      }, {});
 
-        res.json(filteredServiceMetadata);
-      });
-      router.get(api_category + app_routes.manage, (req, res) => res.redirect(config.manage_endpoint));
-      router.get(api_category + app_routes.jwks, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET"));
-      router.get(api_category + app_routes.userinfo, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.userinfo_endpoint, "GET"));
-      router.post(api_category + app_routes.introspection, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.introspection_endpoint, "POST", querystring));
+      res.json(filteredServiceMetadata);
+    });
+    router.get(api_category + app_routes.manage, (req, res) => res.redirect(config.manage_endpoint));
+    router.get(api_category + app_routes.jwks, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET"));
+    router.get(api_category + app_routes.userinfo, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.userinfo_endpoint, "GET"));
+    router.post(api_category + app_routes.introspection, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.introspection_endpoint, "POST", querystring));
 
-      router.post(api_category + app_routes.revoke, (req, res) => {
-        proxyRequestToOkta(req, res, service_issuer.metadata.revocation_endpoint, "POST", querystring);
-      });
+    router.post(api_category + app_routes.revoke, (req, res) => {
+      proxyRequestToOkta(req, res, service_issuer.metadata.revocation_endpoint, "POST", querystring);
+    });
 
-      router.delete(api_category + app_routes.grants, async (req, res, next) => {
-        await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
-      });
-    }
+    router.delete(api_category + app_routes.grants, async (req, res, next) => {
+      await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
+    });
   }
+
 
   return app;
 }
@@ -306,7 +299,7 @@ function startApp(config, issuer, isolatedIssuers) {
         });
       })
   }
-  
+
   const dynamoHandle = dynamoClient.createDynamoHandle(
     Object.assign({},
       { region: config.aws_region },
