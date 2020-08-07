@@ -30,7 +30,25 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
-  manage_endpoint: 'http://localhost:9091/account'
+  manage_endpoint: 'http://localhost:9091/account',
+  routes: {
+    categories: [
+      {
+        api_category: "/veteran-verification-apis/v1",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl()
+      }
+    ],
+    app_routes: {
+      authorize: "/authorization",
+      token: "/token",
+      userinfo: "/userinfo",
+      introspection: "/introspect",
+      manage: "/manage",
+      revoke: "/revoke",
+      jwks: "/keys",
+      grants: "/grants"
+    }
+  }
 };
 
 function buildFakeOktaClient(fakeRecord) {
@@ -98,6 +116,14 @@ describe('OpenID Connect Conformance', () => {
         },
       }
     });
+    const isolatedIssuers = {};
+    const isolatedOktaClients = {};
+    if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
+      for (const service_config of defaultTestingConfig.routes.categories) {
+        isolatedIssuers[service_config.api_category] = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
+        isolatedOktaClients[service_config.api_category] = oktaClient;
+      }
+    }
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
       code: 'xyz789',
@@ -114,7 +140,7 @@ describe('OpenID Connect Conformance', () => {
       };
     };
 
-    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator);
+    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator, isolatedIssuers, isolatedOktaClients);
     // We're starting and stopping this server in a beforeAll/afterAll pair,
     // rather than beforeEach/afterEach because this is an end-to-end
     // functional. Since internal application state could affect functionality

@@ -204,7 +204,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
   });
 
-  if (config.routes) {
+  if (config.routes && config.routes.categories) {
     const app_routes = config.routes.app_routes;
     Object.entries(config.routes.categories).forEach(
       ([key, isolatedOktaConfig]) => {
@@ -336,11 +336,9 @@ if (require.main === module) {
       const config = processArgs();
       const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
       const isolatedIssuers = {};
-      if (config.routes) {
-        if (config.routes.categories) {
-          for (const service_config of config.routes.categories) {
-            isolatedIssuers[service_config.api_category] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
-          }
+      if (config.routes && config.routes.categories) {
+        for (const service_config of config.routes.categories) {
+          isolatedIssuers[service_config.api_category] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
         }
       }
       startApp(config, issuer, isolatedIssuers);
