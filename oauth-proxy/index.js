@@ -290,7 +290,7 @@ function startApp(config, issuer, isolatedIssuers) {
   });
 
   const isolatedOktaClients = {};
-  if (config.routes !== undefined) {
+  if (config.routes && config.routes.categories) {
     Object.entries(config.routes.categories).forEach(
       ([key, isolatedOktaConfig]) => {
         isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
