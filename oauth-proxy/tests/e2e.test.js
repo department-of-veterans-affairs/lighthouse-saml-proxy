@@ -518,8 +518,39 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
-  it('tests manage endponit redirect', async () => {
+  it('returns an OIDC conformant status 400 on sending json, isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      JSON.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+        headers: {
+          'content-type':'application/json',
+          'authorization': encodeBasicAuthHeader('user', 'pass'),
+          'origin': 'http://localhost:8080'
+        },
+        auth: { username: 'clientId123', password: 'secretXyz' }
+    }
+    ).then(resp => {
+      expect(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+    });
+  });
+
+  it('tests manage endpoint redirect', async () => {
     await axios.get('http://localhost:9090/testServer/manage').then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(resp.data).toEqual('acls updated');
+    })
+    .catch(err => {
+      console.info(err);
+      expect(true).toEqual(false);
+    });
+  });
+
+  it('tests manage endpoint redirect, isolated endpoint', async () => {
+    await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/manage').then(resp => {
       expect(resp.status).toEqual(200);
       expect(resp.data).toEqual('acls updated');
     })
