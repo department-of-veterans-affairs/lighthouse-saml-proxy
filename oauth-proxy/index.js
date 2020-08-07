@@ -210,14 +210,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-        router.get(isolatedOktaConfig.api_category + app_routes.authorize, async (req, res, next) => {
-          await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
-            .catch(next);
-        });
-        router.post(isolatedOktaConfig.api_category + app_routes.token, async (req, res, next) => {
-          await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
-            .catch(next);
-        });
         apiCategoryRouteEndpoints(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client)
       })
   }
@@ -251,7 +243,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }
   });
 
-
   function apiCategoryRouteEndpoints(api_category, app_routes, service_issuer, okta_client) {
     var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
     router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
@@ -263,6 +254,17 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
       res.json(filteredServiceMetadata);
     });
+
+    router.get(api_category + app_routes.authorize, async (req, res, next) => {
+      await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+        .catch(next);
+    });
+
+    router.post(api_category + app_routes.token, async (req, res, next) => {
+      await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
+        .catch(next);
+    });
+
     router.get(api_category + app_routes.manage, (req, res) => res.redirect(config.manage_endpoint));
     router.get(api_category + app_routes.jwks, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET"));
     router.get(api_category + app_routes.userinfo, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.userinfo_endpoint, "GET"));
