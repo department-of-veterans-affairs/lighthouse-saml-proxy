@@ -23,7 +23,9 @@ const redirectHandler = async (logger, dynamo, dynamoClient, req, res, next) => 
     const document = await dynamoClient.getFromDynamoByState(dynamo, state);
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
-    res.redirect(`${document.redirect_uri.S}?${params.toString()}`)
+    var full_redirect_url = `${document.redirect_uri.S}?${params.toString()}`;
+    logger.info("####### Redirecting to ---> " + full_redirect_url);
+    res.redirect(full_redirect_url)
   } catch (error) {
     logger.error("Failed to redirect to the OAuth client application", error);
     return next(error); // This error is unrecoverable because we can't look up the original redirect.
