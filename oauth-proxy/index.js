@@ -206,7 +206,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   if (config.routes) {
     const app_routes = config.routes.app_routes;
-    Object.entries(config.routes.service).forEach(
+    Object.entries(config.routes.categories).forEach(
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
@@ -289,7 +289,7 @@ function startApp(config, issuer, isolatedIssuers) {
 
   const isolatedOktaClients = {};
   if (config.routes !== undefined) {
-    Object.entries(config.routes.service).forEach(
+    Object.entries(config.routes.categories).forEach(
       ([key, isolatedOktaConfig]) => {
         isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
           orgUrl: config.okta_url,
@@ -335,8 +335,8 @@ if (require.main === module) {
       const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
       const isolatedIssuers = {};
       if (config.routes) {
-        if (config.routes.service) {
-          for (const service_config of config.routes.service) {
+        if (config.routes.categories) {
+          for (const service_config of config.routes.categories) {
             isolatedIssuers[service_config.api_category] = await createIssuer(service_config.upstream_issuer, service_config.upstream_issuer_timeout_ms);
           }
         }
