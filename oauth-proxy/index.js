@@ -200,13 +200,12 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-        const service_redirect_uri = `${config.host}${well_known_base_path}${isolatedOktaConfig.api_category}${app_routes.redirect}`;  
         router.get(isolatedOktaConfig.api_category + app_routes.authorize, async (req, res, next) => {
-          await oauthHandlers.authorizeHandler(config, service_redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+          await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
             .catch(next);
         });
         router.post(isolatedOktaConfig.api_category + app_routes.token, async (req, res, next) => {
-          await oauthHandlers.tokenHandler(config, service_redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
+          await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
             .catch(next);
         });
       })
@@ -278,11 +277,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
       router.post(api_category + app_routes.revoke, (req, res) => {
         proxyRequestToOkta(req, res, service_issuer.metadata.revocation_endpoint, "POST", querystring);
-      });
-
-      router.get(api_category + app_routes.redirect, async (req, res, next) => {
-        await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
-          .catch(next);
       });
 
       router.delete(api_category + app_routes.grants, async (req, res, next) => {
