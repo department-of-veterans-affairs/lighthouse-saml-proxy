@@ -321,9 +321,55 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant token response for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/token',
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+
+    expect(resp.status).toEqual(200);
+    const parsedResp = resp.data;
+    const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
+    expect(parsedResp).toMatchObject({
+      access_token: expect.stringMatching(JWT_PATTERN),
+      expires_in: expect.any(Number),
+      id_token: expect.stringMatching(JWT_PATTERN),
+      refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
+      scope: expect.stringMatching(/.+/),
+      token_type: 'Bearer',
+    });
+  });
+
   it('returns an OIDC conformant status 200 on token introspection', async () => {
     const resp = await axios.post(
       'http://localhost:9090/testServer/introspect',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    ).then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
+    }).catch(err => {
+      // Handle Error Here
+    });
+  }); 
+
+
+  it('returns an OIDC conformant status 200 on token introspection for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/introspect',
       qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
       {
           headers: {
@@ -358,6 +404,24 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant status 200 on token revocation for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    ).then(resp => {
+      expect(resp.status).toEqual(200);
+    }).catch(err => {
+      // Handle Error 
+    });
+  });
+
   it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
     await axios.post(
       'http://localhost:9090/testServer/revoke',
@@ -376,9 +440,47 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant status 400 on token revocation, from missing authentication for the api category isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'origin': 'http://localhost:8080'
+          },
+      }
+    ).then(resp => {
+      expect(true).toEqual(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual('invalid client_id');
+    });
+  });
+
   it('returns an OIDC conformant status 400 on token revocation, from missing token', async () => {
     await axios.post(
       'http://localhost:9090/testServer/revoke',
+      qs.stringify({ token_type_hint: 'access_token' }),
+      {
+        headers: {
+          'authorization': encodeBasicAuthHeader('user', 'pass'),
+          'origin': 'http://localhost:8080'
+        },
+        auth: { username: 'clientId123', password: 'secretXyz' }
+    }
+    ).then(resp => {
+      expect(true).toEqual(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual("invalid_request, missing `token`")
+    });
+  });
+
+  it('returns an OIDC conformant status 400 on token revocation, from missing token for the api category isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
       qs.stringify({ token_type_hint: 'access_token' }),
       {
         headers: {
