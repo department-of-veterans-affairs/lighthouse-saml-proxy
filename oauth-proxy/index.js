@@ -127,6 +127,10 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
+
+  /**
+   * @deprecated - To be removed following AuthZ Server reorganization
+   */
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
 
   const app = express();
@@ -155,8 +159,11 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     optionsSuccessStatus: 200,
     preflightContinue: true,
   });
+
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.options('/.well-known/*', corsHandler);
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get('/.well-known/openid-configuration', corsHandler, (req, res) => {
     const baseMetadata = { ...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
@@ -167,19 +174,24 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.manage, (req, res) => {
     res.redirect(config.manage_endpoint);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.jwks, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET"));
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.userinfo, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET"));
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.post(appRoutes.introspection, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST", querystring));
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.post(appRoutes.revoke, (req, res) => {
     proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring);
   });
@@ -189,17 +201,19 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       .catch(next)
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
       .catch(next)
   });
 
-
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
       .catch(next)
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.delete(appRoutes.grants, async (req, res, next) => {
     await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
   });
@@ -278,7 +292,6 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
     });
   }
-
 
   return app;
 }
