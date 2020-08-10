@@ -91,7 +91,7 @@ function processArgs() {
         required: false,
         categories: {
           type: "array",
-          description: "An array of objects that describe the api-category endpoint path suffux as well as the upstream issuer for the respective api category",
+          description: "An array of objects that describe the api-category endpoint path suffix as well as the upstream issuer for the respective api category",
           required: true,
           api_category: {
             description: "A string that represents both the api category and an endpoint path addition, eg: '/veteran-verification-apis/v1'",
