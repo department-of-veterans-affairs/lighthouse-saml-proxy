@@ -260,7 +260,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   function buildMetadataForOpenIdConfiguration(api_category, app_routes, service_issuer, okta_client) {
     var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
     router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
-      const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite }
+      const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite };
       const filteredServiceMetadata = openidMetadataWhitelist.reduce((meta, key) => {
         meta[key] = baseServiceMetadata[key];
         return meta;
