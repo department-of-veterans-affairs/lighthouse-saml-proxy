@@ -15,6 +15,10 @@ function processArgs() {
         description: 'host of oauth-proxy in the form of protocol://domain:port',
         required: true
       },
+      upstream_issuer: {
+        description: 'URI of upstream issuer to the proxy. Eventually, this field will go away in favor is the isoated issuers based on API category',
+        required: true,
+      },
       upstream_issuer_timeout_ms: {
         description: 'Optional timeout (ms) for upstream requests',
         required: false
@@ -84,7 +88,7 @@ function processArgs() {
       },
       routes: {
         description: "An object that describes route configurations for isolated api categories",
-        required: true,
+        required: false,
         categories: {
           type: "array",
           description: "An array of objects that describe the api-category endpoint path suffux as well as the upstream issuer for the respective api category",
