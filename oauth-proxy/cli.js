@@ -16,7 +16,7 @@ function processArgs() {
         required: true
       },
       upstream_issuer: {
-        description: 'URI of upstream issuer to the proxy. Eventually, this field will go away in favor is the isoated issuers based on API category',
+        description: 'URI of upstream issuer to the proxy. Eventually, this field will go away in favor is the isolated issuers based on API category',
         required: true,
       },
       upstream_issuer_timeout_ms: {
