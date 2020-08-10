@@ -15,10 +15,6 @@ function processArgs() {
         description: 'host of oauth-proxy in the form of protocol://domain:port',
         required: true
       },
-      upstream_issuer: {
-        description: 'URI of upstream issuer to be proxies',
-        required: true,
-      },
       upstream_issuer_timeout_ms: {
         description: 'Optional timeout (ms) for upstream requests',
         required: false
@@ -85,6 +81,44 @@ function processArgs() {
         description: "Enable Delete Grants endpoint (Okta Consent)?",
         required: false,
         default: false,
+      },
+      routes: {
+        description: "An object that describes route configurations for isolated api categories",
+        required: true,
+        categories: {
+          type: "array",
+          description: "An array of objects that describe the api-category endpoint path suffux as well as the upstream issuer for the respective api category",
+          required: true,
+          api_category: {
+            description: "A string that represents both the api category and an endpoint path addition, eg: '/veteran-verification-apis/v1'",
+            required: true,
+          },
+          upstream_issuer: {
+            description: 'URI of upstream issuer to be proxies',
+            required: true,
+          },
+          app_routes: {
+            description: "Represents a route to the respective okta server route as well as a path to the endpoint. eg: '/authorization'",
+            required: true,
+            string: true,
+            authorize: {
+              required: true,
+              default: "/authorization",
+            },
+            token: {
+              required: true,
+              default: "/token",
+            },
+            userinfo: {
+              required: true,
+              default: "/userinfo",
+            },
+            introspection: {
+              required: true,
+              default: "/introspect",
+            },
+          },
+        }
       }
     })
     .wrap(yargs.terminalWidth())
