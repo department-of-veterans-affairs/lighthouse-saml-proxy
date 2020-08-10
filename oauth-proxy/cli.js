@@ -96,53 +96,54 @@ function processArgs() {
           upstream_issuer: {
             description: 'URI of upstream issuer to be proxies',
             required: true,
-          },
-          app_routes: {
-            description: "Represents a route to the respective okta server route as well as a path to the endpoint. eg: '/authorization'",
+          }
+        },
+        app_routes: {
+          description: "Represents a route to the respective okta server route as well as a path to the endpoint. eg: '/authorization'",
+          required: true,
+          string: true,
+          authorize: {
+            description: "The path component for the authorization endpoint",
             required: true,
-            string: true,
-            authorize: {
-              description: "The path component for the authorization endpoint",
-              required: true,
-              default: "/authorization",
-            },
-            token: {
-              description: "The path component for the token endpoint",
-              required: true,
-              default: "/token",
-            },
-            userinfo: {
-              description: "The path component for the userinfo endpoint",
-              required: true,
-              default: "/userinfo",
-            },
-            introspection: {
-              description: "The path component for the introspection endpoint",
-              required: true,
-              default: "/introspect",
-            },
-            manage: {
-              description: "The path component for the manage endpoint",
-              required: true,
-              default: "/manage",
-            },
-            revoke: {
-              description: "The path component for the revoke endpoint",
-              required: true,
-              default: "/revoke",
-            },
-            jwks: {
-              description: "The path component for the jwks endpoint",
-              required: true,
-              default: "/keys",
-            },
-            grants: {
-              description: "The path component for the grants endpoint",
-              required: true,
-              default: "/grants",
-            },
+            default: "/authorization",
           },
-        }
+          token: {
+            description: "The path component for the token endpoint",
+            required: true,
+            default: "/token",
+          },
+          userinfo: {
+            description: "The path component for the userinfo endpoint",
+            required: true,
+            default: "/userinfo",
+          },
+          introspection: {
+            description: "The path component for the introspection endpoint",
+            required: true,
+            default: "/introspect",
+          },
+          manage: {
+            description: "The path component for the manage endpoint",
+            required: true,
+            default: "/manage",
+          },
+          revoke: {
+            description: "The path component for the revoke endpoint",
+            required: true,
+            default: "/revoke",
+          },
+          jwks: {
+            description: "The path component for the jwks endpoint",
+            required: true,
+            default: "/keys",
+          },
+          grants: {
+            description: "The path component for the grants endpoint",
+            required: true,
+            default: "/grants",
+          },
+        },
+
       }
     })
     .wrap(yargs.terminalWidth())
