@@ -15,6 +15,10 @@
   "routes": {
     "categories": [
       {
+        "api_category": "default",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default"
+      },
+      {
         "api_category": "/health-apis-patient/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7"
       },
