@@ -19,7 +19,7 @@
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7"
       },
       {
-        "api_category": "benefits-apis/v1",
+        "api_category": "/benefits-apis/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7"
       },
       {
