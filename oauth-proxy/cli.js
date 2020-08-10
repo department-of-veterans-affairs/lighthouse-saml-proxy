@@ -117,6 +117,22 @@ function processArgs() {
               required: true,
               default: "/introspect",
             },
+            manage: {
+              required: true,
+              default: "/manage",
+            },
+            revoke: {
+              required: true,
+              default: "/revoke",
+            },
+            jwks: {
+              required: true,
+              default: "/keys",
+            },
+            grants: {
+              required: true,
+              default: "/grants",
+            },
           },
         }
       }
