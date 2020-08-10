@@ -198,24 +198,24 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
   router.delete(appRoutes.grants, async (req, res, next) => {
-    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
+    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
   });
 
   if (config.routes && config.routes.categories) {
@@ -224,8 +224,8 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-        apiCategoryRouteEndpoints(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client)
-      })
+        apiCategoryRouteEndpoints(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client);
+      });
   }
 
   app.use(well_known_base_path, router);
@@ -311,7 +311,7 @@ function startApp(config, issuer, isolatedIssuers) {
           token: config.okta_token,
           requestExecutor: new okta.DefaultRequestExecutor()
         });
-      })
+      });
   }
 
   const dynamoHandle = dynamoClient.createDynamoHandle(
