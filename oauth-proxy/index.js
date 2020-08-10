@@ -224,7 +224,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
       ([key, isolatedOktaConfig]) => {
         const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
         const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-        apiCategoryRouteEndpoints(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client);
+        buildMetadataForOpenIdConfiguration(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client);
       });
   }
 
@@ -257,7 +257,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }
   });
 
-  function apiCategoryRouteEndpoints(api_category, app_routes, service_issuer, okta_client) {
+  function buildMetadataForOpenIdConfiguration(api_category, app_routes, service_issuer, okta_client) {
     var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
     router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
       const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite }
