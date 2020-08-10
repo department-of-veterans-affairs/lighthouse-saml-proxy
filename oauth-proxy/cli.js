@@ -102,34 +102,42 @@ function processArgs() {
             required: true,
             string: true,
             authorize: {
+              description: "The path component for the authorization endpoint",
               required: true,
               default: "/authorization",
             },
             token: {
+              description: "The path component for the token endpoint",
               required: true,
               default: "/token",
             },
             userinfo: {
+              description: "The path component for the userinfo endpoint",
               required: true,
               default: "/userinfo",
             },
             introspection: {
+              description: "The path component for the introspection endpoint",
               required: true,
               default: "/introspect",
             },
             manage: {
+              description: "The path component for the manage endpoint",
               required: true,
               default: "/manage",
             },
             revoke: {
+              description: "The path component for the revoke endpoint",
               required: true,
               default: "/revoke",
             },
             jwks: {
+              description: "The path component for the jwks endpoint",
               required: true,
               default: "/keys",
             },
             grants: {
+              description: "The path component for the grants endpoint",
               required: true,
               default: "/grants",
             },
