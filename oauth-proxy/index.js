@@ -53,7 +53,7 @@ const openidMetadataWhitelist = [
 
 async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
   if (upstream_issuer_timeout_ms) {
-    Issuer.defaultHttpOptions = { timeout: config.upstream_issuer_timeout_ms };
+    Issuer.defaultHttpOptions = { timeout: upstream_issuer_timeout_ms };
   }
   return await Issuer.discover(upstream_issuer);
 }
@@ -347,7 +347,8 @@ if (require.main === module) {
   (async () => {
     try {
       const config = processArgs();
-      const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
+      const default_config = config.routes.categories.find(c => c.api_category == "default");
+      const issuer = await createIssuer(default_config.upstream_issuer, config.upstream_issuer_timeout_ms);
       const isolatedIssuers = {};
       if (config.routes && config.routes.categories) {
         for (const service_config of config.routes.categories) {
