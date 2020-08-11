@@ -67,14 +67,13 @@ const getClientInfo = async (config, clientId) => {
 const getAuthorizationServerInfo = async (config, authorizationServerId) => {
   let error;
   let response;
-  const template = uriTemplates(config.okta_url+"api/v1/authorizationServers/{authorizationServerId}")
-
+  const template = uriTemplates(config.okta_url+"/api/v1/authorizationServers/{authorizationServerId}")
   await axios({
     method: "GET",
     url: template.fill({authorizationServerId: authorizationServerId}),
     headers: {Authorization: "SSWS "+config.okta_token}
   }).then(res => {
-    response = res})
+    response = res.data})
   .catch(err => {error = err})
 
   if(response == null){
