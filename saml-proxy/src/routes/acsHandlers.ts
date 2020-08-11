@@ -81,7 +81,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
     req.user.claims.lastName = last_name;
     next();
   } catch (mviError) {
-    logger.warn("Failed MVI lookup; will try VSO search", { mviError, session, action, result: 'failure' });
+    logger.warn("Failed MVI lookup; will try VSO search", { session, action, result: 'failure' });
 
     try  {
       await requestWithMetrics(VSORequestMetrics, (): Promise<any> => {
@@ -89,7 +89,7 @@ export const loadICN = async (req: IConfiguredRequest, res: Response, next: Next
       });
       next();
     } catch (error) {
-      logger.error("Failed MVI lookup and VSO search", { error, session, action, result: 'failure' });
+      logger.error("Failed MVI lookup and VSO search", { session, action, result: 'failure' });
       res.render(unknownUsersErrorTemplate(mviError), {});
     }
   }
