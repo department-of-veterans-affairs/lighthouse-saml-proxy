@@ -30,7 +30,25 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
-  manage_endpoint: 'http://localhost:9091/account'
+  manage_endpoint: 'http://localhost:9091/account',
+  routes: {
+    categories: [
+      {
+        api_category: "/veteran-verification-apis/v1",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl()
+      }
+    ],
+    app_routes: {
+      authorize: "/authorization",
+      token: "/token",
+      userinfo: "/userinfo",
+      introspection: "/introspect",
+      manage: "/manage",
+      revoke: "/revoke",
+      jwks: "/keys",
+      grants: "/grants"
+    }
+  }
 };
 
 function buildFakeOktaClient(fakeRecord) {
@@ -98,6 +116,14 @@ describe('OpenID Connect Conformance', () => {
         },
       }
     });
+    const isolatedIssuers = {};
+    const isolatedOktaClients = {};
+    if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
+      for (const service_config of defaultTestingConfig.routes.categories) {
+        isolatedIssuers[service_config.api_category] = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
+        isolatedOktaClients[service_config.api_category] = oktaClient;
+      }
+    }
     dynamoClient = buildFakeDynamoClient({
       state: 'abc123',
       code: 'xyz789',
@@ -114,7 +140,7 @@ describe('OpenID Connect Conformance', () => {
       };
     };
 
-    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator);
+    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator, isolatedIssuers, isolatedOktaClients);
     // We're starting and stopping this server in a beforeAll/afterAll pair,
     // rather than beforeEach/afterEach because this is an end-to-end
     // functional. Since internal application state could affect functionality
@@ -199,6 +225,60 @@ describe('OpenID Connect Conformance', () => {
     // signaure requirement.
   });
 
+  it('responds to the issolated api category endpoints described in the OIDC metadata response', async (done) => {
+    // This test is making multiple requests. Theoretically it could be broken
+    // up, with each request being made in a separate test. That would make it
+    // much more difficult to use the metadata response to drive the requests
+    // for the subsequent requests.
+    const testServerIssolatedBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}/veteran-verification-apis/v1.*`);
+ 
+    const resp = await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/.well-known/openid-configuration');
+    const parsedMeta = resp.data;
+    expect(parsedMeta).toMatchObject({
+      authorization_endpoint: expect.any(String),
+      token_endpoint: expect.any(String),
+      userinfo_endpoint: expect.any(String),
+      jwks_uri: expect.any(String),
+    });
+
+    expect(parsedMeta).toMatchObject({
+      jwks_uri: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      authorization_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      userinfo_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      token_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+    });
+
+    await axios.get(parsedMeta.jwks_uri);
+    await axios.get(parsedMeta.userinfo_endpoint);
+    axios.post(parsedMeta.introspection_endpoint);
+
+    const authorizeConfig = {
+      maxRedirects: 0,
+      validateStatus: function(status) {
+        return status < 500;
+      },
+      params: {
+        client_id: 'clientId123',
+        state: 'abc123',
+        redirect_uri: 'http://localhost:8080/oauth/redirect'
+      }
+    };
+    const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
+    expect(authorizeResp.status).toEqual(302);
+    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
+
+    await axios.post(
+      parsedMeta.token_endpoint,
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+    done()
+  });
+
+
   it('redirects the user back to the client app', async () => {
     const config = {
       maxRedirects: 0,
@@ -241,9 +321,55 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant token response for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/token',
+      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    );
+
+    expect(resp.status).toEqual(200);
+    const parsedResp = resp.data;
+    const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
+    expect(parsedResp).toMatchObject({
+      access_token: expect.stringMatching(JWT_PATTERN),
+      expires_in: expect.any(Number),
+      id_token: expect.stringMatching(JWT_PATTERN),
+      refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
+      scope: expect.stringMatching(/.+/),
+      token_type: 'Bearer',
+    });
+  });
+
   it('returns an OIDC conformant status 200 on token introspection', async () => {
     const resp = await axios.post(
       'http://localhost:9090/testServer/introspect',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    ).then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
+    }).catch(err => {
+      // Handle Error Here
+    });
+  }); 
+
+
+  it('returns an OIDC conformant status 200 on token introspection for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/introspect',
       qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
       {
           headers: {
@@ -278,6 +404,24 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant status 200 on token revocation for the api category isolated endpoint', async () => {
+    const resp = await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'authorization': encodeBasicAuthHeader('user', 'pass'),
+            'origin': 'http://localhost:8080'
+          },
+          auth: { username: 'clientId123', password: 'secretXyz' }
+      }
+    ).then(resp => {
+      expect(resp.status).toEqual(200);
+    }).catch(err => {
+      // Handle Error 
+    });
+  });
+
   it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
     await axios.post(
       'http://localhost:9090/testServer/revoke',
@@ -296,9 +440,47 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
+  it('returns an OIDC conformant status 400 on token revocation, from missing authentication for the api category isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+          headers: {
+            'origin': 'http://localhost:8080'
+          },
+      }
+    ).then(resp => {
+      expect(true).toEqual(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual('invalid client_id');
+    });
+  });
+
   it('returns an OIDC conformant status 400 on token revocation, from missing token', async () => {
     await axios.post(
       'http://localhost:9090/testServer/revoke',
+      qs.stringify({ token_type_hint: 'access_token' }),
+      {
+        headers: {
+          'authorization': encodeBasicAuthHeader('user', 'pass'),
+          'origin': 'http://localhost:8080'
+        },
+        auth: { username: 'clientId123', password: 'secretXyz' }
+    }
+    ).then(resp => {
+      expect(true).toEqual(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+      expect(err.response.data).toEqual("invalid_request, missing `token`")
+    });
+  });
+
+  it('returns an OIDC conformant status 400 on token revocation, from missing token for the api category isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
       qs.stringify({ token_type_hint: 'access_token' }),
       {
         headers: {
@@ -336,8 +518,39 @@ describe('OpenID Connect Conformance', () => {
     });
   });
 
-  it('tests manage endponit redirect', async () => {
+  it('returns an OIDC conformant status 400 on sending json, isolated endpoint', async () => {
+    await axios.post(
+      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
+      JSON.stringify({ token: 'token', token_type_hint: 'access_token' }),
+      {
+        headers: {
+          'content-type':'application/json',
+          'authorization': encodeBasicAuthHeader('user', 'pass'),
+          'origin': 'http://localhost:8080'
+        },
+        auth: { username: 'clientId123', password: 'secretXyz' }
+    }
+    ).then(resp => {
+      expect(false); // Don't expect to be here
+    }).catch(err => {
+      // Handle Error Here
+      expect(err.response.status).toEqual(400);
+    });
+  });
+
+  it('tests manage endpoint redirect', async () => {
     await axios.get('http://localhost:9090/testServer/manage').then(resp => {
+      expect(resp.status).toEqual(200);
+      expect(resp.data).toEqual('acls updated');
+    })
+    .catch(err => {
+      console.info(err);
+      expect(true).toEqual(false);
+    });
+  });
+
+  it('tests manage endpoint redirect, isolated endpoint', async () => {
+    await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/manage').then(resp => {
       expect(resp.status).toEqual(200);
       expect(resp.data).toEqual('acls updated');
     })

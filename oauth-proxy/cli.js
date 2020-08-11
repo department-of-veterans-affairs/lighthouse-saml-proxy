@@ -16,7 +16,7 @@ function processArgs() {
         required: true
       },
       upstream_issuer: {
-        description: 'URI of upstream issuer to be proxies',
+        description: 'URI of upstream issuer to the proxy. Eventually, this field will go away in favor is the isolated issuers based on API category',
         required: true,
       },
       upstream_issuer_timeout_ms: {
@@ -85,6 +85,69 @@ function processArgs() {
         description: "Enable Delete Grants endpoint (Okta Consent)?",
         required: false,
         default: false,
+      },
+      routes: {
+        description: "An object that describes route configurations for isolated api categories",
+        required: false,
+        categories: {
+          type: "array",
+          description: "An array of objects that describe the api-category endpoint path suffix as well as the upstream issuer for the respective api category",
+          required: true,
+          api_category: {
+            description: "A string that represents both the api category and an endpoint path addition, eg: '/veteran-verification-apis/v1'",
+            required: true,
+          },
+          upstream_issuer: {
+            description: 'URI of upstream issuer to be proxies',
+            required: true,
+          }
+        },
+        app_routes: {
+          description: "Represents a route to the respective okta server route as well as a path to the endpoint. eg: '/authorization'",
+          required: true,
+          string: true,
+          authorize: {
+            description: "The path component for the authorization endpoint",
+            required: true,
+            default: "/authorization",
+          },
+          token: {
+            description: "The path component for the token endpoint",
+            required: true,
+            default: "/token",
+          },
+          userinfo: {
+            description: "The path component for the userinfo endpoint",
+            required: true,
+            default: "/userinfo",
+          },
+          introspection: {
+            description: "The path component for the introspection endpoint",
+            required: true,
+            default: "/introspect",
+          },
+          manage: {
+            description: "The path component for the manage endpoint",
+            required: true,
+            default: "/manage",
+          },
+          revoke: {
+            description: "The path component for the revoke endpoint",
+            required: true,
+            default: "/revoke",
+          },
+          jwks: {
+            description: "The path component for the jwks endpoint",
+            required: true,
+            default: "/keys",
+          },
+          grants: {
+            description: "The path component for the grants endpoint",
+            required: true,
+            default: "/grants",
+          },
+        },
+
       }
     })
     .wrap(yargs.terminalWidth())

@@ -11,5 +11,31 @@
   "validate_apiKey": "<FIX ME>",
   "okta_token": "<FIX ME>",
   "enable_pkce_authorization_flow": true,
-  "enable_okta_consent_endpoint": true
+  "enable_okta_consent_endpoint": true,
+  "routes": {
+    "categories": [
+      {
+        "api_category": "/health-apis-patient/v1",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7"
+      },
+      {
+        "api_category": "/benefits-apis/v1",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7"
+      },
+      {
+        "api_category": "/veteran-verification-apis/v1",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7"
+      }
+    ],
+    "app_routes": {
+      "authorize": "/authorization",
+      "token": "/token",
+      "userinfo": "/userinfo",
+      "introspection": "/introspect",
+      "manage": "/manage",
+      "revoke": "/revoke",
+      "jwks": "/keys",
+      "grants": "/grants"
+    }
+  }
 }

@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const promBundle = require('express-prom-bundle');
 const Sentry = require('@sentry/node');
 const axios = require('axios')
-const querystring= require('querystring')
+const querystring = require('querystring')
 const { logger, middlewareLogFormat } = require('./logger');
 
 const oauthHandlers = require('./oauthHandlers');
@@ -51,21 +51,24 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ]
 
-async function createIssuer(config) {
-  if (config.upstream_issuer_timeout_ms) {
-    Issuer.defaultHttpOptions = { timeout: config.upstream_issuer_timeout_ms };
+async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
+  if (upstream_issuer_timeout_ms) {
+    Issuer.defaultHttpOptions = { timeout: upstream_issuer_timeout_ms };
   }
-  return await Issuer.discover(config.upstream_issuer);
+  return await Issuer.discover(upstream_issuer);
 }
 
-function buildMetadataRewriteTable(config, appRoutes) {
+function buildMetadataRewriteTable(config, appRoutes, api_category) {
+  if (api_category === undefined) {
+    api_category = '';
+  }
   return {
-    authorization_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.authorize}`,
-    token_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.token}`,
-    userinfo_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.userinfo}`,
-    revocation_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.revoke}`,
-    introspection_endpoint: `${config.host}${config.well_known_base_path}${appRoutes.introspection}`,
-    jwks_uri: `${config.host}${config.well_known_base_path}${appRoutes.jwks}`,
+    authorization_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.authorize}`,
+    token_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.token}`,
+    userinfo_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.userinfo}`,
+    revocation_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.revoke}`,
+    introspection_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.introspection}`,
+    jwks_uri: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.jwks}`,
   };
 }
 
@@ -75,7 +78,7 @@ function filterProperty(object, property) {
   }
 }
 
-function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToken) {
+function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToken, isolatedIssuers, isolatedOktaClients) {
   const useSentry = config.sentry_dsn !== undefined && config.sentry_environment !== undefined;
   if (useSentry) {
     Sentry.init({
@@ -117,13 +120,17 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }).then((response) => {
       setProxyResponse(response, res)
     })
-    .catch(err => {
-      setProxyResponse(err.response, res)
-    })
+      .catch(err => {
+        setProxyResponse(err.response, res)
+      })
   };
 
   const { well_known_base_path } = config;
   const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
+
+  /**
+   * @deprecated - To be removed following AuthZ Server reorganization
+   */
   const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
 
   const app = express();
@@ -140,7 +147,7 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
   app.use(promBundle({
     includeMethod: true,
     includePath: true,
-    customLabels: {app: 'oauth_proxy'},
+    customLabels: { app: 'oauth_proxy' },
   }));
 
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -152,10 +159,13 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     optionsSuccessStatus: 200,
     preflightContinue: true,
   });
+
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.options('/.well-known/*', corsHandler);
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get('/.well-known/openid-configuration', corsHandler, (req, res) => {
-    const baseMetadata = {...issuer.metadata, ...metadataRewrite }
+    const baseMetadata = { ...issuer.metadata, ...metadataRewrite }
     const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
       meta[key] = baseMetadata[key];
       return meta;
@@ -164,41 +174,59 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     res.json(filteredMetadata);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.manage, (req, res) => {
     res.redirect(config.manage_endpoint);
   });
 
-  router.get(appRoutes.jwks, (req, res) => 
+  // @deprecated - To be removed following AuthZ Server reorganization
+  router.get(appRoutes.jwks, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET"));
 
-  router.get(appRoutes.userinfo, (req, res) => 
+  // @deprecated - To be removed following AuthZ Server reorganization
+  router.get(appRoutes.userinfo, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET"));
 
-  router.post(appRoutes.introspection, (req, res) => 
+  // @deprecated - To be removed following AuthZ Server reorganization
+  router.post(appRoutes.introspection, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.introspection_endpoint, "POST", querystring));
 
-  router.post(appRoutes.revoke, (req, res) =>  {
-    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring); 
+  // @deprecated - To be removed following AuthZ Server reorganization
+  router.post(appRoutes.revoke, (req, res) => {
+    proxyRequestToOkta(req, res, issuer.metadata.revocation_endpoint, "POST", querystring);
   });
-  
+
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers.redirectHandler(logger, dynamo, dynamoClient, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.get(appRoutes.authorize, async (req, res, next) => {
     await oauthHandlers.authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.post(appRoutes.token, async (req, res, next) => {
     await oauthHandlers.tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next)
-      .catch(next)
+      .catch(next);
   });
 
+  // @deprecated - To be removed following AuthZ Server reorganization
   router.delete(appRoutes.grants, async (req, res, next) => {
-    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next)
-  })
+    await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
+  });
+
+  if (config.routes && config.routes.categories) {
+    const app_routes = config.routes.app_routes;
+    Object.entries(config.routes.categories).forEach(
+      ([key, isolatedOktaConfig]) => {
+        const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
+        const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
+        buildMetadataForOpenIdConfiguration(isolatedOktaConfig.api_category, app_routes, service_issuer, okta_client);
+      });
+  }
 
   app.use(well_known_base_path, router);
 
@@ -229,15 +257,62 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
     }
   });
 
+  function buildMetadataForOpenIdConfiguration(api_category, app_routes, service_issuer, okta_client) {
+    var servicesMetadataRewrite = buildMetadataRewriteTable(config, app_routes, api_category);
+    router.get(api_category + '/.well-known/openid-configuration', corsHandler, (req, res) => {
+      const baseServiceMetadata = { ...service_issuer.metadata, ...servicesMetadataRewrite };
+      const filteredServiceMetadata = openidMetadataWhitelist.reduce((meta, key) => {
+        meta[key] = baseServiceMetadata[key];
+        return meta;
+      }, {});
+
+      res.json(filteredServiceMetadata);
+    });
+
+    router.get(api_category + app_routes.authorize, async (req, res, next) => {
+      await oauthHandlers.authorizeHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, okta_client, req, res, next)
+        .catch(next);
+    });
+
+    router.post(api_category + app_routes.token, async (req, res, next) => {
+      await oauthHandlers.tokenHandler(config, redirect_uri, logger, service_issuer, dynamo, dynamoClient, validateToken, req, res, next)
+        .catch(next);
+    });
+
+    router.get(api_category + app_routes.manage, (req, res) => res.redirect(config.manage_endpoint));
+    router.get(api_category + app_routes.jwks, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET"));
+    router.get(api_category + app_routes.userinfo, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.userinfo_endpoint, "GET"));
+    router.post(api_category + app_routes.introspection, (req, res) => proxyRequestToOkta(req, res, service_issuer.metadata.introspection_endpoint, "POST", querystring));
+
+    router.post(api_category + app_routes.revoke, (req, res) => {
+      proxyRequestToOkta(req, res, service_issuer.metadata.revocation_endpoint, "POST", querystring);
+    });
+
+    router.delete(api_category + app_routes.grants, async (req, res, next) => {
+      await oauthHandlers.revokeUserGrantHandler(config, req, res, next).catch(next);
+    });
+  }
+
   return app;
 }
-
-function startApp(config, issuer) {
+function startApp(config, issuer, isolatedIssuers) {
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
     requestExecutor: new okta.DefaultRequestExecutor()
   });
+
+  const isolatedOktaClients = {};
+  if (config.routes && config.routes.categories) {
+    Object.entries(config.routes.categories).forEach(
+      ([key, isolatedOktaConfig]) => {
+        isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
+          orgUrl: config.okta_url,
+          token: config.okta_token,
+          requestExecutor: new okta.DefaultRequestExecutor()
+        });
+      });
+  }
 
   const dynamoHandle = dynamoClient.createDynamoHandle(
     Object.assign({},
@@ -250,7 +325,7 @@ function startApp(config, issuer) {
   );
 
   const validateToken = configureTokenValidator(config.validate_endpoint, config.validate_apiKey);
-  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken);
+  const app = buildApp(config, issuer, oktaClient, dynamoHandle, dynamoClient, validateToken, isolatedIssuers, isolatedOktaClients);
   const env = app.get('env');
   const server = app.listen(config.port, () => {
     logger.info(`OAuth Proxy listening on port ${config.port} in ${env} mode!`, {
@@ -272,8 +347,14 @@ if (require.main === module) {
   (async () => {
     try {
       const config = processArgs();
-      const issuer = await createIssuer(config);
-      startApp(config, issuer);
+      const issuer = await createIssuer(config.upstream_issuer, config.upstream_issuer_timeout_ms);
+      const isolatedIssuers = {};
+      if (config.routes && config.routes.categories) {
+        for (const service_config of config.routes.categories) {
+          isolatedIssuers[service_config.api_category] = await createIssuer(service_config.upstream_issuer, config.upstream_issuer_timeout_ms);
+        }
+      }
+      startApp(config, issuer, isolatedIssuers);
     } catch (error) {
       logger.error("Could not start the OAuth proxy", error);
       process.exit(1);
