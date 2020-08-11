@@ -30,6 +30,7 @@
     "express-session": "^1.15.6",
     "jwt-decode": "^2.2.0",
     "morgan": "^1.9.1",
+    "node-cache": "^5.1.2",
     "openid-client": "^2.4.5",
     "prom-client": "^11.5.2",
     "uri-templates": "^0.2.0",

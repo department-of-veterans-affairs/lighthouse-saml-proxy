@@ -1,6 +1,7 @@
 const axios = require('axios');
 const uriTemplates = require('uri-templates');
 const URI = require('urijs');
+const { axiosCachingAdapter } = require('./axiosCachingAdapter')
 
 const deleteUserGrantOnClient = async (config, userId, clientId) => {
   let error;
@@ -71,7 +72,8 @@ const getAuthorizationServerInfo = async (config, authorizationServerId) => {
   await axios({
     method: "GET",
     url: template.fill({authorizationServerId: authorizationServerId}),
-    headers: {Authorization: "SSWS "+config.okta_token}
+    headers: {Authorization: "SSWS "+config.okta_token},
+    adapter: axiosCachingAdapter
   }).then(res => response = res.data)
   .catch(err => error = err)
 
