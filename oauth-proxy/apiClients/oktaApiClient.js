@@ -72,9 +72,8 @@ const getAuthorizationServerInfo = async (config, authorizationServerId) => {
     method: "GET",
     url: template.fill({authorizationServerId: authorizationServerId}),
     headers: {Authorization: "SSWS "+config.okta_token}
-  }).then(res => {
-    response = res.data})
-  .catch(err => {error = err})
+  }).then(res => response = res.data)
+  .catch(err => error = err)
 
   if(response == null){
     throw error;
