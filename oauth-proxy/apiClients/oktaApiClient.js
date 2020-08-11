@@ -64,4 +64,24 @@ const getClientInfo = async (config, clientId) => {
   return response;
 }
 
-module.exports = { deleteUserGrantOnClient, getUserInfo, getClientInfo };
+const getAuthorizationServerInfo = async (config, authorizationServerId) => {
+  let error;
+  let response;
+  const template = uriTemplates(config.okta_url+"api/v1/authorizationServers/{authorizationServerId}")
+
+  await axios({
+    method: "GET",
+    url: template.fill({authorizationServerId: authorizationServerId}),
+    headers: {Authorization: "SSWS "+config.okta_token}
+  }).then(res => {
+    response = res})
+  .catch(err => {error = err})
+
+  if(response == null){
+    throw error;
+  }
+
+  return response;
+}
+
+module.exports = { deleteUserGrantOnClient, getUserInfo, getClientInfo, getAuthorizationServerInfo };
