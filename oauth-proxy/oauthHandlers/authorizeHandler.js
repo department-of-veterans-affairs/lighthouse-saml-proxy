@@ -49,11 +49,11 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
 };
 
 const checkParameters = async (state, aud, config, issuer) => {
-  if(state == null || state == undefined) {
+  if(!state) {
     throw {status: 400, error: "invalid_request", error_description: "State parameter required"};
   }
 
-  if(aud != null && aud != undefined) {
+  if(aud) {
     let authorizationServerId = new URL(issuer.metadata.issuer).pathname.split('/').pop();
     let serverAudiences;
     
