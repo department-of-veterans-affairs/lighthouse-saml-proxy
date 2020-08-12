@@ -7,7 +7,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
   try{
-    await checkParameters(state, aud, config, issuer)
+    await checkParameters(state, aud, config, issuer);
   }catch(err) {
     res.status(err.status).json({
       error: err.error,
@@ -45,7 +45,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
     params.set('idp', config.idp);
   }
 
-  res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
+  res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`);
 };
 
 const checkParameters = async (state, aud, config, issuer) => {
@@ -59,7 +59,8 @@ const checkParameters = async (state, aud, config, issuer) => {
     
     await getAuthorizationServerInfo(config, authorizationServerId)
     .then(res => {
-      serverAudiences = res.audiences})
+      serverAudiences = res.audiences;
+    })
     .catch(() => {
       throw {status: 500, error: "internal_error"};
     });
