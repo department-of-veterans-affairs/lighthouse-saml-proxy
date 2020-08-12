@@ -5,7 +5,6 @@ const myCache = new NodeCache({useClones: false, stdTTL: 3600});
 const axiosCachingAdapter = (config) => {
     let response = myCache.get(config.url)
     if (response == undefined) {
-        console.log("not cached")
         return httpRequestAdapter(config)
     }
 
