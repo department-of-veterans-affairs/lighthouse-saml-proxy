@@ -1,12 +1,12 @@
 const axios = require('axios');
 const uriTemplates = require('uri-templates');
 const URI = require('urijs');
-const { axiosCachingAdapter } = require('./axiosCachingAdapter')
+const { axiosCachingAdapter } = require('./axiosCachingAdapter');
 
 const deleteUserGrantOnClient = async (config, userId, clientId) => {
   let error;
   let response;
-  const template = uriTemplates(config.okta_url+"/api/v1/users/{userid}/clients/{clientid}/grants")
+  const template = uriTemplates(config.okta_url+"/api/v1/users/{userid}/clients/{clientid}/grants");
   await axios({
       method: "DELETE",
       url: template.fill({userid: userId, clientid: clientId}),
@@ -24,8 +24,8 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
 
 const getUserInfo = async (config, email) => {
   let uri = URI(config.okta_url+"/api/v1/users");
-  let emailFilter = `profile.email eq "${email}"`
-  uri.search({filter: emailFilter})
+  let emailFilter = `profile.email eq "${email}"`;
+  uri.search({filter: emailFilter});
   
   let response;
   let error;
@@ -48,7 +48,7 @@ const getUserInfo = async (config, email) => {
 const getClientInfo = async (config, clientId) => {
   let error;
   let response;
-  const template = uriTemplates(config.okta_url+"/oauth2/v1/clients/{clientid}")
+  const template = uriTemplates(config.okta_url+"/oauth2/v1/clients/{clientid}");
 
   await axios({
     method: "GET",
@@ -68,7 +68,7 @@ const getClientInfo = async (config, clientId) => {
 const getAuthorizationServerInfo = async (config, authorizationServerId) => {
   let error;
   let response;
-  const template = uriTemplates(config.okta_url+"/api/v1/authorizationServers/{authorizationServerId}")
+  const template = uriTemplates(config.okta_url+"/api/v1/authorizationServers/{authorizationServerId}");
   await axios({
     method: "GET",
     url: template.fill({authorizationServerId: authorizationServerId}),
