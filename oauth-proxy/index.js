@@ -239,14 +239,12 @@ function buildApp(config, issuer, oktaClient, dynamo, dynamoClient, validateToke
         // Report 4xx and 5xx errors to sentry.
         // Including 4xx errors is a temporary change to get more insight
         // into errors reported by our users
-        console.log("Sentry error handler");
         return error.status >= 400
       }
     }));
   }
 
   app.use(function (err, req, res, next) {
-    console.log("Index error handler")
     logger.error(err);
 
     // If we have error and description as query params display them, otherwise go to the
