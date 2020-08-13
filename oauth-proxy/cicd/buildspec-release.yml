@@ -21,44 +21,44 @@ env:
 phases:
   pre_build:
     commands:
-    - echo Logging into ECR
-    - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
-    - echo Setting tag for new release...
-    # To get the new release version, we will increment the last version number found in Github
-    - NEW_RELEASE_TAG=$(increment.sh $(hub tag|grep '^fargate-oauth-proxy'|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
-    - slackpost.sh "Creating and tagging a new release for ${FRIENDLY_NAME}..."
-    - echo Creating release...
-    # We use the 'hub' command to create a release here with the contents of 'master'. If the command exits successfully, we then
-    # git fetch to get the new tag created, and we use that tag to get a commit SHA for the new release.
-    # This is a WORKAROUND to Codebuild not having the 'git_commit_sha' from the webhook available.
-    # We then tag the image using tag_containers.py, if that command is successful, we are done with this section.
-    # Failures are noted and notifications are made with links to the Codebuild job.
-    - |
-      if hub release create -m ${NEW_RELEASE_TAG} -t master ${NEW_RELEASE_TAG}; then
-        git fetch origin
-        if TAG_COMMIT_HASH=$(git rev-parse ${NEW_RELEASE_TAG}); then
-          echo Got hash for ${NEW_RELEASE_TAG}: ${TAG_COMMIT_HASH}
-        else
-          echo Failed to get hash for ${NEW_RELEASE_TAG}
-          exit 1
-        fi
-        echo Tagging ECR image...
-        CLEAN_TAG=$(echo "${NEW_RELEASE_TAG}"|awk -F"/" '{print $2}')
-        if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${CLEAN_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
-          slackpost.sh "Tagged ${REPOSITORY}:${CLEAN_TAG}"
+      - echo Logging into ECR
+      - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
+      - echo Setting tag for new release...
+      # To get the new release version, we will increment the last version number found in Github
+      - NEW_RELEASE_TAG=$(increment.sh $(hub tag|grep '^fargate-oauth-proxy'|sort --version-sort |tail -1)); export NEW_RELEASE_TAG
+      - slackpost.sh "Creating and tagging a new release for ${FRIENDLY_NAME}..."
+      - echo Creating release...
+      # We use the 'hub' command to create a release here with the contents of 'master'. If the command exits successfully, we then
+      # git fetch to get the new tag created, and we use that tag to get a commit SHA for the new release.
+      # This is a WORKAROUND to Codebuild not having the 'git_commit_sha' from the webhook available.
+      # We then tag the image using tag_containers.py, if that command is successful, we are done with this section.
+      # Failures are noted and notifications are made with links to the Codebuild job.
+      - |
+        if hub release create -m ${NEW_RELEASE_TAG} -t master ${NEW_RELEASE_TAG}; then
+          git fetch origin
+          if TAG_COMMIT_HASH=$(git rev-parse ${NEW_RELEASE_TAG}); then
+            echo Got hash for ${NEW_RELEASE_TAG}: ${TAG_COMMIT_HASH}
+          else
+            echo Failed to get hash for ${NEW_RELEASE_TAG}
+            exit 1
+          fi
+          echo Tagging ECR image...
+          CLEAN_TAG=$(echo "${NEW_RELEASE_TAG}"|awk -F"/" '{print $2}')
+          if python3 /usr/local/bin/tag_containers.py -n ${CI_JOB_NAME} -i ${TAG_COMMIT_HASH} -r ${REPOSITORY} -v ${CLEAN_TAG} -o ${CODEBUILD_SRC_DIR}/tag_output.txt; then
+            slackpost.sh "Tagged ${REPOSITORY}:${CLEAN_TAG}"
+          else
+            PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
+            BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
+            TAG_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/tag_output.txt)
+            slackpost.sh -d "$TAG_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Tagging failed."
+            exit 1
+          fi
         else
           PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
           BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
-          TAG_OUTPUT=$(cat ${CODEBUILD_SRC_DIR}/tag_output.txt)
-          slackpost.sh -d "$TAG_OUTPUT\n<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Tagging failed."
+          slackpost.sh -d "<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
           exit 1
         fi
-      else
-        PROJECT=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $1}')
-        BUILD=$(echo ${CODEBUILD_BUILD_ID}|awk -F":" '{print $2}')
-        slackpost.sh -d "<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>" "Release failed."
-        exit 1
-      fi
   build:
     commands:
       # We trigger the deploys here. The list of environments to automatically deploy to is placed at the end of the command below, separated
