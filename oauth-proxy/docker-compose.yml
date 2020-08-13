@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 services:
   dynamodb:
     image: amazon/dynamodb-local
@@ -8,7 +8,7 @@ services:
     image: node:alpine
     depends_on:
       - dynamodb
-    volumes: 
+    volumes:
       - .:/opt/
     command: sh -c "cd /opt && npm install && node dynamo_schema.js"
   oauth-proxy:
