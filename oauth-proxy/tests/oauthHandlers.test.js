@@ -17,6 +17,7 @@ jest.mock('../apiClients/oktaApiClient');
 const deleteUserGrantOnClientMock = oktaApiClient.deleteUserGrantOnClient;
 const getClientInfoMock = oktaApiClient.getClientInfo;
 const getUserInfoMock = oktaApiClient.getUserInfo;
+const getAuthorizationServerInfo = oktaApiClient.getAuthorizationServerInfo;
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
@@ -57,6 +58,7 @@ class FakeIssuer {
       }
     };
     this.metadata = {
+      issuer: "https://fake.okta.com/oauth2/1234",
       authorization_endpoint: "fake_enpoint"
     }
   }
@@ -146,6 +148,110 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
+let buildFakeGetAuthorizationServerInfoResponse = (audiences) => {
+  return {
+    "id": "id",
+    "name": "name",
+    "description": "description",
+    "audiences": audiences,
+    "issuer": "https://fake.okta.com/oauth2/1234",
+    "issuerMode": "ORG_URL",
+    "status": "ACTIVE",
+    "created": "2000-01-01T00:00:00.000Z",
+    "lastUpdated": "2000-01-01T00:00:00.000Z",
+    "credentials": {
+        "signing": {
+            "rotationMode": "AUTO",
+            "lastRotated": "2000-01-01T00:00:00.000Z",
+            "nextRotation": "2000-01-01T00:00:00.000Z",
+            "kid": "kid"
+        }
+    },
+    "_links": {
+        "rotateKey": {
+            "href": "https://fake.okta.com/oauth2/1234/keyRotate",
+            "hints": {
+                "allow": [
+                    "POST"
+                ]
+            }
+        },
+        "metadata": [
+            {
+                "name": "oauth-authorization-server",
+                "href": "https://fake.okta.com/oauth2/1234/.well-known/oauth-authorization-server",
+                "hints": {
+                    "allow": [
+                        "GET"
+                    ]
+                }
+            },
+            {
+                "name": "openid-configuration",
+                "href": "https://fake.okta.com/oauth2/1234/.well-known/openid-configuration",
+                "hints": {
+                    "allow": [
+                        "GET"
+                    ]
+                }
+            }
+        ],
+        "keys": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/credentials/keys",
+            "hints": {
+                "allow": [
+                    "GET"
+                ]
+            }
+        },
+        "claims": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/claims",
+            "hints": {
+                "allow": [
+                    "GET",
+                    "POST"
+                ]
+            }
+        },
+        "policies": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/policies",
+            "hints": {
+                "allow": [
+                    "GET",
+                    "POST"
+                ]
+            }
+        },
+        "self": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default",
+            "hints": {
+                "allow": [
+                    "GET",
+                    "DELETE",
+                    "PUT"
+                ]
+            }
+        },
+        "scopes": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/scopes",
+            "hints": {
+                "allow": [
+                    "GET",
+                    "POST"
+                ]
+            }
+        },
+        "deactivate": {
+            "href": "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/lifecycle/deactivate",
+            "hints": {
+                "allow": [
+                    "POST"
+                ]
+            }
+        }
+    }
+  }
+}
 let config;
 let redirect_uri;
 let issuer;
@@ -352,7 +458,13 @@ describe('tokenHandler', () => {
 describe('authorizeHandler', () => {
   afterEach(() => { });
 
+  beforeEach(() => {
+    getAuthorizationServerInfo.mockReset();
+  });
+
   it('Happy Path Redirect', async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"])
+    getAuthorizationServerInfo.mockResolvedValue(response);
     res = {
       redirect: jest.fn()
     }
@@ -365,6 +477,54 @@ describe('authorizeHandler', () => {
 
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
     expect(res.redirect).toHaveBeenCalled()
+  })
+
+  it('Happy Path Redirect with Aud parameter', async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn()
+    }
+
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "aud"
+    }
+
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.redirect).toHaveBeenCalled()
+  })
+
+  it('Aud parameter does not match API response, return 400', async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockResolvedValue(response);
+
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue"
+    }
+
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  })
+
+  it('getAuthorizationServerInfo Error, return 500', async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockRejectedValue({error: "fakeError"});
+
+    req.query = {
+      state: "fake_state", 
+      client_id: "clientId123", 
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue"
+    }
+
+    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
+    expect(res.statusCode).toEqual(500);
   })
 
   it('No state, returns 400', async () => {

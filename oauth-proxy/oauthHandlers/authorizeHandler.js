@@ -1,16 +1,19 @@
-const { URLSearchParams } = require('url');
+const { URLSearchParams, URL } = require('url');
 const { loginBegin } = require('../metrics');
+const { getAuthorizationServerInfo } = require('../apiClients/oktaApiClient');
 
 const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next) => {
   loginBegin.inc();
-  const { state, client_id, redirect_uri: client_redirect } = req.query;
+  const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
-  if(state == null) {
-    res.status(400).json({
-      error: "invalid_request",
-      error_description: "State parameter required",
+  try{
+    await checkParameters(state, aud, config, issuer);
+  }catch(err) {
+    res.status(err.status).json({
+      error: err.error,
+      error_description: err.error_description,
     })
-    return next()
+    return next();
   }
 
   try {
@@ -42,7 +45,30 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
     params.set('idp', config.idp);
   }
 
-  res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`)
+  res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`);
 };
+
+const checkParameters = async (state, aud, config, issuer) => {
+  if(!state) {
+    throw {status: 400, error: "invalid_request", error_description: "State parameter required"};
+  }
+
+  if(aud) {
+    let authorizationServerId = new URL(issuer.metadata.issuer).pathname.split('/').pop();
+    let serverAudiences;
+    
+    await getAuthorizationServerInfo(config, authorizationServerId)
+    .then(res => {
+      serverAudiences = res.audiences;
+    })
+    .catch(() => {
+      throw {status: 500, error: "internal_error"};
+    });
+
+    if(!serverAudiences.includes(aud)){
+      throw {status: 400, error: "invalid_request", error_description: "Invalid aud parameter"};
+    }
+  }
+}
 
 module.exports = authorizeHandler;
