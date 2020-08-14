@@ -19,7 +19,7 @@ EXPOSE 7100 7100
 HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
   CMD node bin/healthcheck.js
 
-CMD npm run-script lint
+run npm run-script lint
 
 USER node
 CMD ["node", "index.js"]
