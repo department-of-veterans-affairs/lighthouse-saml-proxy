@@ -197,7 +197,7 @@ function buildUpstreamOAuthTestApp() {
 			res
 				.status(400)
 				.send(
-					"invalid_request, unsupported type " + req.headers.content - type
+					"invalid_request, unsupported type " + req.headers["content-type"]
 				);
 		}
 
@@ -221,7 +221,7 @@ function buildUpstreamOAuthTestApp() {
 			res
 				.status(400)
 				.send(
-					"invalid_request, unsupported type " + req.headers.content - type
+					"invalid_request, unsupported type " + req.headers["content-type"]
 				);
 		}
 

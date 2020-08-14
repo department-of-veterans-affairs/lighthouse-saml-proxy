@@ -1,4 +1,3 @@
-const axios = require("axios");
 const {
 	deleteUserGrantOnClient,
 	getUserInfo,
@@ -63,6 +62,7 @@ const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
 };
 
 const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
+	let retValue;
 	await deleteUserGrantOnClient(config, userId, clientId)
 		.then((response) => {
 			retValue = {

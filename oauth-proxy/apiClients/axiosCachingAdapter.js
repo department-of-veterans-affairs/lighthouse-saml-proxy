@@ -8,7 +8,7 @@ const axiosCachingAdapter = (config) => {
 		return httpRequestAdapter(config);
 	}
 
-	return new Promise((resolve, reject) => resolve(response));
+	return new Promise((resolve) => resolve(response));
 };
 
 const httpRequestAdapter = (config) => {
