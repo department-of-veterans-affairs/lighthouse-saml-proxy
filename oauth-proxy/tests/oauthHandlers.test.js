@@ -268,7 +268,7 @@ beforeEach(() => {
   config = jest.mock();
   redirect_uri = jest.mock();
   issuer = jest.mock();
-  logger = { error: jest.fn(), info: jest.fn() };
+  logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   validateToken = jest.fn();
@@ -513,11 +513,11 @@ describe('authorizeHandler', () => {
     }
 
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(logger.info).toHaveBeenCalledWith("Client included invalid audience parameter.");
+    expect(logger.warn).toHaveBeenCalledWith("Client included invalid audience parameter.");
     expect(res.redirect).toHaveBeenCalled()
   })
 
-  it('getAuthorizationServerInfo Error, redirect -> until we implement', async () => {
+  it('getAuthorizationServerInfo Error, return 500', async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfo.mockRejectedValue({error: "fakeError"});
 
@@ -528,13 +528,8 @@ describe('authorizeHandler', () => {
       aud: "notAPIValue"
     }
 
-    res = {
-      redirect: jest.fn()
-    }
-    
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(logger.info).toHaveBeenCalledWith("Error retrieving audiences from okta.");
-    expect(res.redirect).toHaveBeenCalled()
+    expect(res.statusCode).toEqual(500);
   })
 
   it('No state, returns 400', async () => {
