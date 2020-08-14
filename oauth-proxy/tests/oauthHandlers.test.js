@@ -15,7 +15,7 @@ const {
 	revokeUserGrantHandler,
 } = require("../oauthHandlers");
 const { translateTokenSet } = require("../oauthHandlers/tokenResponse");
-const { encodeBasicAuthHeader, rethrowIfRuntimeError } = require("../utils");
+const { encodeBasicAuthHeader } = require("../utils");
 const { convertObjectToDynamoAttributeValues } = require("./testUtils");
 const oktaApiClient = require("../apiClients/oktaApiClient");
 jest.mock("../apiClients/oktaApiClient");
@@ -26,8 +26,8 @@ const getAuthorizationServerInfo = oktaApiClient.getAuthorizationServerInfo;
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
 	const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-	dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
-		return new Promise((resolve, reject) => {
+	dynamoClient.saveToDynamo.mockImplementation((state) => {
+		return new Promise((resolve) => {
 			// It's unclear whether this should resolve with a full records or just
 			// the identity field but thus far it has been irrelevant to the
 			// functional testing of the oauth-proxy.
@@ -60,7 +60,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
 class FakeIssuer {
 	constructor(client) {
 		this.Client = class FakeInlineClient {
-			constructor(_) {
+			constructor() {
 				return client;
 			}
 		};
@@ -119,7 +119,7 @@ describe("translateTokenSet", () => {
 let buildOpenIDClient = (fns) => {
 	let client = {};
 	for (let [fn_name, fn_impl] of Object.entries(fns)) {
-		client[fn_name] = jest.fn().mockImplementation(async (_) => {
+		client[fn_name] = jest.fn().mockImplementation(async () => {
 			return new Promise((resolve, reject) => {
 				fn_impl(resolve, reject);
 			});
@@ -130,7 +130,7 @@ let buildOpenIDClient = (fns) => {
 
 let buildExpiredRefreshTokenClient = () => {
 	return buildOpenIDClient({
-		refresh: (_resolve, _reject) => {
+		refresh: () => {
 			// This simulates an upstream error so that we don't have to test the full handler.
 			throw new RequestError(
 				new Error(
@@ -641,7 +641,6 @@ describe("authorizeHandler", () => {
 	});
 
 	it("getAuthorizationServerInfo Error, return 500", async () => {
-		let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
 		getAuthorizationServerInfo.mockRejectedValue({ error: "fakeError" });
 
 		req.query = {
