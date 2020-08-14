@@ -9,10 +9,10 @@ const { RequestError } = require("request-promise-native/errors");
 const timekeeper = require("timekeeper");
 
 const {
-	tokenHandler,
-	authorizeHandler,
-	redirectHandler,
-	revokeUserGrantHandler,
+  tokenHandler,
+  authorizeHandler,
+  redirectHandler,
+  revokeUserGrantHandler,
 } = require("../oauthHandlers");
 const { translateTokenSet } = require("../oauthHandlers/tokenResponse");
 const { encodeBasicAuthHeader } = require("../utils");
@@ -25,226 +25,226 @@ const getUserInfoMock = oktaApiClient.getUserInfo;
 const getAuthorizationServerInfo = oktaApiClient.getAuthorizationServerInfo;
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
-	const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-	dynamoClient.saveToDynamo.mockImplementation((state) => {
-		return new Promise((resolve) => {
-			// It's unclear whether this should resolve with a full records or just
-			// the identity field but thus far it has been irrelevant to the
-			// functional testing of the oauth-proxy.
-			resolve({ pk: state });
-		});
-	});
-	dynamoClient.getFromDynamoBySecondary.mockImplementation(
-		(handle, attr, value) => {
-			return new Promise((resolve, reject) => {
-				if (fakeDynamoRecord[attr] === value) {
-					resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-				} else {
-					reject(`no such ${attr} value`);
-				}
-			});
-		}
-	);
-	dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
-		return new Promise((resolve, reject) => {
-			if (state === fakeDynamoRecord.state) {
-				resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-			} else {
-				reject("no such state value");
-			}
-		});
-	});
-	return dynamoClient;
+  const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
+  dynamoClient.saveToDynamo.mockImplementation((state) => {
+    return new Promise((resolve) => {
+      // It's unclear whether this should resolve with a full records or just
+      // the identity field but thus far it has been irrelevant to the
+      // functional testing of the oauth-proxy.
+      resolve({ pk: state });
+    });
+  });
+  dynamoClient.getFromDynamoBySecondary.mockImplementation(
+    (handle, attr, value) => {
+      return new Promise((resolve, reject) => {
+        if (fakeDynamoRecord[attr] === value) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such ${attr} value`);
+        }
+      });
+    }
+  );
+  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
+    return new Promise((resolve, reject) => {
+      if (state === fakeDynamoRecord.state) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject("no such state value");
+      }
+    });
+  });
+  return dynamoClient;
 }
 
 class FakeIssuer {
-	constructor(client) {
-		this.Client = class FakeInlineClient {
-			constructor() {
-				return client;
-			}
-		};
-		this.metadata = {
-			issuer: "https://fake.okta.com/oauth2/1234",
-			authorization_endpoint: "fake_enpoint",
-		};
-	}
+  constructor(client) {
+    this.Client = class FakeInlineClient {
+      constructor() {
+        return client;
+      }
+    };
+    this.metadata = {
+      issuer: "https://fake.okta.com/oauth2/1234",
+      authorization_endpoint: "fake_enpoint",
+    };
+  }
 }
 
 describe("translateTokenSet", () => {
-	it("omits id_token if not in TokenSet", async () => {
-		const oauth_only_set = new TokenSet({
-			access_token: "oauth.is.cool",
-			refresh_token: "refresh.later",
-			expires_in: 3600,
-		});
-		const translated = translateTokenSet(oauth_only_set);
-		expect(translated).not.toHaveProperty("id_token");
-	});
+  it("omits id_token if not in TokenSet", async () => {
+    const oauth_only_set = new TokenSet({
+      access_token: "oauth.is.cool",
+      refresh_token: "refresh.later",
+      expires_in: 3600,
+    });
+    const translated = translateTokenSet(oauth_only_set);
+    expect(translated).not.toHaveProperty("id_token");
+  });
 
-	it("copies id_token for OIDC", async () => {
-		const fake_id_token = "oidc.is.cool";
-		const oidc_set = new TokenSet({
-			access_token: "oauth.is.cool",
-			refresh_token: "refresh.later",
-			id_token: fake_id_token,
-			expires_in: 3600,
-		});
+  it("copies id_token for OIDC", async () => {
+    const fake_id_token = "oidc.is.cool";
+    const oidc_set = new TokenSet({
+      access_token: "oauth.is.cool",
+      refresh_token: "refresh.later",
+      id_token: fake_id_token,
+      expires_in: 3600,
+    });
 
-		const translated = translateTokenSet(oidc_set);
-		expect(translated).toHaveProperty("id_token");
-		expect(translated.id_token).toEqual(fake_id_token);
-	});
+    const translated = translateTokenSet(oidc_set);
+    expect(translated).toHaveProperty("id_token");
+    expect(translated.id_token).toEqual(fake_id_token);
+  });
 
-	it("translates absolute timestamps to relative timestamps", async () => {
-		try {
-			timekeeper.freeze(Date.now());
-			const abs_oauth_set = new TokenSet({
-				access_token: "oauth.is.cool",
-				refresh_token: "refresh.later",
-				expires_in: 7200,
-			});
-			const now_sec = Math.floor(Date.now() / 1000);
-			expect(abs_oauth_set.expires_at - now_sec).toEqual(7200);
+  it("translates absolute timestamps to relative timestamps", async () => {
+    try {
+      timekeeper.freeze(Date.now());
+      const abs_oauth_set = new TokenSet({
+        access_token: "oauth.is.cool",
+        refresh_token: "refresh.later",
+        expires_in: 7200,
+      });
+      const now_sec = Math.floor(Date.now() / 1000);
+      expect(abs_oauth_set.expires_at - now_sec).toEqual(7200);
 
-			const translated = translateTokenSet(abs_oauth_set);
-			expect(translated).toHaveProperty("expires_in");
-			expect(translated.expires_in).toEqual(7200);
-		} finally {
-			timekeeper.reset();
-		}
-	});
+      const translated = translateTokenSet(abs_oauth_set);
+      expect(translated).toHaveProperty("expires_in");
+      expect(translated.expires_in).toEqual(7200);
+    } finally {
+      timekeeper.reset();
+    }
+  });
 });
 
 let buildOpenIDClient = (fns) => {
-	let client = {};
-	for (let [fn_name, fn_impl] of Object.entries(fns)) {
-		client[fn_name] = jest.fn().mockImplementation(async () => {
-			return new Promise((resolve, reject) => {
-				fn_impl(resolve, reject);
-			});
-		});
-	}
-	return client;
+  let client = {};
+  for (let [fn_name, fn_impl] of Object.entries(fns)) {
+    client[fn_name] = jest.fn().mockImplementation(async () => {
+      return new Promise((resolve, reject) => {
+        fn_impl(resolve, reject);
+      });
+    });
+  }
+  return client;
 };
 
 let buildExpiredRefreshTokenClient = () => {
-	return buildOpenIDClient({
-		refresh: () => {
-			// This simulates an upstream error so that we don't have to test the full handler.
-			throw new RequestError(
-				new Error(
-					"simulated upstream response error for expired refresh token"
-				),
-				{},
-				{ statusCode: 400 }
-			);
-		},
-	});
+  return buildOpenIDClient({
+    refresh: () => {
+      // This simulates an upstream error so that we don't have to test the full handler.
+      throw new RequestError(
+        new Error(
+          "simulated upstream response error for expired refresh token"
+        ),
+        {},
+        { statusCode: 400 }
+      );
+    },
+  });
 };
 
 function buildFakeOktaClient(fakeRecord) {
-	const oktaClient = { getApplication: jest.fn() };
-	oktaClient.getApplication.mockImplementation((client_id) => {
-		return new Promise((resolve, reject) => {
-			if (client_id === fakeRecord.client_id) {
-				resolve(fakeRecord);
-			} else {
-				reject(`no such client application '${client_id}'`);
-			}
-		});
-	});
-	return oktaClient;
+  const oktaClient = { getApplication: jest.fn() };
+  oktaClient.getApplication.mockImplementation((client_id) => {
+    return new Promise((resolve, reject) => {
+      if (client_id === fakeRecord.client_id) {
+        resolve(fakeRecord);
+      } else {
+        reject(`no such client application '${client_id}'`);
+      }
+    });
+  });
+  return oktaClient;
 }
 
 let buildFakeGetAuthorizationServerInfoResponse = (audiences) => {
-	return {
-		id: "id",
-		name: "name",
-		description: "description",
-		audiences: audiences,
-		issuer: "https://fake.okta.com/oauth2/1234",
-		issuerMode: "ORG_URL",
-		status: "ACTIVE",
-		created: "2000-01-01T00:00:00.000Z",
-		lastUpdated: "2000-01-01T00:00:00.000Z",
-		credentials: {
-			signing: {
-				rotationMode: "AUTO",
-				lastRotated: "2000-01-01T00:00:00.000Z",
-				nextRotation: "2000-01-01T00:00:00.000Z",
-				kid: "kid",
-			},
-		},
-		_links: {
-			rotateKey: {
-				href: "https://fake.okta.com/oauth2/1234/keyRotate",
-				hints: {
-					allow: ["POST"],
-				},
-			},
-			metadata: [
-				{
-					name: "oauth-authorization-server",
-					href:
-						"https://fake.okta.com/oauth2/1234/.well-known/oauth-authorization-server",
-					hints: {
-						allow: ["GET"],
-					},
-				},
-				{
-					name: "openid-configuration",
-					href:
-						"https://fake.okta.com/oauth2/1234/.well-known/openid-configuration",
-					hints: {
-						allow: ["GET"],
-					},
-				},
-			],
-			keys: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/credentials/keys",
-				hints: {
-					allow: ["GET"],
-				},
-			},
-			claims: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/claims",
-				hints: {
-					allow: ["GET", "POST"],
-				},
-			},
-			policies: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/policies",
-				hints: {
-					allow: ["GET", "POST"],
-				},
-			},
-			self: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default",
-				hints: {
-					allow: ["GET", "DELETE", "PUT"],
-				},
-			},
-			scopes: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/scopes",
-				hints: {
-					allow: ["GET", "POST"],
-				},
-			},
-			deactivate: {
-				href:
-					"https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/lifecycle/deactivate",
-				hints: {
-					allow: ["POST"],
-				},
-			},
-		},
-	};
+  return {
+    id: "id",
+    name: "name",
+    description: "description",
+    audiences: audiences,
+    issuer: "https://fake.okta.com/oauth2/1234",
+    issuerMode: "ORG_URL",
+    status: "ACTIVE",
+    created: "2000-01-01T00:00:00.000Z",
+    lastUpdated: "2000-01-01T00:00:00.000Z",
+    credentials: {
+      signing: {
+        rotationMode: "AUTO",
+        lastRotated: "2000-01-01T00:00:00.000Z",
+        nextRotation: "2000-01-01T00:00:00.000Z",
+        kid: "kid",
+      },
+    },
+    _links: {
+      rotateKey: {
+        href: "https://fake.okta.com/oauth2/1234/keyRotate",
+        hints: {
+          allow: ["POST"],
+        },
+      },
+      metadata: [
+        {
+          name: "oauth-authorization-server",
+          href:
+            "https://fake.okta.com/oauth2/1234/.well-known/oauth-authorization-server",
+          hints: {
+            allow: ["GET"],
+          },
+        },
+        {
+          name: "openid-configuration",
+          href:
+            "https://fake.okta.com/oauth2/1234/.well-known/openid-configuration",
+          hints: {
+            allow: ["GET"],
+          },
+        },
+      ],
+      keys: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/credentials/keys",
+        hints: {
+          allow: ["GET"],
+        },
+      },
+      claims: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/claims",
+        hints: {
+          allow: ["GET", "POST"],
+        },
+      },
+      policies: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/policies",
+        hints: {
+          allow: ["GET", "POST"],
+        },
+      },
+      self: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default",
+        hints: {
+          allow: ["GET", "DELETE", "PUT"],
+        },
+      },
+      scopes: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/scopes",
+        hints: {
+          allow: ["GET", "POST"],
+        },
+      },
+      deactivate: {
+        href:
+          "https://fake.okta.com/oauth2/1234/api/v1/authorizationServers/default/lifecycle/deactivate",
+        hints: {
+          allow: ["POST"],
+        },
+      },
+    },
+  };
 };
 let config;
 let redirect_uri;
@@ -551,206 +551,208 @@ describe('authorizeHandler', () => {
 });
 
 describe("authorizeHandler", () => {
-	afterEach(() => {});
+  afterEach(() => {});
 
-	beforeEach(() => {
-		getAuthorizationServerInfo.mockReset();
-	});
+  beforeEach(() => {
+    getAuthorizationServerInfo.mockReset();
+  });
 
-	it("Happy Path Redirect", async () => {
-		let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-		getAuthorizationServerInfo.mockResolvedValue(response);
-		res = {
-			redirect: jest.fn(),
-		};
+  it("Happy Path Redirect", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
 
-		req.query = {
-			state: "fake_state",
-			client_id: "clientId123",
-			redirect_uri: "http://localhost:8080/oauth/redirect",
-		};
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
 
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.redirect).toHaveBeenCalled();
-	});
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
 
-	it("Happy Path Redirect with Aud parameter", async () => {
-		let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-		getAuthorizationServerInfo.mockResolvedValue(response);
-		res = {
-			redirect: jest.fn(),
-		};
+  it("Happy Path Redirect with Aud parameter", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
 
-		req.query = {
-			state: "fake_state",
-			client_id: "clientId123",
-			redirect_uri: "http://localhost:8080/oauth/redirect",
-			aud: "aud",
-		};
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "aud",
+    };
 
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.redirect).toHaveBeenCalled();
-	});
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
 
-	it("Aud parameter does not match API response, return 400", async () => {
-		let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-		getAuthorizationServerInfo.mockResolvedValue(response);
+  it("Aud parameter does not match API response, return 400", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfo.mockResolvedValue(response);
 
-		req.query = {
-			state: "fake_state",
-			client_id: "clientId123",
-			redirect_uri: "http://localhost:8080/oauth/redirect",
-			aud: "notAPIValue",
-		};
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue",
+    };
 
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.statusCode).toEqual(400);
-	});
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
 
-	it("getAuthorizationServerInfo Error, return 500", async () => {
-		getAuthorizationServerInfo.mockRejectedValue({ error: "fakeError" });
+  it("getAuthorizationServerInfo Error, return 500", async () => {
+    getAuthorizationServerInfo.mockRejectedValue({ error: "fakeError" });
 
-		req.query = {
-			state: "fake_state",
-			client_id: "clientId123",
-			redirect_uri: "http://localhost:8080/oauth/redirect",
-			aud: "notAPIValue",
-		};
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue",
+    };
 
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.statusCode).toEqual(500);
-	});
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(500);
+  });
 
-	it("No state, returns 400", async () => {
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.statusCode).toEqual(400);
-	});
+  it("No state, returns 400", async () => {
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
 
-	it("State is empty, returns 400", async () => {
-		req.query = { state: null };
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.statusCode).toEqual(400);
-	});
+  it("State is empty, returns 400", async () => {
+    req.query = { state: null };
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
 
-	it("Bad redirect_uri", async () => {
-		req.query = {
-			state: "fake_state",
-			client_id: "clientId123",
-			redirect_uri: "https://www.google.com",
-		};
+  it("Bad redirect_uri", async () => {
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "https://www.google.com",
+    };
 
-		await authorizeHandler(
-			config,
-			redirect_uri,
-			logger,
-			issuer,
-			dynamo,
-			dynamoClient,
-			oktaClient,
-			req,
-			res,
-			next
-		);
-		expect(res.statusCode).toEqual(400);
-	});
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
 });
 
 describe("redirectHandler", () => {
-	afterEach(() => {});
+  afterEach(() => {});
 
-	it("Happy Path Redirect", async () => {
-		res = {
-			redirect: jest.fn(),
-		};
+  it("Happy Path Redirect", async () => {
+    res = {
+      redirect: jest.fn(),
+    };
 
-		req.query = {
-			state: "abc123",
-		};
+    req.query = {
+      state: "abc123",
+    };
 
-		await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
-		expect(res.redirect).toHaveBeenCalled();
-	});
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.redirect).toHaveBeenCalled();
+  });
 
-	it("No state, returns 400", async () => {
-		await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
-		expect(res.statusCode).toEqual(400);
-	});
+  it("No state, returns 400", async () => {
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
 
-	it("State is empty, returns 400", async () => {
-		req.query = { state: null };
-		await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
-		expect(res.statusCode).toEqual(400);
-	});
+  it("State is empty, returns 400", async () => {
+    req.query = { state: null };
+    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
 });
 
-describe('revokeUserGrantHandler', () => {
-  afterEach(() => { jest.unmock('../apiClients/oktaApiClient');});
+describe("revokeUserGrantHandler", () => {
+  afterEach(() => {
+    jest.unmock("../apiClients/oktaApiClient");
+  });
   let res;
   let req;
   let config;
@@ -759,7 +761,7 @@ describe('revokeUserGrantHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     config = {
-      "enable_okta_consent_endpoint": true
+      enable_okta_consent_endpoint: true,
     };
     next = jest.fn();
     req = new MockExpressRequest();
@@ -767,85 +769,87 @@ describe('revokeUserGrantHandler', () => {
     deleteUserGrantOnClientMock.mockReset();
     getClientInfoMock.mockReset();
     getUserInfoMock.mockReset();
-  })  
+  });
 
-  it('Happy Path', async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
-    getUserInfoMock.mockResolvedValue({"data": [{id: "id1"}, {id: "id2"}]});
-    req.body = {client_id: 'clientid123', email: 'email@example.com'}
+  it("Happy Path", async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserInfoMock.mockResolvedValue({ data: [{ id: "id1" }, { id: "id2" }] });
+    req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(200);
-  })
+  });
 
-  it('Revoke Grants Turned Off', async () => {
+  it("Revoke Grants Turned Off", async () => {
     config = {
-      "enable_okta_consent_endpoint": false
+      enable_okta_consent_endpoint: false,
     };
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200})
-    req.body = {client_id: 'clientid123', user_id: 'userid123'}
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    req.body = { client_id: "clientid123", user_id: "userid123" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(403);
-  })
+  });
 
-  it('Client Id Empty', async () => {
-    req.body = {client_id: '', user_id: 'userid123'}
+  it("Client Id Empty", async () => {
+    req.body = { client_id: "", user_id: "userid123" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Email Empty', async () => {
-    req.body = {client_id: 'clientid123', email: ''}
+  it("Email Empty", async () => {
+    req.body = { client_id: "clientid123", email: "" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Client Id Null', async () => {
-    req.body = {user_id: 'userid123'}
+  it("Client Id Null", async () => {
+    req.body = { user_id: "userid123" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Email Null', async () => {
-    req.body = {client_id: 'clientid123'}
+  it("Email Null", async () => {
+    req.body = { client_id: "clientid123" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Invalid Client Id', async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
-    getUserInfoMock.mockResolvedValue({"data": [{id: "id1"}, {id: "id2"}]});
-    req.body = {client_id: 'clientid123!', email: 'email@example.com'}
+  it("Invalid Client Id", async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserInfoMock.mockResolvedValue({ data: [{ id: "id1" }, { id: "id2" }] });
+    req.body = { client_id: "clientid123!", email: "email@example.com" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('No User Ids associated with Email', async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
-    getUserInfoMock.mockResolvedValue({"data": []});
-    req.body = {client_id: 'clientid123', email: 'email@example.com'}
+  it("No User Ids associated with Email", async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserInfoMock.mockResolvedValue({ data: [] });
+    req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Invalid Email', async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
-    getUserInfoMock.mockResolvedValue({"data": [{id: "id1"}, {id: "id2"}]});
-    req.body = {client_id: 'clientid123', email: 'email@example'}
+  it("Invalid Email", async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserInfoMock.mockResolvedValue({ data: [{ id: "id1" }, { id: "id2" }] });
+    req.body = { client_id: "clientid123", email: "email@example" };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
+  });
 
-  it('Email with additional filtering', async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({status: 200});
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
-    getUserInfoMock.mockResolvedValue({"data": [{id: "id1"}, {id: "id2"}]});
-    req.body = {client_id: 'clientid123', email: 'email@example.com or firstName eq "John"'}
+  it("Email with additional filtering", async () => {
+    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserInfoMock.mockResolvedValue({ data: [{ id: "id1" }, { id: "id2" }] });
+    req.body = {
+      client_id: "clientid123",
+      email: 'email@example.com or firstName eq "John"',
+    };
     await revokeUserGrantHandler(config, req, res, next);
     expect(res.statusCode).toEqual(400);
-  })
-
+  });
 });
