@@ -62,17 +62,12 @@ const checkParameters = async (state, aud, config, issuer, logger) => {
       serverAudiences = res.audiences;
     })
     .catch(() => {
-      /* throw {status: 500, error: "internal_error"};*/
-      logger.info("Error retrieving audiences from okta.");
+      throw {status: 500, error: "internal_error"};
     });
-
-    if(!serverAudiences){
-      return;
-    }
 
     if(!serverAudiences.includes(aud)){
       /* throw {status: 400, error: "invalid_request", error_description: "Invalid aud parameter"};*/
-      logger.info("Client included invalid audience parameter.")
+      logger.warn("Client included invalid audience parameter.")
     }
   }
 }
