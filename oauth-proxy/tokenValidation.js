@@ -8,27 +8,27 @@ const axios = require("axios");
 // directly. See configureTokenValidator below for a friendlier version.
 
 const validateToken = async (endpoint, api_key, access_token) => {
-	const validateTokenStart = process.hrtime.bigint();
-	const config = {
-		headers: {
-			apiKey: api_key,
-			authorization: `Bearer ${access_token}`,
-		},
-	};
-	const response = await axios.get(endpoint, config);
-	stopTimer(validationGauge, validateTokenStart);
-	return response.data.data.attributes;
+  const validateTokenStart = process.hrtime.bigint();
+  const config = {
+    headers: {
+      apiKey: api_key,
+      authorization: `Bearer ${access_token}`,
+    },
+  };
+  const response = await axios.get(endpoint, config);
+  stopTimer(validationGauge, validateTokenStart);
+  return response.data.data.attributes;
 };
 
 // Returns a function that calls validateToken with the given configuration
 // parameters.
 const configureTokenValidator = (endpoint, api_key) => {
-	return (access_token) => {
-		return validateToken(endpoint, api_key, access_token);
-	};
+  return (access_token) => {
+    return validateToken(endpoint, api_key, access_token);
+  };
 };
 
 module.exports = {
-	validateToken: validateToken,
-	configureTokenValidator: configureTokenValidator,
+  validateToken: validateToken,
+  configureTokenValidator: configureTokenValidator,
 };
