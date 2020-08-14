@@ -72,8 +72,8 @@ function buildFakeOktaClient(fakeRecord) {
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
 	const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-	dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
-		return new Promise((resolve, reject) => {
+	dynamoClient.saveToDynamo.mockImplementation((state) => {
+		return new Promise((resolve) => {
 			// It's unclear whether this should resolve with a full records or just
 			// the identity field but thus far it has been irrelevant to the
 			// functional testing of the oauth-proxy.
@@ -144,7 +144,7 @@ describe("OpenID Connect Conformance", () => {
 		});
 		dynamoHandle = jest.mock();
 
-		const fakeTokenValidator = (access_token) => {
+		const fakeTokenValidator = () => {
 			return {
 				va_identifiers: {
 					icn: "0000000000000",
@@ -402,7 +402,7 @@ describe("OpenID Connect Conformance", () => {
 	});
 
 	it("returns an OIDC conformant status 200 on token introspection", async () => {
-		const resp = await axios
+		await axios
 			.post(
 				"http://localhost:9090/testServer/introspect",
 				qs.stringify({ token: "token", token_type_hint: "access_token" }),
@@ -416,15 +416,15 @@ describe("OpenID Connect Conformance", () => {
 			)
 			.then((resp) => {
 				expect(resp.status).toEqual(200);
-				expect(data.username).toEqual("cfa32244569841a090ad9d2f0524cf38");
+				expect(resp.data.username).toEqual("john.doe@example.com");
 			})
-			.catch((err) => {
-				// Handle Error Here
+			.catch(() => {
+				expect(true).toEqual(false);
 			});
 	});
 
 	it("returns an OIDC conformant status 200 on token introspection for the api category isolated endpoint", async () => {
-		const resp = await axios
+		await axios
 			.post(
 				"http://localhost:9090/testServer/veteran-verification-apis/v1/introspect",
 				qs.stringify({ token: "token", token_type_hint: "access_token" }),
@@ -438,15 +438,15 @@ describe("OpenID Connect Conformance", () => {
 			)
 			.then((resp) => {
 				expect(resp.status).toEqual(200);
-				expect(data.username).toEqual("cfa32244569841a090ad9d2f0524cf38");
+				expect(resp.data.username).toEqual("john.doe@example.com");
 			})
-			.catch((err) => {
-				// Handle Error Here
+			.catch(() => {
+				expect(true).toEqual(false);
 			});
 	});
 
 	it("returns an OIDC conformant status 200 on token revocation", async () => {
-		const resp = await axios
+		await axios
 			.post(
 				"http://localhost:9090/testServer/revoke",
 				qs.stringify({ token: "token", token_type_hint: "access_token" }),
@@ -461,13 +461,13 @@ describe("OpenID Connect Conformance", () => {
 			.then((resp) => {
 				expect(resp.status).toEqual(200);
 			})
-			.catch((err) => {
-				// Handle Error
+			.catch(() => {
+				expect(true).toEqual(false);
 			});
 	});
 
 	it("returns an OIDC conformant status 200 on token revocation for the api category isolated endpoint", async () => {
-		const resp = await axios
+		await axios
 			.post(
 				"http://localhost:9090/testServer/veteran-verification-apis/v1/revoke",
 				qs.stringify({ token: "token", token_type_hint: "access_token" }),
@@ -482,8 +482,8 @@ describe("OpenID Connect Conformance", () => {
 			.then((resp) => {
 				expect(resp.status).toEqual(200);
 			})
-			.catch((err) => {
-				// Handle Error
+			.catch(() => {
+				expect(true).toEqual(false);
 			});
 	});
 
@@ -498,7 +498,7 @@ describe("OpenID Connect Conformance", () => {
 					},
 				}
 			)
-			.then((resp) => {
+			.then(() => {
 				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
@@ -519,7 +519,7 @@ describe("OpenID Connect Conformance", () => {
 					},
 				}
 			)
-			.then((resp) => {
+			.then(() => {
 				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
@@ -542,7 +542,7 @@ describe("OpenID Connect Conformance", () => {
 					auth: { username: "clientId123", password: "secretXyz" },
 				}
 			)
-			.then((resp) => {
+			.then(() => {
 				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
@@ -565,7 +565,7 @@ describe("OpenID Connect Conformance", () => {
 					auth: { username: "clientId123", password: "secretXyz" },
 				}
 			)
-			.then((resp) => {
+			.then(() => {
 				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
@@ -589,8 +589,8 @@ describe("OpenID Connect Conformance", () => {
 					auth: { username: "clientId123", password: "secretXyz" },
 				}
 			)
-			.then((resp) => {
-				expect(false); // Don't expect to be here
+			.then(() => {
+				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
 				// Handle Error Here
@@ -612,8 +612,8 @@ describe("OpenID Connect Conformance", () => {
 					auth: { username: "clientId123", password: "secretXyz" },
 				}
 			)
-			.then((resp) => {
-				expect(false); // Don't expect to be here
+			.then(() => {
+				expect(true).toEqual(false); // Don't expect to be here
 			})
 			.catch((err) => {
 				// Handle Error Here
@@ -628,8 +628,7 @@ describe("OpenID Connect Conformance", () => {
 				expect(resp.status).toEqual(200);
 				expect(resp.data).toEqual("acls updated");
 			})
-			.catch((err) => {
-				console.info(err);
+			.catch(() => {
 				expect(true).toEqual(false);
 			});
 	});
@@ -643,8 +642,7 @@ describe("OpenID Connect Conformance", () => {
 				expect(resp.status).toEqual(200);
 				expect(resp.data).toEqual("acls updated");
 			})
-			.catch((err) => {
-				console.info(err);
+			.catch(() => {
 				expect(true).toEqual(false);
 			});
 	});
