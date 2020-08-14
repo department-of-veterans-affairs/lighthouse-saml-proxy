@@ -24,7 +24,7 @@ const redirectHandler = async (
 			await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
 		} catch (error) {
 			logger.error(
-				`Failed to save authorization code in redirect handler`,
+				"Failed to save authorization code in redirect handler",
 				error
 			);
 		}

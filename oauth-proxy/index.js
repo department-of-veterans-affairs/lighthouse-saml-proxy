@@ -284,7 +284,7 @@ function buildApp(
 	if (config.routes && config.routes.categories) {
 		const app_routes = config.routes.app_routes;
 		Object.entries(config.routes.categories).forEach(
-			([key, isolatedOktaConfig]) => {
+			([, isolatedOktaConfig]) => {
 				const okta_client =
 					isolatedOktaClients[isolatedOktaConfig.api_category];
 				const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
@@ -447,7 +447,7 @@ function startApp(config, issuer, isolatedIssuers) {
 	const isolatedOktaClients = {};
 	if (config.routes && config.routes.categories) {
 		Object.entries(config.routes.categories).forEach(
-			([key, isolatedOktaConfig]) => {
+			([, isolatedOktaConfig]) => {
 				isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
 					orgUrl: config.okta_url,
 					token: config.okta_token,
