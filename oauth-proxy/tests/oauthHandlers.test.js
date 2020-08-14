@@ -497,7 +497,7 @@ describe('authorizeHandler', () => {
     expect(res.redirect).toHaveBeenCalled()
   })
 
-  it('Aud parameter does not match API response, return 400', async () => {
+  it('Aud parameter does not match API response, redirect -> until we implement', async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfo.mockResolvedValue(response);
 
@@ -508,11 +508,16 @@ describe('authorizeHandler', () => {
       aud: "notAPIValue"
     }
 
+    res = {
+      redirect: jest.fn()
+    }
+
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(400);
+    expect(logger.info).toHaveBeenCalledWith("Client included invalid audience parameter.");
+    expect(res.redirect).toHaveBeenCalled()
   })
 
-  it('getAuthorizationServerInfo Error, return 500', async () => {
+  it('getAuthorizationServerInfo Error, redirect -> until we implement', async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfo.mockRejectedValue({error: "fakeError"});
 
@@ -523,8 +528,13 @@ describe('authorizeHandler', () => {
       aud: "notAPIValue"
     }
 
+    res = {
+      redirect: jest.fn()
+    }
+    
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(500);
+    expect(logger.info).toHaveBeenCalledWith("Error retrieving audiences from okta.");
+    expect(res.redirect).toHaveBeenCalled()
   })
 
   it('No state, returns 400', async () => {
