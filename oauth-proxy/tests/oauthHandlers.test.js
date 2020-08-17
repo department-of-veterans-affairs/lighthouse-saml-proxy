@@ -513,7 +513,8 @@ describe('authorizeHandler', () => {
     }
 
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(logger.warn).toHaveBeenCalledWith("Client included invalid audience parameter.");
+    expect(logger.warn).toHaveBeenCalledWith(
+      {message: "Unexpected audience", actual: req.query.aud, expected: response.audiences});
     expect(res.redirect).toHaveBeenCalled()
   })
 

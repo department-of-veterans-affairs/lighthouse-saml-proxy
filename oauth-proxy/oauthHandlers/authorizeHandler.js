@@ -56,7 +56,7 @@ const checkParameters = async (state, aud, config, issuer, logger) => {
   if(aud) {
     let authorizationServerId = new URL(issuer.metadata.issuer).pathname.split('/').pop();
     let serverAudiences;
-    
+
     await getAuthorizationServerInfo(config, authorizationServerId)
     .then(res => {
       serverAudiences = res.audiences;
@@ -66,8 +66,7 @@ const checkParameters = async (state, aud, config, issuer, logger) => {
     });
 
     if(!serverAudiences.includes(aud)){
-      /* throw {status: 400, error: "invalid_request", error_description: "Invalid aud parameter"};*/
-      logger.warn("Client included invalid audience parameter.")
+      logger.warn({message: "Unexpected audience", actual: aud, expected: serverAudiences});
     }
   }
 }
