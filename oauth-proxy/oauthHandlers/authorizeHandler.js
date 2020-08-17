@@ -7,7 +7,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
   try{
-    await checkParameters(state, aud, config, issuer);
+    await checkParameters(state, aud, config, issuer, logger);
   }catch(err) {
     res.status(err.status).json({
       error: err.error,
@@ -48,7 +48,7 @@ const authorizeHandler = async (config, redirect_uri, logger, issuer, dynamo, dy
   res.redirect(`${issuer.metadata.authorization_endpoint}?${params.toString()}`);
 };
 
-const checkParameters = async (state, aud, config, issuer) => {
+const checkParameters = async (state, aud, config, issuer, logger) => {
   if(!state) {
     throw {status: 400, error: "invalid_request", error_description: "State parameter required"};
   }
@@ -56,7 +56,7 @@ const checkParameters = async (state, aud, config, issuer) => {
   if(aud) {
     let authorizationServerId = new URL(issuer.metadata.issuer).pathname.split('/').pop();
     let serverAudiences;
-    
+
     await getAuthorizationServerInfo(config, authorizationServerId)
     .then(res => {
       serverAudiences = res.audiences;
@@ -66,7 +66,7 @@ const checkParameters = async (state, aud, config, issuer) => {
     });
 
     if(!serverAudiences.includes(aud)){
-      throw {status: 400, error: "invalid_request", error_description: "Invalid aud parameter"};
+      logger.warn({message: "Unexpected audience", actual: aud, expected: serverAudiences});
     }
   }
 }

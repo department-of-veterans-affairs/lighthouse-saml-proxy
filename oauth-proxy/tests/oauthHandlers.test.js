@@ -268,7 +268,7 @@ beforeEach(() => {
   config = jest.mock();
   redirect_uri = jest.mock();
   issuer = jest.mock();
-  logger = { error: jest.fn(), info: jest.fn() };
+  logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   validateToken = jest.fn();
@@ -497,7 +497,7 @@ describe('authorizeHandler', () => {
     expect(res.redirect).toHaveBeenCalled()
   })
 
-  it('Aud parameter does not match API response, return 400', async () => {
+  it('Aud parameter does not match API response, redirect -> until we implement', async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfo.mockResolvedValue(response);
 
@@ -508,8 +508,14 @@ describe('authorizeHandler', () => {
       aud: "notAPIValue"
     }
 
+    res = {
+      redirect: jest.fn()
+    }
+
     await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(400);
+    expect(logger.warn).toHaveBeenCalledWith(
+      {message: "Unexpected audience", actual: req.query.aud, expected: response.audiences});
+    expect(res.redirect).toHaveBeenCalled()
   })
 
   it('getAuthorizationServerInfo Error, return 500', async () => {
