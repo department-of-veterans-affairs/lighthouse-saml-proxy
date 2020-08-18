@@ -17,13 +17,13 @@ const authorizeHandler = async (
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
-  try{
+  try {
     await checkParameters(state, aud, config, issuer, logger);
-  }catch(err) {
+  } catch (err) {
     res.status(err.status).json({
       error: err.error,
       error_description: err.error_description,
-    })
+    });
     return next();
   }
 
@@ -75,26 +75,36 @@ const authorizeHandler = async (
 };
 
 const checkParameters = async (state, aud, config, issuer, logger) => {
-  if(!state) {
-    throw {status: 400, error: "invalid_request", error_description: "State parameter required"};
+  if (!state) {
+    throw {
+      status: 400,
+      error: "invalid_request",
+      error_description: "State parameter required",
+    };
   }
 
-  if(aud) {
-    let authorizationServerId = new URL(issuer.metadata.issuer).pathname.split('/').pop();
+  if (aud) {
+    let authorizationServerId = new URL(issuer.metadata.issuer).pathname
+      .split("/")
+      .pop();
     let serverAudiences;
 
     await getAuthorizationServerInfo(config, authorizationServerId)
-    .then(res => {
-      serverAudiences = res.audiences;
-    })
-    .catch(() => {
-      throw {status: 500, error: "internal_error"};
-    });
+      .then((res) => {
+        serverAudiences = res.audiences;
+      })
+      .catch(() => {
+        throw { status: 500, error: "internal_error" };
+      });
 
-    if(!serverAudiences.includes(aud)){
-      logger.warn({message: "Unexpected audience", actual: aud, expected: serverAudiences});
+    if (!serverAudiences.includes(aud)) {
+      logger.warn({
+        message: "Unexpected audience",
+        actual: aud,
+        expected: serverAudiences,
+      });
     }
   }
-}
+};
 
 module.exports = authorizeHandler;

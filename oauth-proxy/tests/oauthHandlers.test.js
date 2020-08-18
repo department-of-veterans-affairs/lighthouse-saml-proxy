@@ -271,27 +271,26 @@ beforeEach(() => {
   res = new MockExpressResponse();
 
   oktaClient = buildFakeOktaClient({
-    client_id: 'clientId123',
-    client_secret: 'secretXyz',
+    client_id: "clientId123",
+    client_secret: "secretXyz",
     settings: {
       oauthClient: {
-        redirect_uris: ['http://localhost:8080/oauth/redirect'],
+        redirect_uris: ["http://localhost:8080/oauth/redirect"],
       },
-    }
+    },
   });
 
   dynamoClient = buildFakeDynamoClient({
-    state: 'abc123',
-    code: 'the_fake_authorization_code',
-    refresh_token: '',
-    redirect_uri: "http://localhost/thisDoesNotMatter"
+    state: "abc123",
+    code: "the_fake_authorization_code",
+    refresh_token: "",
+    redirect_uri: "http://localhost/thisDoesNotMatter",
   });
 
   issuer = new FakeIssuer(dynamoClient);
-})
+});
 
-describe('tokenHandler', () => {
-
+describe("tokenHandler", () => {
   afterEach(() => {
     // expressjs requires that all handlers call next() unless they want to
     // stop the remaining middleware from running. Since the remaining
@@ -300,254 +299,236 @@ describe('tokenHandler', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('handles the authorization_code flow', async () => {
+  it("handles the authorization_code flow", async () => {
     let req = new MockExpressRequest({
       body: {
-        'grant_type': 'authorization_code',
-        'code': 'the_fake_authorization_code',
-        'client_id': 'client123',
-        'client_secret': 'secret789'
-      }
+        grant_type: "authorization_code",
+        code: "the_fake_authorization_code",
+        client_id: "client123",
+        client_secret: "secret789",
+      },
     });
     dynamoClient = buildFakeDynamoClient({
-      state: 'abc123',
-      code: 'the_fake_authorization_code',
-      refresh_token: '',
-      redirect_uri: "http://localhost/thisDoesNotMatter"
+      state: "abc123",
+      code: "the_fake_authorization_code",
+      refresh_token: "",
+      redirect_uri: "http://localhost/thisDoesNotMatter",
     });
-    validateToken = (access_token) => {
-      return { va_identifiers: { icn: '0000000000000' } };
+    validateToken = () => {
+      return { va_identifiers: { icn: "0000000000000" } };
     };
     let res = new MockExpressResponse();
     let client = buildOpenIDClient({
-      grant: (resolve, _reject) => {
-        resolve(new TokenSet({
-          access_token: "eyJraWQiOiJDcnNSZDNpYnhIMUswSl9WYWd0TnlHaER2cFlRN0hLdVd6NFFibk5IQmlBIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk41Qlg4d3RXN01jSlp4ZDlqX0FfLVozVFA1LWI5Mk5fZ3E1MXRMY2w1VXcuUUFjTlo1d3JpL1ZhMUx4UGZ4b2ZjU3RvbkpKMnM0b0d0SzI5RDZFdGpsRT0iLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU3ODU4NTQ1MSwiZXhwIjoxNTc4NTg5MDUxLCJjaWQiOiIwb2EzNXJsYjhwdEh1bGVGZjJwNyIsInVpZCI6IjAwdTJwOWZhcjRpaERBRVg4MnA3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGF0aWVudC9QYXRpZW50LnJlYWQiLCJsYXVuY2gvcGF0aWVudCIsInZldGVyYW5fc3RhdHVzLnJlYWQiLCJvcGVuaWQiLCJwcm9maWxlIl0sInN1YiI6ImNmYTMyMjQ0NTY5ODQxYTA5MGFkOWQyZjA1MjRjZjM4In0.NN8kTau8BKOycr_8BQKvV9_BnNgXjC1LkP2f85lTKcz8n1soAXqcfDJpDpndt7ihGgdd7AbDQIwaQwW6j9NPg9wr98G7kPfaFNIqJTsjj1FvHw9kwIK74l1CB0nQoRs-Yl-g26c6Z9fvOkSsTbFzGwFoTLp3dox6-vt18C5ql8vfPyNyooIZ9C1V2myEtYgoKpWHH1mx_Sx1ySRInuIOsoUYFJmRw87BMbb9F3n_IF377hJNy9tVNJFS78O9ZvnFWzUOQsx5qCtMGRkHEQFRQsK4Zo8Nd-Gc1_rjVwklfDeQlNd2uPEklGkbxCEZd2rIuWU4fIPPkENN6TKrVUtzjg",
-          expires_in: 60
-        }));
-      }
+      grant: (resolve) => {
+        resolve(
+          new TokenSet({
+            access_token:
+              "eyJraWQiOiJDcnNSZDNpYnhIMUswSl9WYWd0TnlHaER2cFlRN0hLdVd6NFFibk5IQmlBIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk41Qlg4d3RXN01jSlp4ZDlqX0FfLVozVFA1LWI5Mk5fZ3E1MXRMY2w1VXcuUUFjTlo1d3JpL1ZhMUx4UGZ4b2ZjU3RvbkpKMnM0b0d0SzI5RDZFdGpsRT0iLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU3ODU4NTQ1MSwiZXhwIjoxNTc4NTg5MDUxLCJjaWQiOiIwb2EzNXJsYjhwdEh1bGVGZjJwNyIsInVpZCI6IjAwdTJwOWZhcjRpaERBRVg4MnA3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGF0aWVudC9QYXRpZW50LnJlYWQiLCJsYXVuY2gvcGF0aWVudCIsInZldGVyYW5fc3RhdHVzLnJlYWQiLCJvcGVuaWQiLCJwcm9maWxlIl0sInN1YiI6ImNmYTMyMjQ0NTY5ODQxYTA5MGFkOWQyZjA1MjRjZjM4In0.NN8kTau8BKOycr_8BQKvV9_BnNgXjC1LkP2f85lTKcz8n1soAXqcfDJpDpndt7ihGgdd7AbDQIwaQwW6j9NPg9wr98G7kPfaFNIqJTsjj1FvHw9kwIK74l1CB0nQoRs-Yl-g26c6Z9fvOkSsTbFzGwFoTLp3dox6-vt18C5ql8vfPyNyooIZ9C1V2myEtYgoKpWHH1mx_Sx1ySRInuIOsoUYFJmRw87BMbb9F3n_IF377hJNy9tVNJFS78O9ZvnFWzUOQsx5qCtMGRkHEQFRQsK4Zo8Nd-Gc1_rjVwklfDeQlNd2uPEklGkbxCEZd2rIuWU4fIPPkENN6TKrVUtzjg",
+            expires_in: 60,
+          })
+        );
+      },
     });
     issuer = new FakeIssuer(client);
-    await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(client.grant).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
   });
 
-  it('handles the refresh flow', async () => {
+  it("handles the refresh flow", async () => {
     let req = new MockExpressRequest({
       body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': 'the_fake_refresh_token',
-        'client_id': 'client123',
-        'client_secret': 'secret789'
-      }
+        grant_type: "refresh_token",
+        refresh_token: "the_fake_refresh_token",
+        client_id: "client123",
+        client_secret: "secret789",
+      },
     });
     dynamoClient = buildFakeDynamoClient({
-      state: 'abc123',
-      code: 'xyz789',
-      refresh_token: 'the_fake_refresh_token',
-      redirect_uri: "http://localhost/thisDoesNotMatter"
+      state: "abc123",
+      code: "xyz789",
+      refresh_token: "the_fake_refresh_token",
+      redirect_uri: "http://localhost/thisDoesNotMatter",
     });
-    validateToken = (access_token) => {
-      return { va_identifiers: { icn: '0000000000000' } };
+    validateToken = () => {
+      return { va_identifiers: { icn: "0000000000000" } };
     };
     let res = new MockExpressResponse();
     let client = buildOpenIDClient({
-      refresh: (resolve, _reject) => {
-        resolve(new TokenSet({
-          access_token: "eyJraWQiOiJDcnNSZDNpYnhIMUswSl9WYWd0TnlHaER2cFlRN0hLdVd6NFFibk5IQmlBIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk41Qlg4d3RXN01jSlp4ZDlqX0FfLVozVFA1LWI5Mk5fZ3E1MXRMY2w1VXcuUUFjTlo1d3JpL1ZhMUx4UGZ4b2ZjU3RvbkpKMnM0b0d0SzI5RDZFdGpsRT0iLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU3ODU4NTQ1MSwiZXhwIjoxNTc4NTg5MDUxLCJjaWQiOiIwb2EzNXJsYjhwdEh1bGVGZjJwNyIsInVpZCI6IjAwdTJwOWZhcjRpaERBRVg4MnA3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGF0aWVudC9QYXRpZW50LnJlYWQiLCJsYXVuY2gvcGF0aWVudCIsInZldGVyYW5fc3RhdHVzLnJlYWQiLCJvcGVuaWQiLCJwcm9maWxlIl0sInN1YiI6ImNmYTMyMjQ0NTY5ODQxYTA5MGFkOWQyZjA1MjRjZjM4In0.NN8kTau8BKOycr_8BQKvV9_BnNgXjC1LkP2f85lTKcz8n1soAXqcfDJpDpndt7ihGgdd7AbDQIwaQwW6j9NPg9wr98G7kPfaFNIqJTsjj1FvHw9kwIK74l1CB0nQoRs-Yl-g26c6Z9fvOkSsTbFzGwFoTLp3dox6-vt18C5ql8vfPyNyooIZ9C1V2myEtYgoKpWHH1mx_Sx1ySRInuIOsoUYFJmRw87BMbb9F3n_IF377hJNy9tVNJFS78O9ZvnFWzUOQsx5qCtMGRkHEQFRQsK4Zo8Nd-Gc1_rjVwklfDeQlNd2uPEklGkbxCEZd2rIuWU4fIPPkENN6TKrVUtzjg",
-          refresh_token: 'the_fake_refresh_token',
-          expires_in: 60
-        }));
-      }
+      refresh: (resolve) => {
+        resolve(
+          new TokenSet({
+            access_token:
+              "eyJraWQiOiJDcnNSZDNpYnhIMUswSl9WYWd0TnlHaER2cFlRN0hLdVd6NFFibk5IQmlBIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULk41Qlg4d3RXN01jSlp4ZDlqX0FfLVozVFA1LWI5Mk5fZ3E1MXRMY2w1VXcuUUFjTlo1d3JpL1ZhMUx4UGZ4b2ZjU3RvbkpKMnM0b0d0SzI5RDZFdGpsRT0iLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU3ODU4NTQ1MSwiZXhwIjoxNTc4NTg5MDUxLCJjaWQiOiIwb2EzNXJsYjhwdEh1bGVGZjJwNyIsInVpZCI6IjAwdTJwOWZhcjRpaERBRVg4MnA3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGF0aWVudC9QYXRpZW50LnJlYWQiLCJsYXVuY2gvcGF0aWVudCIsInZldGVyYW5fc3RhdHVzLnJlYWQiLCJvcGVuaWQiLCJwcm9maWxlIl0sInN1YiI6ImNmYTMyMjQ0NTY5ODQxYTA5MGFkOWQyZjA1MjRjZjM4In0.NN8kTau8BKOycr_8BQKvV9_BnNgXjC1LkP2f85lTKcz8n1soAXqcfDJpDpndt7ihGgdd7AbDQIwaQwW6j9NPg9wr98G7kPfaFNIqJTsjj1FvHw9kwIK74l1CB0nQoRs-Yl-g26c6Z9fvOkSsTbFzGwFoTLp3dox6-vt18C5ql8vfPyNyooIZ9C1V2myEtYgoKpWHH1mx_Sx1ySRInuIOsoUYFJmRw87BMbb9F3n_IF377hJNy9tVNJFS78O9ZvnFWzUOQsx5qCtMGRkHEQFRQsK4Zo8Nd-Gc1_rjVwklfDeQlNd2uPEklGkbxCEZd2rIuWU4fIPPkENN6TKrVUtzjg",
+            refresh_token: "the_fake_refresh_token",
+            expires_in: 60,
+          })
+        );
+      },
     });
     issuer = new FakeIssuer(client);
-    await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(client.refresh).toHaveBeenCalled();
     expect(res.statusCode).toEqual(200);
   });
 
-  it('supports client_secret_basic authentication', async () => { 
+  it("supports client_secret_basic authentication", async () => {
     let req = new MockExpressRequest({
       headers: {
-        'authorization': encodeBasicAuthHeader('client123', 'secret789'),
+        authorization: encodeBasicAuthHeader("client123", "secret789"),
       },
       body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': 'the_fake_refresh_token',
-      }
+        grant_type: "refresh_token",
+        refresh_token: "the_fake_refresh_token",
+      },
     });
     let res = new MockExpressResponse();
     let client = buildExpiredRefreshTokenClient();
     issuer = new FakeIssuer(client);
-    await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(client.refresh).toHaveBeenCalled();
     expect(res.statusCode).toEqual(400);
   });
 
-  it('supports client_secret_post authentication', async () => {
+  it("supports client_secret_post authentication", async () => {
     let req = new MockExpressRequest({
       body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': 'the_fake_refresh_token',
-        'client_id': 'client123',
-        'client_secret': 'secret789'
-      }
+        grant_type: "refresh_token",
+        refresh_token: "the_fake_refresh_token",
+        client_id: "client123",
+        client_secret: "secret789",
+      },
     });
     let res = new MockExpressResponse();
     let client = buildExpiredRefreshTokenClient();
     issuer = new FakeIssuer(client);
-    await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(client.refresh).toHaveBeenCalled();
     expect(res.statusCode).toEqual(400);
   });
 
-  it('supports none (PKCE) authentication', async () => {
-    let customConfig = {...config, "enable_pkce_authorization_flow": true};
+  it("supports none (PKCE) authentication", async () => {
+    let customConfig = { ...config, enable_pkce_authorization_flow: true };
     let req = new MockExpressRequest({
       body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': 'the_fake_refresh_token',
-        'client_id': 'client123'
-      }
+        grant_type: "refresh_token",
+        refresh_token: "the_fake_refresh_token",
+        client_id: "client123",
+      },
     });
     let res = new MockExpressResponse();
     let client = buildExpiredRefreshTokenClient();
     issuer = new FakeIssuer(client);
-    await tokenHandler(customConfig, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      customConfig,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(client.refresh).toHaveBeenCalled();
     expect(res.statusCode).toEqual(400);
   });
 
-  it('errors properly for unauthorized (blank) requests', async () => {
+  it("errors properly for unauthorized (blank) requests", async () => {
     let req = new MockExpressRequest({
-      method: 'POST',
-      url: '/oauth2/token',
-      body: {}
+      method: "POST",
+      url: "/oauth2/token",
+      body: {},
     });
     let res = new MockExpressResponse();
-    await tokenHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(validateToken).not.toHaveBeenCalled();
     expect(res.statusCode).toEqual(401);
   });
 
-  it('errors properly for unauthorized (no client_secret) requests', async () => {
-    let customConfig = {...config, "enable_pkce_authorization_flow": false};
+  it("errors properly for unauthorized (no client_secret) requests", async () => {
+    let customConfig = { ...config, enable_pkce_authorization_flow: false };
     let req = new MockExpressRequest({
-      method: 'POST',
-      url: '/oauth2/token',
+      method: "POST",
+      url: "/oauth2/token",
       body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': 'the_fake_refresh_token',
-        'client_id': 'client123'
-      }
+        grant_type: "refresh_token",
+        refresh_token: "the_fake_refresh_token",
+        client_id: "client123",
+      },
     });
     let res = new MockExpressResponse();
-    await tokenHandler(customConfig, redirect_uri, logger, issuer, dynamo, dynamoClient, validateToken, req, res, next);
+    await tokenHandler(
+      customConfig,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
     expect(validateToken).not.toHaveBeenCalled();
     expect(res.statusCode).toEqual(401);
   });
-});
-
-describe('authorizeHandler', () => {
-  afterEach(() => { });
-
-  beforeEach(() => {
-    getAuthorizationServerInfo.mockReset();
-  });
-
-  it('Happy Path Redirect', async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"])
-    getAuthorizationServerInfo.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn()
-    }
-
-    req.query = {
-      state: "fake_state", 
-      client_id: "clientId123", 
-      redirect_uri: "http://localhost:8080/oauth/redirect"
-    }
-
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.redirect).toHaveBeenCalled()
-  })
-
-  it('Happy Path Redirect with Aud parameter', async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn()
-    }
-
-    req.query = {
-      state: "fake_state", 
-      client_id: "clientId123", 
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "aud"
-    }
-
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.redirect).toHaveBeenCalled()
-  })
-
-  it('Aud parameter does not match API response, redirect -> until we implement', async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockResolvedValue(response);
-
-    req.query = {
-      state: "fake_state", 
-      client_id: "clientId123", 
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "notAPIValue"
-    }
-
-    res = {
-      redirect: jest.fn()
-    }
-
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(logger.warn).toHaveBeenCalledWith(
-      {message: "Unexpected audience", actual: req.query.aud, expected: response.audiences});
-    expect(res.redirect).toHaveBeenCalled()
-  })
-
-  it('getAuthorizationServerInfo Error, return 500', async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockRejectedValue({error: "fakeError"});
-
-    req.query = {
-      state: "fake_state", 
-      client_id: "clientId123", 
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "notAPIValue"
-    }
-
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(500);
-  })
-
-  it('No state, returns 400', async () => {
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(400);
-  })
-
-  it('State is empty, returns 400', async () => {
-    req.query = {state: null}
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(400);
-  })
-
-  it('Bad redirect_uri', async () => {
-    req.query = {
-      state: "fake_state", 
-      client_id: "clientId123", 
-      redirect_uri: "https://www.google.com"
-    }
-
-    await authorizeHandler(config, redirect_uri, logger, issuer, dynamo, dynamoClient, oktaClient, req, res, next);
-    expect(res.statusCode).toEqual(400);
-  })
 });
 
 describe("authorizeHandler", () => {
@@ -614,7 +595,7 @@ describe("authorizeHandler", () => {
     expect(res.redirect).toHaveBeenCalled();
   });
 
-  it("Aud parameter does not match API response, return 400", async () => {
+  it("Aud parameter does not match API response, redirect -> until we implement", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfo.mockResolvedValue(response);
 
@@ -623,6 +604,10 @@ describe("authorizeHandler", () => {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
       aud: "notAPIValue",
+    };
+
+    res = {
+      redirect: jest.fn(),
     };
 
     await authorizeHandler(
@@ -637,7 +622,12 @@ describe("authorizeHandler", () => {
       res,
       next
     );
-    expect(res.statusCode).toEqual(400);
+    expect(logger.warn).toHaveBeenCalledWith({
+      message: "Unexpected audience",
+      actual: req.query.aud,
+      expected: response.audiences,
+    });
+    expect(res.redirect).toHaveBeenCalled();
   });
 
   it("getAuthorizationServerInfo Error, return 500", async () => {
