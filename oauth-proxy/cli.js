@@ -83,7 +83,7 @@ function processArgs() {
       enable_pkce_authorization_flow: {
         description: "Enable PKCE authorization flow?",
         required: false,
-        default: false,
+        default: true,
       },
       enable_okta_consent_endpoint: {
         description: "Enable Delete Grants endpoint (Okta Consent)?",
