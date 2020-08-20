@@ -52,6 +52,25 @@ pipeline {
       }
     }
 
+    stage('Run oauth-proxy linting check') {
+      agent {
+        dockerfile {
+          args "--entrypoint='' -u root"
+          dir "."
+          filename "oauth-proxy/Dockerfile"
+          label 'vetsgov-general-purpose'
+          additionalBuildArgs '--pull'
+        }
+      }
+
+      steps {
+        sh '''
+          cd /home/node
+          npm run-script lint
+        '''
+      }
+    }
+
     stage('Deploy dev and staging') {
       when { branch 'master' }
 

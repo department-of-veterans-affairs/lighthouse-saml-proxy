@@ -1,8 +1,6 @@
-const process = require('process');
-const { validationGauge, stopTimer } = require('./metrics');
-const axios = require('axios');
-
-
+const process = require("process");
+const { validationGauge, stopTimer } = require("./metrics");
+const axios = require("axios");
 
 // Calls the token validation API and returns the attributes provided in the
 // response. If an error occurs, the axios exception is
@@ -14,8 +12,8 @@ const validateToken = async (endpoint, api_key, access_token) => {
   const config = {
     headers: {
       apiKey: api_key,
-      authorization: `Bearer ${access_token}`
-    }
+      authorization: `Bearer ${access_token}`,
+    },
   };
   const response = await axios.get(endpoint, config);
   stopTimer(validationGauge, validateTokenStart);

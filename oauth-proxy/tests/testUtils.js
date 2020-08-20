@@ -1,15 +1,19 @@
 function buildDynamoAttributeValue(value) {
   // BEWARE: This doesn't work with number sets and a few other Dynamo types.
   if (value.constructor === String) {
-    return { "S": value };
+    return { S: value };
   } else if (value.constructor === Number) {
-    return { "N": value.toString() };
+    return { N: value.toString() };
   } else if (value.constructor === Boolean) {
-    return { "BOOL": value };
+    return { BOOL: value };
   } else if (value.constructor === Array) {
-    return { "L": value.map((x) => { buildDynamoAttributeValue(x) }) };
+    return {
+      L: value.map((x) => {
+        buildDynamoAttributeValue(x);
+      }),
+    };
   } else if (value.constructor === Object) {
-    return { "M": convertObjectToDynamoAttributeValues(value) };
+    return { M: convertObjectToDynamoAttributeValues(value) };
   } else {
     throw new Error("Unknown type.");
   }

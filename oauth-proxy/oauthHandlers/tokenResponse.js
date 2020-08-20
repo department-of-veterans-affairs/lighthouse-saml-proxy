@@ -50,16 +50,16 @@ const translateTokenSet = (token_set) => {
   // translates from an absolute timestamp field named `expires_at`. If we
   // simply serialized the `TokenSet` object then the response would contain
   // the internal fields liked `expires_at`.
-  copy_field('access_token');
-  copy_field('id_token');
-  copy_field('refresh_token');
-  copy_field('token_type');
-  copy_field('scope');
-  copy_field('expires_in');
+  copy_field("access_token");
+  copy_field("id_token");
+  copy_field("refresh_token");
+  copy_field("token_type");
+  copy_field("scope");
+  copy_field("expires_in");
 
   return responseAccum;
 };
 
 module.exports = {
-  translateTokenSet: translateTokenSet
+  translateTokenSet: translateTokenSet,
 };

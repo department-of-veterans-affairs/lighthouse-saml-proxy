@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 
 // This module is a bit confused re: it's purpose. It exports a method to
 // construct a DynamoDB handle and methods to use that handle. It should
 // probably export an object that ties methods to a particular handle. Alas
 // that will have to wait until we have a proper test suite in place.
-const { config, DynamoDB } = require('aws-sdk');
+const { config, DynamoDB } = require("aws-sdk");
 
 var TableName;
 
@@ -21,13 +21,13 @@ function createDynamoHandle(awsConfig, local, tableName) {
 function getFromDynamoBySecondary(client, key, value) {
   const params = {
     IndexName: `oauth_${key}_index`,
-    KeyConditionExpression: '#key= :k',
+    KeyConditionExpression: "#key= :k",
     ExpressionAttributeNames: {
-      '#key': key,
+      "#key": key,
     },
     ExpressionAttributeValues: {
-      ':k': {
-        'S': value,
+      ":k": {
+        S: value,
       },
     },
     TableName,
@@ -47,7 +47,7 @@ function getFromDynamoBySecondary(client, key, value) {
 function getFromDynamoByState(client, state) {
   const params = {
     Key: {
-      "state": {
+      state: {
         S: state,
       },
     },
@@ -76,7 +76,7 @@ function saveToDynamo(client, state, key, value) {
       },
     },
     Key: {
-      "state": {
+      state: {
         S: state,
       },
     },
@@ -101,4 +101,4 @@ module.exports = {
   saveToDynamo,
   getFromDynamoByState,
   getFromDynamoBySecondary,
-}
+};

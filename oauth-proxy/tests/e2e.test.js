@@ -1,17 +1,22 @@
-'use strict';
+"use strict";
 
-require('jest');
-const axios = require('axios');
-const qs = require('qs');
-const { Issuer } = require('openid-client');
-const { randomBytes } = require('crypto');
+require("jest");
+const axios = require("axios");
+const qs = require("qs");
+const { Issuer } = require("openid-client");
+const { randomBytes } = require("crypto");
 
-const { convertObjectToDynamoAttributeValues } = require('./testUtils');
-const { buildBackgroundServerModule } = require('../../common/backgroundServer');
-const upstreamOAuthTestServer = require('./upstreamOAuthTestServer');
-const { startServerInBackground, stopBackgroundServer } = buildBackgroundServerModule("oauth-proxy test app");
-const { buildApp } = require('../index');
-const { encodeBasicAuthHeader } = require('../utils');
+const { convertObjectToDynamoAttributeValues } = require("./testUtils");
+const {
+  buildBackgroundServerModule,
+} = require("../../common/backgroundServer");
+const upstreamOAuthTestServer = require("./upstreamOAuthTestServer");
+const {
+  startServerInBackground,
+  stopBackgroundServer,
+} = buildBackgroundServerModule("oauth-proxy test app");
+const { buildApp } = require("../index");
+const { encodeBasicAuthHeader } = require("../utils");
 
 beforeAll(() => {
   upstreamOAuthTestServer.start();
@@ -22,21 +27,21 @@ afterAll(() => {
 });
 
 const TEST_SERVER_PORT = 9090;
-const FAKE_CLIENT_APP_REDIRECT_URL = 'http://localhost:8080/oauth/redirect';
+const FAKE_CLIENT_APP_REDIRECT_URL = "http://localhost:8080/oauth/redirect";
 const FAKE_CLIENT_APP_URL_PATTERN = /http:[/][/]localhost:8080.*/;
 const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
-  well_known_base_path: '/testServer',
+  well_known_base_path: "/testServer",
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
-  manage_endpoint: 'http://localhost:9091/account',
+  manage_endpoint: "http://localhost:9091/account",
   routes: {
     categories: [
       {
         api_category: "/veteran-verification-apis/v1",
-        upstream_issuer: upstreamOAuthTestServer.baseUrl()
-      }
+        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+      },
     ],
     app_routes: {
       authorize: "/authorization",
@@ -46,14 +51,14 @@ const defaultTestingConfig = {
       manage: "/manage",
       revoke: "/revoke",
       jwks: "/keys",
-      grants: "/grants"
-    }
-  }
+      grants: "/grants",
+    },
+  },
 };
 
 function buildFakeOktaClient(fakeRecord) {
   const oktaClient = { getApplication: jest.fn() };
-  oktaClient.getApplication.mockImplementation(client_id => {
+  oktaClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
         resolve(fakeRecord);
@@ -65,82 +70,98 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
-
 function buildFakeDynamoClient(fakeDynamoRecord) {
-  const dynamoClient = jest.genMockFromModule('../dynamo_client.js');
-  dynamoClient.saveToDynamo.mockImplementation((handle, state, key, value) => {
-    return new Promise((resolve, reject) => {
+  const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
+  dynamoClient.saveToDynamo.mockImplementation((state) => {
+    return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
       resolve({ pk: state });
     });
   });
-  dynamoClient.getFromDynamoBySecondary.mockImplementation((handle, attr, value) => {
-    return new Promise((resolve, reject) => {
-      if (fakeDynamoRecord[attr] === value) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-      } else {
-        reject(`no such ${attr} value`);
-      }
-    });
-  });
+  dynamoClient.getFromDynamoBySecondary.mockImplementation(
+    (handle, attr, value) => {
+      return new Promise((resolve, reject) => {
+        if (fakeDynamoRecord[attr] === value) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such ${attr} value`);
+        }
+      });
+    }
+  );
   dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
     return new Promise((resolve, reject) => {
       if (state === fakeDynamoRecord.state) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
       } else {
-        reject('no such state value');
+        reject("no such state value");
       }
     });
   });
   return dynamoClient;
 }
 
-describe('OpenID Connect Conformance', () => {
+describe("OpenID Connect Conformance", () => {
   let issuer;
   let oktaClient;
   let dynamoClient;
   let dynamoHandle;
-  const testServerBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`);
-  const upstreamOAuthTestServerBaseUrlPattern = new RegExp(`^${upstreamOAuthTestServer.baseUrl()}.*`);
+  const testServerBaseUrlPattern = new RegExp(
+    `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`
+  );
+  const upstreamOAuthTestServerBaseUrlPattern = new RegExp(
+    `^${upstreamOAuthTestServer.baseUrl()}.*`
+  );
 
   beforeAll(async () => {
     issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
     oktaClient = buildFakeOktaClient({
-      client_id: 'clientId123',
-      client_secret: 'secretXyz',
+      client_id: "clientId123",
+      client_secret: "secretXyz",
       settings: {
         oauthClient: {
-          redirect_uris: ['http://localhost:8080/oauth/redirect'],
+          redirect_uris: ["http://localhost:8080/oauth/redirect"],
         },
-      }
+      },
     });
     const isolatedIssuers = {};
     const isolatedOktaClients = {};
     if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
       for (const service_config of defaultTestingConfig.routes.categories) {
-        isolatedIssuers[service_config.api_category] = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
+        isolatedIssuers[service_config.api_category] = await Issuer.discover(
+          upstreamOAuthTestServer.baseUrl()
+        );
         isolatedOktaClients[service_config.api_category] = oktaClient;
       }
     }
     dynamoClient = buildFakeDynamoClient({
-      state: 'abc123',
-      code: 'xyz789',
-      refresh_token: 'jkl456',
+      state: "abc123",
+      code: "xyz789",
+      refresh_token: "jkl456",
       redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
     });
     dynamoHandle = jest.mock();
 
-    const fakeTokenValidator = (access_token) => {
+    const fakeTokenValidator = () => {
       return {
         va_identifiers: {
-          icn: '0000000000000'
-        }
+          icn: "0000000000000",
+        },
       };
     };
 
-    const app = buildApp(defaultTestingConfig, issuer, oktaClient, dynamoHandle, dynamoClient, fakeTokenValidator, isolatedIssuers, isolatedOktaClients);
+    const app = buildApp(
+      defaultTestingConfig,
+      issuer,
+      oktaClient,
+      dynamoHandle,
+      dynamoClient,
+      fakeTokenValidator,
+      isolatedIssuers,
+      isolatedOktaClients
+    );
     // We're starting and stopping this server in a beforeAll/afterAll pair,
     // rather than beforeEach/afterEach because this is an end-to-end
     // functional. Since internal application state could affect functionality
@@ -152,26 +173,35 @@ describe('OpenID Connect Conformance', () => {
     stopBackgroundServer();
   });
 
-  it('allows CORS on the OIDC metadata endpoint', async () => {
-    const randomHeaderName = randomBytes(20).toString('hex');
+  it("allows CORS on the OIDC metadata endpoint", async () => {
+    const randomHeaderName = randomBytes(20).toString("hex");
     const options = {
       headers: {
-        'origin': 'http://localhost:8080',
-        'access-control-request-headers': randomHeaderName,
-      }
-    }
-    const resp = await axios.options('http://localhost:9090/testServer/.well-known/openid-configuration', options);
+        origin: "http://localhost:8080",
+        "access-control-request-headers": randomHeaderName,
+      },
+    };
+    const resp = await axios.options(
+      "http://localhost:9090/testServer/.well-known/openid-configuration",
+      options
+    );
     expect(resp.status).toEqual(200);
-    expect(resp.headers['access-control-allow-headers']).toMatch(randomHeaderName);
-    expect(resp.headers['access-control-allow-origin']).toMatch(FAKE_CLIENT_APP_URL_PATTERN);
+    expect(resp.headers["access-control-allow-headers"]).toMatch(
+      randomHeaderName
+    );
+    expect(resp.headers["access-control-allow-origin"]).toMatch(
+      FAKE_CLIENT_APP_URL_PATTERN
+    );
   });
 
-  it('responds to the endpoints described in the OIDC metadata response', async (done) => {
+  it("responds to the endpoints described in the OIDC metadata response", async (done) => {
     // This test is making multiple requests. Theoretically it could be broken
     // up, with each request being made in a separate test. That would make it
     // much more difficult to use the metadata response to drive the requests
     // for the subsequent requests.
-    const resp = await axios.get('http://localhost:9090/testServer/.well-known/openid-configuration');
+    const resp = await axios.get(
+      "http://localhost:9090/testServer/.well-known/openid-configuration"
+    );
     const parsedMeta = resp.data;
     expect(parsedMeta).toMatchObject({
       authorization_endpoint: expect.any(String),
@@ -194,27 +224,32 @@ describe('OpenID Connect Conformance', () => {
 
     const authorizeConfig = {
       maxRedirects: 0,
-      validateStatus: function(status) {
+      validateStatus: function (status) {
         return status < 500;
       },
       params: {
-        client_id: 'clientId123',
-        state: 'abc123',
-        redirect_uri: 'http://localhost:8080/oauth/redirect'
-      }
+        client_id: "clientId123",
+        state: "abc123",
+        redirect_uri: "http://localhost:8080/oauth/redirect",
+      },
     };
-    const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
+    const authorizeResp = await axios.get(
+      parsedMeta.authorization_endpoint,
+      authorizeConfig
+    );
     expect(authorizeResp.status).toEqual(302);
-    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
+    expect(authorizeResp.headers["location"]).toMatch(
+      upstreamOAuthTestServerBaseUrlPattern
+    );
 
     await axios.post(
       parsedMeta.token_endpoint,
-      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      qs.stringify({ grant_type: "authorization_code", code: "xzy789" }),
       {
-          auth: { username: 'clientId123', password: 'secretXyz' }
+        auth: { username: "clientId123", password: "secretXyz" },
       }
     );
-    done()
+    done();
     // TODO: We should really call the token endpoint using the refresh_token
     // grant type here. Right now the openid-client library makes this a little
     // difficult. It automatically verifies the signature of the new access
@@ -225,14 +260,18 @@ describe('OpenID Connect Conformance', () => {
     // signaure requirement.
   });
 
-  it('responds to the issolated api category endpoints described in the OIDC metadata response', async (done) => {
+  it("responds to the issolated api category endpoints described in the OIDC metadata response", async (done) => {
     // This test is making multiple requests. Theoretically it could be broken
     // up, with each request being made in a separate test. That would make it
     // much more difficult to use the metadata response to drive the requests
     // for the subsequent requests.
-    const testServerIssolatedBaseUrlPattern = new RegExp(`^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}/veteran-verification-apis/v1.*`);
- 
-    const resp = await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/.well-known/openid-configuration');
+    const testServerIssolatedBaseUrlPattern = new RegExp(
+      `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}/veteran-verification-apis/v1.*`
+    );
+
+    const resp = await axios.get(
+      "http://localhost:9090/testServer/veteran-verification-apis/v1/.well-known/openid-configuration"
+    );
     const parsedMeta = resp.data;
     expect(parsedMeta).toMatchObject({
       authorization_endpoint: expect.any(String),
@@ -243,10 +282,16 @@ describe('OpenID Connect Conformance', () => {
 
     expect(parsedMeta).toMatchObject({
       jwks_uri: expect.stringMatching(testServerIssolatedBaseUrlPattern),
-      authorization_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
-      userinfo_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      authorization_endpoint: expect.stringMatching(
+        testServerIssolatedBaseUrlPattern
+      ),
+      userinfo_endpoint: expect.stringMatching(
+        testServerIssolatedBaseUrlPattern
+      ),
       token_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
-      introspection_endpoint: expect.stringMatching(testServerIssolatedBaseUrlPattern),
+      introspection_endpoint: expect.stringMatching(
+        testServerIssolatedBaseUrlPattern
+      ),
     });
 
     await axios.get(parsedMeta.jwks_uri);
@@ -255,56 +300,65 @@ describe('OpenID Connect Conformance', () => {
 
     const authorizeConfig = {
       maxRedirects: 0,
-      validateStatus: function(status) {
+      validateStatus: function (status) {
         return status < 500;
       },
       params: {
-        client_id: 'clientId123',
-        state: 'abc123',
-        redirect_uri: 'http://localhost:8080/oauth/redirect'
-      }
+        client_id: "clientId123",
+        state: "abc123",
+        redirect_uri: "http://localhost:8080/oauth/redirect",
+      },
     };
-    const authorizeResp = await axios.get(parsedMeta.authorization_endpoint, authorizeConfig);
+    const authorizeResp = await axios.get(
+      parsedMeta.authorization_endpoint,
+      authorizeConfig
+    );
     expect(authorizeResp.status).toEqual(302);
-    expect(authorizeResp.headers['location']).toMatch(upstreamOAuthTestServerBaseUrlPattern);
+    expect(authorizeResp.headers["location"]).toMatch(
+      upstreamOAuthTestServerBaseUrlPattern
+    );
 
     await axios.post(
       parsedMeta.token_endpoint,
-      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      qs.stringify({ grant_type: "authorization_code", code: "xzy789" }),
       {
-          auth: { username: 'clientId123', password: 'secretXyz' }
+        auth: { username: "clientId123", password: "secretXyz" },
       }
     );
-    done()
+    done();
   });
 
-
-  it('redirects the user back to the client app', async () => {
+  it("redirects the user back to the client app", async () => {
     const config = {
       maxRedirects: 0,
-      validateStatus: function(status) {
+      validateStatus: function (status) {
         return status < 500;
       },
       params: {
-        state: 'abc123',
-        code: 'xzy789',
-      }
-    }
-    const resp = await axios.get('http://localhost:9090/testServer/redirect', config);
+        state: "abc123",
+        code: "xzy789",
+      },
+    };
+    const resp = await axios.get(
+      "http://localhost:9090/testServer/redirect",
+      config
+    );
     expect(resp.status).toEqual(302);
-    expect(resp.headers.location).toMatch(new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`));
+    expect(resp.headers.location).toMatch(
+      new RegExp(`^${FAKE_CLIENT_APP_REDIRECT_URL}.*$`)
+    );
   });
 
-  it('returns an OIDC conformant token response', async () => {
+  it("returns an OIDC conformant token response", async () => {
     const resp = await axios.post(
-      'http://localhost:9090/testServer/token',
-      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      "http://localhost:9090/testServer/token",
+      qs.stringify({ grant_type: "authorization_code", code: "xzy789" }),
       {
-          headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
-          },
-          auth: { username: 'clientId123', password: 'secretXyz' }
+        headers: {
+          authorization: encodeBasicAuthHeader("user", "pass"),
+          origin: "http://localhost:8080",
+        },
+        auth: { username: "clientId123", password: "secretXyz" },
       }
     );
 
@@ -317,20 +371,20 @@ describe('OpenID Connect Conformance', () => {
       id_token: expect.stringMatching(JWT_PATTERN),
       refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
       scope: expect.stringMatching(/.+/),
-      token_type: 'Bearer',
+      token_type: "Bearer",
     });
   });
 
-  it('returns an OIDC conformant token response for the api category isolated endpoint', async () => {
+  it("returns an OIDC conformant token response for the api category isolated endpoint", async () => {
     const resp = await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/token',
-      qs.stringify({ grant_type: 'authorization_code', code: 'xzy789' }),
+      "http://localhost:9090/testServer/veteran-verification-apis/v1/token",
+      qs.stringify({ grant_type: "authorization_code", code: "xzy789" }),
       {
-          headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
-          },
-          auth: { username: 'clientId123', password: 'secretXyz' }
+        headers: {
+          authorization: encodeBasicAuthHeader("user", "pass"),
+          origin: "http://localhost:8080",
+        },
+        auth: { username: "clientId123", password: "secretXyz" },
       }
     );
 
@@ -343,220 +397,253 @@ describe('OpenID Connect Conformance', () => {
       id_token: expect.stringMatching(JWT_PATTERN),
       refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
       scope: expect.stringMatching(/.+/),
-      token_type: 'Bearer',
+      token_type: "Bearer",
     });
   });
 
-  it('returns an OIDC conformant status 200 on token introspection', async () => {
-    const resp = await axios.post(
-      'http://localhost:9090/testServer/introspect',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 200 on token introspection", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/introspect",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
           },
-          auth: { username: 'clientId123', password: 'secretXyz' }
-      }
-    ).then(resp => {
-      expect(resp.status).toEqual(200);
-      expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
-    }).catch(err => {
-      // Handle Error Here
-    });
-  }); 
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data.username).toEqual("john.doe@example.com");
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
+  });
 
-
-  it('returns an OIDC conformant status 200 on token introspection for the api category isolated endpoint', async () => {
-    const resp = await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/introspect',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 200 on token introspection for the api category isolated endpoint", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/introspect",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
           },
-          auth: { username: 'clientId123', password: 'secretXyz' }
-      }
-    ).then(resp => {
-      expect(resp.status).toEqual(200);
-      expect(data.username).toEqual('cfa32244569841a090ad9d2f0524cf38');
-    }).catch(err => {
-      // Handle Error Here
-    });
-  }); 
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data.username).toEqual("john.doe@example.com");
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
+  });
 
-  it('returns an OIDC conformant status 200 on token revocation', async () => {
-    const resp = await axios.post(
-      'http://localhost:9090/testServer/revoke',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 200 on token revocation", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/revoke",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
           },
-          auth: { username: 'clientId123', password: 'secretXyz' }
-      }
-    ).then(resp => {
-      expect(resp.status).toEqual(200);
-    }).catch(err => {
-      // Handle Error 
-    });
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
   });
 
-  it('returns an OIDC conformant status 200 on token revocation for the api category isolated endpoint', async () => {
-    const resp = await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 200 on token revocation for the api category isolated endpoint", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/revoke",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'authorization': encodeBasicAuthHeader('user', 'pass'),
-            'origin': 'http://localhost:8080'
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
           },
-          auth: { username: 'clientId123', password: 'secretXyz' }
-      }
-    ).then(resp => {
-      expect(resp.status).toEqual(200);
-    }).catch(err => {
-      // Handle Error 
-    });
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
   });
 
-  it('returns an OIDC conformant status 400 on token revocation, from missing authentication', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/revoke',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 400 on token revocation, from missing authentication", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/revoke",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'origin': 'http://localhost:8080'
+            origin: "http://localhost:8080",
           },
-      }
-    ).then(resp => {
-      expect(true).toEqual(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-      expect(err.response.data).toEqual('invalid client_id');
-    });
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+        expect(err.response.data).toEqual("invalid client_id");
+      });
   });
 
-  it('returns an OIDC conformant status 400 on token revocation, from missing authentication for the api category isolated endpoint', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
-      qs.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
+  it("returns an OIDC conformant status 400 on token revocation, from missing authentication for the api category isolated endpoint", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/revoke",
+        qs.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
           headers: {
-            'origin': 'http://localhost:8080'
+            origin: "http://localhost:8080",
           },
-      }
-    ).then(resp => {
-      expect(true).toEqual(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-      expect(err.response.data).toEqual('invalid client_id');
-    });
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+        expect(err.response.data).toEqual("invalid client_id");
+      });
   });
 
-  it('returns an OIDC conformant status 400 on token revocation, from missing token', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/revoke',
-      qs.stringify({ token_type_hint: 'access_token' }),
-      {
-        headers: {
-          'authorization': encodeBasicAuthHeader('user', 'pass'),
-          'origin': 'http://localhost:8080'
-        },
-        auth: { username: 'clientId123', password: 'secretXyz' }
-    }
-    ).then(resp => {
-      expect(true).toEqual(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-      expect(err.response.data).toEqual("invalid_request, missing `token`")
-    });
+  it("returns an OIDC conformant status 400 on token revocation, from missing token", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/revoke",
+        qs.stringify({ token_type_hint: "access_token" }),
+        {
+          headers: {
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
+          },
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+        expect(err.response.data).toEqual("invalid_request, missing `token`");
+      });
   });
 
-  it('returns an OIDC conformant status 400 on token revocation, from missing token for the api category isolated endpoint', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
-      qs.stringify({ token_type_hint: 'access_token' }),
-      {
-        headers: {
-          'authorization': encodeBasicAuthHeader('user', 'pass'),
-          'origin': 'http://localhost:8080'
-        },
-        auth: { username: 'clientId123', password: 'secretXyz' }
-    }
-    ).then(resp => {
-      expect(true).toEqual(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-      expect(err.response.data).toEqual("invalid_request, missing `token`")
-    });
+  it("returns an OIDC conformant status 400 on token revocation, from missing token for the api category isolated endpoint", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/revoke",
+        qs.stringify({ token_type_hint: "access_token" }),
+        {
+          headers: {
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
+          },
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+        expect(err.response.data).toEqual("invalid_request, missing `token`");
+      });
   });
 
-  it('returns an OIDC conformant status 400 on sending json', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/revoke',
-      JSON.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
-        headers: {
-          'content-type':'application/json',
-          'authorization': encodeBasicAuthHeader('user', 'pass'),
-          'origin': 'http://localhost:8080'
-        },
-        auth: { username: 'clientId123', password: 'secretXyz' }
-    }
-    ).then(resp => {
-      expect(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-    });
+  it("returns an OIDC conformant status 400 on sending json", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/revoke",
+        JSON.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
+          headers: {
+            "content-type": "application/json",
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
+          },
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+      });
   });
 
-  it('returns an OIDC conformant status 400 on sending json, isolated endpoint', async () => {
-    await axios.post(
-      'http://localhost:9090/testServer/veteran-verification-apis/v1/revoke',
-      JSON.stringify({ token: 'token', token_type_hint: 'access_token' }),
-      {
-        headers: {
-          'content-type':'application/json',
-          'authorization': encodeBasicAuthHeader('user', 'pass'),
-          'origin': 'http://localhost:8080'
-        },
-        auth: { username: 'clientId123', password: 'secretXyz' }
-    }
-    ).then(resp => {
-      expect(false); // Don't expect to be here
-    }).catch(err => {
-      // Handle Error Here
-      expect(err.response.status).toEqual(400);
-    });
+  it("returns an OIDC conformant status 400 on sending json, isolated endpoint", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/revoke",
+        JSON.stringify({ token: "token", token_type_hint: "access_token" }),
+        {
+          headers: {
+            "content-type": "application/json",
+            authorization: encodeBasicAuthHeader("user", "pass"),
+            origin: "http://localhost:8080",
+          },
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        // Handle Error Here
+        expect(err.response.status).toEqual(400);
+      });
   });
 
-  it('tests manage endpoint redirect', async () => {
-    await axios.get('http://localhost:9090/testServer/manage').then(resp => {
-      expect(resp.status).toEqual(200);
-      expect(resp.data).toEqual('acls updated');
-    })
-    .catch(err => {
-      console.info(err);
-      expect(true).toEqual(false);
-    });
+  it("tests manage endpoint redirect", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/manage")
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data).toEqual("acls updated");
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
   });
 
-  it('tests manage endpoint redirect, isolated endpoint', async () => {
-    await axios.get('http://localhost:9090/testServer/veteran-verification-apis/v1/manage').then(resp => {
-      expect(resp.status).toEqual(200);
-      expect(resp.data).toEqual('acls updated');
-    })
-    .catch(err => {
-      console.info(err);
-      expect(true).toEqual(false);
-    });
+  it("tests manage endpoint redirect, isolated endpoint", async () => {
+    await axios
+      .get(
+        "http://localhost:9090/testServer/veteran-verification-apis/v1/manage"
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data).toEqual("acls updated");
+      })
+      .catch(() => {
+        expect(true).toEqual(false);
+      });
   });
 });

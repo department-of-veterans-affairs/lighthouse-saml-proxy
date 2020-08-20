@@ -1,5 +1,5 @@
 function statusCodeFromError(error) {
-  if(error.response && error.response.statusCode) {
+  if (error.response && error.response.statusCode) {
     return error.response.statusCode;
   }
   return 500;
@@ -7,11 +7,11 @@ function statusCodeFromError(error) {
 
 const isRuntimeError = (err) => {
   return (
-    (err instanceof EvalError)
-    || (err instanceof ReferenceError)
-    || (err instanceof RangeError)
-    || (err instanceof SyntaxError)
-    || (err instanceof TypeError)
+    err instanceof EvalError ||
+    err instanceof ReferenceError ||
+    err instanceof RangeError ||
+    err instanceof SyntaxError ||
+    err instanceof TypeError
   );
 };
 
@@ -22,7 +22,9 @@ const rethrowIfRuntimeError = (err) => {
 };
 
 function encodeBasicAuthHeader(username, password) {
-  const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
+  const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
+    "base64"
+  );
   return `Basic ${encodedCredentials}`;
 }
 
@@ -30,15 +32,15 @@ const BASIC_AUTH_REGEX = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$
 const USER_PASS_REGEX = /^([^:]*):(.*)$/;
 
 function parseBasicAuth(req) {
-  if (!req || typeof req !== 'object') {
+  if (!req || typeof req !== "object") {
     return undefined;
   }
 
-  if (!req.headers || typeof req.headers !== 'object') {
+  if (!req.headers || typeof req.headers !== "object") {
     return undefined;
   }
 
-  if (typeof req.headers.authorization !== 'string') {
+  if (typeof req.headers.authorization !== "string") {
     return undefined;
   }
 
@@ -47,7 +49,9 @@ function parseBasicAuth(req) {
     return undefined;
   }
 
-  const userPass = USER_PASS_REGEX.exec(Buffer.from(match[1], 'base64').toString('utf-8'));
+  const userPass = USER_PASS_REGEX.exec(
+    Buffer.from(match[1], "base64").toString("utf-8")
+  );
   if (!userPass) {
     return undefined;
   }
@@ -60,9 +64,8 @@ function Credentials(username, password) {
   this.password = password;
 }
 
-
 function parseClientId(clientId) {
-  var regex = /^[A-Za-z0-9]+$/
+  var regex = /^[A-Za-z0-9]+$/;
   var isValid = regex.test(clientId);
 
   return isValid;
@@ -74,5 +77,5 @@ module.exports = {
   statusCodeFromError,
   encodeBasicAuthHeader,
   parseBasicAuth,
-  parseClientId
+  parseClientId,
 };

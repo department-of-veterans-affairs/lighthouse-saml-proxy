@@ -1,0 +1,44 @@
+env:
+  node: true
+  commonjs: true
+  es2020: true
+  jest/globals: true
+extends:
+  - "eslint:recommended"
+  - "plugin:prettier/recommended"
+plugins:
+  - prettier
+  - jest
+parserOptions:
+  ecmaVersion: 11
+rules:
+  prettier/prettier:
+    - error
+  jest/no-disabled-tests:
+    - warn
+  jest/no-focused-tests:
+    - error
+  jest/no-identical-title:
+    - error
+  jest/prefer-to-have-length:
+    - warn
+  jest/valid-expect:
+    - error
+  indent:
+    - error
+    - 2
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - error
+    - double
+    - { avoidEscape: true }
+  semi:
+    - error
+    - always
+  no-unused-vars:
+    - error
+    - { argsIgnorePattern: next }
+  no-prototype-builtins:
+    - warn
