@@ -53,6 +53,7 @@ const loggingMiddleware = (options: Options) => morgan(middlewareJsonFormat, opt
 export {
   loggingMiddleware,
   sassLogger,
+  logger
 };
 
 export default logger;

@@ -9,7 +9,7 @@ import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
 
-import { loggingMiddleware, sassLogger } from '../logger';
+import { loggingMiddleware, sassLogger, logger } from '../logger';
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
@@ -17,6 +17,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from 'express-prom-bundle';
 import * as Sentry from '@sentry/node';
+// import { logger } from "handlebars";
 
 function filterProperty(object, property) {
   if (property in object) {
@@ -142,6 +143,13 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   });
 
   addRoutes(app, idpOptions, spOptions);
+
+  // Catches unhandled errors
+  app.use(function onError(err, req, res, next) {
+    err.status = err.status || 500;
+    logger.error("An unhandled error occured. ", err);
+    next(err)
+  });
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
