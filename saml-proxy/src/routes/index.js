@@ -18,6 +18,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from 'express-prom-bundle';
 import * as Sentry from '@sentry/node';
+// import { logger } from "handlebars";
 
 function filterProperty(object, property) {
   if (property in object) {
