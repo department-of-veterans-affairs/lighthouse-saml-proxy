@@ -46,6 +46,7 @@ const middlewareJsonFormat = (tokens: TokenIndexer, req: Request, res: Response)
     'status-code': tokens.status(req, res),
     'content-length': tokens.res(req, res, 'content-length'),
     referrer: tokens.referrer(req, res),
+    'request_id': rTracer.id(),
   }, null, 2);
 };
 
