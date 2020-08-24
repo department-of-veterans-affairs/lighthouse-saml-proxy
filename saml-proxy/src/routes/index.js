@@ -10,7 +10,7 @@ import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
 import rTracer from 'cls-rtracer';
 
-import { loggingMiddleware as morganMiddleware, winstonMiddleware, sassLogger, logger } from '../logger';
+import { loggingMiddleware, winstonMiddleware, sassLogger, logger } from '../logger';
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
