@@ -10,7 +10,7 @@ import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
 import rTracer from 'cls-rtracer';
 
-import { loggingMiddleware, sassLogger, logger } from '../logger';
+import { loggingMiddleware, winstonMiddleware, sassLogger, logger } from '../logger';
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
@@ -95,6 +95,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
       return req.path.startsWith('/samlproxy/idp/bower_components') || req.path.startsWith('/samlproxy/idp/css');
     }
   }));
+  app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(cookieParser());
   app.use(session({
