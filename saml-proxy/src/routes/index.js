@@ -164,8 +164,10 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     app.use(Sentry.Handlers.errorHandler({
       shouldHandleError(error) {
         if (error.status >= 400) {
+          logger.info("Error handled by sentry.");
           return true
         }
+        logger.info("Error not handled by sentry.");
         return false
       }
     }));
