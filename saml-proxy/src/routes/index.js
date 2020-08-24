@@ -8,6 +8,7 @@ import flash from 'connect-flash';
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
+import rTracer from 'cls-rtracer';
 
 import { loggingMiddleware, sassLogger, logger } from '../logger';
 import createPassport from "./passport";
@@ -87,7 +88,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   /**
    * Middleware
    */
-
+  app.use(rTracer.expressMiddleware());
   app.use(loggingMiddleware({
     skip: function (req, res)
     {
