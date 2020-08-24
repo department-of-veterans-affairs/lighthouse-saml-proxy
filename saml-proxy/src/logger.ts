@@ -49,7 +49,7 @@ const middlewareJsonFormat = (tokens: TokenIndexer, req: Request, res: Response)
   }, null, 2);
 };
 
-const loggingMiddleware = (options: Options) => morgan(middlewareJsonFormat, options);
+const morganMiddleware = (options: Options) => morgan(middlewareJsonFormat, options);
 
 const winstonMiddleware = (req: Request, res: Response, next: NextFunction) => {
   logger.defaultMeta['request_id'] = rTracer.id();
@@ -57,7 +57,7 @@ const winstonMiddleware = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export {
-  loggingMiddleware,
+  morganMiddleware as loggingMiddleware,
   winstonMiddleware,
   sassLogger,
   logger
