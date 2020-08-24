@@ -89,7 +89,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
    * Middleware
    */
   app.use(rTracer.expressMiddleware());
-  app.use(morganMiddleware({
+  app.use(loggingMiddleware({
     skip: function (req, res)
     {
       return req.path.startsWith('/samlproxy/idp/bower_components') || req.path.startsWith('/samlproxy/idp/css');
