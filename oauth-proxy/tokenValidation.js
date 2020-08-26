@@ -7,15 +7,19 @@ const axios = require("axios");
 // allowed to bubble up to the caller. You probably don't want to call this
 // directly. See configureTokenValidator below for a friendlier version.
 
-const validateToken = async (endpoint, api_key, access_token) => {
+const validateToken = async (endpoint, api_key, access_token, aud) => {
   const validateTokenStart = process.hrtime.bigint();
-  const config = {
+  const response = await axios({
+    method: 'post',
+    url: endpoint,
     headers: {
       apiKey: api_key,
       authorization: `Bearer ${access_token}`,
     },
-  };
-  const response = await axios.get(endpoint, config);
+    data: {
+      aud: aud
+    }
+  })
   stopTimer(validationGauge, validateTokenStart);
   return response.data.data.attributes;
 };
@@ -23,8 +27,8 @@ const validateToken = async (endpoint, api_key, access_token) => {
 // Returns a function that calls validateToken with the given configuration
 // parameters.
 const configureTokenValidator = (endpoint, api_key) => {
-  return (access_token) => {
-    return validateToken(endpoint, api_key, access_token);
+  return (access_token, aud) => {
+    return validateToken(endpoint, api_key, access_token, aud);
   };
 };
 
