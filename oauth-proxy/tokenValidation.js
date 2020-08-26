@@ -10,16 +10,16 @@ const axios = require("axios");
 const validateToken = async (endpoint, api_key, access_token, aud) => {
   const validateTokenStart = process.hrtime.bigint();
   const response = await axios({
-    method: 'post',
+    method: "post",
     url: endpoint,
     headers: {
       apiKey: api_key,
       authorization: `Bearer ${access_token}`,
     },
     data: {
-      aud: aud
-    }
-  })
+      aud: aud,
+    },
+  });
   stopTimer(validationGauge, validateTokenStart);
   return response.data.data.attributes;
 };
