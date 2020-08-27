@@ -7,11 +7,7 @@ import {
   loadFileSync,
   KEY_CERT_HELP_TEXT,
 } from "./coercing";
-import {
-  checkEncryptionCerts,
-  checkIdpProfileMapper,
-  checkWhenNoMetadata,
-} from "./checks";
+import { checkEncryptionCerts, checkWhenNoMetadata } from "./checks";
 import { BINDINGS } from "../samlConstants";
 
 export function processArgs() {
@@ -205,7 +201,7 @@ export function processArgs() {
         description: "IdP Public Key Signing Certificate (PEM)",
         required: false,
         string: true,
-        coerce: (value) => {
+        coerce: () => {
           return certToPEM(
             makeCertFileCoercer(
               "certificate",

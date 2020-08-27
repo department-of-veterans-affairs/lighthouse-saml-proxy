@@ -137,7 +137,7 @@ export const getParticipant = (req) => {
 };
 
 export const idpSignIn = function (req, res) {
-  const authOptions = extend({}, req.idp.options);
+  const authOptions = extend({}, req.idp.options); // eslint-disable-line 
   Object.keys(req.body).forEach(function (key) {
     var buffer;
     if (key === "_authnRequest") {
@@ -184,8 +184,6 @@ export const acsFactory = (app, acsUrl) => {
   app.get(getPath(acsUrl), processAcs(acsUrl));
   app.post(getPath(acsUrl), processAcs(acsUrl));
 };
-
-const setUpSaml = function (req, res, view) {};
 
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });

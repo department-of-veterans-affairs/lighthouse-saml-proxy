@@ -26,10 +26,6 @@ rules:
     - warn
   jest/valid-expect:
     - error
-  indent:
-    - error
-    - 2
-    - { "SwitchCase": 1 }
   linebreak-style:
     - error
     - unix
@@ -42,7 +38,7 @@ rules:
     - always
   no-unused-vars:
     - error
-    - { argsIgnorePattern: next }
+    - { argsIgnorePattern: \b(?:res|req|next)\b }
   no-prototype-builtins:
     - off
 overrides:
@@ -79,10 +75,6 @@ overrides:
         - warn
       jest/valid-expect:
         - error
-      indent:
-        - error
-        - 2
-        - { "SwitchCase": 1 }
       linebreak-style:
         - error
         - unix
@@ -95,3 +87,6 @@ overrides:
         - always
       no-prototype-builtins:
         - off
+      "@typescript-eslint/no-unused-vars":
+        - error
+        - { argsIgnorePattern: \b(?:res|req|next)\b }

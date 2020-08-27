@@ -1,4 +1,4 @@
-import { IDP_SSO, SP_VERIFY, SP_LOGIN_URL } from "./constants";
+import { SP_VERIFY, SP_LOGIN_URL } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { IConfiguredRequest } from "./types";
 

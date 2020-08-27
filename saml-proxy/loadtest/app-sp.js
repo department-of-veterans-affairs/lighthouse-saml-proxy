@@ -2,7 +2,6 @@
 
 const express = require("express");
 const constants = require("../src/routes/constants");
-const handlers = require("../src/routes/handlers");
 const IdPMetadata = require("../src/idpMetadata");
 const IDPConfig = require("../src/IDPConfig").default;
 const SPConfig = require("../src/SPConfig").default;
@@ -13,7 +12,7 @@ const fs = require("fs");
 const process = require("process");
 const path = require("path");
 const template = require("lodash.template");
-const samlp = require("samlp");
+const https = require("https");
 const http = require("http");
 const os = require("os");
 
@@ -76,7 +75,6 @@ function runServer(argv) {
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
-      const app = express();
       const app = express();
       app.set("port", parseInt(process.env.PORT || argv.port) + 2);
       const spConfig = new SPConfig(argv);

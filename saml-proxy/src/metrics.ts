@@ -53,7 +53,7 @@ export const MVIRequestMetrics = {
 export const VSORequestMetrics = {
   histogram: VSOLookupBucket,
   attempt: VSOAttempt,
-  failure: MVIFailure,
+  failure: VSOFailure,
 };
 
 export interface IRequestMetrics {

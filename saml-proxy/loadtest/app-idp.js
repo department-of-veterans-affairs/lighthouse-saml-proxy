@@ -3,27 +3,20 @@
 const express = require("express");
 const constants = require("../src/routes/constants");
 const handlers = require("../src/routes/handlers");
-const IdPMetadata = require("../src/idpMetadata");
 const IDPConfig = require("../src/IDPConfig").default;
 const SPConfig = require("../src/SPConfig").default;
 const cli = require("../src/cli");
 const configureHandlebars = require("../src/routes/handlebars").default;
 
-const fs = require("fs");
+const https = require("https");
 const process = require("process");
-const path = require("path");
-const template = require("lodash.template");
 const samlp = require("samlp");
 const http = require("http");
 const os = require("os");
 const assignIn = require("lodash.assignin");
 const session = require("express-session");
 
-const METADATA_TEMPLATE = template(
-  fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
-);
-
-function addRoutes(app, idpConfig, spConfig) {
+function addRoutes(app) {
   app.get(
     ["/", "/idp", constants.IDP_SSO],
     handlers.parseSamlRequest,
@@ -66,7 +59,6 @@ function addRoutes(app, idpConfig, spConfig) {
 }
 
 function runServer(argv) {
-  const app = express();
   const app = express();
   app.set("port", parseInt(process.env.PORT || argv.port) + 1);
   const spConfig = new SPConfig(argv);

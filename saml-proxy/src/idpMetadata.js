@@ -1,14 +1,13 @@
 "use strict";
 
-const util = require("util"),
-  request = require("request"),
-  xml2js = require("xml2js");
+const request = require("request");
+const xml2js = require("xml2js");
 const logger = require("./logger");
 
 function getBindingLocation(serviceEl, bindingUri) {
   var location;
   if (serviceEl && serviceEl.length > 0) {
-    serviceEl.forEach((element, index, array) => {
+    serviceEl.forEach((element) => {
       if (element.$.Binding.toLowerCase() === bindingUri) {
         location = element.$.Location;
       }
@@ -47,8 +46,7 @@ export function fetch(url) {
           explicitCharkey: true,
           tagNameProcessors: [xml2js.processors.stripPrefix],
         },
-        parser = new xml2js.Parser(parserConfig),
-        nameIds = [];
+        parser = new xml2js.Parser(parserConfig);
 
       parser.parseString(body, (err, docEl) => {
         if (err) {
@@ -74,7 +72,7 @@ export function fetch(url) {
             });
 
             if (ssoEl.NameIDFormat) {
-              ssoEl.NameIDFormat.forEach((element, index, array) => {
+              ssoEl.NameIDFormat.forEach((element) => {
                 if (element._) {
                   metadata.nameIdFormats.push(element._);
                 }
