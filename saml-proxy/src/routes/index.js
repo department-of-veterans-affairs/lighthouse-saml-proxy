@@ -18,7 +18,6 @@ import { getParticipant } from "./handlers";
 
 import promBundle from 'express-prom-bundle';
 import * as Sentry from '@sentry/node';
-// import { logger } from "handlebars";
 
 function filterProperty(object, property) {
   if (property in object) {
@@ -68,7 +67,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.set('views', path.join(process.cwd(), './views'));
   // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
   // but notably sets req.ip = 'X-Forwarded-for'. See http://expressjs.com/en/guide/behind-proxies.html
-  app.set('trust proxy', true)
+  app.set('trust proxy', true);
 
   /**
    * View Engine
@@ -150,7 +149,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.use(function onError(err, req, res, next) {
     err.status = err.status || 500;
     logger.error("An unhandled error occured. ", err);
-    next(err)
+    next(err);
   });
 
   // catch 404 and forward to error handler
@@ -165,10 +164,10 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
       shouldHandleError(error) {
         if (error.status >= 400) {
           logger.info("Error handled by sentry.");
-          return true
+          return true;
         }
         logger.info("Error not handled by sentry.");
-        return false
+        return false;
       }
     }));
   }
