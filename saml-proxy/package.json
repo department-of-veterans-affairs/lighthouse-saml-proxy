@@ -107,6 +107,7 @@
     "@types/xmldom": "^0.1.29",
     "jest": "^26.4.0",
     "nodemon": "^2.0.4",
+    "prettier": "2.1.1",
     "source-map-support": "^0.5.9",
     "ts-jest": "^23.1.4",
     "ts-node": "^7.0.1",

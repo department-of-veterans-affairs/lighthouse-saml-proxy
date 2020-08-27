@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import { PassportStatic, Strategy } from 'passport';
+import { Request } from "express";
+import { PassportStatic, Strategy } from "passport";
 
-import { VetsAPIClient } from '../VetsAPIClient';
+import { VetsAPIClient } from "../VetsAPIClient";
 
 interface IExtendedStrategy extends Strategy {
   options: any;

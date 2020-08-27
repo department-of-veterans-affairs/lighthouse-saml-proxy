@@ -1,5 +1,5 @@
 import "jest";
-import { getHashCode } from "./handlers.js"
+import { getHashCode } from "./handlers.js";
 
 describe("getHashCode", () => {
   it("should get hash code for a string", () => {

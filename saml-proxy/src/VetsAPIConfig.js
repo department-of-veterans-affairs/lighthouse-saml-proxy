@@ -3,4 +3,4 @@ export default class VetsApiConfig {
     this.token = argv.vetsAPIToken;
     this.apiHost = argv.vetsAPIHost;
   }
-};
+}

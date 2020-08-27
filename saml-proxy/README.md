@@ -1,6 +1,6 @@
 # VA.gov SAML Proxy
 
-This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and ID.me which VA.gov currently uses a authentication service. 
+This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and ID.me which VA.gov currently uses a authentication service.
 
 ## Installation
 
@@ -31,13 +31,15 @@ dev-config.json
 
 ### Commands
 
-Docker: 
+Docker:
+
 ```bash
 docker build -t saml-idp .
 docker run -p 7000:7000 saml-idp --config dev-config.json
 ```
 
 Node:
+
 ```bash
 npm install
 npm run-script start-dev
@@ -53,13 +55,13 @@ You must generate a self-signed certificate for the IdP.
 
 You can generate a keypair using the following command (requires openssl in your path):
 
-``` shell
+```shell
 openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout idp-private-key.pem -out idp-public-cert.pem -days 7300
 ```
 
 You will also need to generated a self-signed certificate of the SP functions
 
-``` shell
+```shell
 openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout sp-key.pem -out sp-cert.pem -days 7300
 ```
 
@@ -68,12 +70,13 @@ You can also grab the development certificates from [here](https://github.com/de
 ## SAML Flow
 
 The proxy fills both roles typically seen in a SAML interaction:
+
 - It acts as an Identity Provider (IDP) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
-- It acts as a Service Provider (SP) relative to ID.me. It sends a SAML request to ID.me, and receives a SAML response. 
+- It acts as a Service Provider (SP) relative to ID.me. It sends a SAML request to ID.me, and receives a SAML response.
 
-These two interactions are interleaved, - the request received from Okta is re-signed and passed along to ID.me. Then the respone from ID.me is validated, transformed, re-signed, and passed along to Okta. 
+These two interactions are interleaved, - the request received from Okta is re-signed and passed along to ID.me. Then the respone from ID.me is validated, transformed, re-signed, and passed along to Okta.
 
-Flow of the SAML login process: 
+Flow of the SAML login process:
 
 ```
 +-----------------------+
@@ -129,4 +132,4 @@ Flow of the SAML login process:
 
 ## Contributing
 
-This is a hybrid JavaScript/Typescript application. Our goal is eventually have it be completely written in Typescript, therefor all new features should be written in TypeScript and have accompanying test written using Jest. 
+This is a hybrid JavaScript/Typescript application. Our goal is eventually have it be completely written in Typescript, therefor all new features should be written in TypeScript and have accompanying test written using Jest.

@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 services:
   saml-proxy:
     build:
@@ -6,4 +6,4 @@ services:
       dockerfile: saml-proxy/Dockerfile
     ports:
       - "7000:7000"
-    command: 'node build/app.js --config dev-config.json'
+    command: "node build/app.js --config dev-config.json"

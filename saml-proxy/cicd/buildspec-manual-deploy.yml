@@ -21,19 +21,19 @@ env:
 phases:
   pre_build:
     commands:
-    - echo Logging into ECR
-    - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
-    - slackpost.sh "Beginning a deploy for ${FRIENDLY_NAME} in envs - ${DEPLOY_ENVS}..."
-    - echo Getting latest tag...
-    # To get the latest release version, we will increment the last version number found in Github
-    - |
-      if [ -n "$DEPLOY_TAG" ]; then
-        echo Found DEPLOY_TAG in job variables: "$DEPLOY_TAG".
-      else
-        DEPLOY_TAG=$(hub tag|sort --version-sort |tail -1); export DEPLOY_TAG
-        echo Got latest tag from Github: "$DEPLOY_TAG"
-      fi
-    - slackpost.sh "Release version - ${DEPLOY_TAG} - will be deployed..."
+      - echo Logging into ECR
+      - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
+      - slackpost.sh "Beginning a deploy for ${FRIENDLY_NAME} in envs - ${DEPLOY_ENVS}..."
+      - echo Getting latest tag...
+      # To get the latest release version, we will increment the last version number found in Github
+      - |
+        if [ -n "$DEPLOY_TAG" ]; then
+          echo Found DEPLOY_TAG in job variables: "$DEPLOY_TAG".
+        else
+          DEPLOY_TAG=$(hub tag|sort --version-sort |tail -1); export DEPLOY_TAG
+          echo Got latest tag from Github: "$DEPLOY_TAG"
+        fi
+      - slackpost.sh "Release version - ${DEPLOY_TAG} - will be deployed..."
   build:
     commands:
       # We trigger the deploys here. The list of environments to automatically deploy to is placed at the end of the command below, separated

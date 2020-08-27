@@ -8,151 +8,152 @@ $dslogon-blue: #003e73;
 
 // Override bad src url in formation
 @font-face {
-    font-family: "Font Awesome 5 Free";
-    src: url("fonts/fa-solid-900.woff2") format("woff2"),
-         url("fonts/fa-solid-900.woff") format("woff"),
-         url("fonts/fa-solid-900.eot") format("eot");
-    font-weight: normal;
-    font-style: normal;
+  font-family: "Font Awesome 5 Free";
+  src: url("fonts/fa-solid-900.woff2") format("woff2"),
+    url("fonts/fa-solid-900.woff") format("woff"),
+    url("fonts/fa-solid-900.eot") format("eot");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .saml-proxy {
-    margin: 18px;
+  margin: 18px;
 
-    .usa-grid {
-        @media screen and (max-width: $medium-screen - 1) {
-            margin: 0;
-            padding: 0;
-        }
+  .usa-grid {
+    @media screen and (max-width: $medium-screen - 1) {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .logo-banner {
+    width: 66%;
+    max-width: 313px;
+    margin: 0 auto;
+
+    a {
+      display: inline-block;
+      width: 100%;
     }
 
-    .logo-banner {
-        width: 66%;
-        max-width: 313px;
-        margin: 0 auto;
+    img {
+      height: auto;
+      width: 100%;
+    }
+  }
 
-        a {
-            display: inline-block;
-            width: 100%;
-        }
+  .usa-grid > hr {
+    border-color: $color-gray-light-alt;
+    margin: 1em 0;
+  }
 
-        img {
-            height: auto;
-            width: 100%
-        }
+  .idme-signup-footer {
+    text-align: center;
+
+    @include media($medium-screen) {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .login-selection-header {
+    text-align: center;
+    margin-bottom: 1em;
+
+    h2 {
+      margin-top: 0;
+    }
+  }
+
+  .usa-button {
+    width: 100%;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @media screen and (max-width: $medium-screen - 1) {
+      height: 50px;
     }
 
-    .usa-grid > hr {
-        border-color: $color-gray-light-alt;
-        margin: 1em 0;
+    &.dslogon {
+      background-color: $dslogon-blue;
     }
 
-    .idme-signup-footer {
-        text-align: center;
-
-        @include media($medium-screen) {
-            display: flex;
-            justify-content: center;
-        }
+    &.idme-signin {
+      background-color: $idme-green;
     }
 
-    .login-selection-header {
-        text-align: center;
-        margin-bottom: 1em;
-
-        h2 {
-            margin-top: 0;
-        }
+    &.idme-signup {
+      background-color: white;
+      box-shadow: inset 0 0 0 2px $idme-green;
+      color: $idme-green;
     }
 
-    .usa-button {
-        width: 100%;
-        font-weight: 700;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    img {
+      display: inline-block;
+      vertical-align: middle;
+      height: 1em;
+      max-width: 100%;
+      padding: 0 0.25em;
+    }
+  }
 
-        @media screen and (max-width: $medium-screen - 1) {
-            height: 50px;
-        }
+  .login-selection {
+    display: flex;
+    flex-flow: column;
 
-        &.dslogon {
-            background-color: $dslogon-blue;
-        }
+    @include media($medium-screen) {
+      display: block;
+    }
+  }
 
-        &.idme-signin {
-            background-color: $idme-green;
-        }
+  .login-help {
+    text-align: center;
+    order: 1;
+    margin-top: 1em;
 
-        &.idme-signup {
-            background-color: white;
-            box-shadow: inset 0 0 0 2px $idme-green;
-            color: $idme-green;
-        }
+    @include media($medium-screen) {
+      margin: 0;
+      text-align: left;
+      order: 0;
+    }
+  }
 
-        img {
-            display: inline-block;
-            vertical-align: middle;
-            height: 1em;
-            max-width: 100%;
-            padding: 0 0.25em;
-        }
+  .usa-grid > span.sidelines {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+    font-size: 1.15em;
+    font-weight: bold;
+    margin: 1em 0;
+
+    &:before,
+    &:after {
+      position: absolute;
+      top: 51%;
+      overflow: hidden;
+      width: 50%;
+      height: 2px;
+      content: "\a0";
+      background-color: $color-gray-light-alt;
     }
 
-    .login-selection {
-        display: flex;
-        flex-flow: column;
-
-        @include media($medium-screen) {
-            display: block;
-        }
+    &:before {
+      margin-left: -52%;
+      text-align: right;
     }
 
-    .login-help {
-        text-align: center;
-        order: 1;
-        margin-top: 1em;
-
-        @include media($medium-screen) {
-            margin: 0;
-            text-align: left;
-            order: 0;
-        }
+    &:after {
+      margin-left: 2%;
     }
+  }
 
-    .usa-grid > span.sidelines {
-        position: relative;
-        z-index: 1;
-        overflow: hidden;
-        text-align: center;
-        width: 100%;
-        display: inline-block;
-        font-size: 1.15em;
-        font-weight: bold;
-        margin: 1em 0;
-
-        &:before, &:after {
-            position: absolute;
-            top: 51%;
-            overflow: hidden;
-            width: 50%;
-            height: 2px;
-            content: "\a0";
-            background-color: $color-gray-light-alt;
-        }
-
-        &:before {
-            margin-left: -52%;
-            text-align: right;
-        }
-
-        &:after {
-            margin-left: 2%;
-        }
-    }
-
-    .fed-warning {
-        font-size: .9em;
-        margin-bottom: 2em;
-    }
+  .fed-warning {
+    font-size: 0.9em;
+    margin-bottom: 2em;
+  }
 }
