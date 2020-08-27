@@ -128,3 +128,4 @@ build/
 # Coverage data for the test suite
 /oauth-proxy/tests/coverage
 
+saml-proxy/.vscode/launch.json

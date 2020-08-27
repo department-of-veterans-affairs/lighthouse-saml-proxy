@@ -187,5 +187,5 @@ export const acsFactory = (app, acsUrl) => {
 
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
-  res.render(urlUserErrorTemplate(req, {}));
+  res.render(urlUserErrorTemplate());
 };

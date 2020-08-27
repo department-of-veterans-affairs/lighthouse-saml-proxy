@@ -26,7 +26,7 @@ const unknownUsersErrorTemplate = (error: any) => {
   }
 };
 
-export const urlUserErrorTemplate = (error: any) => {
+export const urlUserErrorTemplate = () => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   return "handleFailure.hbs";
