@@ -97,15 +97,7 @@ function runServer(argv) {
 
   console.log("starting proxy server on port %s", app.get("port"));
 
-  httpServer.listen(app.get("port"), function () {
-    const scheme = argv.idpHttps ? "https" : "http",
-      address = httpServer.address(),
-      hostname = os.hostname();
-    const baseUrl =
-      address.address === "0.0.0.0" || address.address === "::"
-        ? scheme + "://" + hostname + ":" + address.port
-        : scheme + "://localhost:" + address.port;
-  });
+  httpServer.listen(app.get("port"));
 }
 
 function main() {
