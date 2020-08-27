@@ -12,7 +12,6 @@ const https = require("https");
 const process = require("process");
 const samlp = require("samlp");
 const http = require("http");
-const os = require("os");
 const assignIn = require("lodash.assignin");
 const session = require("express-session");
 
