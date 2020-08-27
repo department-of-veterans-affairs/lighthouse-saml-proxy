@@ -141,7 +141,10 @@ const tokenHandler = async (
   var decoded = jwtDecode(tokens.access_token);
   if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
     try {
-      const validation_result = await validateToken(tokens.access_token);
+      const validation_result = await validateToken(
+        tokens.access_token,
+        decoded.aud
+      );
       const patient = validation_result.va_identifiers.icn;
       res.json({ ...tokenResponseBase, patient, state });
       return next();

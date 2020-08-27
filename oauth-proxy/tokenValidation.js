@@ -7,24 +7,43 @@ const axios = require("axios");
 // allowed to bubble up to the caller. You probably don't want to call this
 // directly. See configureTokenValidator below for a friendlier version.
 
-const validateToken = async (endpoint, api_key, access_token) => {
+const validateToken = async (endpoint, post_endpoint, api_key, access_token, aud) => {
   const validateTokenStart = process.hrtime.bigint();
-  const config = {
-    headers: {
-      apiKey: api_key,
-      authorization: `Bearer ${access_token}`,
-    },
-  };
-  const response = await axios.get(endpoint, config);
-  stopTimer(validationGauge, validateTokenStart);
-  return response.data.data.attributes;
+
+  // This if/else is only required until the post validation transition
+  // is completed across all environments.
+  if (post_endpoint) {
+    const response = await axios({
+      method: "post",
+      url: post_endpoint,
+      headers: {
+        apiKey: api_key,
+        authorization: `Bearer ${access_token}`,
+      },
+      data: {
+        aud: aud,
+      },
+    });
+    stopTimer(validationGauge, validateTokenStart);
+    return response.data.data.attributes;
+  } else {
+    const config = {
+      headers: {
+        apiKey: api_key,
+        authorization: `Bearer ${access_token}`,
+      },
+    };
+    const response = await axios.get(endpoint, config);
+    stopTimer(validationGauge, validateTokenStart);
+    return response.data.data.attributes;
+  }
 };
 
 // Returns a function that calls validateToken with the given configuration
 // parameters.
-const configureTokenValidator = (endpoint, api_key) => {
-  return (access_token) => {
-    return validateToken(endpoint, api_key, access_token);
+const configureTokenValidator = (endpoint, post_endpoint, api_key) => {
+  return (access_token, aud) => {
+    return validateToken(endpoint, post_endpoint, api_key, access_token, aud);
   };
 };
 

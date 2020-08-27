@@ -57,6 +57,10 @@ function processArgs() {
         required: true,
         default: "https://sandbox-api.va.gov/internal/auth/v0/validation",
       },
+      validate_post_endpoint: {
+        description: "va.gov token validation endpoint",
+        required: false,
+      },
       manage_endpoint: {
         description:
           "URL where an end-user can view which applications currently have access to data and can make adjustments to these access rights",
