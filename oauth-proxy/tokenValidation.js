@@ -7,7 +7,8 @@ const axios = require("axios");
 // allowed to bubble up to the caller. You probably don't want to call this
 // directly. See configureTokenValidator below for a friendlier version.
 
-const validateToken = async (endpoint,
+const validateToken = async (
+  endpoint,
   post_endpoint,
   api_key,
   access_token,
