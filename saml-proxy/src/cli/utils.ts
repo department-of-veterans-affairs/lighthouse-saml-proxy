@@ -3,7 +3,7 @@ import path from "path";
 import { cwd, env } from "process";
 
 export function resolveFilePath(filePath: string) {
-  var possiblePath;
+  let possiblePath;
   if (fs.existsSync(filePath)) {
     return filePath;
   }

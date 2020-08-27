@@ -221,7 +221,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
   // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
   // the canonical names, associated in the various IClaimDescriptions tables above.
   public getMappedClaims(): object {
-    let claims = {};
+    const claims = {};
     this.getClaimFields(commonConfiguration, claims);
     if (this.samlAssertions.claims.mhv_uuid) {
       this.getClaimFields(mhvConfiguration, claims);

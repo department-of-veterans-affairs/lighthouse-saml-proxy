@@ -1,0 +1,12 @@
+# Ignore artifacts:
+build
+coverage
+test
+
+# Ignore filetypes:
+*.hbs
+*.html
+*.test.js
+*.test.ts
+
+

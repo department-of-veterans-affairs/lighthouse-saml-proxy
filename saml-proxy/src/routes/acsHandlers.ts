@@ -203,7 +203,7 @@ export async function requestWithMetrics(
   const timer = metrics.histogram.startTimer();
   metrics.attempt.inc();
   try {
-    var res = await promiseFunc();
+    const res = await promiseFunc();
     timer({ status_code: "200" });
     return res;
   } catch (err) {

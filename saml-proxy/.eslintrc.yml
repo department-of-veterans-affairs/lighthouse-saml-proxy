@@ -2,6 +2,7 @@ env:
   node: true
   commonjs: true
   es2020: true
+  es6: true
   jest/globals: true
 extends:
   - "eslint:recommended"
@@ -11,6 +12,7 @@ plugins:
   - jest
 parserOptions:
   ecmaVersion: 11
+  sourceType: module
 rules:
   prettier/prettier:
     - error
@@ -27,6 +29,7 @@ rules:
   indent:
     - error
     - 2
+    - { "SwitchCase": 1 }
   linebreak-style:
     - error
     - unix
@@ -41,13 +44,14 @@ rules:
     - error
     - { argsIgnorePattern: next }
   no-prototype-builtins:
-    - warn
+    - off
 overrides:
   - files: ["**/*.ts", "**/*.tsx"]
     env:
       node: true
       commonjs: true
       es2020: true
+      es6: true
       jest/globals: true
     extends:
       - "eslint:recommended"
@@ -63,6 +67,8 @@ overrides:
     rules:
       prettier/prettier:
         - error
+      "@typescript-eslint/ban-types":
+        - off
       jest/no-disabled-tests:
         - warn
       jest/no-focused-tests:
@@ -87,8 +93,5 @@ overrides:
       semi:
         - error
         - always
-      no-unused-vars:
-        - error
-        - { argsIgnorePattern: next }
       no-prototype-builtins:
-        - warn
+        - off

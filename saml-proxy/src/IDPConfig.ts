@@ -96,7 +96,7 @@ export default class IDPConfig implements IdPOptions {
 
   public transformAssertion(assertionDom: any) {
     if (this.authnContextDecl) {
-      var declDoc;
+      let declDoc;
       try {
         declDoc = new DOMParser().parseFromString(this.authnContextDecl);
       } catch (err) {
