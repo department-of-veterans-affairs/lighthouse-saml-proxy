@@ -1,6 +1,7 @@
 import morgan, { TokenIndexer, Options } from 'morgan';
-import { format, createLogger, transports } from 'winston';
-import { Request, Response } from 'express';
+import winston, { format, createLogger, transports } from 'winston';
+import { Request, Response, NextFunction } from 'express';
+import rTracer from 'cls-rtracer';
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
@@ -45,14 +46,22 @@ const middlewareJsonFormat = (tokens: TokenIndexer, req: Request, res: Response)
     'status-code': tokens.status(req, res),
     'content-length': tokens.res(req, res, 'content-length'),
     referrer: tokens.referrer(req, res),
+    'request_id': rTracer.id(),
   }, null, 2);
 };
 
-const loggingMiddleware = (options: Options) => morgan(middlewareJsonFormat, options);
+const morganMiddleware = (options: Options) => morgan(middlewareJsonFormat, options);
+
+const winstonMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  logger.defaultMeta['request_id'] = rTracer.id();
+  next();
+}
 
 export {
-  loggingMiddleware,
+  morganMiddleware as loggingMiddleware,
+  winstonMiddleware,
   sassLogger,
+  logger
 };
 
 export default logger;

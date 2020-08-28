@@ -8,8 +8,9 @@ import flash from 'connect-flash';
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from 'uuid/v4';
+import rTracer from 'cls-rtracer';
 
-import { loggingMiddleware, sassLogger } from '../logger';
+import { loggingMiddleware as morganMiddleware, winstonMiddleware, sassLogger, logger } from '../logger';
 import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
@@ -66,7 +67,7 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   app.set('views', path.join(process.cwd(), './views'));
   // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
   // but notably sets req.ip = 'X-Forwarded-for'. See http://expressjs.com/en/guide/behind-proxies.html
-  app.set('trust proxy', true)
+  app.set('trust proxy', true);
 
   /**
    * View Engine
@@ -86,13 +87,14 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
   /**
    * Middleware
    */
-
-  app.use(loggingMiddleware({
+  app.use(rTracer.expressMiddleware());
+  app.use(morganMiddleware({
     skip: function (req, res)
     {
       return req.path.startsWith('/samlproxy/idp/bower_components') || req.path.startsWith('/samlproxy/idp/css');
     }
   }));
+  app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(cookieParser());
   app.use(session({
@@ -143,6 +145,13 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
 
   addRoutes(app, idpOptions, spOptions);
 
+  // Catches unhandled errors
+  app.use(function onError(err, req, res, next) {
+    err.status = err.status || 500;
+    logger.error("An unhandled error occured. ", err);
+    next(err);
+  });
+
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     const err = new Error('Route Not Found');
@@ -154,9 +163,11 @@ export default function configureExpress(app, argv, idpOptions, spOptions, vetsA
     app.use(Sentry.Handlers.errorHandler({
       shouldHandleError(error) {
         if (error.status >= 400) {
-          return true
+          logger.info("Error handled by sentry.");
+          return true;
         }
-        return false
+        logger.info("Error not handled by sentry.");
+        return false;
       }
     }));
   }
