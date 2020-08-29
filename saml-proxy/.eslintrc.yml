@@ -64,7 +64,7 @@ overrides:
       prettier/prettier:
         - error
       "@typescript-eslint/ban-types":
-        - off
+        - warn
       jest/no-disabled-tests:
         - warn
       jest/no-focused-tests:

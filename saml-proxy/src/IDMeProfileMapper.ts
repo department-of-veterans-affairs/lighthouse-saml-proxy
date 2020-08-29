@@ -1,10 +1,10 @@
-interface IClaimField {
-  id: string;
-  optional: boolean;
-  displayName: string;
-  description: string;
+import { MetadataItem, ProfileMapper } from "samlp";
+interface Claims {
+  [key: string]: any; //eslint-disable-line
+}
+interface IClaimField extends MetadataItem {
   multiValue: boolean;
-  transformer?: (claim: any) => string;
+  transformer?: (claim: Claims) => string;
 }
 
 interface IClaimDescriptions {
@@ -12,7 +12,7 @@ interface IClaimDescriptions {
 }
 
 interface ISamlAssertions {
-  claims: any;
+  claims: Claims;
   userName: string;
   nameIdFormat: string;
   nameIdNameQualifier?: string;
@@ -195,8 +195,8 @@ const mhvConfiguration: IClaimDescriptions = {
 
 // If the samlp library was written in typescript, this is the interface it would likely export for
 // profile mappers.
-interface ISamlpProfileMapper {
-  getClaims(options: object): object;
+export interface ISamlpProfileMapper {
+  getClaims(options: object): Claims;
   getNameIdentifier(options: object): object | null;
 }
 
@@ -214,13 +214,13 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
 
   // Returns the profile fields received from the upstream identity provider. This is part of the
   // interface required by `samlp` library.
-  public getClaims(): object {
+  public getClaims(): Claims {
     return this.samlAssertions.claims;
   }
 
   // Constructs and returns a new claims object by mapping fields (found in the `samlAssertions`) to
   // the canonical names, associated in the various IClaimDescriptions tables above.
-  public getMappedClaims(): object {
+  public getMappedClaims(): Claims {
     const claims = {};
     this.getClaimFields(commonConfiguration, claims);
     if (this.samlAssertions.claims.mhv_uuid) {
@@ -246,10 +246,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
   // Updates the given `claims` object by inserting the fields described by `fields`. The value(s)
   // for each fields are taken from the `samlAssertions` entry with the `id` field of the claim
   // description. Returns nothing.
-  private getClaimFields(
-    fields: IClaimDescriptions,
-    claims: { [key: string]: string | undefined }
-  ) {
+  private getClaimFields(fields: IClaimDescriptions, claims: Claims) {
     Object.keys(fields).forEach((claimKey) => {
       const { id, multiValue, ...claimField } = fields[claimKey];
       const upstreamValue = this.samlAssertions.claims[id];
@@ -264,7 +261,9 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
   }
 }
 
-export const createProfileMapper = (assertions: ISamlAssertions) => {
+export const createProfileMapper = (
+  assertions: ISamlAssertions
+): IDMeProfileMapper => {
   return new IDMeProfileMapper(assertions);
 };
 

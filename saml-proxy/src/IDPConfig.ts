@@ -4,11 +4,11 @@ import { DOMParser } from "xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp";
 import { Response, Request, NextFunction } from "express";
 import logger from "./logger";
-
+interface AuthnRequest {
+  acsUrl?: string;
+}
 interface IdPRequest extends Request {
-  authnRequest?: {
-    acsUrl?: string;
-  };
+  authnRequest?: AuthnRequest;
 }
 
 export default class IDPConfig implements IdPOptions {
@@ -36,14 +36,14 @@ export default class IDPConfig implements IdPOptions {
   authnContextClassRef: string;
   authnContextDecl: string;
   includeAttributeNameFormat: boolean;
-  profileMapper: any;
+  profileMapper: any; // eslint-disable-line
   postEndpointPath: string;
   redirectEndpointPath: string;
   logoutEndpointPaths: {
     redirect?: string;
     post?: string;
   };
-
+  //eslint-disable-next-line
   constructor(argv: any) {
     this.idpBaseUrl = argv.idpBaseUrl;
     this.issuer = argv.idpIssuer;
@@ -76,16 +76,12 @@ export default class IDPConfig implements IdPOptions {
     this.logoutEndpointPaths = {};
   }
 
-  public getUserFromRequest(req: Request) {
-    return req.user;
-  }
-
   public getPostURL(
     audience: string,
-    authnRequestDom: any,
+    authnRequestDom: AuthnRequest,
     req: IdPRequest,
-    callback: (err: any, url: string) => void
-  ) {
+    callback: (err: Error | null, url: string) => void
+  ): void {
     callback(
       null,
       req.authnRequest && req.authnRequest.acsUrl
@@ -94,7 +90,7 @@ export default class IDPConfig implements IdPOptions {
     );
   }
 
-  public transformAssertion(assertionDom: any) {
+  public transformAssertion(assertionDom: Document): void {
     if (this.authnContextDecl) {
       let declDoc;
       try {
@@ -120,12 +116,12 @@ export default class IDPConfig implements IdPOptions {
   }
 
   public responseHandler(
-    response: any,
-    opts: any,
+    response: Buffer,
+    opts: Record<string, unknown>,
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): void {
     res.render("samlresponse", {
       AcsUrl: opts.postUrl,
       SAMLResponse: response.toString("base64"),
