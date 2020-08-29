@@ -1,13 +1,13 @@
 import morgan, { TokenIndexer, Options } from "morgan";
 import { format, createLogger, transports } from "winston";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import rTracer from "cls-rtracer";
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
   format.json({
     space: 2,
-    replacer: (key: string, value: any) => {
+    replacer: (key: string, value: string) => {
       // timestamp format's alias is in addition to "timestamp", this deduplicates the info object
       if (typeof value === "object" && key === "" && "timestamp" in value) {
         delete value["timestamp"];
@@ -58,10 +58,14 @@ const middlewareJsonFormat = (
   );
 };
 
-const morganMiddleware = (options: Options) =>
+const morganMiddleware = (options: Options): RequestHandler =>
   morgan(middlewareJsonFormat, options);
 
-const winstonMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const winstonMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   logger.defaultMeta["request_id"] = rTracer.id();
   next();
 };

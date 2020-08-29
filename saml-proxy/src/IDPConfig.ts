@@ -90,7 +90,7 @@ export default class IDPConfig implements IdPOptions {
     );
   }
 
-  public transformAssertion(assertionDom: Document): void {
+  public transformAssertion(assertionDom: any): void {
     if (this.authnContextDecl) {
       let declDoc;
       try {
