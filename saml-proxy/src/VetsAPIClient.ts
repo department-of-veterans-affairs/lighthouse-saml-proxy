@@ -19,7 +19,7 @@ const VSO_SEARCH_PATH = "/services/veteran/v0/representatives/find_rep";
 export class VetsAPIClient {
   token: string;
   apiHost: string;
-  headers: object;
+  headers: Record<string, unknown>;
 
   constructor(token: string, apiHost: string) {
     this.token = token;

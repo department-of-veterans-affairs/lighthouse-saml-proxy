@@ -1,4 +1,4 @@
-import { MetadataItem, ProfileMapper } from "samlp";
+import { MetadataItem } from "samlp";
 interface Claims {
   [key: string]: any; //eslint-disable-line
 }
