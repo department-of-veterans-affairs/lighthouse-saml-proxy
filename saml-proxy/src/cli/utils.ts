@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { cwd, env } from "process";
 
-export function resolveFilePath(filePath: string) {
+export function resolveFilePath(filePath: string): string | null {
   let possiblePath;
   if (fs.existsSync(filePath)) {
     return filePath;

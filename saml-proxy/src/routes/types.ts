@@ -4,7 +4,7 @@ import { PassportStatic, Strategy } from "passport";
 import { VetsAPIClient } from "../VetsAPIClient";
 
 interface IExtendedStrategy extends Strategy {
-  options: any;
+  options: Record<string, unknown>;
 }
 
 export interface IConfiguredRequest extends Request {

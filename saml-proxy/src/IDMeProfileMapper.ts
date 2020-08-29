@@ -196,8 +196,10 @@ const mhvConfiguration: IClaimDescriptions = {
 // If the samlp library was written in typescript, this is the interface it would likely export for
 // profile mappers.
 export interface ISamlpProfileMapper {
-  getClaims(options: object): Claims;
-  getNameIdentifier(options: object): object | null;
+  getClaims(options: Record<string, unknown>): Claims;
+  getNameIdentifier(
+    options: Record<string, unknown>
+  ): Record<string, unknown> | null;
 }
 
 // This class maps between the fields as they are known to our upstream identity provider to the
@@ -233,7 +235,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
     return claims;
   }
 
-  public getNameIdentifier(): object {
+  public getNameIdentifier(): Record<string, unknown> {
     return {
       nameIdentifier: this.samlAssertions.userName,
       nameIdentifierFormat: this.samlAssertions.nameIdFormat,
