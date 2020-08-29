@@ -1,5 +1,5 @@
 import { MetadataItem } from "samlp";
-interface Claims {
+export interface Claims {
   [key: string]: any; //eslint-disable-line
 }
 interface IClaimField extends MetadataItem {

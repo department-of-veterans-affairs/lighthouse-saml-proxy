@@ -7,13 +7,17 @@ import assignIn from "lodash.assignin";
 import samlp from "samlp";
 import * as url from "url";
 import logger from "../logger";
+import { Claims } from "../IDMeProfileMapper";
 import {
   MVIRequestMetrics,
   VSORequestMetrics,
   IRequestMetrics,
 } from "../metrics";
 
-const unknownUsersErrorTemplate = (error: any) => {
+const unknownUsersErrorTemplate = (error: {
+  statusCode: number;
+  name: string;
+}): string => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   if (
@@ -26,7 +30,7 @@ const unknownUsersErrorTemplate = (error: any) => {
   }
 };
 
-export const urlUserErrorTemplate = () => {
+export const urlUserErrorTemplate = (): string => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   return "handleFailure.hbs";
@@ -34,7 +38,7 @@ export const urlUserErrorTemplate = () => {
 
 // This depends on being called after buildPassportLoginHandler because it uses
 // the mapped claim mhv_account_type.
-const sufficientLevelOfAssurance = (claims: any) => {
+const sufficientLevelOfAssurance = (claims: Claims) => {
   if (claims.mhv_account_type) {
     return claims.mhv_account_type === "Premium";
   } else if (claims.dslogon_assurance) {
@@ -44,7 +48,9 @@ const sufficientLevelOfAssurance = (claims: any) => {
   }
 };
 
-export const buildPassportLoginHandler = (acsURL: string) => {
+export const buildPassportLoginHandler = (
+  acsURL: string
+): ((req: IConfiguredRequest, res: Response, next: NextFunction) => void) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     logRelayState(req, logger, "from IDP");
     if (
@@ -74,14 +80,14 @@ export const loadICN = async (
   req: IConfiguredRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const session = req.sessionID;
   const action = "loadICN";
 
   try {
     const { icn, first_name, last_name } = await requestWithMetrics(
       MVIRequestMetrics,
-      (): Promise<any> => {
+      (): Promise<{ icn: string; first_name: string; last_name: string }> => {
         return req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
       }
     );
@@ -105,7 +111,7 @@ export const loadICN = async (
     try {
       await requestWithMetrics(
         VSORequestMetrics,
-        (): Promise<any> => {
+        (): Promise<Record<string, unknown>> => {
           return req.vetsAPIClient.getVSOSearch(
             req.user.claims.firstName,
             req.user.claims.lastName
@@ -128,7 +134,7 @@ export const scrubUserClaims = (
   req: IConfiguredRequest,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   // Makes sure we're only serializing user claims as SAML Assertions
   // that are safe to pass to Okta
   req.user.claims = {
@@ -149,7 +155,7 @@ export const testLevelOfAssuranceOrRedirect = (
   req: IConfiguredRequest,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   if (
     req.user &&
     req.user.claims &&
@@ -172,7 +178,7 @@ export const serializeAssertions = (
   req: IConfiguredRequest,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
@@ -198,8 +204,8 @@ export const serializeAssertions = (
 
 export async function requestWithMetrics(
   metrics: IRequestMetrics,
-  promiseFunc: () => Promise<any>
-) {
+  promiseFunc: () => Promise<Record<string, unknown>>
+): Promise<Record<string, unknown>> {
   const timer = metrics.histogram.startTimer();
   metrics.attempt.inc();
   try {

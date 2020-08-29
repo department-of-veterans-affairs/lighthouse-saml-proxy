@@ -58,7 +58,7 @@ export class VetsAPIClient {
   public async getVSOSearch(
     firstName: string,
     lastName: string
-  ): Promise<{ poa: string }> {
+  ): Promise<Record<string, unknown>> {
     const qs = {
       first_name: firstName,
       last_name: lastName,
