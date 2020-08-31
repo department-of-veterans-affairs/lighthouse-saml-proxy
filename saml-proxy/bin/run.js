@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 /*
  * Run easily as a command
  */
-require('../app').main();
+require("../app").main();
