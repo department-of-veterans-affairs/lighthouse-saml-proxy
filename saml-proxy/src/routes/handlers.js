@@ -74,10 +74,7 @@ export const samlLogin = function (template) {
           });
         })
         .catch(next);
-<<<<<<< HEAD
       });
-=======
->>>>>>> 0e045201f82b0f5626797b2ad3ff57f9e97fe046
     } catch (error) {
       logger.error("error", error);
       res.render("error.hbs", {
