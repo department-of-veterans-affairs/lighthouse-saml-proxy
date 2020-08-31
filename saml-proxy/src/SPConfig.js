@@ -26,7 +26,8 @@ export default class SPConfig {
     this.idpThumbprint = argv.spIdpThumbprint;
     this.idpMetaUrl = argv.spIdpMetaUrl;
     this.audience = argv.spAudience;
-    (this.providerName = argv.spProviderName), (this.acsUrls = argv.spAcsUrls);
+    this.providerName = argv.spProviderName;
+    this.acsUrls = argv.spAcsUrls;
     this.signAuthnRequests = argv.spSignAuthnRequests;
     this.signatureAlgorithm = argv.spSignatureAlgorithm;
     this.digestAlgorithm = argv.spDigestAlgorithm;
