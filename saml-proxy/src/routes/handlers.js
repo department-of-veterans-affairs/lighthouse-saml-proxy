@@ -40,7 +40,7 @@ export const samlLogin = function(template) {
       ].reduce((memo, [key, authnContext, exParams = null]) => {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
-          req.authnRequest.forceAuthn,
+          (req.authnRequest && req.authnRequest.forceAuthn) || 'false',
           (req.authnRequest && req.authnRequest.relayState) || '/',
           authnContext
         );
