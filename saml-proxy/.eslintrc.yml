@@ -26,6 +26,10 @@ rules:
   semi:
     - error
     - always
+  no-undef:
+    - warn
+  no-dupe-keys:
+    - warn
   no-unused-vars:
     - warn
     - { argsIgnorePattern: \b(?:res|req|next)\b }
@@ -53,6 +57,8 @@ overrides:
     rules:
       prettier/prettier:
         - error
+      "@typescript-eslint/ban-types":
+        - warn
       linebreak-style:
         - error
         - unix
@@ -65,6 +71,8 @@ overrides:
         - always
       no-prototype-builtins:
         - off
+      no-undef:
+        - warn
       "@typescript-eslint/no-unused-vars":
         - warn
         - { argsIgnorePattern: \b(?:res|req|next)\b }
