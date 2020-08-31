@@ -38,42 +38,50 @@ export const samlLogin = function (template) {
     );
     try {
       [
-        ['id_me_login_link', 'http://idmanagement.gov/ns/assurance/loa/3'],
-        ['dslogon_login_link', 'dslogon'],
-        ['mhv_login_link', 'myhealthevet'],
-        ['id_me_signup_link', 'http://idmanagement.gov/ns/assurance/loa/3', '&op=signup']
+        ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
+        ["dslogon_login_link", "dslogon"],
+        ["mhv_login_link", "myhealthevet"],
+        [
+          "id_me_signup_link",
+          "http://idmanagement.gov/ns/assurance/loa/3",
+          "&op=signup",
+        ],
       ].reduce((memo, [key, authnContext, exParams = null]) => {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
-          (req.authnRequest && req.authnRequest.forceAuthn) || 'false',
-          (req.authnRequest && req.authnRequest.relayState) || '/',
+          (req.authnRequest && req.authnRequest.forceAuthn) || "false",
+          (req.authnRequest && req.authnRequest.relayState) || "/",
           authnContext
         );
-        return memo.then((m) => {
-          return new Promise((resolve, reject) => {
-            samlp.getSamlRequestUrl(params, (err, url) => {
-              if (err) {
-                reject(err);
-              }
-  
-              if (exParams) {
-                m[key] = url + exParams;
-              } else {
-                m[key] = url;
-              }
-              resolve(m);
+        return memo
+          .then((m) => {
+            return new Promise((resolve, reject) => {
+              samlp.getSamlRequestUrl(params, (err, url) => {
+                if (err) {
+                  reject(err);
+                }
+
+                if (exParams) {
+                  m[key] = url + exParams;
+                } else {
+                  m[key] = url;
+                }
+                resolve(m);
+              });
             });
-          });
-        }, Promise.resolve({}))
-        .then((authOptions) => {
-          res.render(template, authOptions);
-          logger.info("User arrived from Okta. Rendering IDP login template.", {
-            action: "parseSamlRequest",
-            result: "success",
-            session: req.sessionID,
-          });
-        })
-        .catch(next);
+          }, Promise.resolve({}))
+          .then((authOptions) => {
+            res.render(template, authOptions);
+            logger.info(
+              "User arrived from Okta. Rendering IDP login template.",
+              {
+                action: "parseSamlRequest",
+                result: "success",
+                session: req.sessionID,
+              }
+            );
+          })
+          .catch(next);
       });
     } catch (error) {
       logger.error("error", error);
