@@ -3,11 +3,13 @@ env:
   commonjs: true
   es2020: true
   es6: true
+  jest/globals: true
 extends:
   - "eslint:recommended"
   - "plugin:prettier/recommended"
 plugins:
   - prettier
+  - jest
 parserOptions:
   ecmaVersion: 11
   sourceType: module
@@ -36,6 +38,7 @@ overrides:
       commonjs: true
       es2020: true
       es6: true
+      jest/globals: true
     extends:
       - "eslint:recommended"
       - "plugin:prettier/recommended"
@@ -43,6 +46,7 @@ overrides:
       - "plugin:@typescript-eslint/recommended"
     plugins:
       - prettier
+      - jest
     parser: "@typescript-eslint/parser"
     parserOptions:
       ecmaVersion: 11

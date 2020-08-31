@@ -69,6 +69,7 @@
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
+    "eslint-plugin-jest": "^23.20.0",
     "event-stream": "^3.3.4",
     "express": "^4.16.4",
     "express-prom-bundle": "^5.1.5",
