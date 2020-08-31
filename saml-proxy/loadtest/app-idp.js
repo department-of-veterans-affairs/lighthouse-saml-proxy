@@ -59,7 +59,6 @@ function addRoutes(app, idpConfig, spConfig) {
 
 function runServer(argv) {
   const app = express();
-  const app = express();
   app.set('port', parseInt(process.env.PORT || argv.port) + 1);
   const spConfig = new SPConfig(argv);
   const idpConfig = new IDPConfig(argv);
