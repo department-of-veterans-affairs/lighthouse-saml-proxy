@@ -77,7 +77,6 @@ function runServer(argv) {
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
-      const app = express();
       app.set('port', parseInt(process.env.PORT || argv.port) + 2);
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
