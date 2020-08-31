@@ -7,8 +7,8 @@ import {
   loadICN,
   scrubUserClaims,
   serializeAssertions,
-  urlUserErrorTemplate
-} from './acsHandlers';
+  urlUserErrorTemplate,
+} from "./acsHandlers";
 import logger from "../logger";
 
 export const getHashCode = (str) => {
@@ -17,21 +17,26 @@ export const getHashCode = (str) => {
   if (str.length == 0) return hash;
   for (i = 0; i < str.length; i++) {
     var char = str.charCodeAt(i);
-    hash = ((hash<<5)-hash)+char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   return hash;
 };
 
-export const samlLogin = function(template) {
-  return function(req, res, next) {
-    const acsUrl = req.query.acsUrl ?
-          getReqUrl(req, req.query.acsUrl) :
-          getReqUrl(req, req.sp.options.requestAcsUrl);
-    const authnRequest = req.authnRequest ? req.authnRequest : req.session.authnRequest;
+export const samlLogin = function (template) {
+  return function (req, res, next) {
+    const acsUrl = req.query.acsUrl
+      ? getReqUrl(req, req.query.acsUrl)
+      : getReqUrl(req, req.sp.options.requestAcsUrl);
+    const authnRequest = req.authnRequest
+      ? req.authnRequest
+      : req.session.authnRequest;
     req.authnRequest = authnRequest;
-    const samlp = new _samlp(req.sp.options.getResponseParams(), new SAML.SAML(req.sp.options.getResponseParams()));
-    try{
+    const samlp = new _samlp(
+      req.sp.options.getResponseParams(),
+      new SAML.SAML(req.sp.options.getResponseParams())
+    );
+    try {
       [
         ['id_me_login_link', 'http://idmanagement.gov/ns/assurance/loa/3'],
         ['dslogon_login_link', 'dslogon'],
@@ -59,31 +64,38 @@ export const samlLogin = function(template) {
               resolve(m);
             });
           });
-        });
-      }, Promise.resolve({})).then(
-        (authOptions) => {
-          res.render(template, authOptions)
-          logger.info('User arrived from Okta. Rendering IDP login template.', { action: 'parseSamlRequest', result: 'success', session: req.sessionID })
-        }
-      ).catch(next);
-    }catch (error){
+        }, Promise.resolve({}))
+        .then((authOptions) => {
+          res.render(template, authOptions);
+          logger.info("User arrived from Okta. Rendering IDP login template.", {
+            action: "parseSamlRequest",
+            result: "success",
+            session: req.sessionID,
+          });
+        })
+        .catch(next);
+      });
+    } catch (error) {
       logger.error("error", error);
-      res.render('error.hbs', {message: "Error processing SAML request", error: {status: error.status}});
+      res.render("error.hbs", {
+        message: "Error processing SAML request",
+        error: { status: error.status },
+      });
     }
-  }
+  };
 };
 
 /**
  * Shared Handlers
  */
 
-export const parseSamlRequest = function(req, res, next) {
-  logRelayState(req, logger, 'from Okta');
-  samlp.parseRequest(req, function(err, data) {
+export const parseSamlRequest = function (req, res, next) {
+  logRelayState(req, logger, "from Okta");
+  samlp.parseRequest(req, function (err, data) {
     if (err) {
-      logger.warn("Allowing login with no final redirect.")
+      logger.warn("Allowing login with no final redirect.");
       next();
-    };
+    }
     if (data) {
       req.authnRequest = {
         relayState: req.query.RelayState || req.body.RelayState,
@@ -91,7 +103,7 @@ export const parseSamlRequest = function(req, res, next) {
         issuer: data.issuer,
         destination: data.destination,
         acsUrl: data.assertionConsumerServiceURL,
-        forceAuthn: data.forceAuthn === 'true'
+        forceAuthn: data.forceAuthn === "true",
       };
       req.session.authnRequest = req.authnRequest;
     }
@@ -110,7 +122,7 @@ export const getParticipant = (req) => {
   const participant = {
     serviceProviderId: req.idp.options.serviceProviderId,
     sessionIndex: getSessionIndex(req),
-    serviceProviderLogoutURL: req.idp.options.sloUrl
+    serviceProviderLogoutURL: req.idp.options.sloUrl,
   };
   if (req.user) {
     participant.nameId = req.user.userName;
@@ -119,13 +131,13 @@ export const getParticipant = (req) => {
   return participant;
 };
 
-export const idpSignIn = function(req, res) {
+export const idpSignIn = function (req, res) {
   const authOptions = extend({}, req.idp.options);
-  Object.keys(req.body).forEach(function(key) {
+  Object.keys(req.body).forEach(function (key) {
     var buffer;
-    if (key === '_authnRequest') {
-      buffer = new Buffer(req.body[key], 'base64');
-      req.authnRequest = JSON.parse(buffer.toString('utf8'));
+    if (key === "_authnRequest") {
+      buffer = new Buffer(req.body[key], "base64");
+      req.authnRequest = JSON.parse(buffer.toString("utf8"));
 
       // Apply AuthnRequest Params
       authOptions.inResponseTo = req.authnRequest.id;
@@ -164,21 +176,13 @@ const processAcs = (acsUrl) => [
 ];
 
 export const acsFactory = (app, acsUrl) => {
-  app.get(
-    getPath(acsUrl),
-    processAcs(acsUrl)
-  );
-  app.post(
-    getPath(acsUrl),
-    processAcs(acsUrl)
-  );
+  app.get(getPath(acsUrl), processAcs(acsUrl));
+  app.post(getPath(acsUrl), processAcs(acsUrl));
 };
 
-const setUpSaml = function(req, res, view) {
-
-}
+const setUpSaml = function (req, res, view) {};
 
 export const handleError = (req, res) => {
-  logger.error({idp_sid: req.cookies.idp_sid});
+  logger.error({ idp_sid: req.cookies.idp_sid });
   res.render(urlUserErrorTemplate(req, {}));
 };

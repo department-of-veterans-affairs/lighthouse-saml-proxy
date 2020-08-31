@@ -2,12 +2,12 @@ import fs from "fs";
 import path from "path";
 import { cwd, env } from "process";
 
-export function resolveFilePath(filePath : string) {
-  var possiblePath;
+export function resolveFilePath(filePath: string) {
+  let possiblePath;
   if (fs.existsSync(filePath)) {
     return filePath;
   }
-  if (filePath.slice(0, 2) === '~/') {
+  if (filePath.slice(0, 2) === "~/") {
     possiblePath = path.resolve(env.HOME || "/", filePath.slice(2));
     if (fs.existsSync(possiblePath)) {
       return possiblePath;
@@ -16,7 +16,7 @@ export function resolveFilePath(filePath : string) {
       return filePath;
     }
   }
-  ['.', cwd()].forEach(function (base) {
+  [".", cwd()].forEach(function (base) {
     possiblePath = path.resolve(base, filePath);
     if (fs.existsSync(possiblePath)) {
       return possiblePath;
