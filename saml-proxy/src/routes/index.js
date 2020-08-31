@@ -11,7 +11,7 @@ import uuidv4 from "uuid/v4";
 import rTracer from "cls-rtracer";
 
 import {
-  loggingMiddleware as morganMiddleware,
+  morganMiddleware,
   winstonMiddleware,
   sassLogger,
   logger,
@@ -23,7 +23,6 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
-// import { logger } from "handlebars";
 
 function filterProperty(object, property) {
   if (property in object) {

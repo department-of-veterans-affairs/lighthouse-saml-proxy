@@ -71,7 +71,7 @@ const winstonMiddleware = (
 };
 
 export {
-  morganMiddleware as loggingMiddleware,
+  morganMiddleware,
   winstonMiddleware,
   sassLogger,
   logger,
