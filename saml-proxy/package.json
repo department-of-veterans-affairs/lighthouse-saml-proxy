@@ -21,12 +21,14 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "prestart": "yarn build",
+    "prestart": "yarn build && npx eslint .",
     "start": "node build/app.js",
+    "lint": "npx eslint .",
+    "lint-fix": "npx eslint . --fix",
     "test": "jest",
     "test:ci": "jest --ci",
     "test:watch": "jest --watch",
-    "start-dev": "ts-node -r source-map-support/register src/app.js --config dev-config.json",
+    "start-dev": "npx eslint . && ts-node -r source-map-support/register src/app.js --config dev-config.json",
     "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
   "jest": {
@@ -69,6 +71,7 @@
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~3.1.0",
+    "eslint-plugin-jest": "^23.20.0",
     "event-stream": "^3.3.4",
     "express": "^4.16.4",
     "express-prom-bundle": "^5.1.5",
@@ -102,14 +105,20 @@
     "@types/express": "^4.16.0",
     "@types/handlebars": "^4.0.39",
     "@types/jest": "^23.3.9",
-    "@types/node": "^10.12.9",
+    "@types/node": "^10.17.28",
     "@types/samlp": "^1.0.7",
     "@types/xmldom": "^0.1.29",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "eslint": "^7.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.4.0",
     "nodemon": "^2.0.4",
+    "prettier": "2.1.1",
     "source-map-support": "^0.5.9",
     "ts-jest": "^23.1.4",
     "ts-node": "^7.0.1",
-    "typescript": "^3.1.6"
+    "typescript": "^3.9.7"
   }
 }

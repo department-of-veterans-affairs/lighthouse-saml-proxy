@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -29,40 +28,42 @@ const handleMetadata = (argv) => {
       }
 
       switch (metadata.protocol) {
-      case 'samlp':
-        if (metadata.sso.redirectUrl) {
-          argv.spIdpSsoUrl = metadata.sso.redirectUrl;
-        } else if (metadata.sso.postUrl) {
-          argv.spIdpSsoUrl = metadata.sso.postUrl;
-        }
-        if (metadata.slo.redirectUrl) {
-          argv.spIdpSloUrl = metadata.slo.redirectUrl;
-        } else if (metadata.slo.postUrl) {
-          argv.spIdpSloUrl = metadata.slo.postUrl;
-        }
-        if (metadata.signRequest) {
-          argv.spSignAuthnRequests = metadata.signRequest;
-        }
-        break;
-      case 'wsfed':
-        if (metadata.sso.redirectUrl) {
-          argv.spIdpSsoUrl = metadata.sso.redirectUrl;
-        }
-        break;
+        case "samlp":
+          if (metadata.sso.redirectUrl) {
+            argv.spIdpSsoUrl = metadata.sso.redirectUrl;
+          } else if (metadata.sso.postUrl) {
+            argv.spIdpSsoUrl = metadata.sso.postUrl;
+          }
+          if (metadata.slo.redirectUrl) {
+            argv.spIdpSloUrl = metadata.slo.redirectUrl;
+          } else if (metadata.slo.postUrl) {
+            argv.spIdpSloUrl = metadata.slo.postUrl;
+          }
+          if (metadata.signRequest) {
+            argv.spSignAuthnRequests = metadata.signRequest;
+          }
+          break;
+        case "wsfed":
+          if (metadata.sso.redirectUrl) {
+            argv.spIdpSsoUrl = metadata.sso.redirectUrl;
+          }
+          break;
       }
     }
   };
 };
-
 
 function runServer(argv) {
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
-      const httpServer = argv.idpHttps ?
-            https.createServer({ key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert }, app) :
-            http.createServer(app);
+      const httpServer = argv.idpHttps
+        ? https.createServer(
+            { key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert },
+            app
+          )
+        : http.createServer(app);
 
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
@@ -70,22 +71,27 @@ function runServer(argv) {
       const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
       configureExpress(app, argv, idpConfig, spConfig, vetsApiClient);
 
-      const env = app.get('env'), port = app.get("port");
-      logger.info(`Starting proxy server on port ${port} in ${env} mode`, { env, port });
+      const env = app.get("env"),
+        port = app.get("port");
+      logger.info(`Starting proxy server on port ${port} in ${env} mode`, {
+        env,
+        port,
+      });
       httpServer.keepAliveTimeout = 75000;
       httpServer.headersTimeout = 75000;
-      httpServer.listen(app.get('port'), function() {
-        const scheme   = argv.idpHttps ? 'https' : 'http',
-              address  = httpServer.address(),
-              hostname = os.hostname();
-        const baseUrl  = address.address === '0.0.0.0' || address.address === '::' ?
-          scheme + '://' + hostname + ':' + address.port :
-          scheme + '://localhost:' + address.port;
+      httpServer.listen(app.get("port"), function () {
+        const scheme = argv.idpHttps ? "https" : "http",
+          address = httpServer.address(),
+          hostname = os.hostname();
+        const baseUrl =
+          address.address === "0.0.0.0" || address.address === "::"
+            ? scheme + "://" + hostname + ":" + address.port
+            : scheme + "://localhost:" + address.port;
       });
     });
 }
 
-function main () {
+function main() {
   runServer(cli.processArgs());
 }
 
