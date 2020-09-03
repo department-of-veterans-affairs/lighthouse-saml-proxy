@@ -45,10 +45,7 @@ export default function configureHandlebars() {
   // Given a string like "1-777-888-9999" it generates an anchor tag like so:
   //
   //   <a href="tel:17778889999" aria-label="1. 7 7 7. 8 8 8. 9 9 9 9.">1-777-888-9999</a>
-  hbs.registerHelper("accessible-phone-number", function (
-    digitString,
-    context
-  ) {
+  hbs.registerHelper("accessible-phone-number", function (digitString) {
     var digits = digitString.split("").filter(function (ch) {
       return "0123456789".indexOf(ch) !== -1;
     });
