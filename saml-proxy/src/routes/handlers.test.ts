@@ -1,5 +1,5 @@
 import "jest";
-import { getHashCode, samlLogin } from "./handlers.js"
+import { getHashCode, samlLogin } from "./handlers.js";
 
 describe("getHashCode", () => {
   it("should get hash code for a string", () => {
@@ -8,12 +8,16 @@ describe("getHashCode", () => {
 });
 
 describe("samlLogin", () => {
-  it("Happy Path", async () => {
-    const res = {
-      render: jest.fn((arg1, arg2) => {})
-    }
-    
-    const mockRequest = {
+  let mockResponse;
+  let mockRequest;
+  let mockNext;
+
+  beforeEach(() => {
+    mockResponse = {
+      render: jest.fn(),
+    };
+
+    mockRequest = {
       sessionID: "sessionID",
       query: {
         acsUrl: "url",
@@ -43,8 +47,11 @@ describe("samlLogin", () => {
         return param;
       },
     };
-    const mockNext = jest.fn();
-    samlLogin("login_selection")(mockRequest, res, mockNext);
-    expect(res.render).toHaveBeenCalled();
+
+    mockNext = jest.fn();
+  });
+  it("Happy Path", async () => {
+    samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
+    expect(mockResponse.render).toHaveBeenCalled();
   });
 });
