@@ -72,7 +72,7 @@ export function fetch(url) {
             });
 
             if (ssoEl.NameIDFormat) {
-              ssoEl.NameIDFormat.forEach((element, index, array) => {
+              ssoEl.NameIDFormat.forEach((element) => {
                 if (element._) {
                   metadata.nameIdFormats.push(element._);
                 }
