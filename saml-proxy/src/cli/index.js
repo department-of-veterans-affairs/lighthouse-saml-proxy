@@ -7,10 +7,7 @@ import {
   loadFileSync,
   KEY_CERT_HELP_TEXT,
 } from "./coercing";
-import {
-  checkEncryptionCerts,
-  checkWhenNoMetadata,
-} from "./checks";
+import { checkEncryptionCerts, checkWhenNoMetadata } from "./checks";
 import { BINDINGS } from "../samlConstants";
 
 export function processArgs() {
