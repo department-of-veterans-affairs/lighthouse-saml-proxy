@@ -1,7 +1,6 @@
 import {
   IDP_SSO,
   IDP_METADATA,
-  IDP_REDIRECT,
   SP_METADATA_URL,
   SP_VERIFY,
   SP_ERROR_URL,
@@ -11,7 +10,6 @@ import {
 import {
   acsFactory,
   parseSamlRequest,
-  showLoginOptions,
   handleError,
   samlLogin,
   idpSignIn,
