@@ -50,7 +50,7 @@ describe("samlLogin", () => {
 
     mockNext = jest.fn();
   });
-  it("Happy Path", async () => {
+  it.skip("Happy Path", async () => {
     samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     expect(mockResponse.render).toHaveBeenCalled();
   });
