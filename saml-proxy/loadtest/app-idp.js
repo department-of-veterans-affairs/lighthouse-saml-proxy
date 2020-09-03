@@ -3,27 +3,18 @@
 const express = require("express");
 const constants = require("../src/routes/constants");
 const handlers = require("../src/routes/handlers");
-const IdPMetadata = require("../src/idpMetadata");
 const IDPConfig = require("../src/IDPConfig").default;
 const SPConfig = require("../src/SPConfig").default;
 const cli = require("../src/cli");
 const configureHandlebars = require("../src/routes/handlebars").default;
 
-const fs = require("fs");
 const process = require("process");
-const path = require("path");
-const template = require("lodash.template");
 const samlp = require("samlp");
 const http = require("http");
-const os = require("os");
 const assignIn = require("lodash.assignin");
 const session = require("express-session");
 
-const METADATA_TEMPLATE = template(
-  fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
-);
-
-function addRoutes(app, idpConfig, spConfig) {
+function addRoutes(app) {
   app.get(
     ["/", "/idp", constants.IDP_SSO],
     handlers.parseSamlRequest,
@@ -100,19 +91,11 @@ function runServer(argv) {
     req.idp = { options: idpConfig };
     next();
   });
-  addRoutes(app, idpConfig, spConfig);
+  addRoutes(app);
 
   console.log("starting proxy server on port %s", app.get("port"));
 
-  httpServer.listen(app.get("port"), function () {
-    const scheme = argv.idpHttps ? "https" : "http",
-      address = httpServer.address(),
-      hostname = os.hostname();
-    const baseUrl =
-      address.address === "0.0.0.0" || address.address === "::"
-        ? scheme + "://" + hostname + ":" + address.port
-        : scheme + "://localhost:" + address.port;
-  });
+  httpServer.listen(app.get("port"));
 }
 
 function main() {
