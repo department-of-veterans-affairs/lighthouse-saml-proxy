@@ -34,7 +34,7 @@ const vetsApiClient = new MockVetsApiClient();
 
 function buildSamlResponse(type, level_of_assurance) {
   const user = getUser(type, level_of_assurance);
-  return new Promise((resolve, _) => {
+  return new Promise((resolve) => {
     getSamlResponse(idpConfig, user, (_, samlResponse) => {
       resolve(btoa(samlResponse));
     });
