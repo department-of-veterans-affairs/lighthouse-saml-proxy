@@ -3,7 +3,7 @@ import * as request from "request-promise-native";
 import { VetsAPIClient } from "./VetsAPIClient";
 jest.mock("request-promise-native", () => {
   return {
-    post: jest.fn((_) => Promise.resolve({})),
+    post: jest.fn(() => Promise.resolve({})),
   };
 });
 
@@ -38,7 +38,7 @@ const samlTraitsICN = {
 
 beforeEach(() => {
   request.post.mockReset();
-  request.post.mockImplementation((_) =>
+  request.post.mockImplementation(() =>
     Promise.resolve({
       data: {
         id: "fakeICN",
