@@ -7,7 +7,7 @@ const logger = require("./logger");
 function getBindingLocation(serviceEl, bindingUri) {
   var location;
   if (serviceEl && serviceEl.length > 0) {
-    serviceEl.forEach((element, index, array) => {
+    serviceEl.forEach((element) => {
       if (element.$.Binding.toLowerCase() === bindingUri) {
         location = element.$.Location;
       }
