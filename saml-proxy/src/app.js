@@ -5,7 +5,6 @@
 import express from "express";
 import http from "http";
 import https from "https";
-import os from "os";
 import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
