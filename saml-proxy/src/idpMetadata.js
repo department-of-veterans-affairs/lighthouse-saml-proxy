@@ -1,8 +1,7 @@
 "use strict";
 
-const util = require("util"),
-  request = require("request"),
-  xml2js = require("xml2js");
+const request = require("request");
+const xml2js = require("xml2js");
 const logger = require("./logger");
 
 function getBindingLocation(serviceEl, bindingUri) {
@@ -47,8 +46,7 @@ export function fetch(url) {
           explicitCharkey: true,
           tagNameProcessors: [xml2js.processors.stripPrefix],
         },
-        parser = new xml2js.Parser(parserConfig),
-        nameIds = [];
+        parser = new xml2js.Parser(parserConfig);
 
       parser.parseString(body, (err, docEl) => {
         if (err) {
