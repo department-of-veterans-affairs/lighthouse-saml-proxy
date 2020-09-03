@@ -214,7 +214,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
 
   // Returns the profile fields received from the upstream identity provider. This is part of the
   // interface required by `samlp` library.
-  public getClaims(options: object): object {
+  public getClaims(): object {
     return this.samlAssertions.claims;
   }
 
@@ -233,7 +233,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
     return claims;
   }
 
-  public getNameIdentifier(options: object): object {
+  public getNameIdentifier(): object {
     return {
       nameIdentifier: this.samlAssertions.userName,
       nameIdentifierFormat: this.samlAssertions.nameIdFormat,
