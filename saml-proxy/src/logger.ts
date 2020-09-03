@@ -1,5 +1,5 @@
 import morgan, { TokenIndexer, Options } from "morgan";
-import winston, { format, createLogger, transports } from "winston";
+import { format, createLogger, transports } from "winston";
 import { Request, Response, NextFunction } from "express";
 import rTracer from "cls-rtracer";
 
