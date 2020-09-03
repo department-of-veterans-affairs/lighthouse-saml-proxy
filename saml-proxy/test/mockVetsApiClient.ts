@@ -19,8 +19,8 @@ export default class MockVetsApiClient {
   }
 
   public async getVSOSearch(
-    firstName: string,
-    lastName: string
+    firstName: string, // eslint-disable-line
+    lastName: string // eslint-disable-line
   ): Promise<{ poa: string }> {
     if (this.userIsVSO) {
       return {
