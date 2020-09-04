@@ -21,4 +21,5 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
 
 USER node
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/home/node/bin/config.sh"]
-CMD ["node", "index.js"]
+
+CMD ["node", "index.js", "--config", "/home/node/config.json"]
