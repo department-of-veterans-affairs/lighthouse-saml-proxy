@@ -160,7 +160,7 @@ export default function configureExpress(
 
   app.use(function (req, res, next) {
     if (req.idp.options.rollSession) {
-      req.session.regenerate(function (err) {
+      req.session.regenerate(function () {
         return next();
       });
     } else {

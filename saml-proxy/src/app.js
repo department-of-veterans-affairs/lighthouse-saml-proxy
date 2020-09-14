@@ -5,7 +5,6 @@
 import express from "express";
 import http from "http";
 import https from "https";
-import os from "os";
 import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
@@ -79,15 +78,7 @@ function runServer(argv) {
       });
       httpServer.keepAliveTimeout = 75000;
       httpServer.headersTimeout = 75000;
-      httpServer.listen(app.get("port"), function () {
-        const scheme = argv.idpHttps ? "https" : "http",
-          address = httpServer.address(),
-          hostname = os.hostname();
-        const baseUrl =
-          address.address === "0.0.0.0" || address.address === "::"
-            ? scheme + "://" + hostname + ":" + address.port
-            : scheme + "://localhost:" + address.port;
-      });
+      httpServer.listen(app.get("port"));
     });
 }
 

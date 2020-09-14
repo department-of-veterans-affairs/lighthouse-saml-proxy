@@ -177,8 +177,6 @@ export const acsFactory = (app, acsUrl) => {
   app.post(getPath(acsUrl), processAcs(acsUrl));
 };
 
-const setUpSaml = function (req, res, view) {};
-
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
   res.render(urlUserErrorTemplate(req, {}));

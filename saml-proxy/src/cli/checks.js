@@ -1,7 +1,6 @@
 import isString from "lodash.isstring";
-import { resolveFilePath } from "./utils";
 
-export function checkEncryptionCerts(argv, aliases) {
+export function checkEncryptionCerts(argv) {
   if (argv.idpEncryptAssertion) {
     if (argv.idpEncryptionPublicKey === undefined) {
       return "encryptionPublicKey argument is also required for assertion encryption";
@@ -13,7 +12,7 @@ export function checkEncryptionCerts(argv, aliases) {
   return true;
 }
 
-export function checkWhenNoMetadata(argv, aliases) {
+export function checkWhenNoMetadata(argv) {
   if (!isString(argv.spIdpMetaUrl)) {
     if (!isString(argv.spIdpSsoUrl) || argv.spIdpSsoUrl === "") {
       return "IdP SSO Assertion Consumer URL (spIdpSsoUrl) is required when IdP metadata is not specified";

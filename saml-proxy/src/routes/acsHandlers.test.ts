@@ -1,5 +1,4 @@
 import "jest";
-import { Response, Request, NextFunction } from "express";
 
 import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
@@ -219,7 +218,7 @@ describe("requestWithMetrics", () => {
   it("should call the passed in functions promise", async () => {
     let called = false;
     const func = () => {
-      return new Promise((resolve, _) => {
+      return new Promise((resolve) => {
         called = true;
         resolve();
       });

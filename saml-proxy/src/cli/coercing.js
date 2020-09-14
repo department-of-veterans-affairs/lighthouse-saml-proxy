@@ -14,7 +14,7 @@ export function matchesCertType(value, type) {
   return cryptTypes[type] && cryptTypes[type].test(value);
 }
 
-function bufferFromString(value) {
+export function bufferFromString(value) {
   if (Buffer.hasOwnProperty("from")) {
     // node 6+
     return Buffer.from(value);
@@ -52,7 +52,7 @@ export function certToPEM(cert) {
   return cert;
 }
 
-function loadFileSync(value) {
+export function loadFileSync(value) {
   const filePath = resolveFilePath(value);
   if (filePath) {
     return fs.readFileSync(filePath, "utf8");

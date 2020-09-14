@@ -18,9 +18,14 @@ export default class MockVetsApiClient {
     throw new Error("Not found");
   }
 
+  /*
+   * Mock VSO search.
+   *
+   * Params are unused but are present to mimic real signature.
+   */
   public async getVSOSearch(
-    firstName: string,
-    lastName: string
+    firstName: string, // eslint-disable-line
+    lastName: string // eslint-disable-line
   ): Promise<{ poa: string }> {
     if (this.userIsVSO) {
       return {
