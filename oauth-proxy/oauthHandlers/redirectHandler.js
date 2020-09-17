@@ -19,7 +19,7 @@ const redirectHandler = async (
     return next();
   }
 
-  if (!req.query.hasOwnProperty("error")) {
+  if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
       await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
     } catch (error) {
