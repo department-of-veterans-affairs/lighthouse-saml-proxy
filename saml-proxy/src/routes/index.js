@@ -145,6 +145,7 @@ export default function configureExpress(
   );
 
   app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
+  app.use("/fonts", express.static(path.join(process.cwd(), "public/fonts")));
   app.use(
     "/samlproxy/assets/fonts",
     express.static(path.join(process.cwd(), "public/fonts"))
