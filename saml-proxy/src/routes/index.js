@@ -144,12 +144,8 @@ export default function configureExpress(
     })
   );
 
+  // This route exposes our static assets - fonts, images, and css
   app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
-  app.use("/fonts", express.static(path.join(process.cwd(), "public/fonts")));
-  app.use(
-    "/samlproxy/assets/fonts",
-    express.static(path.join(process.cwd(), "public/fonts"))
-  );
 
   app.use(function (req, res, next) {
     req.metadata = idpOptions.profileMapper.metadata;

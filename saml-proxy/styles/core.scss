@@ -1,20 +1,14 @@
 $font-path: "/samlproxy/idp/fonts";
+$formation-asset-path: "../idp";
+$formation-image-path: "#{$formation-asset-path}/img";
+$formation-font-path: "#{$formation-asset-path}/fonts";
+
 $image-path: "img";
 $idme-green: #2e8540;
 $dslogon-blue: #003e73;
 
 @import "~@department-of-veterans-affairs/formation/sass/core";
 @import "~@department-of-veterans-affairs/formation/sass/modules/m-alert";
-
-// Override bad src url in formation
-@font-face {
-    font-family: "Font Awesome 5 Free";
-    src: url("fonts/fa-solid-900.woff2") format("woff2"),
-         url("fonts/fa-solid-900.woff") format("woff"),
-         url("fonts/fa-solid-900.eot") format("eot");
-    font-weight: normal;
-    font-style: normal;
-}
 
 .saml-proxy {
     margin: 18px;
