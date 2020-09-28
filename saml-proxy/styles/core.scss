@@ -1,7 +1,8 @@
 $font-path: "/samlproxy/idp/fonts";
-$formation-asset-path: "../idp";
+$formation-asset-path: "/samlproxy/idp";
 $formation-image-path: "#{$formation-asset-path}/img";
 $formation-font-path: "#{$formation-asset-path}/fonts";
+$fa-font-path: "/samlproxy/idp/fonts";
 
 $image-path: "img";
 $idme-green: #2e8540;
