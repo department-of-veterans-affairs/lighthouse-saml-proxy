@@ -206,6 +206,7 @@ export default function configureExpress(
         res.statusCode < 500 ? err.message : "Error processing SAML request";
       res.render("error", {
         message: errMessage,
+        request_id: rTracer.id(),
       });
     }
   });
