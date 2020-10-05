@@ -1,7 +1,6 @@
 import { getPath, getReqUrl, logRelayState } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
-import extend from "extend";
 import {
   buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
