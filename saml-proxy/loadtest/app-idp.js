@@ -47,8 +47,6 @@ function addRoutes(app) {
   );
   app.post(["/", "/idp", constants.IDP_SSO], handlers.parseSamlRequest);
 
-  app.post(constants.IDP_SIGN_IN, handlers.idpSignIn);
-
   app.get(constants.IDP_METADATA, function (req, res, next) {
     samlp.metadata(req.idp.options)(req, res);
   });
