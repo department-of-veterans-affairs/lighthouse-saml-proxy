@@ -2,6 +2,7 @@ const axios = require("axios");
 const uriTemplates = require("uri-templates");
 const URI = require("urijs");
 const { axiosCachingAdapter } = require("./axiosCachingAdapter");
+const okta = require('@okta/okta-sdk-nodejs');
 
 const deleteUserGrantOnClient = async (config, userId, clientId) => {
   let error;
@@ -81,21 +82,38 @@ const getClientInfo = async (config, clientId) => {
   return response;
 };
 
-const getAuthorizationServerInfo = async (config, authorizationServerId) => {
+const getAuthorizationServerInfo = async (config, authorizationServerId, oktaClient) => {
   let error;
   let response;
   const template = uriTemplates(
     config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
   );
-  await axios({
-    method: "GET",
-    url: template.fill({ authorizationServerId: authorizationServerId }),
-    headers: { Authorization: "SSWS " + config.okta_token },
-    adapter: axiosCachingAdapter,
-  })
+
+  const filledTemplate = template.fill({ authorizationServerId: authorizationServerId });
+    // await axios({
+    //   method: "GET",
+    //   url: filledTemplate,
+    //   headers: { Authorization: "SSWS " + config.okta_token },
+    //   adapter: axiosCachingAdapter,
+    // })
+    //   .then((res) => (response = res.data))
+    //   .catch((err) => (error = err));
+
+
+  const okta_token = "SSWS " + config.okta_token;
+  const request = {
+    method: 'get'
+    // headers: {
+    //   'Accept': 'application/json',
+    //   'Content-Type': 'application/x-www-form-urlencoded',
+    //   'Authorization': okta_token,
+    // }
+  };
+  
+ await oktaClient.http.http(filledTemplate, request)
     .then((res) => (response = res.data))
     .catch((err) => (error = err));
-
+  
   if (response == null) {
     throw error;
   }

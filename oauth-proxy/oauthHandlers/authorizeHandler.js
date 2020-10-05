@@ -18,7 +18,7 @@ const authorizeHandler = async (
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
   try {
-    await checkParameters(state, aud, config, issuer, logger);
+    await checkParameters(state, aud, config, issuer, logger, oktaClient);
   } catch (err) {
     res.status(err.status).json({
       error: err.error,
@@ -74,7 +74,7 @@ const authorizeHandler = async (
   );
 };
 
-const checkParameters = async (state, aud, config, issuer, logger) => {
+const checkParameters = async (state, aud, config, issuer, logger, oktaClient) => {
   if (!state) {
     throw {
       status: 400,
@@ -89,7 +89,7 @@ const checkParameters = async (state, aud, config, issuer, logger) => {
       .pop();
     let serverAudiences;
 
-    await getAuthorizationServerInfo(config, authorizationServerId)
+    await getAuthorizationServerInfo(config, authorizationServerId, oktaClient)
       .then((res) => {
         serverAudiences = res.audiences;
       })
