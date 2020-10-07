@@ -26,8 +26,6 @@ rules:
   semi:
     - error
     - always
-  no-undef:
-    - warn
   no-dupe-keys:
     - warn
   no-unused-vars:
@@ -75,8 +73,6 @@ overrides:
         - always
       no-prototype-builtins:
         - off
-      no-undef:
-        - warn
       "@typescript-eslint/no-unused-vars":
         - error
         - { argsIgnorePattern: \b(?:res|req|next)\b }
