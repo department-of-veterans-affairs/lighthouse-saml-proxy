@@ -89,44 +89,14 @@ const getAuthorizationServerInfo = async (config, authorizationServerId, oktaCli
     config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
   );
 
-  const filledTemplate = template.fill({ authorizationServerId: authorizationServerId });
-    // await axios({
-    //   method: "GET",
-    //   url: filledTemplate,
-    //   headers: { Authorization: "SSWS " + config.okta_token },
-    //   adapter: axiosCachingAdapter,
-    // })
-    //   .then((res) => (response = res.data))
-    //   .catch((err) => (error = err));
-
-
-  const okta_token = "SSWS " + config.okta_token;
-  const request = {
-    method: 'get'
-    // headers: {
-    //   'Accept': 'application/json',
-    //   'Content-Type': 'application/x-www-form-urlencoded',
-    //   'Authorization': okta_token,
-    // }
-  };
-  // let claims;
-  // await oktaClient.listOAuth2Claims(authorizationServerId)
-  //  .then ((res) => claims = res)
-  //  .catch ((err) => console.error(err));
-  
-  
-
-  await oktaClient.http.http(filledTemplate, request)
+  await oktaClient.http.http(template.fill({ authorizationServerId: authorizationServerId }), {method: 'get'})
   .then(res => res.text())
-  .then(text => {
-    response = JSON.parse(text);
-  })
-  .catch ((err) => console.error(err));
+  .then(text => response = JSON.parse(text))
+  .catch ((err) => error = err);
 
   if (response == null) {
     throw error;
   }
-
   return response;
 };
 
