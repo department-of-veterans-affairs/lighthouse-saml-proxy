@@ -109,10 +109,23 @@ const getAuthorizationServerInfo = async (config, authorizationServerId, oktaCli
     //   'Authorization': okta_token,
     // }
   };
+  // let claims;
+  // await oktaClient.listOAuth2Claims(authorizationServerId)
+  //  .then ((res) => claims = res)
+  //  .catch ((err) => console.error(err));
   
- await oktaClient.http.http(filledTemplate, request)
-    .then((res) => (response = res.data))
-    .catch((err) => (error = err));
+  
+let serverinfo
+try {
+  serverinfo = await oktaClient.http.http(filledTemplate, request)
+  .then(res => res.text())
+  .then(text => {
+    console.log(text);
+    serverinfo = text;
+  })
+} catch (err) {
+  console.log(err);
+}
   
   if (response == null) {
     throw error;
