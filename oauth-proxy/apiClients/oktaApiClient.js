@@ -100,9 +100,19 @@ const getAuthorizationServerInfo = async (config, authorizationServerId, oktaCli
   return response;
 };
 
+const getClaims = async (authorizationServerId, oktaClient) => {
+  let claims = [];
+  const claimsCollection = await oktaClient.listOAuth2Claims(authorizationServerId);
+  await claimsCollection.each(claim => {
+    claims.push(claim.name);
+  })
+  return claims;
+}
+
 module.exports = {
   deleteUserGrantOnClient,
   getUserInfo,
   getClientInfo,
   getAuthorizationServerInfo,
+  getClaims
 };
