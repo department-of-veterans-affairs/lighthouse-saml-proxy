@@ -15,7 +15,6 @@ const defaultTestingConfig = {
   idpBaseUrl: "https://dev-api.va.gov/samlproxy/idp",
   spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
   spIdpSsoBinding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-  spNameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   spProtocol: "samlp",
   spIdpSsoUrl: "https://api.idmelabs.com/saml/SingleSignOnService",
   spAudience: "test",
