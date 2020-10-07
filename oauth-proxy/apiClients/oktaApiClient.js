@@ -115,18 +115,14 @@ const getAuthorizationServerInfo = async (config, authorizationServerId, oktaCli
   //  .catch ((err) => console.error(err));
   
   
-let serverinfo
-try {
-  serverinfo = await oktaClient.http.http(filledTemplate, request)
+
+  await oktaClient.http.http(filledTemplate, request)
   .then(res => res.text())
   .then(text => {
-    console.log(text);
-    serverinfo = text;
+    response = JSON.parse(text);
   })
-} catch (err) {
-  console.log(err);
-}
-  
+  .catch ((err) => console.error(err));
+
   if (response == null) {
     throw error;
   }
