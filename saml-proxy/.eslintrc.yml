@@ -26,8 +26,6 @@ rules:
   semi:
     - error
     - always
-  no-dupe-keys:
-    - warn
   no-unused-vars:
     - error
     - { argsIgnorePattern: \b(?:res|req|next)\b }
