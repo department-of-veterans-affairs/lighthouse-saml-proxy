@@ -1,5 +1,5 @@
 import isString from "lodash.isstring";
-import { certToPEM } from "../src/cli/coercing";
+import { certToPEM } from "./coercing";
 
 export function checkEncryptionCerts(argv) {
   if (argv.idpEncryptAssertion) {
