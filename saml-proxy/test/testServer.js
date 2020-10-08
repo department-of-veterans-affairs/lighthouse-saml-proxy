@@ -15,7 +15,6 @@ const defaultTestingConfig = {
   idpBaseUrl: "https://dev-api.va.gov/samlproxy/idp",
   spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
   spIdpSsoBinding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-  spNameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   spProtocol: "samlp",
   spIdpSsoUrl: "https://api.idmelabs.com/saml/SingleSignOnService",
   spAudience: "test",
@@ -35,8 +34,6 @@ const defaultTestingConfig = {
   spValidateNameIDFormat: true,
   spNameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
   spRequestAuthnContext: true,
-  spAuthnContextClassRef:
-    "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 };
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);

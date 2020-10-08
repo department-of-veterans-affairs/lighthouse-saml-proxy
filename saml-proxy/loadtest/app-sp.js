@@ -13,6 +13,7 @@ const process = require("process");
 const path = require("path");
 const template = require("lodash.template");
 const http = require("http");
+const https = require("https");
 
 const METADATA_TEMPLATE = template(
   fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
