@@ -6,12 +6,12 @@ const {
 const { parseClientId } = require("../utils");
 const validator = require("validator");
 
-const revokeUserGrantHandler = async (config, req, res, next) => {
+const revokeUserGrantHandler = async (okta_client, config, req, res, next) => {
   let client_id = req.body.client_id;
   let email = req.body.email;
 
   try {
-    await checkForValidParams(config, client_id, email);
+    await checkForValidParams(okta_client, config, client_id, email);
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -32,6 +32,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
   }
 
   let revokeGrantsResponse = await revokeGrantsOnClientsAndUserIds(
+    okta_client,
     config,
     userIds,
     client_id
@@ -104,7 +105,7 @@ const grabUserIdsFromUserInfo = (data) => {
   return userIds;
 };
 
-const checkForValidParams = async (config, clientId, email) => {
+const checkForValidParams = async (okta_client, config, clientId, email) => {
   if (!config.enable_okta_consent_endpoint) {
     throw {
       status: 403,
@@ -114,7 +115,7 @@ const checkForValidParams = async (config, clientId, email) => {
 
   checkIfParamsExist(clientId, email);
   checkForValidEmail(email);
-  await checkForValidClient(config, clientId);
+  await checkForValidClient(okta_client, config, clientId);
 };
 
 const checkForValidEmail = (email) => {
@@ -123,10 +124,10 @@ const checkForValidEmail = (email) => {
   }
 };
 
-const checkForValidClient = async (config, clientId) => {
+const checkForValidClient = async (okta_client, config, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
-    await getClientInfo(config, clientId)
+    await getClientInfo(okta_client, config, clientId)
       .then(() => (clientError = false))
       .catch(() => (clientError = true));
   }
