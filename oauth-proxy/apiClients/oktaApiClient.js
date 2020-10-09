@@ -31,19 +31,16 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
 
 const getUserIds = async (okta_client, email) => {
   let emailFilter = 'profile.email eq "' + email + '"';
-  let error;
-
-  const userCollection = await okta_client.listUsers({
-    search: emailFilter
-  });
-
   let userIds = [];
-  await userCollection.each(user => {
-    userIds.push(user.id);
-  });
-  
+
+  await okta_client.listUsers({
+    search: emailFilter
+  })
+  .each(user => userIds.push(user.id))
+  .catch(err => {throw err});
+
   if (!userIds.length) {
-    throw error;
+    throw {status: 400, errorMessage: "Invalid email"};
   }
 
   return userIds;
