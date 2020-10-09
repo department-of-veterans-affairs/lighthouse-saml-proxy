@@ -1,7 +1,5 @@
-const axios = require("axios");
 const uriTemplates = require("uri-templates");
 const URI = require("urijs");
-const { axiosCachingAdapter } = require("./axiosCachingAdapter");
 const okta = require('@okta/okta-sdk-nodejs');
 
 const deleteUserGrantOnClient = async (oktaClient, config, userId, clientId) => {
