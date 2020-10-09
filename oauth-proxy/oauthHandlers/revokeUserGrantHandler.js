@@ -10,17 +10,17 @@ const revokeUserGrantHandler = async (okta_client, config, req, res, next) => {
   let client_id = req.body.client_id;
   let email = req.body.email;
 
-  try {
-    await checkForValidParams(okta_client, config, client_id, email);
-  } catch (error) {
-    setErrorResponse(res, error.status, error.errorMessage);
-    return next();
-  }
+  // try {
+  //   await checkForValidParams(okta_client, config, client_id, email);
+  // } catch (error) {
+  //   setErrorResponse(res, error.status, error.errorMessage);
+  //   return next();
+  // }
 
   let userIds;
 
   try {
-    userIds = await getUserIds(config, email);
+    userIds = await getUserIds(okta_client, config, email);
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -64,30 +64,30 @@ const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
 
 const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
   let retValue;
-  await deleteUserGrantOnClient(config, userId, clientId)
-    .then((response) => {
-      retValue = {
-        status: response.status,
-        userId: userId,
-        message: "Okta grants successfully revoked",
-      };
-    })
-    .catch((err) => {
-      throw {
-        status: err.response.status,
-        userId: userId,
-        message: err.response.data.errorSummary,
-      };
-    });
+  // await deleteUserGrantOnClient(config, userId, clientId)
+  //   .then((response) => {
+  //     retValue = {
+  //       status: response.status,
+  //       userId: userId,
+  //       message: "Okta grants successfully revoked",
+  //     };
+  //   })
+  //   .catch((err) => {
+  //     throw {
+  //       status: err.response.status,
+  //       userId: userId,
+  //       message: err.response.data.errorSummary,
+  //     };
+  //   });
 
   return retValue;
 };
 
-const getUserIds = async (config, email) => {
+const getUserIds = async (okta_client, config, email) => {
   let errorMessage;
   let userIds;
-  await getUserInfo(config, email)
-    .then((response) => (userIds = grabUserIdsFromUserInfo(response.data)))
+  await getUserInfo(okta_client, config, email)
+    .then((response) => (userIds = response))
     .catch(() => (errorMessage += "Invalid email address."));
 
   if (errorMessage) {

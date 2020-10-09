@@ -29,31 +29,27 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
   return response;
 };
 
-const getUserInfo = async (config, email) => {
+const getUserInfo = async (okta_client, config, email) => {
   let uri = URI(config.okta_url + "/api/v1/users");
-  let emailFilter = `profile.email eq "${email}"`;
+  let emailFilter = 'profile.email eq "va.api.user+idme.003@gmail.com"';
   uri.search({ filter: emailFilter });
 
   let response;
   let error;
 
-  await axios({
-    method: "GET",
-    url: uri.toString(),
-    headers: { Authorization: "SSWS " + config.okta_token },
-  })
-    .then((res) => {
-      response = res;
-    })
-    .catch((err) => {
-      error = err;
-    });
-
-  if (response == null) {
+  const orgUsersCollection = await okta_client.listUsers({
+    search: emailFilter
+  });
+  let userIds = [];
+  await orgUsersCollection.each(user => {
+    userIds.push(user.id);
+  });
+  
+  if (orgUsersCollection == null) {
     throw error;
   }
 
-  return response;
+  return userIds;
 };
 
 const getClientInfo = async (okta_client, config, clientId) => {
@@ -63,17 +59,17 @@ const getClientInfo = async (okta_client, config, clientId) => {
     config.okta_url + "/oauth2/v1/clients/{clientid}"
   );
 
-  // await axios({
-  //   method: "GET",
-  //   url: template.fill({ clientid: clientId }),
-  //   headers: { Authorization: "SSWS " + config.okta_token },
-  // })
-  //   .then((res) => {
-  //     response = res;
-  //   })
-  //   .catch((err) => {
-  //     error = err;
-  //   });
+  await axios({
+    method: "GET",
+    url: template.fill({ clientid: clientId }),
+    headers: { Authorization: "SSWS " + config.okta_token },
+  })
+    .then((res) => {
+      response = res;
+    })
+    .catch((err) => {
+      error = err;
+    });
 
   if (response == null) {
     throw error;
