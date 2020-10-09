@@ -46,12 +46,12 @@ module.exports = revokeUserGrantHandler;
 
 //Helper Methods
 
-const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
+const revokeGrantsOnClientsAndUserIds = async (okta_client, config, userIds, clientId) => {
   let responses = [];
   let status = 200;
 
   for (var i = 0; i < userIds.length; i++) {
-    await deleteGrantsOnClientAndUserId(config, userIds[i], clientId)
+    await deleteGrantsOnClientAndUserId(okta_client, config, userIds[i], clientId)
       .then((response) => responses.push(response))
       .catch((err) => {
         status = 400;
@@ -62,9 +62,9 @@ const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
   return { status: status, responses: responses };
 };
 
-const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
+const deleteGrantsOnClientAndUserId = async (okta_client, config, userId, clientId) => {
   let retValue;
-  await deleteUserGrantOnClient(config, userId, clientId)
+  await deleteUserGrantOnClient(okta_client, config, userId, clientId)
     .then((response) => {
       retValue = {
         status: response.status,
@@ -81,14 +81,6 @@ const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
     });
 
   return retValue;
-};
-
-const grabUserIdsFromUserInfo = (data) => {
-  let userIds = [];
-  data.forEach((obj) => {
-    userIds.push(obj.id);
-  });
-  return userIds;
 };
 
 const checkForValidParams = async (okta_client, config, clientId, email) => {
