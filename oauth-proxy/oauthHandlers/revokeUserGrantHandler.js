@@ -64,38 +64,24 @@ const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
 
 const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
   let retValue;
-  // await deleteUserGrantOnClient(config, userId, clientId)
-  //   .then((response) => {
-  //     retValue = {
-  //       status: response.status,
-  //       userId: userId,
-  //       message: "Okta grants successfully revoked",
-  //     };
-  //   })
-  //   .catch((err) => {
-  //     throw {
-  //       status: err.response.status,
-  //       userId: userId,
-  //       message: err.response.data.errorSummary,
-  //     };
-  //   });
+  await deleteUserGrantOnClient(config, userId, clientId)
+    .then((response) => {
+      retValue = {
+        status: response.status,
+        userId: userId,
+        message: "Okta grants successfully revoked",
+      };
+    })
+    .catch((err) => {
+      throw {
+        status: err.response.status,
+        userId: userId,
+        message: err.response.data.errorSummary,
+      };
+    });
 
   return retValue;
 };
-
-// const getUserIds = async (okta_client, config, email) => {
-//   let errorMessage;
-//   let userIds;
-//   await getUserInfo(okta_client, config, email)
-//     .then((response) => (userIds = response))
-//     .catch(() => (errorMessage += "Invalid email address."));
-
-//   if (errorMessage) {
-//     throw { status: 400, errorMessage: errorMessage };
-//   }
-
-//   return userIds;
-// };
 
 const grabUserIdsFromUserInfo = (data) => {
   let userIds = [];
