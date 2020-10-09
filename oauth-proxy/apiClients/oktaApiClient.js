@@ -29,23 +29,20 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
   return response;
 };
 
-const getUserInfo = async (okta_client, config, email) => {
-  let uri = URI(config.okta_url + "/api/v1/users");
-  let emailFilter = 'profile.email eq "va.api.user+idme.003@gmail.com"';
-  uri.search({ filter: emailFilter });
-
-  let response;
+const getUserIds = async (okta_client, email) => {
+  let emailFilter = 'profile.email eq "' + email + '"';
   let error;
 
-  const orgUsersCollection = await okta_client.listUsers({
+  const userCollection = await okta_client.listUsers({
     search: emailFilter
   });
+
   let userIds = [];
-  await orgUsersCollection.each(user => {
+  await userCollection.each(user => {
     userIds.push(user.id);
   });
   
-  if (orgUsersCollection == null) {
+  if (!userIds.length) {
     throw error;
   }
 
@@ -107,7 +104,7 @@ const getClaims = async (authorizationServerId, oktaClient) => {
 
 module.exports = {
   deleteUserGrantOnClient,
-  getUserInfo,
+  getUserIds,
   getClientInfo,
   getAuthorizationServerInfo,
   getClaims

@@ -1,6 +1,6 @@
 const {
   deleteUserGrantOnClient,
-  getUserInfo,
+  getUserIds,
   getClientInfo,
 } = require("../apiClients/oktaApiClient");
 const { parseClientId } = require("../utils");
@@ -10,17 +10,17 @@ const revokeUserGrantHandler = async (okta_client, config, req, res, next) => {
   let client_id = req.body.client_id;
   let email = req.body.email;
 
-  // try {
-  //   await checkForValidParams(okta_client, config, client_id, email);
-  // } catch (error) {
-  //   setErrorResponse(res, error.status, error.errorMessage);
-  //   return next();
-  // }
+  try {
+    await checkForValidParams(okta_client, config, client_id, email);
+  } catch (error) {
+    setErrorResponse(res, error.status, error.errorMessage);
+    return next();
+  }
 
   let userIds;
 
   try {
-    userIds = await getUserIds(okta_client, config, email);
+    userIds = await getUserIds(okta_client, email);
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -83,19 +83,19 @@ const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
   return retValue;
 };
 
-const getUserIds = async (okta_client, config, email) => {
-  let errorMessage;
-  let userIds;
-  await getUserInfo(okta_client, config, email)
-    .then((response) => (userIds = response))
-    .catch(() => (errorMessage += "Invalid email address."));
+// const getUserIds = async (okta_client, config, email) => {
+//   let errorMessage;
+//   let userIds;
+//   await getUserInfo(okta_client, config, email)
+//     .then((response) => (userIds = response))
+//     .catch(() => (errorMessage += "Invalid email address."));
 
-  if (errorMessage) {
-    throw { status: 400, errorMessage: errorMessage };
-  }
+//   if (errorMessage) {
+//     throw { status: 400, errorMessage: errorMessage };
+//   }
 
-  return userIds;
-};
+//   return userIds;
+// };
 
 const grabUserIdsFromUserInfo = (data) => {
   let userIds = [];
