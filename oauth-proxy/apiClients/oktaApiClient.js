@@ -29,34 +29,24 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
   return response;
 };
 
-const getUserInfo = async (config, email) => {
-  let uri = URI(config.okta_url + "/api/v1/users");
-  let emailFilter = `profile.email eq "${email}"`;
-  uri.search({ filter: emailFilter });
+const getUserIds = async (okta_client, email) => {
+  let emailFilter = 'profile.email eq "' + email + '"';
+  let userIds = [];
 
-  let response;
-  let error;
-
-  await axios({
-    method: "GET",
-    url: uri.toString(),
-    headers: { Authorization: "SSWS " + config.okta_token },
+  await okta_client.listUsers({
+    search: emailFilter
   })
-    .then((res) => {
-      response = res;
-    })
-    .catch((err) => {
-      error = err;
-    });
+  .each(user => userIds.push(user.id))
+  .catch(err => {throw err});
 
-  if (response == null) {
-    throw error;
+  if (!userIds.length) {
+    throw {status: 400, errorMessage: "Invalid email"};
   }
 
-  return response;
+  return userIds;
 };
 
-const getClientInfo = async (config, clientId) => {
+const getClientInfo = async (okta_client, config, clientId) => {
   let error;
   let response;
   const template = uriTemplates(
@@ -111,7 +101,7 @@ const getClaims = async (authorizationServerId, oktaClient) => {
 
 module.exports = {
   deleteUserGrantOnClient,
-  getUserInfo,
+  getUserIds,
   getClientInfo,
   getAuthorizationServerInfo,
   getClaims

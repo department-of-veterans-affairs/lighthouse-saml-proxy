@@ -430,7 +430,7 @@ function buildApp(
 
     router.delete(api_category + app_routes.grants, async (req, res, next) => {
       await oauthHandlers
-        .revokeUserGrantHandler(config, req, res, next)
+        .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
   }
