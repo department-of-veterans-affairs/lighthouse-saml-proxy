@@ -10,17 +10,17 @@ const deleteUserGrantOnClient = async (config, userId, clientId) => {
   const template = uriTemplates(
     config.okta_url + "/api/v1/users/{userid}/clients/{clientid}/grants"
   );
-  await axios({
-    method: "DELETE",
-    url: template.fill({ userid: userId, clientid: clientId }),
-    headers: { Authorization: "SSWS " + config.okta_token },
-  })
-    .then((res) => {
-      response = res;
-    })
-    .catch((err) => {
-      error = err;
-    });
+  // await axios({
+  //   method: "DELETE",
+  //   url: template.fill({ userid: userId, clientid: clientId }),
+  //   headers: { Authorization: "SSWS " + config.okta_token },
+  // })
+  //   .then((res) => {
+  //     response = res;
+  //   })
+  //   .catch((err) => {
+  //     error = err;
+  //   });
 
   if (response == null) {
     throw error;
@@ -46,24 +46,17 @@ const getUserIds = async (okta_client, email) => {
   return userIds;
 };
 
-const getClientInfo = async (okta_client, config, clientId) => {
+const getClientInfo = async (oktaClient, config, clientId) => {
   let error;
   let response;
   const template = uriTemplates(
     config.okta_url + "/oauth2/v1/clients/{clientid}"
   );
 
-  await axios({
-    method: "GET",
-    url: template.fill({ clientid: clientId }),
-    headers: { Authorization: "SSWS " + config.okta_token },
-  })
-    .then((res) => {
-      response = res;
-    })
-    .catch((err) => {
-      error = err;
-    });
+  await oktaClient.http.http(template.fill({ clientid: clientId }), {method: 'get'})
+  .then(res => res.text())
+  .then(text => response = JSON.parse(text))
+  .catch ((err) => error = err);
 
   if (response == null) {
     throw error;
