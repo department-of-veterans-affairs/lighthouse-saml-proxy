@@ -48,20 +48,11 @@ const getClientInfo = async (oktaClient, config, clientId) => {
 };
 
 const getAuthorizationServerInfo = async (config, authorizationServerId, oktaClient) => {
-  let error;
-  let response;
   const template = uriTemplates(
     config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
   );
 
-  await oktaClient.http.http(template.fill({ authorizationServerId: authorizationServerId }), {method: 'get'})
-  .then(res => res.text())
-  .then(text => response = JSON.parse(text))
-  .catch ((err) => error = err);
-
-  if (response == null) {
-    throw error;
-  }
+  let response = await callOktaEndpoint(oktaClient, template.fill({ clientid: clientId }));
   return response;
 };
 
