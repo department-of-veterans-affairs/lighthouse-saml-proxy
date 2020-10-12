@@ -815,7 +815,7 @@ describe("revokeUserGrantHandler", () => {
 
   it("No User Ids associated with Email", async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({client_id: "clientid123"});
+    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
     getUserIdsMock.mockResolvedValue([]);
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(undefined, config, req, res, next);
