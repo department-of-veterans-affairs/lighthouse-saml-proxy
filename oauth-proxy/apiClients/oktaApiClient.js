@@ -52,7 +52,7 @@ const getAuthorizationServerInfo = async (config, authorizationServerId, oktaCli
     config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
   );
 
-  let response = await callOktaEndpoint(oktaClient, template.fill({ clientid: clientId }));
+  let response = await callOktaEndpoint(oktaClient, template.fill({ authorizationServerId: authorizationServerId }));
   return response;
 };
 
