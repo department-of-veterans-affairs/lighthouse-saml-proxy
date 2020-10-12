@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const dynamoClient = require("./dynamo_client");
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
+const MemoryStore = require("@okta/okta-sdk-nodejs/src/memory-store");
 const morgan = require("morgan");
 const promBundle = require("express-prom-bundle");
 const Sentry = require("@sentry/node");
@@ -50,6 +51,17 @@ const openidMetadataWhitelist = [
   "request_parameter_supported",
   "request_object_signing_alg_values_supported",
 ];
+
+async function cacheMiddleware(ctx, next) {
+  let cachedResp = myCache.get(ctx.req.uri);
+  if (cachedResp) {
+    ctx.res = {
+      status: OK,
+      text() { return Promise.resolve(cachedResp); }
+    }
+    await next(); // will skip external request
+  }
+}
 
 async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
   if (upstream_issuer_timeout_ms) {
@@ -438,10 +450,16 @@ function buildApp(
   return app;
 }
 function startApp(config, issuer, isolatedIssuers) {
+  const keyLimit = config.key_limit ? config.key_limit : 100000;
+  const expirationPoll = config.cache_expiration_sec ? config.cache_expiration_sec : 3600 * 1000;
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
     requestExecutor: new okta.DefaultRequestExecutor(),
+    cacheStore: new MemoryStore({
+      keyLimit: keyLimit,
+      expirationPoll: expirationPoll
+    })
   });
 
   const isolatedOktaClients = {};
@@ -452,6 +470,10 @@ function startApp(config, issuer, isolatedIssuers) {
           orgUrl: config.okta_url,
           token: config.okta_token,
           requestExecutor: new okta.DefaultRequestExecutor(),
+          cacheStore: new MemoryStore({
+            keyLimit: keyLimit,
+            expirationPoll: expirationPoll
+          })
         });
       }
     );

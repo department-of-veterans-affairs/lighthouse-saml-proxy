@@ -63,14 +63,6 @@ const getClaims = async (authorizationServerId, oktaClient) => {
     claims.push(claim.name);
   })
   return claims;
-}
-
-module.exports = {
-  deleteUserGrantOnClient,
-  getUserIds,
-  getClientInfo,
-  getAuthorizationServerInfo,
-  getClaims
 };
 
 // Assumes json responses from the target oktaUrl
@@ -87,5 +79,14 @@ async function callOktaEndpoint(oktaClient, oktaUrl, method) {
     throw error;
   }
   return response;
-}
+};
+
+module.exports = {
+  deleteUserGrantOnClient,
+  getUserIds,
+  getClientInfo,
+  getAuthorizationServerInfo,
+  getClaims
+};
+
 
