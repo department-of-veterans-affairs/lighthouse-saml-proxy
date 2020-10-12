@@ -1,3 +1,4 @@
+const axios = require("axios");
 const uriTemplates = require("uri-templates");
 const URI = require("urijs");
 const okta = require('@okta/okta-sdk-nodejs');
@@ -10,14 +11,13 @@ const deleteUserGrantOnClient = async (oktaClient, config, userId, clientId) => 
   );
   
   await oktaClient.http.http(template.fill({ userid: userId, clientid: clientId }), {method: 'DELETE'})
-    .then(res => res.text())
-    .then(text => response = JSON.parse(text))
+    .then(res => response = res)
     .catch ((err) => error = err);
   
-  if (response == null) {
+  if (response === undefined) {
     throw error;
   }
-
+  
   return response;
 };
 
@@ -39,39 +39,20 @@ const getUserIds = async (okta_client, email) => {
 };
 
 const getClientInfo = async (oktaClient, config, clientId) => {
-  let error;
-  let response;
   const template = uriTemplates(
     config.okta_url + "/oauth2/v1/clients/{clientid}"
   );
 
-  await oktaClient.http.http(template.fill({ clientid: clientId }), {method: 'get'})
-  .then(res => res.text())
-  .then(text => response = JSON.parse(text))
-  .catch ((err) => error = err);
-
-  if (response == null) {
-    throw error;
-  }
-
+  let response = await callOktaEndpoint(oktaClient, template.fill({ clientid: clientId }));
   return response;
 };
 
 const getAuthorizationServerInfo = async (config, authorizationServerId, oktaClient) => {
-  let error;
-  let response;
   const template = uriTemplates(
     config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
   );
 
-  await oktaClient.http.http(template.fill({ authorizationServerId: authorizationServerId }), {method: 'get'})
-  .then(res => res.text())
-  .then(text => response = JSON.parse(text))
-  .catch ((err) => error = err);
-
-  if (response == null) {
-    throw error;
-  }
+  let response = await callOktaEndpoint(oktaClient, template.fill({ authorizationServerId: authorizationServerId }));
   return response;
 };
 
@@ -91,3 +72,20 @@ module.exports = {
   getAuthorizationServerInfo,
   getClaims
 };
+
+// Assumes json responses from the target oktaUrl
+async function callOktaEndpoint(oktaClient, oktaUrl, method) {
+  let error;
+  let response;
+  method = method === undefined ? 'get' : method;
+  await oktaClient.http.http(oktaUrl, { method: method })
+    .then(res => res.text())
+    .then(text => response = JSON.parse(text))
+    .catch((err) => error = err);
+
+  if (response === undefined) {
+    throw error;
+  }
+  return response;
+}
+
