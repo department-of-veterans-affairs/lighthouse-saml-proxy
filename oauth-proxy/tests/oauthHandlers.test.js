@@ -764,7 +764,7 @@ describe("revokeUserGrantHandler", () => {
   it("Happy Path", async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
     getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"] );
+    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(undefined, config, req, res, next);
     expect(res.statusCode).toEqual(200);
@@ -807,7 +807,7 @@ describe("revokeUserGrantHandler", () => {
   it("Invalid Client Id", async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
     getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"] );
+    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
     req.body = { client_id: "clientid123!", email: "email@example.com" };
     await revokeUserGrantHandler(undefined, config, req, res, next);
     expect(res.statusCode).toEqual(400);
@@ -825,7 +825,7 @@ describe("revokeUserGrantHandler", () => {
   it("Invalid Email", async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
     getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"] );
+    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
     req.body = { client_id: "clientid123", email: "email@example" };
     await revokeUserGrantHandler(undefined, config, req, res, next);
     expect(res.statusCode).toEqual(400);
@@ -834,7 +834,7 @@ describe("revokeUserGrantHandler", () => {
   it("Email with additional filtering", async () => {
     deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
     getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"] );
+    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
     req.body = {
       client_id: "clientid123",
       email: 'email@example.com or firstName eq "John"',

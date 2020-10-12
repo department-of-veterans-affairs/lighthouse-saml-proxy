@@ -440,15 +440,17 @@ function buildApp(
 }
 function startApp(config, issuer, isolatedIssuers) {
   const keyLimit = config.key_limit ? config.key_limit : 100000;
-  const expirationPoll = config.cache_expiration_sec ? config.cache_expiration_sec : 3600 * 1000;
+  const expirationPoll = config.cache_expiration_sec
+    ? config.cache_expiration_sec
+    : 3600 * 1000;
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
     requestExecutor: new okta.DefaultRequestExecutor(),
     cacheStore: new MemoryStore({
       keyLimit: keyLimit,
-      expirationPoll: expirationPoll
-    })
+      expirationPoll: expirationPoll,
+    }),
   });
 
   const isolatedOktaClients = {};
@@ -461,8 +463,8 @@ function startApp(config, issuer, isolatedIssuers) {
           requestExecutor: new okta.DefaultRequestExecutor(),
           cacheStore: new MemoryStore({
             keyLimit: keyLimit,
-            expirationPoll: expirationPoll
-          })
+            expirationPoll: expirationPoll,
+          }),
         });
       }
     );

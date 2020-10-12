@@ -46,12 +46,22 @@ module.exports = revokeUserGrantHandler;
 
 //Helper Methods
 
-const revokeGrantsOnClientsAndUserIds = async (oktaClient, config, userIds, clientId) => {
+const revokeGrantsOnClientsAndUserIds = async (
+  oktaClient,
+  config,
+  userIds,
+  clientId
+) => {
   let responses = [];
   let status = 200;
 
   for (var i = 0; i < userIds.length; i++) {
-    await deleteGrantsOnClientAndUserId(oktaClient, config, userIds[i], clientId)
+    await deleteGrantsOnClientAndUserId(
+      oktaClient,
+      config,
+      userIds[i],
+      clientId
+    )
       .then((response) => responses.push(response))
       .catch((err) => {
         status = 400;
@@ -62,7 +72,12 @@ const revokeGrantsOnClientsAndUserIds = async (oktaClient, config, userIds, clie
   return { status: status, responses: responses };
 };
 
-const deleteGrantsOnClientAndUserId = async (oktaClient, config, userId, clientId) => {
+const deleteGrantsOnClientAndUserId = async (
+  oktaClient,
+  config,
+  userId,
+  clientId
+) => {
   let retValue;
   await deleteUserGrantOnClient(oktaClient, config, userId, clientId)
     .then((response) => {
