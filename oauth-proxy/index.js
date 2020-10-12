@@ -52,17 +52,6 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ];
 
-async function cacheMiddleware(ctx, next) {
-  let cachedResp = myCache.get(ctx.req.uri);
-  if (cachedResp) {
-    ctx.res = {
-      status: OK,
-      text() { return Promise.resolve(cachedResp); }
-    }
-    await next(); // will skip external request
-  }
-}
-
 async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
   if (upstream_issuer_timeout_ms) {
     Issuer.defaultHttpOptions = { timeout: upstream_issuer_timeout_ms };
