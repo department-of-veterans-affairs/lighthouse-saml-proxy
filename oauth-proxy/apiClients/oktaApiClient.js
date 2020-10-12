@@ -11,11 +11,14 @@ const deleteUserGrantOnClient = async (
   const template = uriTemplates(
     config.okta_url + "/api/v1/users/{userid}/clients/{clientid}/grants"
   );
-  
-  await oktaClient.http.http(template.fill({ userid: userId, clientid: clientId }), {method: "DELETE"})
+
+  await oktaClient.http
+    .http(template.fill({ userid: userId, clientid: clientId }), {
+      method: "DELETE",
+    })
     .then((res) => (response = res))
     .catch ((err) => (error = err));
-  
+
   if (response === undefined) {
     throw error;
   }
