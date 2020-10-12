@@ -74,7 +74,14 @@ const authorizeHandler = async (
   );
 };
 
-const checkParameters = async (state, aud, config, issuer, logger, oktaClient) => {
+const checkParameters = async (
+  state,
+  aud,
+  config,
+  issuer,
+  logger,
+  oktaClient
+) => {
   if (!state) {
     throw {
       status: 400,
