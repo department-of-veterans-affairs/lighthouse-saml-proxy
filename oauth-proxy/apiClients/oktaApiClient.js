@@ -17,7 +17,7 @@ const deleteUserGrantOnClient = async (
       method: "DELETE",
     })
     .then((res) => (response = res))
-    .catch ((err) => (error = err));
+    .catch((err) => (error = err));
 
   if (response === undefined) {
     throw error;
