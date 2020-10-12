@@ -39,21 +39,11 @@ const getUserIds = async (okta_client, email) => {
 };
 
 const getClientInfo = async (oktaClient, config, clientId) => {
-  let error;
-  let response;
   const template = uriTemplates(
     config.okta_url + "/oauth2/v1/clients/{clientid}"
   );
 
-  await oktaClient.http.http(template.fill({ clientid: clientId }), {method: 'get'})
-  .then(res => res.text())
-  .then(text => response = JSON.parse(text))
-  .catch ((err) => error = err);
-
-  if (response == null) {
-    throw error;
-  }
-
+  let response = await callOktaEndpoint(oktaClient, template.fill({ clientid: clientId }));
   return response;
 };
 
@@ -91,3 +81,19 @@ module.exports = {
   getAuthorizationServerInfo,
   getClaims
 };
+
+async function callOktaEndpoint(oktaClient, oktaUrl, method) {
+  let error;
+  let response;
+  method = method === undefined ? 'get' : method;
+  await oktaClient.http.http(oktaUrl, { method: method })
+    .then(res => res.text())
+    .then(text => response = JSON.parse(text))
+    .catch((err) => error = err);
+
+  if (response == null) {
+    throw error;
+  }
+  return response;
+}
+
