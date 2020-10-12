@@ -1,3 +1,4 @@
+const axios = require("axios");
 const uriTemplates = require("uri-templates");
 const URI = require("urijs");
 const okta = require('@okta/okta-sdk-nodejs');
@@ -10,14 +11,13 @@ const deleteUserGrantOnClient = async (oktaClient, config, userId, clientId) => 
   );
   
   await oktaClient.http.http(template.fill({ userid: userId, clientid: clientId }), {method: 'DELETE'})
-    .then(res => res.text())
-    .then(text => response = JSON.parse(text))
+    .then(res => response = res)
     .catch ((err) => error = err);
   
-  if (response == null) {
+  if (response === undefined) {
     throw error;
   }
-
+  
   return response;
 };
 
@@ -73,6 +73,7 @@ module.exports = {
   getClaims
 };
 
+// Assumes json responses from the target oktaUrl
 async function callOktaEndpoint(oktaClient, oktaUrl, method) {
   let error;
   let response;
@@ -82,7 +83,7 @@ async function callOktaEndpoint(oktaClient, oktaUrl, method) {
     .then(text => response = JSON.parse(text))
     .catch((err) => error = err);
 
-  if (response == null) {
+  if (response === undefined) {
     throw error;
   }
   return response;
