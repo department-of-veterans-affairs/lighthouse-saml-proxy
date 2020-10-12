@@ -102,6 +102,15 @@ export const parseSamlRequest = function (req, res, next) {
         acsUrl: data.assertionConsumerServiceURL,
         forceAuthn: data.forceAuthn === "true",
       };
+      if (
+        req.authnRequest.relayState == null ||
+        req.authnRequest.relayState == ""
+      ) {
+        logger.error("Empty relay state. Invalid request.");
+        throw {
+          message: "Error: Empty relay state. Invalid request.",
+        };
+      }
       req.session.authnRequest = req.authnRequest;
     }
     next();
