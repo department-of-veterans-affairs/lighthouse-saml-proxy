@@ -1,7 +1,4 @@
-const axios = require("axios");
 const uriTemplates = require("uri-templates");
-const URI = require("urijs");
-const okta = require('@okta/okta-sdk-nodejs');
 
 const deleteUserGrantOnClient = async (oktaClient, config, userId, clientId) => {
   let error;
@@ -10,9 +7,9 @@ const deleteUserGrantOnClient = async (oktaClient, config, userId, clientId) => 
     config.okta_url + "/api/v1/users/{userid}/clients/{clientid}/grants"
   );
   
-  await oktaClient.http.http(template.fill({ userid: userId, clientid: clientId }), {method: 'DELETE'})
-    .then(res => response = res)
-    .catch ((err) => error = err);
+  await oktaClient.http.http(template.fill({ userid: userId, clientid: clientId }), {method: "DELETE"})
+    .then((res) => (response = res))
+    .catch ((err) => (error = err));
   
   if (response === undefined) {
     throw error;
@@ -71,9 +68,9 @@ async function callOktaEndpoint(oktaClient, oktaUrl, method) {
   let response;
   method = method === undefined ? 'get' : method;
   await oktaClient.http.http(oktaUrl, { method: method })
-    .then(res => res.text())
-    .then(text => response = JSON.parse(text))
-    .catch((err) => error = err);
+    .then((res) => (res.text()))
+    .then((text) => (response = JSON.parse(text)))
+    .catch((err) => (error = err));
 
   if (response === undefined) {
     throw error;
