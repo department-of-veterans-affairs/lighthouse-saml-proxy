@@ -62,7 +62,8 @@ const revokeGrantsOnClientsAndUserIds = async (
 
 const deleteGrantsOnClientAndUserId = async (oktaClient, userId, clientId) => {
   let retValue;
-  await oktaClient.revokeGrantsForUserAndClient(userId, clientId)
+  await oktaClient
+    .revokeGrantsForUserAndClient(userId, clientId)
     .then((response) => {
       retValue = {
         status: response.status,
@@ -103,7 +104,8 @@ const checkForValidEmail = (email) => {
 const checkForValidClient = async (oktaClient, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
-    await oktaClient.getApplication(clientId)
+    await oktaClient
+      .getApplication(clientId)
       .then(() => (clientError = false))
       .catch(() => (clientError = true));
   }
