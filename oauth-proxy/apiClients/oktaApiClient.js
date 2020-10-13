@@ -12,7 +12,8 @@ const deleteUserGrantOnClient = async (
     config.okta_url + "/api/v1/users/{userid}/clients/{clientid}/grants"
   );
 
-  await oktaClient.http
+  await oktaClient
+  .http
     .http(template.fill({ userid: userId, clientid: clientId }), {
       method: "DELETE",
     })
@@ -56,19 +57,10 @@ const getClientInfo = async (oktaClient, config, clientId) => {
 };
 
 const getAuthorizationServerInfo = async (
-  config,
   authorizationServerId,
   oktaClient
 ) => {
-  const template = uriTemplates(
-    config.okta_url + "/api/v1/authorizationServers/{authorizationServerId}"
-  );
-
-  let response = await callOktaEndpoint(
-    oktaClient,
-    template.fill({ authorizationServerId: authorizationServerId })
-  );
-  return response;
+  return await oktaClient.getAuthorizationServer(authorizationServerId);
 };
 
 const getClaims = async (authorizationServerId, oktaClient) => {

@@ -96,7 +96,7 @@ const checkParameters = async (
       .pop();
     let serverAudiences;
 
-    await getAuthorizationServerInfo(config, authorizationServerId, oktaClient)
+    await getAuthorizationServerInfo(authorizationServerId, oktaClient)
       .then((res) => {
         serverAudiences = res.audiences;
       })
