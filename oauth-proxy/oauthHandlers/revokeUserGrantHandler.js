@@ -141,16 +141,24 @@ const getUserIds = async (oktaClient, email) => {
   let emailFilter = 'profile.email eq "' + email + '"';
   let userIds = [];
 
+  try {
   await oktaClient
     .listUsers({ search: emailFilter })
-    .each((user) => userIds.push(user.id))
+    .each((user) => {
+      if (user.id) {
+        userIds.push(user.id);
+      }
+    })  
     .catch((err) => {
       throw err;
     });
 
-  if (!userIds.length) {
+  if (!userIds.length || userIds.length === 0) {
     throw { status: 400, errorMessage: "Invalid email" };
   }
+} catch (err) {
+  console.error(err);
+}
 
   return userIds;
 };
