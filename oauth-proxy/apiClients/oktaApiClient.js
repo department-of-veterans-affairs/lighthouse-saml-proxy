@@ -29,7 +29,8 @@ const getUserIds = async (oktaClient, email) => {
   let emailFilter = 'profile.email eq "' + email + '"';
   let userIds = [];
 
-  await oktaClient.listUsers({ search: emailFilter })
+  await oktaClient
+    .listUsers({ search: emailFilter })
     .each((user) => userIds.push(user.id))
     .catch((err) => {
       throw err;
