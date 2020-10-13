@@ -1,5 +1,3 @@
-const uriTemplates = require("uri-templates");
-
 const deleteUserGrantOnClient = async (oktaClient, userId, clientId) => {
   return await oktaClient.revokeGrantsForUserAndClient(userId, clientId);
 };
@@ -22,16 +20,9 @@ const getUserIds = async (oktaClient, email) => {
   return userIds;
 };
 
-const getClientInfo = async (oktaClient, config, clientId) => {
-  const template = uriTemplates(
-    config.okta_url + "/oauth2/v1/clients/{clientid}"
-  );
-
-  let response = await callOktaEndpoint(
-    oktaClient,
-    template.fill({ clientid: clientId })
-  );
-  return response;
+const getClientInfo = async (oktaClient, clientId) => {
+  let response = await oktaClient.getApplication(clientId);
+  return response.oauthClient;
 };
 
 const getAuthorizationServerInfo = async (
@@ -51,23 +42,6 @@ const getClaims = async (authorizationServerId, oktaClient) => {
   });
   return claims;
 };
-
-// Assumes json responses from the target oktaUrl
-async function callOktaEndpoint(oktaClient, oktaUrl, method) {
-  let error;
-  let response;
-  method = method === undefined ? "get" : method;
-  await oktaClient.http
-    .http(oktaUrl, { method: method })
-    .then((res) => res.text())
-    .then((text) => (response = JSON.parse(text)))
-    .catch((err) => (error = err));
-
-  if (response === undefined) {
-    throw error;
-  }
-  return response;
-}
 
 module.exports = {
   deleteUserGrantOnClient,

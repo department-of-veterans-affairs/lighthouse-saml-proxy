@@ -120,7 +120,7 @@ const checkForValidEmail = (email) => {
 const checkForValidClient = async (oktaClient, config, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
-    await getClientInfo(oktaClient, config, clientId)
+    await getClientInfo(oktaClient, clientId)
       .then(() => (clientError = false))
       .catch(() => (clientError = true));
   }
