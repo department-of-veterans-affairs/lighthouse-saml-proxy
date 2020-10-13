@@ -32,21 +32,9 @@ const getAuthorizationServerInfo = async (
   return await oktaClient.getAuthorizationServer(authorizationServerId);
 };
 
-const getClaims = async (authorizationServerId, oktaClient) => {
-  let claims = [];
-  const claimsCollection = await oktaClient.listOAuth2Claims(
-    authorizationServerId
-  );
-  await claimsCollection.each((claim) => {
-    claims.push(claim.name);
-  });
-  return claims;
-};
-
 module.exports = {
   deleteUserGrantOnClient,
   getUserIds,
   getClientInfo,
   getAuthorizationServerInfo,
-  getClaims,
 };
