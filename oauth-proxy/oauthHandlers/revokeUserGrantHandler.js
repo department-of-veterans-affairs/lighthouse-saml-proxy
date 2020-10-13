@@ -54,11 +54,7 @@ const revokeGrantsOnClientsAndUserIds = async (
   let status = 200;
 
   for (var i = 0; i < userIds.length; i++) {
-    await deleteGrantsOnClientAndUserId(
-      oktaClient,
-      userIds[i],
-      clientId
-    )
+    await deleteGrantsOnClientAndUserId(oktaClient, userIds[i], clientId)
       .then((response) => responses.push(response))
       .catch((err) => {
         status = 400;
@@ -69,11 +65,7 @@ const revokeGrantsOnClientsAndUserIds = async (
   return { status: status, responses: responses };
 };
 
-const deleteGrantsOnClientAndUserId = async (
-  oktaClient,
-  userId,
-  clientId
-) => {
+const deleteGrantsOnClientAndUserId = async (oktaClient, userId, clientId) => {
   let retValue;
   await deleteUserGrantOnClient(oktaClient, userId, clientId)
     .then((response) => {
