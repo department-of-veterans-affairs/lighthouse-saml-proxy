@@ -79,7 +79,7 @@ const deleteGrantsOnClientAndUserId = async (
   clientId
 ) => {
   let retValue;
-  await deleteUserGrantOnClient(oktaClient, config, userId, clientId)
+  await deleteUserGrantOnClient(oktaClient, userId, clientId)
     .then((response) => {
       retValue = {
         status: response.status,

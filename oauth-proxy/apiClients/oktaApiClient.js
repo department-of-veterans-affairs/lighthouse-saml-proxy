@@ -1,29 +1,7 @@
 const uriTemplates = require("uri-templates");
 
-const deleteUserGrantOnClient = async (
-  oktaClient,
-  config,
-  userId,
-  clientId
-) => {
-  let error;
-  let response;
-  const template = uriTemplates(
-    config.okta_url + "/api/v1/users/{userid}/clients/{clientid}/grants"
-  );
-
-  await oktaClient
-  .http
-    .http(template.fill({ userid: userId, clientid: clientId }), {
-      method: "DELETE",
-    })
-    .then((res) => (response = res))
-    .catch((err) => (error = err));
-
-  if (response === undefined) {
-    throw error;
-  }
-  return response;
+const deleteUserGrantOnClient = async (oktaClient, userId, clientId) => {
+  return await oktaClient.revokeGrantsForUserAndClient(userId, clientId);
 };
 
 const getUserIds = async (oktaClient, email) => {
