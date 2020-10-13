@@ -96,7 +96,7 @@ const checkForValidParams = async (oktaClient, config, clientId, email) => {
 
   checkIfParamsExist(clientId, email);
   checkForValidEmail(email);
-  await checkForValidClient(oktaClient, config, clientId);
+  await checkForValidClient(oktaClient, clientId);
 };
 
 const checkForValidEmail = (email) => {
@@ -105,7 +105,7 @@ const checkForValidEmail = (email) => {
   }
 };
 
-const checkForValidClient = async (oktaClient, config, clientId) => {
+const checkForValidClient = async (oktaClient, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
     await getClientInfo(oktaClient, clientId)
