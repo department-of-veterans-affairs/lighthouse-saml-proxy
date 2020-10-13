@@ -33,7 +33,6 @@ const revokeUserGrantHandler = async (oktaClient, config, req, res, next) => {
 
   let revokeGrantsResponse = await revokeGrantsOnClientsAndUserIds(
     oktaClient,
-    config,
     userIds,
     client_id
   );
@@ -48,7 +47,6 @@ module.exports = revokeUserGrantHandler;
 
 const revokeGrantsOnClientsAndUserIds = async (
   oktaClient,
-  config,
   userIds,
   clientId
 ) => {
@@ -58,7 +56,6 @@ const revokeGrantsOnClientsAndUserIds = async (
   for (var i = 0; i < userIds.length; i++) {
     await deleteGrantsOnClientAndUserId(
       oktaClient,
-      config,
       userIds[i],
       clientId
     )
@@ -74,7 +71,6 @@ const revokeGrantsOnClientsAndUserIds = async (
 
 const deleteGrantsOnClientAndUserId = async (
   oktaClient,
-  config,
   userId,
   clientId
 ) => {
