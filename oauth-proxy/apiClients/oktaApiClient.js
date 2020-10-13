@@ -25,11 +25,12 @@ const deleteUserGrantOnClient = async (
   return response;
 };
 
-const getUserIds = async (okta_client, email) => {
+const getUserIds = async (oktaClient, email) => {
   let emailFilter = 'profile.email eq "' + email + '"';
   let userIds = [];
 
-  await okta_client.listUsers({ search: emailFilter })
+  await oktaClient
+    .listUsers({ search: emailFilter })
     .each((user) => userIds.push(user.id))
     .catch((err) => {
       throw err;
