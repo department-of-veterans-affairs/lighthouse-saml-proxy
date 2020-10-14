@@ -112,6 +112,11 @@ export const parseSamlRequest = function (req, res, next) {
         };
       }
       req.session.authnRequest = req.authnRequest;
+    } else {
+      logger.error("Empty request data. Invalid request.");
+      throw {
+        message: "Error: Empty request data. Invalid request.",
+      };
     }
     next();
   });
