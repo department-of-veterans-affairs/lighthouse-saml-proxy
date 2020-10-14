@@ -1,7 +1,6 @@
 "use strict";
 
 require("jest");
-const okta = require("@okta/okta-sdk-nodejs");
 const MockExpressRequest = require("mock-express-request");
 const MockExpressResponse = require("mock-express-response");
 const { TokenSet } = require("openid-client");
@@ -127,11 +126,7 @@ let buildOpenIDClient = (fns) => {
   }
   return client;
 };
-class MockUser {
-  constructor(id) {
-    this.id = id;
-  }
-}
+
 let buildExpiredRefreshTokenClient = () => {
   return buildOpenIDClient({
     refresh: () => {
@@ -147,8 +142,8 @@ let buildExpiredRefreshTokenClient = () => {
   });
 };
 
-const userCollection = new Collection("", "",new ModelFactory(User));
-userCollection.currentItems = [{id: 1}];
+const userCollection = new Collection("", "", new ModelFactory(User));
+userCollection.currentItems = [{ id: 1 }];
 
 function buildFakeOktaClient(fakeRecord) {
   const oClient = { getApplication: jest.fn(), listUsers: jest.fn() };
@@ -159,10 +154,12 @@ function buildFakeOktaClient(fakeRecord) {
       } else {
         reject(`no such client application '${client_id}'`);
       }
-      });
     });
+  });
   oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
-  oClient.listUsers =  () => { return userCollection};
+  oClient.listUsers = () => {
+    return userCollection;
+  };
   return oClient;
 }
 
@@ -830,11 +827,12 @@ describe("revokeUserGrantHandler", () => {
   it("Invalid Email", async () => {
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockImplementation(() => {return []});
+    getUserIdsMock.mockImplementation(() => {
+      return [];
+    });
     req.body = { client_id: "clientid123", email: "email@example" };
-    await revokeUserGrantHandler(oktaClient, config, req, res, next)
-    .catch((err) => {
-      console.error(err);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next).catch((err) => {
+        console.error(err);
     });
     expect(res.statusCode).toEqual(400);
   });
@@ -842,7 +840,6 @@ describe("revokeUserGrantHandler", () => {
   it("Email with additional filtering", async () => {
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue([{ id:"id1" }, { id: "id2"}]);
     req.body = {
       client_id: "clientid123",
       email: 'email@example.com or firstName eq "John"',
