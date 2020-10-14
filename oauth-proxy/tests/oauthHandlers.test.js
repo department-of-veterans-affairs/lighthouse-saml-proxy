@@ -831,9 +831,11 @@ describe("revokeUserGrantHandler", () => {
       return [];
     });
     req.body = { client_id: "clientid123", email: "email@example" };
-    await revokeUserGrantHandler(oktaClient, config, req, res, next).catch((err) => {
+    await revokeUserGrantHandler(oktaClient, config, req, res, next).catch(
+      (err) => {
         console.error(err);
-    });
+      }
+    );
     expect(res.statusCode).toEqual(400);
   });
 
