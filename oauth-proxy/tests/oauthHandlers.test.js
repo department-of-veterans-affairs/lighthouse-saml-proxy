@@ -125,7 +125,11 @@ let buildOpenIDClient = (fns) => {
   }
   return client;
 };
-
+class MockUser {
+  constructor(id) {
+    this.id = id;
+  }
+}
 let buildExpiredRefreshTokenClient = () => {
   return buildOpenIDClient({
     refresh: () => {
@@ -153,21 +157,23 @@ function buildFakeOktaClient(fakeRecord) {
       }
       });
     });
-  const eachFn = jest.fn(() => {
-    return new Promise((resolve, reject) => {
+  const eachFn = function()  {
+    return  new Promise((resolve, reject) => {
       let index = 0;
       if (index >= userList.length) {
         return false;
       }
-      resolve(userList[index]);
-    })
-  });
+      resolve(userList[index++]);
+      });
+    }
 
-  oClient.listUsers = function()  {
-    return {
-      each: eachFn
-    };
+  const catchFn = function() {
+    return {message: "some error"};
   }
+  oClient.listUsers = jest.fn();
+  oClient.listUsers.mockImplementation((searchFilter) => {
+    return {each: eachFn};
+  });
   oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
   return oClient;
 }

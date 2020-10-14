@@ -148,7 +148,7 @@ const getUserIds = async (oktaClient, email) => {
       if (user.id) {
         userIds.push(user.id);
       }
-    })  
+    })
     .catch((err) => {
       throw err;
     });
