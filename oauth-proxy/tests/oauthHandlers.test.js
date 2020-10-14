@@ -1,13 +1,15 @@
 "use strict";
 
 require("jest");
-
+const okta = require("@okta/okta-sdk-nodejs");
 const MockExpressRequest = require("mock-express-request");
 const MockExpressResponse = require("mock-express-response");
 const { TokenSet } = require("openid-client");
 const { RequestError } = require("request-promise-native/errors");
 const timekeeper = require("timekeeper");
-
+const Collection = require("@okta/okta-sdk-nodejs/src/collection");
+const ModelFactory = require("@okta/okta-sdk-nodejs/src/model-factory");
+const User = require("@okta/okta-sdk-nodejs/src/models/User");
 const {
   tokenHandler,
   authorizeHandler,
@@ -17,12 +19,10 @@ const {
 const { translateTokenSet } = require("../oauthHandlers/tokenResponse");
 const { encodeBasicAuthHeader } = require("../utils");
 const { convertObjectToDynamoAttributeValues } = require("./testUtils");
-const oktaApiClient = require("../apiClients/oktaApiClient");
-jest.mock("../apiClients/oktaApiClient");
-const deleteUserGrantOnClientMock = oktaApiClient.deleteUserGrantOnClient;
-const getClientInfoMock = oktaApiClient.getClientInfo;
-const getUserIdsMock = oktaApiClient.getUserIds;
-const getAuthorizationServerInfo = oktaApiClient.getAuthorizationServerInfo;
+const revokeGrantsForUserAndClientMock = jest.fn();
+const getApplicationMock = jest.fn();
+const getUserIdsMock = jest.fn();
+const getAuthorizationServerInfoMock = jest.fn();
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
@@ -127,7 +127,11 @@ let buildOpenIDClient = (fns) => {
   }
   return client;
 };
-
+class MockUser {
+  constructor(id) {
+    this.id = id;
+  }
+}
 let buildExpiredRefreshTokenClient = () => {
   return buildOpenIDClient({
     refresh: () => {
@@ -143,18 +147,23 @@ let buildExpiredRefreshTokenClient = () => {
   });
 };
 
+const userCollection = new Collection("", "",new ModelFactory(User));
+userCollection.currentItems = [{id: 1}];
+
 function buildFakeOktaClient(fakeRecord) {
-  const oktaClient = { getApplication: jest.fn() };
-  oktaClient.getApplication.mockImplementation((client_id) => {
+  const oClient = { getApplication: jest.fn(), listUsers: jest.fn() };
+  oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
         resolve(fakeRecord);
       } else {
         reject(`no such client application '${client_id}'`);
       }
+      });
     });
-  });
-  return oktaClient;
+  oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
+  oClient.listUsers =  () => { return userCollection};
+  return oClient;
 }
 
 let buildFakeGetAuthorizationServerInfoResponse = (audiences) => {
@@ -535,12 +544,12 @@ describe("authorizeHandler", () => {
   afterEach(() => {});
 
   beforeEach(() => {
-    getAuthorizationServerInfo.mockReset();
+    getAuthorizationServerInfoMock.mockReset();
   });
 
   it("Happy Path Redirect", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockResolvedValue(response);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
     res = {
       redirect: jest.fn(),
     };
@@ -568,7 +577,7 @@ describe("authorizeHandler", () => {
 
   it("Happy Path Redirect with Aud parameter", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockResolvedValue(response);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
     res = {
       redirect: jest.fn(),
     };
@@ -597,7 +606,7 @@ describe("authorizeHandler", () => {
 
   it("Aud parameter does not match API response, redirect -> until we implement", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfo.mockResolvedValue(response);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
 
     req.query = {
       state: "fake_state",
@@ -631,7 +640,7 @@ describe("authorizeHandler", () => {
   });
 
   it("getAuthorizationServerInfo Error, return 500", async () => {
-    getAuthorizationServerInfo.mockRejectedValue({ error: "fakeError" });
+    getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
 
     req.query = {
       state: "fake_state",
@@ -756,17 +765,22 @@ describe("revokeUserGrantHandler", () => {
     next = jest.fn();
     req = new MockExpressRequest();
     res = new MockExpressResponse();
-    deleteUserGrantOnClientMock.mockReset();
-    getClientInfoMock.mockReset();
+    revokeGrantsForUserAndClientMock.mockReset();
+    getApplicationMock.mockReset();
     getUserIdsMock.mockReset();
+    // getUserIdsMock.each = jest.fn();
+    oktaClient.revokeGrantsForUserAndClient = revokeGrantsForUserAndClientMock;
+    oktaClient.getApplication = getApplicationMock;
+    // oktaClient.listUsers = getUserIdsMock;
+    // let ids = [{ id:"id1" }, { id: "id2"}];
+    // getUserIdsMock.each.mockImplementation(ids);
   });
 
   it("Happy Path", async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     req.body = { client_id: "clientid123", email: "email@example.com" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(200);
   });
 
@@ -774,9 +788,9 @@ describe("revokeUserGrantHandler", () => {
     config = {
       enable_okta_consent_endpoint: false,
     };
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     req.body = { client_id: "clientid123", user_id: "userid123" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(403);
   });
 
@@ -788,58 +802,59 @@ describe("revokeUserGrantHandler", () => {
 
   it("Email Empty", async () => {
     req.body = { client_id: "clientid123", email: "" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("Client Id Null", async () => {
     req.body = { user_id: "userid123" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("Email Null", async () => {
     req.body = { client_id: "clientid123" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("Invalid Client Id", async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     req.body = { client_id: "clientid123!", email: "email@example.com" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("No User Ids associated with Email", async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue([]);
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     req.body = { client_id: "clientid123", email: "email@example.com" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("Invalid Email", async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserIdsMock.mockImplementation(() => {return []});
     req.body = { client_id: "clientid123", email: "email@example" };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next)
+    .catch((err) => {
+      console.error(err);
+    });
     expect(res.statusCode).toEqual(400);
   });
 
   it("Email with additional filtering", async () => {
-    deleteUserGrantOnClientMock.mockResolvedValue({ status: 200 });
-    getClientInfoMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockResolvedValue(["id1", "id2"]);
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserIdsMock.mockResolvedValue([{ id:"id1" }, { id: "id2"}]);
     req.body = {
       client_id: "clientid123",
       email: 'email@example.com or firstName eq "John"',
     };
-    await revokeUserGrantHandler(undefined, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 });

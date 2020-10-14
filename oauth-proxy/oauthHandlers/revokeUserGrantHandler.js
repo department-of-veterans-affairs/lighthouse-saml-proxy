@@ -1,8 +1,3 @@
-const {
-  deleteUserGrantOnClient,
-  getUserIds,
-  getClientInfo,
-} = require("../apiClients/oktaApiClient");
 const { parseClientId } = require("../utils");
 const validator = require("validator");
 
@@ -67,7 +62,8 @@ const revokeGrantsOnClientsAndUserIds = async (
 
 const deleteGrantsOnClientAndUserId = async (oktaClient, userId, clientId) => {
   let retValue;
-  await deleteUserGrantOnClient(oktaClient, userId, clientId)
+  await oktaClient
+    .revokeGrantsForUserAndClient(userId, clientId)
     .then((response) => {
       retValue = {
         status: response.status,
@@ -108,11 +104,11 @@ const checkForValidEmail = (email) => {
 const checkForValidClient = async (oktaClient, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
-    await getClientInfo(oktaClient, clientId)
+    await oktaClient
+      .getApplication(clientId)
       .then(() => (clientError = false))
       .catch(() => (clientError = true));
   }
-
   if (clientError) {
     throw { status: 400, errorMessage: "Invalid client_id." };
   }
@@ -139,4 +135,26 @@ const setErrorResponse = (response, status, message) => {
     error: "invalid_request",
     error_description: message,
   });
+};
+
+const getUserIds = async (oktaClient, email) => {
+  let emailFilter = 'profile.email eq "' + email + '"';
+  let userIds = [];
+
+  await oktaClient
+    .listUsers({ search: emailFilter })
+    .each((user) => {
+      if (user.id) {
+        userIds.push(user.id);
+      }
+    })
+    .catch((err) => {
+      throw err;
+    });
+
+  if (!userIds.length || userIds.length === 0) {
+    throw { status: 400, errorMessage: "Invalid email" };
+  }
+
+  return userIds;
 };
