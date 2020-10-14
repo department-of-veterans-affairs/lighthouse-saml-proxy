@@ -7,7 +7,9 @@ const MockExpressResponse = require("mock-express-response");
 const { TokenSet } = require("openid-client");
 const { RequestError } = require("request-promise-native/errors");
 const timekeeper = require("timekeeper");
-
+const Collection = require("@okta/okta-sdk-nodejs/src/collection");
+const ModelFactory = require("@okta/okta-sdk-nodejs/src/model-factory");
+const User = require("@okta/okta-sdk-nodejs/src/models/User");
 const {
   tokenHandler,
   authorizeHandler,
@@ -145,7 +147,10 @@ let buildExpiredRefreshTokenClient = () => {
   });
 };
 
-const userList = [{ id:"id1" }, { id: "id2"}];
+
+const userCollection = new Collection("", "",new ModelFactory(User));
+userCollection.currentItems = [{id: 1}];
+
 function buildFakeOktaClient(fakeRecord) {
   const oClient = { getApplication: jest.fn() };
   oClient.getApplication.mockImplementation((client_id) => {
@@ -157,24 +162,8 @@ function buildFakeOktaClient(fakeRecord) {
       }
       });
     });
-  const eachFn = function()  {
-    return  new Promise((resolve, reject) => {
-      let index = 0;
-      if (index >= userList.length) {
-        return false;
-      }
-      resolve(userList[index++]);
-      });
-    }
-
-  const catchFn = function() {
-    return {message: "some error"};
-  }
-  oClient.listUsers = jest.fn();
-  oClient.listUsers.mockImplementation((searchFilter) => {
-    return {each: eachFn};
-  });
   oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
+  oClient.listUsers = () => { return userCollection};
   return oClient;
 }
 
@@ -789,11 +778,11 @@ describe("revokeUserGrantHandler", () => {
   });
 
   it("Happy Path", async () => {
-    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 204 });
+    revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(oktaClient, config, req, res, next);
-    expect(res.statusCode).toEqual(204);
+    expect(res.statusCode).toEqual(200);
   });
 
   it("Revoke Grants Turned Off", async () => {
