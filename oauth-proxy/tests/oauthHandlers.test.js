@@ -147,12 +147,11 @@ let buildExpiredRefreshTokenClient = () => {
   });
 };
 
-
 const userCollection = new Collection("", "",new ModelFactory(User));
 userCollection.currentItems = [{id: 1}];
 
 function buildFakeOktaClient(fakeRecord) {
-  const oClient = { getApplication: jest.fn() };
+  const oClient = { getApplication: jest.fn(), listUsers: jest.fn() };
   oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
@@ -163,7 +162,7 @@ function buildFakeOktaClient(fakeRecord) {
       });
     });
   oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
-  oClient.listUsers = () => { return userCollection};
+  oClient.listUsers =  () => { return userCollection};
   return oClient;
 }
 
@@ -829,6 +828,7 @@ describe("revokeUserGrantHandler", () => {
 
   it("No User Ids associated with Email", async () => {
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
+    getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
@@ -839,7 +839,10 @@ describe("revokeUserGrantHandler", () => {
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
     getUserIdsMock.mockImplementation(() => {return []});
     req.body = { client_id: "clientid123", email: "email@example" };
-    await revokeUserGrantHandler(oktaClient, config, req, res, next);
+    await revokeUserGrantHandler(oktaClient, config, req, res, next)
+    .catch((err) => {
+      console.error(err);
+    });
     expect(res.statusCode).toEqual(400);
   });
 
