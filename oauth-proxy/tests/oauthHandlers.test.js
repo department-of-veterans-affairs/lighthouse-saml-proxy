@@ -749,9 +749,6 @@ describe("redirectHandler", () => {
 });
 
 describe("revokeUserGrantHandler", () => {
-  afterEach(() => {
-    jest.unmock("../apiClients/oktaApiClient");
-  });
   let res;
   let req;
   let config;
