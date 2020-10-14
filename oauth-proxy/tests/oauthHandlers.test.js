@@ -765,12 +765,8 @@ describe("revokeUserGrantHandler", () => {
     revokeGrantsForUserAndClientMock.mockReset();
     getApplicationMock.mockReset();
     getUserIdsMock.mockReset();
-    // getUserIdsMock.each = jest.fn();
     oktaClient.revokeGrantsForUserAndClient = revokeGrantsForUserAndClientMock;
     oktaClient.getApplication = getApplicationMock;
-    // oktaClient.listUsers = getUserIdsMock;
-    // let ids = [{ id:"id1" }, { id: "id2"}];
-    // getUserIdsMock.each.mockImplementation(ids);
   });
 
   it("Happy Path", async () => {
