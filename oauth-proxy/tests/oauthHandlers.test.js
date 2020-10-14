@@ -141,24 +141,35 @@ let buildExpiredRefreshTokenClient = () => {
   });
 };
 
+const userList = [{ id:"id1" }, { id: "id2"}];
 function buildFakeOktaClient(fakeRecord) {
-  const oktaClient = { getApplication: jest.fn(), listUsers: jest.fn() };
-  oktaClient.getApplication.mockImplementation((client_id) => {
+  const oClient = { getApplication: jest.fn() };
+  oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
         resolve(fakeRecord);
       } else {
         reject(`no such client application '${client_id}'`);
       }
+      });
     });
-  });
-  oktaClient.listUsers.mockImplementation((searchFilter) => {
+  const eachFn = jest.fn(() => {
     return new Promise((resolve, reject) => {
-      resolve([{ id:"id1" }, { id: "id2"}]);
-    });
+      let index = 0;
+      if (index >= userList.length) {
+        return false;
+      }
+      resolve(userList[index]);
+    })
   });
-  oktaClient.getAuthorizationServer = getAuthorizationServerInfoMock;
-  return oktaClient;
+
+  oClient.listUsers = function()  {
+    return {
+      each: eachFn
+    };
+  }
+  oClient.getAuthorizationServer = getAuthorizationServerInfoMock;
+  return oClient;
 }
 
 let buildFakeGetAuthorizationServerInfoResponse = (audiences) => {
