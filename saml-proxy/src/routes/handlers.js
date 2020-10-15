@@ -1,7 +1,6 @@
 import { getPath, getReqUrl, logRelayState } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
-import extend from "extend";
 import {
   buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
@@ -127,42 +126,6 @@ export const getParticipant = (req) => {
     participant.nameIdFormat = req.user.nameIdFormat;
   }
   return participant;
-};
-
-export const idpSignIn = function (req, res) {
-  const authOptions = extend({}, req.idp.options);
-  Object.keys(req.body).forEach(function (key) {
-    var buffer;
-    if (key === "_authnRequest") {
-      buffer = new Buffer(req.body[key], "base64");
-      req.authnRequest = JSON.parse(buffer.toString("utf8"));
-
-      // Apply AuthnRequest Params
-      authOptions.inResponseTo = req.authnRequest.id;
-      if (req.idp.options.allowRequestAcsUrl && req.authnRequest.acsUrl) {
-        authOptions.acsUrl = req.authnRequest.acsUrl;
-        authOptions.recipient = req.authnRequest.acsUrl;
-        authOptions.destination = req.authnRequest.acsUrl;
-        authOptions.forceAuthn = req.authnRequest.forceAuthn;
-      }
-      if (req.authnRequest.relayState) {
-        authOptions.RelayState = req.authnRequest.relayState;
-      }
-    } else {
-      req.user[key] = req.body[key];
-    }
-  });
-
-  if (!authOptions.encryptAssertion) {
-    delete authOptions.encryptionCert;
-    delete authOptions.encryptionPublicKey;
-  }
-
-  // Set Session Index
-  authOptions.sessionIndex = getSessionIndex(req);
-
-  // Keep calm and Single Sign On
-  samlp.auth(authOptions)(req, res);
 };
 
 const processAcs = (acsUrl) => [
