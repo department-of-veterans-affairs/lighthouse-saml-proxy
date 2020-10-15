@@ -4,7 +4,6 @@ import {
   SP_METADATA_URL,
   SP_VERIFY,
   SP_ERROR_URL,
-  IDP_SIGN_IN,
 } from "./constants";
 
 import {
@@ -12,7 +11,6 @@ import {
   parseSamlRequest,
   handleError,
   samlLogin,
-  idpSignIn,
 } from "./handlers";
 
 import fs from "fs";
@@ -36,8 +34,6 @@ export default function addRoutes(app, idpConfig, spConfig) {
     parseSamlRequest,
     samlLogin("login_selection")
   );
-
-  app.post(IDP_SIGN_IN, idpSignIn);
 
   app.get(IDP_METADATA, function (req, res, next) {
     samlp.metadata(req.idp.options)(req, res);

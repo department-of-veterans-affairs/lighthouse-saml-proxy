@@ -8,6 +8,8 @@ import { buildBackgroundServerModule } from "../../common/backgroundServer";
 import { getTestExpressApp, idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER, getUser } from "./testUsers";
 import MockVetsApiClient from "./mockVetsApiClient";
+import atob from "atob";
+import btoa from "btoa";
 
 const {
   startServerInBackground,
