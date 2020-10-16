@@ -32,6 +32,15 @@ export const samlLogin = function (template) {
       ? req.authnRequest
       : req.session.authnRequest;
     req.authnRequest = authnRequest;
+    if (
+      req.authnRequest.relayState == null ||
+      req.authnRequest.relayState == ""
+    ) {
+      logger.error("Empty relay state. Invalid request.");
+      throw {
+        message: "Error: Empty relay state. Invalid request.",
+      };
+    }
     const samlp = new _samlp(
       req.sp.options.getResponseParams(),
       new SAML.SAML(req.sp.options.getResponseParams())
@@ -102,17 +111,8 @@ export const parseSamlRequest = function (req, res, next) {
         acsUrl: data.assertionConsumerServiceURL,
         forceAuthn: data.forceAuthn === "true",
       };
-      if (
-        req.authnRequest.relayState == null ||
-        req.authnRequest.relayState == ""
-      ) {
-        logger.error("Empty relay state. Invalid request.");
-        throw {
-          message: "Error: Empty relay state. Invalid request.",
-        };
-      }
       req.session.authnRequest = req.authnRequest;
-    } else {
+    } else if (!data && !req.authnRequest) {
       logger.error("Empty request data. Invalid request.");
       throw {
         message: "Error: Empty request data. Invalid request.",
