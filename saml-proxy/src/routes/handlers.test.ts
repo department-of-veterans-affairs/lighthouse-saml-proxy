@@ -54,7 +54,7 @@ describe("samlLogin", () => {
     samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     expect(mockResponse.render).toHaveBeenCalled();
   });
-  it("Login requests without a relat state should throw an error", async () => {
+  it("Login requests without a relay state should throw an error", async () => {
     let thrownError;
     try{
       samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
