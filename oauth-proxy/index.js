@@ -429,8 +429,9 @@ function buildApp(
       );
     });
 
-    router.delete(api_category + app_routes.grants, async (req, res, next) => {
-      await oauthHandlers
+    router.delete(api_category + app_routes.grants,  (req, res, next) => {
+      console.log(req);
+      oauthHandlers
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
