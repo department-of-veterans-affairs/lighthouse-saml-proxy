@@ -441,7 +441,7 @@ function buildApp(
 
 function startApp(config, issuer, isolatedIssuers) {
   const keyLimit = config.cache_key_limit;
-  const expirationPoll = config.cache_expiration_seconds;
+  const expirationPoll = config.cache_expiration_seconds * 1000;
 
   const memoryStore = new MemoryStore({
     keyLimit: keyLimit,
