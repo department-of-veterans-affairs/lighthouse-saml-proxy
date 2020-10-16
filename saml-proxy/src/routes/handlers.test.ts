@@ -56,12 +56,10 @@ describe("samlLogin", () => {
   });
   it("Login requests without a relay state should throw an error", async () => {
     let thrownError;
-    try{
+    try {
       samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
-    }
-    catch(err)
-    {
-      thrownError = err
+    } catch (err) {
+      thrownError = err;
     }
     expect(thrownError.message).toEqual(
       "Error: Empty relay state. Invalid request."
@@ -70,13 +68,13 @@ describe("samlLogin", () => {
   it("SAML Assertions without a relay state should throw an error", async () => {
     let thrownError;
     mockRequest = {
-        body : {
-          RelayState: null
-        },
-        query : {
-          RelayState: null
-        },
-        authnContext : null
+      body: {
+        RelayState: null,
+      },
+      query: {
+        RelayState: null,
+      },
+      authnContext: null,
     };
     try {
       parseSamlRequest(mockRequest, mockResponse, mockNext);
