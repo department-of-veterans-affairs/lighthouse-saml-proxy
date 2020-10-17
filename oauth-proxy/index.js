@@ -443,16 +443,10 @@ function startApp(config, issuer, isolatedIssuers) {
   const keyLimit = config.cache_key_limit;
   const expirationPoll = config.cache_expiration_seconds * 1000;
 
-  const memoryStore = new MemoryStore({
-    keyLimit: keyLimit,
-    expirationPoll: expirationPoll,
-  });
-
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
     requestExecutor: new okta.DefaultRequestExecutor(),
-    cacheStore: memoryStore,
   });
 
   const isolatedOktaClients = {};
@@ -463,7 +457,6 @@ function startApp(config, issuer, isolatedIssuers) {
           orgUrl: config.okta_url,
           token: config.okta_token,
           requestExecutor: new okta.DefaultRequestExecutor(),
-          cacheStore: memoryStore,
         });
       }
     );

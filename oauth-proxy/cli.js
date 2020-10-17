@@ -94,16 +94,6 @@ function processArgs() {
         required: false,
         default: false,
       },
-      cache_key_limit: {
-        description: "The maximum number of keys for the in-memory catche.",
-        required: false,
-        default: 100000,
-      },
-      cache_expiration_seconds: {
-        description: "The expiration time in seconds for a cached entry.",
-        required: false,
-        default: 3600,
-      },
       routes: {
         description:
           "An object that describes route configurations for isolated api categories",
