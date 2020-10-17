@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const dynamoClient = require("./dynamo_client");
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
-const MemoryStore = require("@okta/okta-sdk-nodejs/src/memory-store");
 const morgan = require("morgan");
 const promBundle = require("express-prom-bundle");
 const Sentry = require("@sentry/node");
@@ -280,7 +279,7 @@ function buildApp(
     oauthHandlers
       .revokeUserGrantHandler(oktaClient, config, req, res, next)
       .catch(next);
-});
+  });
 
   if (config.routes && config.routes.categories) {
     const app_routes = config.routes.app_routes;
@@ -429,7 +428,7 @@ function buildApp(
       );
     });
 
-    router.delete(api_category + app_routes.grants,  (req, res, next) => {
+    router.delete(api_category + app_routes.grants, (req, res, next) => {
       oauthHandlers
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
@@ -440,9 +439,6 @@ function buildApp(
 }
 
 function startApp(config, issuer, isolatedIssuers) {
-  const keyLimit = config.cache_key_limit;
-  const expirationPoll = config.cache_expiration_seconds * 1000;
-
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
