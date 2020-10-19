@@ -173,7 +173,7 @@ export default function configureExpress(
   // Catches unhandled errors
   app.use(function onError(err, req, res, next) {
     err.status = err.status || 500;
-    logger.error("An unhandled error occured. ", err);
+    logger.error("An error occured. ", err);
     next(err);
   });
 
