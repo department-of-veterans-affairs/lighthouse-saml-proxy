@@ -33,8 +33,8 @@ export const samlLogin = function (template) {
       : req.session.authnRequest;
     req.authnRequest = authnRequest;
     if (
-      req.authnRequest.relayState == null ||
-      req.authnRequest.relayState == ""
+      req.authnRequest?.relayState == null ||
+      req.authnRequest?.relayState == ""
     ) {
       logger.error("Empty relay state. Invalid request.");
       throw {
