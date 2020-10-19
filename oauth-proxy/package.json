@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/department-of-veterans-affairs/oauth-proxy#readme",
   "dependencies": {
-    "@okta/okta-sdk-nodejs": "^4.1.1",
+    "@okta/okta-sdk-nodejs": "^4.2.0",
     "@sentry/node": "^5.7.1",
     "aws-sdk": "^2.372.0",
     "axios": "^0.19.2",
