@@ -1,17 +1,12 @@
-const {
-  deleteUserGrantOnClient,
-  getUserInfo,
-  getClientInfo,
-} = require("../apiClients/oktaApiClient");
 const { parseClientId } = require("../utils");
 const validator = require("validator");
 
-const revokeUserGrantHandler = async (config, req, res, next) => {
+const revokeUserGrantHandler = async (oktaClient, config, req, res, next) => {
   let client_id = req.body.client_id;
   let email = req.body.email;
 
   try {
-    await checkForValidParams(config, client_id, email);
+    await checkForValidParams(oktaClient, config, client_id, email);
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -20,7 +15,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
   let userIds;
 
   try {
-    userIds = await getUserIds(config, email);
+    userIds = await getUserIds(oktaClient, email);
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -32,7 +27,7 @@ const revokeUserGrantHandler = async (config, req, res, next) => {
   }
 
   let revokeGrantsResponse = await revokeGrantsOnClientsAndUserIds(
-    config,
+    oktaClient,
     userIds,
     client_id
   );
@@ -45,12 +40,16 @@ module.exports = revokeUserGrantHandler;
 
 //Helper Methods
 
-const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
+const revokeGrantsOnClientsAndUserIds = async (
+  oktaClient,
+  userIds,
+  clientId
+) => {
   let responses = [];
   let status = 200;
 
   for (var i = 0; i < userIds.length; i++) {
-    await deleteGrantsOnClientAndUserId(config, userIds[i], clientId)
+    await deleteGrantsOnClientAndUserId(oktaClient, userIds[i], clientId)
       .then((response) => responses.push(response))
       .catch((err) => {
         status = 400;
@@ -61,9 +60,10 @@ const revokeGrantsOnClientsAndUserIds = async (config, userIds, clientId) => {
   return { status: status, responses: responses };
 };
 
-const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
+const deleteGrantsOnClientAndUserId = async (oktaClient, userId, clientId) => {
   let retValue;
-  await deleteUserGrantOnClient(config, userId, clientId)
+  await oktaClient
+    .revokeGrantsForUserAndClient(userId, clientId)
     .then((response) => {
       retValue = {
         status: response.status,
@@ -82,29 +82,7 @@ const deleteGrantsOnClientAndUserId = async (config, userId, clientId) => {
   return retValue;
 };
 
-const getUserIds = async (config, email) => {
-  let errorMessage;
-  let userIds;
-  await getUserInfo(config, email)
-    .then((response) => (userIds = grabUserIdsFromUserInfo(response.data)))
-    .catch(() => (errorMessage += "Invalid email address."));
-
-  if (errorMessage) {
-    throw { status: 400, errorMessage: errorMessage };
-  }
-
-  return userIds;
-};
-
-const grabUserIdsFromUserInfo = (data) => {
-  let userIds = [];
-  data.forEach((obj) => {
-    userIds.push(obj.id);
-  });
-  return userIds;
-};
-
-const checkForValidParams = async (config, clientId, email) => {
+const checkForValidParams = async (oktaClient, config, clientId, email) => {
   if (!config.enable_okta_consent_endpoint) {
     throw {
       status: 403,
@@ -114,7 +92,7 @@ const checkForValidParams = async (config, clientId, email) => {
 
   checkIfParamsExist(clientId, email);
   checkForValidEmail(email);
-  await checkForValidClient(config, clientId);
+  await checkForValidClient(oktaClient, clientId);
 };
 
 const checkForValidEmail = (email) => {
@@ -123,14 +101,14 @@ const checkForValidEmail = (email) => {
   }
 };
 
-const checkForValidClient = async (config, clientId) => {
+const checkForValidClient = async (oktaClient, clientId) => {
   let clientError = true;
   if (parseClientId(clientId)) {
-    await getClientInfo(config, clientId)
+    await oktaClient
+      .getApplication(clientId)
       .then(() => (clientError = false))
       .catch(() => (clientError = true));
   }
-
   if (clientError) {
     throw { status: 400, errorMessage: "Invalid client_id." };
   }
@@ -157,4 +135,26 @@ const setErrorResponse = (response, status, message) => {
     error: "invalid_request",
     error_description: message,
   });
+};
+
+const getUserIds = async (oktaClient, email) => {
+  let emailFilter = 'profile.email eq "' + email + '"';
+  let userIds = [];
+
+  await oktaClient
+    .listUsers({ search: emailFilter })
+    .each((user) => {
+      if (user.id) {
+        userIds.push(user.id);
+      }
+    })
+    .catch((err) => {
+      throw err;
+    });
+
+  if (!userIds.length || userIds.length === 0) {
+    throw { status: 400, errorMessage: "Invalid email" };
+  }
+
+  return userIds;
 };
