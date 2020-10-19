@@ -819,23 +819,19 @@ describe("revokeUserGrantHandler", () => {
   it("No User Ids associated with Email", async () => {
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
+    getUserIdsMock.mockImplementation(() => {
+      return [];
+    });
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(oktaClient, config, req, res, next);
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(undefined);
   });
 
   it("Invalid Email", async () => {
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     getApplicationMock.mockResolvedValue({ client_id: "clientid123" });
-    getUserIdsMock.mockImplementation(() => {
-      return [];
-    });
     req.body = { client_id: "clientid123", email: "email@example" };
-    await revokeUserGrantHandler(oktaClient, config, req, res, next).catch(
-      (err) => {
-        console.error(err);
-      }
-    );
+    await revokeUserGrantHandler(oktaClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
