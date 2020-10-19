@@ -112,11 +112,6 @@ export const parseSamlRequest = function (req, res, next) {
         forceAuthn: data.forceAuthn === "true",
       };
       req.session.authnRequest = req.authnRequest;
-    } else if (!data && !req.authnRequest) {
-      logger.error("Empty request data. Invalid request.");
-      throw {
-        message: "Error: Empty request data. Invalid request.",
-      };
     }
     next();
   });

@@ -1,5 +1,5 @@
 import "jest";
-import { getHashCode, samlLogin, parseSamlRequest } from "./handlers.js";
+import { getHashCode, samlLogin } from "./handlers.js";
 
 describe("getHashCode", () => {
   it("should get hash code for a string", () => {
@@ -54,8 +54,11 @@ describe("samlLogin", () => {
     samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     expect(mockResponse.render).toHaveBeenCalled();
   });
-  it("Login requests without a relay state should throw an error", async () => {
+  it("Login requests with a null relay state should throw an error", async () => {
     let thrownError;
+    mockRequest.authnRequest = {
+      relayState: null,
+    };
     try {
       samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     } catch (err) {
@@ -65,24 +68,28 @@ describe("samlLogin", () => {
       "Error: Empty relay state. Invalid request."
     );
   });
-  it("SAML Assertions without a relay state should throw an error", async () => {
+  it("Login requests with an empty relay state should throw an error", async () => {
     let thrownError;
-    mockRequest = {
-      body: {
-        RelayState: null,
-      },
-      query: {
-        RelayState: null,
-      },
-      authnContext: null,
+    mockRequest.authnRequest = {
+      relayState: "",
     };
     try {
-      parseSamlRequest(mockRequest, mockResponse, mockNext);
+      samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     } catch (err) {
       thrownError = err;
     }
     expect(thrownError.message).toEqual(
-      "Error: Empty request data. Invalid request."
+      "Error: Empty relay state. Invalid request."
     );
+  });
+  it("SAML logins with empty requests should throw an error", async () => {
+    let thrownError;
+    mockRequest = null;
+    try {
+      samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError).toBeDefined();
   });
 });
