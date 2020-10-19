@@ -275,8 +275,8 @@ function buildApp(
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.delete(appRoutes.grants, (req, res, next) => {
-    oauthHandlers
+  router.delete(appRoutes.grants, async (req, res, next) => {
+    await oauthHandlers
       .revokeUserGrantHandler(oktaClient, config, req, res, next)
       .catch(next);
   });
@@ -428,8 +428,8 @@ function buildApp(
       );
     });
 
-    router.delete(api_category + app_routes.grants, (req, res, next) => {
-      oauthHandlers
+    router.delete(api_category + app_routes.grants, async (req, res, next) => {
+      await oauthHandlers
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
