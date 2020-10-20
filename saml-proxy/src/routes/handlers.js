@@ -32,6 +32,16 @@ export const samlLogin = function (template) {
       ? req.authnRequest
       : req.session.authnRequest;
     req.authnRequest = authnRequest;
+    if (
+      req.authnRequest?.relayState == null ||
+      req.authnRequest?.relayState == ""
+    ) {
+      logger.error("Empty relay state. Invalid request.");
+      throw {
+        message: "Error: Empty relay state. Invalid request.",
+        status: 400,
+      };
+    }
     const samlp = new _samlp(
       req.sp.options.getResponseParams(),
       new SAML.SAML(req.sp.options.getResponseParams())

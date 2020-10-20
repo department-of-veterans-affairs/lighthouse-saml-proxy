@@ -54,4 +54,42 @@ describe("samlLogin", () => {
     samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
     expect(mockResponse.render).toHaveBeenCalled();
   });
+  it("Login requests with a null relay state should throw an error", async () => {
+    let thrownError;
+    mockRequest.authnRequest = {
+      relayState: null,
+    };
+    try {
+      samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError.message).toEqual(
+      "Error: Empty relay state. Invalid request."
+    );
+  });
+  it("Login requests with an empty relay state should throw an error", async () => {
+    let thrownError;
+    mockRequest.authnRequest = {
+      relayState: "",
+    };
+    try {
+      samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError.message).toEqual(
+      "Error: Empty relay state. Invalid request."
+    );
+  });
+  it("SAML logins with empty requests should throw an error", async () => {
+    let thrownError;
+    mockRequest = null;
+    try {
+      samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError).toBeDefined();
+  });
 });
