@@ -32,21 +32,57 @@ const tokenHandler = async (
   const client = new issuer.Client(clientMetadata);
 
   let responseObject;
-  if (req.body.grant_type === "refresh_token") {
-    await refreshTokenHandler(
-      req,
-      client,
-      logger,
-      dynamo,
-      dynamoClient
-    )
-      .then((res) => (responseObject = res))
-      .catch((err) => {
-        res.status(err.statusCode).json({
-          error: err.error,
-          error_description: err.error_description,
-        });
+
+  await getTokensObject(req, client, logger, dynamo, dynamoClient, redirect_uri)
+    .then((res) => (responseObject = res))
+    .catch((err) => {
+      res.status(err.statusCode).json({
+        error: err.error,
+        error_description: err.error_description,
       });
+    });
+
+  if (res.statusCode >= 400) {
+    return next();
+  }
+
+  let error;
+
+  createTokenResponse(
+    responseObject.tokens,
+    responseObject.state,
+    validateToken,
+    logger
+  )
+    .then((response) => res.json(response))
+    .catch((err) => {
+      error = {
+        error: err.error,
+        error_description: err.error_description,
+      };
+      res.status(err.statusCode).json(error);
+    });
+
+  if (error) {
+    return next(error);
+  }
+
+  return next();
+};
+
+const getTokensObject = async (
+  req,
+  client,
+  logger,
+  dynamo,
+  dynamoClient,
+  redirect_uri
+) => {
+  let tokensObject;
+  if (req.body.grant_type === "refresh_token") {
+    await refreshTokenHandler(req, client, logger, dynamo, dynamoClient).then(
+      (res) => (tokensObject = res)
+    );
   } else if (req.body.grant_type === "authorization_code") {
     await authorizationCodeHandler(
       req,
@@ -55,29 +91,19 @@ const tokenHandler = async (
       dynamo,
       dynamoClient,
       redirect_uri
-    )
-      .then((res) => (responseObject = res))
-      .catch((err) => {
-        res.status(err.statusCode).json({
-          error: err.error,
-          error_description: err.error_description,
-        });
-      });
+    ).then((res) => (tokensObject = res));
   } else {
-    res.status(400).json({
+    throw {
+      statusCode: 400,
       error: "unsupported_grant_type",
       error_description:
         "Only authorization and refresh_token grant types are supported",
-    });
+    };
   }
+  return tokensObject;
+};
 
-  if(res.statusCode >= 400) {
-    return next();
-  }
-
-  let tokens = responseObject.tokens;
-  let state = responseObject.state;
-
+const createTokenResponse = async (tokens, state, validateToken, logger) => {
   const tokenResponseBase = translateTokenSet(tokens);
   var decoded = jwtDecode(tokens.access_token);
   if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
@@ -87,25 +113,22 @@ const tokenHandler = async (
         decoded.aud
       );
       const patient = validation_result.va_identifiers.icn;
-      res.json({ ...tokenResponseBase, patient, state });
-      return next();
+      return { ...tokenResponseBase, patient, state };
     } catch (error) {
       rethrowIfRuntimeError(error);
       logger.error(
         "Could not find a valid patient identifier for the provided authorization code",
         error
       );
-      res.status(400).json({
+      throw {
+        statusCode: 400,
         error: "invalid_grant",
         error_description:
           "We were unable to find a valid patient identifier for the provided authorization code.",
-      });
-      return next(error);
+      };
     }
-  } else {
-    res.json({ ...tokenResponseBase, state });
-    return next();
   }
+  return { ...tokenResponseBase, state };
 };
 
 const authorizationCodeHandler = async (
@@ -116,6 +139,8 @@ const authorizationCodeHandler = async (
   dynamoClient,
   redirect_uri
 ) => {
+  let tokens;
+  let state;
   try {
     tokens = await client.grant({ ...req.body, redirect_uri });
   } catch (error) {
@@ -158,6 +183,8 @@ const refreshTokenHandler = async (
   dynamo,
   dynamoClient
 ) => {
+  let tokens;
+  let state;
   const oktaTokenRefreshStart = process.hrtime.bigint();
   try {
     tokens = await client.refresh(req.body.refresh_token);
