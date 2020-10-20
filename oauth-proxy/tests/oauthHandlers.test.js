@@ -143,16 +143,28 @@ let buildExpiredRefreshTokenClient = () => {
 };
 
 let currentItems = [{ id: 1 }];
-const userCollection = new Collection({http: {http: async () => {
-  return new Promise(resolve => {
-    resolve({
-      headers: {
-        get: () => {return null}
+const userCollection = new Collection(
+  {
+    http: {
+      http: async () => {
+        return new Promise((resolve) => {
+          resolve({
+            headers: {
+              get: () => {
+                return null;
+              },
+            },
+            json: () => {
+              return [];
+            },
+          });
+        });
       },
-      json: () => {return []}
-    });
-  })
-}}}, '', new ModelFactory(User));
+    },
+  },
+  "",
+  new ModelFactory(User)
+);
 userCollection.currentItems = currentItems;
 
 function buildFakeOktaClient(fakeRecord) {
