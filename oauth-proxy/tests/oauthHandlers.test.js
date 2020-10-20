@@ -844,7 +844,7 @@ describe("revokeUserGrantHandler", () => {
     currentItems = [];
     req.body = { client_id: "clientid123", email: "email@example.com" };
     await revokeUserGrantHandler(oktaClient, config, req, res, next);
-    expect(res.statusCode).toEqual(undefined);
+    expect(res.statusCode).toEqual(400);
   });
 
   it("Invalid Email", async () => {
