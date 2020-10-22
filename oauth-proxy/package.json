@@ -16,22 +16,19 @@
     "clearMocks": true,
     "collectCoverage": true,
     "testEnvironment": "node",
-    "testMatch": ["**/*.test.js"],
+    "testMatch": [
+      "**/*.test.js"
+    ],
     "coverageThreshold": {
       "global": {
         "lines": 74
       }
-    },
-    "transform": {
-      ".(js|ts|tsx)": "ts-jest"
     },
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/build/"
     ],
     "moduleFileExtensions": [
-      "ts",
-      "tsx",
       "js",
       "json",
       "node"
@@ -67,7 +64,6 @@
     "node-cache": "^5.1.2",
     "openid-client": "^3.15.10",
     "prom-client": "^11.5.2",
-    "ts-jest": "^26.4.1",
     "typescript": "^3.9.7",
     "validator": "^13.1.1",
     "winston": "^3.2.1",
