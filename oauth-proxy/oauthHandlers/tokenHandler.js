@@ -1,13 +1,13 @@
 const {
-  RefreshTokenStrategy,
-} = require("./tokenHandlerStrategies/refreshTokenStrategy");
+  RefreshTokenStrategy
+} = require("./tokenHandlerStrategyClasses/refreshTokenStrategy");
 const {
-  AccessTokenStrategy,
-} = require("./tokenHandlerStrategies/accessTokenStrategy");
+  AuthorizationCodeStrategy
+} = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
 
 const {
-  TokenHandlerClient,
-} = require("./tokenHandlerStrategies/tokenHandlerClient");
+  TokenHandlerClient
+} = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
 
 const tokenHandler = async (
   config,
@@ -71,7 +71,7 @@ const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
   if (req.body.grant_type === "refresh_token") {
     tokenStrategy = new RefreshTokenStrategy(req, logger, dynamo, dynamoClient);
   } else if (req.body.grant_type === "authorization_code") {
-    tokenStrategy = new AccessTokenStrategy(
+    tokenStrategy = new AuthorizationCodeStrategy(
       req,
       logger,
       dynamo,
