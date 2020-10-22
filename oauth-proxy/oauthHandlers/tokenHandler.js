@@ -35,6 +35,7 @@ const tokenHandler = async (
       error: error.error,
       error_description: error.error_description,
     });
+    return next();
   }
 
   let tokenHandlerClient = new TokenHandlerClient(
@@ -79,7 +80,7 @@ const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
     );
   } else {
     throw {
-      statusCode: 400,
+      statusCode: 401,
       error: "unsupported_grant_type",
       error_description:
         "Only authorization and refresh_token grant types are supported",

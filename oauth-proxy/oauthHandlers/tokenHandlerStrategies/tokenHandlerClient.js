@@ -1,7 +1,7 @@
 const jwtDecode = require("jwt-decode");
 
-const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
-const { translateTokenSet } = require("./tokenResponse");
+const { rethrowIfRuntimeError, parseBasicAuth } = require("../../utils");
+const { translateTokenSet } = require("../tokenResponse");
 
 class TokenHandlerClient {
   constructor(
@@ -34,12 +34,12 @@ class TokenHandlerClient {
 
     const client = new this.issuer.Client(clientMetadata);
 
-    let tokens = await this.tokenStrategy.getToken(client);
+    let tokens = await this.tokenHandlerStrategy.getToken(client);
 
-    let document = await this.tokenStrategy.pullDocumentFromDynamo();
+    let document = await this.tokenHandlerStrategy.pullDocumentFromDynamo();
     let state;
     if (document && tokens) {
-      this.tokenStrategy.saveDocumentToDynamo(document, tokens);
+      this.tokenHandlerStrategy.saveDocumentToDynamo(document, tokens);
       state = document.state.S;
     }
 
