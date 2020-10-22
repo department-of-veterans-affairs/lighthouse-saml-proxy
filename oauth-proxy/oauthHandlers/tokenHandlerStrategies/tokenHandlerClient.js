@@ -4,7 +4,7 @@ const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
 const { translateTokenSet } = require("./tokenResponse");
 
 class TokenHandlerClient {
-  TokenHandlerClient(
+  constructor(
     tokenHandlerStrategy,
     config,
     redirect_uri,
