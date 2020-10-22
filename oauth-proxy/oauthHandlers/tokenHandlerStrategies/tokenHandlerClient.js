@@ -34,7 +34,10 @@ class TokenHandlerClient {
 
     const client = new this.issuer.Client(clientMetadata);
 
-    let tokens = await this.tokenHandlerStrategy.getToken(client);
+    let tokens = await this.tokenHandlerStrategy.getToken(
+      client,
+      this.redirect_uri
+    );
 
     let document = await this.tokenHandlerStrategy.pullDocumentFromDynamo();
     let state;

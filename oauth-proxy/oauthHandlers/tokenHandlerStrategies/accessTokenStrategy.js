@@ -1,20 +1,18 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 
 class AccessTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient, redirect_uri) {
+  constructor(req, logger, dynamo, dynamoClient) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
-    this.redirect_uri = redirect_uri;
   }
 
   //will throw error if cannot retrieve refresh token
-  async getToken(client) {
-    let uri = this.redirect_uri;
+  async getToken(client, redirect_uri) {
     let token;
     try {
-      token = await client.grant({ ...this.req.body, uri });
+      token = await client.grant({ ...this.req.body, redirect_uri });
     } catch (error) {
       rethrowIfRuntimeError(error);
       this.logger.error(
