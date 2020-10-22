@@ -60,7 +60,7 @@ const tokenHandler = async (
       error: err.error,
       error_description: err.error_description,
     });
-    return next(err);
+    return next();
   }
   res.json(tokenResponse);
   return next();
