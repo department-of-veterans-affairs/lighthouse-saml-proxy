@@ -1,14 +1,14 @@
 const {
-  RefreshTokenStrategy
+  RefreshTokenStrategy,
 } = require("./tokenHandlerStrategyClasses/refreshTokenStrategy");
 const {
-  AuthorizationCodeStrategy
+  AuthorizationCodeStrategy,
 } = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
 const {
-  UnsupportedGrantStrategy
-} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy"); 
+  UnsupportedGrantStrategy,
+} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
 const {
-  TokenHandlerClient
+  TokenHandlerClient,
 } = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
 
 const tokenHandler = async (
@@ -24,12 +24,12 @@ const tokenHandler = async (
   next
 ) => {
   let tokenHandlerStrategy = getTokenStrategy(
-      redirect_uri,
-      logger,
-      dynamo,
-      dynamoClient,
-      req
-    );
+    redirect_uri,
+    logger,
+    dynamo,
+    dynamoClient,
+    req
+  );
 
   let tokenHandlerClient = new TokenHandlerClient(
     tokenHandlerStrategy,
@@ -49,7 +49,7 @@ const tokenHandler = async (
   try {
     tokenResponse = await tokenHandlerClient.handleToken();
   } catch (err) {
-    let statusCode = err.statusCode || 500; 
+    let statusCode = err.statusCode || 500;
     res.status(statusCode).json({
       error: err.error,
       error_description: err.error_description,
@@ -63,7 +63,12 @@ const tokenHandler = async (
 const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
   let tokenHandlerStrategy;
   if (req.body.grant_type === "refresh_token") {
-    tokenHandlerStrategy = new RefreshTokenStrategy(req, logger, dynamo, dynamoClient);
+    tokenHandlerStrategy = new RefreshTokenStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient
+    );
   } else if (req.body.grant_type === "authorization_code") {
     tokenHandlerStrategy = new AuthorizationCodeStrategy(
       req,
