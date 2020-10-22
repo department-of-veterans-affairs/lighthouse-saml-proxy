@@ -1,9 +1,8 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 
 class AccessTokenStrategy {
-  constructor(req, client, logger, dynamo, dynamoClient, redirect_uri) {
+  constructor(req, logger, dynamo, dynamoClient, redirect_uri) {
     this.req = req;
-    this.client = client;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
@@ -11,23 +10,24 @@ class AccessTokenStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getToken() {
+  async getToken(client) {
     let uri = this.redirect_uri;
-    return await this.client.grant({ ...this.req.body, uri });
-  }
-
-  handleTokenError(error) {
-    rethrowIfRuntimeError(error);
-    this.logger.error(
-      "Failed to retrieve tokens using the OpenID client",
-      error
-    );
-    const statusCode = statusCodeFromError(error);
-    return {
-      statusCode: statusCode,
-      error: error.error,
-      error_description: error.error_description,
-    };
+    let token;
+    try {
+      token = await client.grant({ ...this.req.body, uri });
+    } catch (error) {
+      rethrowIfRuntimeError(error);
+      this.logger.error(
+        "Failed to retrieve tokens using the OpenID client",
+        error
+      );
+      throw {
+        statusCode: statusCodeFromError(error),
+        error: error.error,
+        error_description: error.error_description,
+      };
+    }
+    return token;
   }
 
   async pullDocumentFromDynamo() {
