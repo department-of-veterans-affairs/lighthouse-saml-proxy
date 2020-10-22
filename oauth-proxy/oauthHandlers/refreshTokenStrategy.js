@@ -1,6 +1,6 @@
 const { oktaTokenRefreshGauge, stopTimer } = require("../metrics");
 
-class RefreshTokenStrategy {
+export class RefreshTokenStrategy {
   constructor(req, client, logger, dynamo, dynamoClient) {
     this.req = req;
     this.client = client;
