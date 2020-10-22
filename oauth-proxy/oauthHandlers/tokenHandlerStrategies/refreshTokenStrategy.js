@@ -4,9 +4,8 @@ const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
 
 class RefreshTokenStrategy {
-  constructor(req, client, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient) {
     this.req = req;
-    this.client = client;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
@@ -14,26 +13,27 @@ class RefreshTokenStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getToken() {
+  async getToken(client) {
     this.oktaTokenRefreshStart = process.hrtime.bigint();
-    let tokens = await this.client.refresh(this.req.body.refresh_token);
-    stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
-    return tokens;
-  }
+    let tokens;
+    try {
+      tokens = await client.refresh(this.req.body.refresh_token);
+      stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
+    } catch (error) {
+      rethrowIfRuntimeError(error);
+      this.logger.error(
+        "Could not refresh the client session with the provided refresh token",
+        error
+      );
+      stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
+      throw {
+        statusCode: statusCodeFromError(error),
+        error: error.error,
+        error_description: error.error_description,
+      };
+    }
 
-  handleTokenError(error) {
-    rethrowIfRuntimeError(error);
-    this.logger.error(
-      "Could not refresh the client session with the provided refresh token",
-      error
-    );
-    stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
-    const statusCode = statusCodeFromError(error);
-    return {
-      statusCode: statusCode,
-      error: error.error,
-      error_description: error.error_description,
-    };
+    return tokens;
   }
 
   async pullDocumentFromDynamo() {
