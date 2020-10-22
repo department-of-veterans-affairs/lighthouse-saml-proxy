@@ -32,6 +32,12 @@
     "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
   "jest": {
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "lines": 77
+      }
+    },
     "transform": {
       ".(js|ts|tsx)": "ts-jest"
     },
