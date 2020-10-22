@@ -23,7 +23,7 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let tokenStrategy = getTokenStrategy(
+  let tokenHandlerStrategy = getTokenStrategy(
       redirect_uri,
       logger,
       dynamo,
@@ -32,7 +32,7 @@ const tokenHandler = async (
     );
 
   let tokenHandlerClient = new TokenHandlerClient(
-    tokenStrategy,
+    tokenHandlerStrategy,
     config,
     redirect_uri,
     logger,
@@ -61,11 +61,11 @@ const tokenHandler = async (
 };
 
 const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
-  let tokenStrategy;
+  let tokenHandlerStrategy;
   if (req.body.grant_type === "refresh_token") {
-    tokenStrategy = new RefreshTokenStrategy(req, logger, dynamo, dynamoClient);
+    tokenHandlerStrategy = new RefreshTokenStrategy(req, logger, dynamo, dynamoClient);
   } else if (req.body.grant_type === "authorization_code") {
-    tokenStrategy = new AuthorizationCodeStrategy(
+    tokenHandlerStrategy = new AuthorizationCodeStrategy(
       req,
       logger,
       dynamo,
@@ -73,9 +73,9 @@ const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
       redirect_uri
     );
   } else {
-    tokenStrategy = new UnsupportedGrantStrategy();
+    tokenHandlerStrategy = new UnsupportedGrantStrategy();
   }
-  return tokenStrategy;
+  return tokenHandlerStrategy;
 };
 
 module.exports = tokenHandler;
