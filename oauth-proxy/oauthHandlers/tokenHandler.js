@@ -2,8 +2,12 @@ const jwtDecode = require("jwt-decode");
 
 const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
 const { translateTokenSet } = require("./tokenResponse");
-const { RefreshTokenStrategy } = require("./refreshTokenStrategy");
-const { AccessTokenStrategy } = require("./accessTokenStrategy");
+const {
+  RefreshTokenStrategy,
+} = require("./tokenHandlerStrategies/refreshTokenStrategy");
+const {
+  AccessTokenStrategy,
+} = require("./tokenHandlerStrategies/accessTokenStrategy");
 
 const tokenHandler = async (
   config,
