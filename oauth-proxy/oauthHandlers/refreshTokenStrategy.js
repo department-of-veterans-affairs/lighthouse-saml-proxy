@@ -10,7 +10,7 @@ export class RefreshTokenStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  getToken() {
+  async getToken() {
     const oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens = await client.refresh(req.body.refresh_token);
     stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
@@ -32,7 +32,7 @@ export class RefreshTokenStrategy {
     }
   }
 
-  pullDocumentFromDynamo() {
+  async pullDocumentFromDynamo() {
     let document;
     try {
       document = await dynamoClient.getFromDynamoBySecondary(
@@ -45,7 +45,7 @@ export class RefreshTokenStrategy {
     }
   }
 
-  saveDocumentToDynamo(document) {
+  async saveDocumentToDynamo(document, tokens) {
     try {
       state = document.state.S;
       await dynamoClient.saveToDynamo(
