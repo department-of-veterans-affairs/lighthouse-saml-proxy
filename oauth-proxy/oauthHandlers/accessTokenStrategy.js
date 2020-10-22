@@ -1,27 +1,27 @@
-export class AccessTokenStrategy {
-  constructor(req,
-    client,
-    logger,
-    dynamo,
-    dynamoClient,
-    redirect_uri) {
-      this.req = req;
-      this.client = client;
-      this.logger = logger;
-      this.dynamo = dynamo;
-      this.dynamoClient = dynamoClient;
-      this.redirect_uri = redirect_uri;
-    }
+const { rethrowIfRuntimeError, statusCodeFromError } = require("../utils");
 
+class AccessTokenStrategy {
+  constructor(req, client, logger, dynamo, dynamoClient, redirect_uri) {
+    this.req = req;
+    this.client = client;
+    this.logger = logger;
+    this.dynamo = dynamo;
+    this.dynamoClient = dynamoClient;
+    this.redirect_uri = redirect_uri;
+  }
 
   //will throw error if cannot retrieve refresh token
   async getToken() {
-    return await client.grant({ ...req.body, redirect_uri });
+    let uri = this.redirect_uri;
+    return await this.client.grant({ ...this.req.body, uri });
   }
 
-  handleTokenError() {
+  handleTokenError(error) {
     rethrowIfRuntimeError(error);
-    logger.error("Failed to retrieve tokens using the OpenID client", error);
+    this.logger.error(
+      "Failed to retrieve tokens using the OpenID client",
+      error
+    );
     const statusCode = statusCodeFromError(error);
     return {
       statusCode: statusCode,
@@ -31,15 +31,15 @@ export class AccessTokenStrategy {
   }
 
   async pullDocumentFromDynamo() {
-    const document;
+    let document;
     try {
-      document = await dynamoClient.getFromDynamoBySecondary(
-        dynamo,
+      document = await this.dynamoClient.getFromDynamoBySecondary(
+        this.dynamo,
         "code",
-        req.body.code
+        this.req.body.code
       );
-    } catch(err) {
-      logger.error("Failed to retrieve document from Dynamo DB.", error);
+    } catch (err) {
+      this.logger.error("Failed to retrieve document from Dynamo DB.", err);
     }
 
     return document;
@@ -49,8 +49,8 @@ export class AccessTokenStrategy {
     try {
       let state = document.state.S;
       if (tokens.refresh_token) {
-        await dynamoClient.saveToDynamo(
-          dynamo,
+        await this.dynamoClient.saveToDynamo(
+          this.dynamo,
           state,
           "refresh_token",
           tokens.refresh_token
@@ -58,8 +58,13 @@ export class AccessTokenStrategy {
       }
     } catch (error) {
       rethrowIfRuntimeError(error);
-      logger.error("Failed to save the new refresh token to DynamoDB", error);
+      this.logger.error(
+        "Failed to save the new refresh token to DynamoDB",
+        error
+      );
       document.state.S = null;
     }
-  } 
+  }
 }
+
+module.exports = { AccessTokenStrategy };
