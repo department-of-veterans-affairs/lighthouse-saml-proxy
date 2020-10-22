@@ -4,7 +4,9 @@ const {
 const {
   AuthorizationCodeStrategy
 } = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
-
+const {
+  UnsupportedGrantStrategy
+} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy"); 
 const {
   TokenHandlerClient
 } = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
@@ -21,22 +23,13 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let tokenStrategy;
-  try {
-    tokenStrategy = getTokenStrategy(
+  let tokenStrategy = getTokenStrategy(
       redirect_uri,
       logger,
       dynamo,
       dynamoClient,
       req
     );
-  } catch (error) {
-    res.status(error.statusCode).json({
-      error: error.error,
-      error_description: error.error_description,
-    });
-    return next();
-  }
 
   let tokenHandlerClient = new TokenHandlerClient(
     tokenStrategy,
@@ -56,7 +49,8 @@ const tokenHandler = async (
   try {
     tokenResponse = await tokenHandlerClient.handleToken();
   } catch (err) {
-    res.status(err.statusCode).json({
+    let statusCode = err.statusCode || 500; 
+    res.status(statusCode).json({
       error: err.error,
       error_description: err.error_description,
     });
@@ -79,12 +73,7 @@ const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
       redirect_uri
     );
   } else {
-    throw {
-      statusCode: 401,
-      error: "unsupported_grant_type",
-      error_description:
-        "Only authorization and refresh_token grant types are supported",
-    };
+    tokenStrategy = new UnsupportedGrantStrategy();
   }
   return tokenStrategy;
 };
