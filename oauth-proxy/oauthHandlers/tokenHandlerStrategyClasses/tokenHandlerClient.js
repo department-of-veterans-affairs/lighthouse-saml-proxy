@@ -42,7 +42,7 @@ class TokenHandlerClient {
     let document = await this.tokenHandlerStrategy.pullDocumentFromDynamo();
     let state;
     if (document && tokens) {
-      this.tokenHandlerStrategy.saveDocumentToDynamo(document, tokens);
+      await this.tokenHandlerStrategy.saveDocumentToDynamo(document, tokens);
       state = document.state.S;
     }
 
