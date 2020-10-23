@@ -1,12 +1,11 @@
 class UnsupportedGrantStrategy {
   constructor() {}
 
-  //will throw error if cannot retrieve refresh token
   async getToken(client, redirect_uri) { // eslint-disable-line
     throw {
-      statusCode: 401,
-      error: "invalid_client",
-      error_description: "Client authentication failed",
+      statusCode: 400,
+      error: "unsupported_grant_type",
+      error_description: "Only authorization and refresh_token grant types are supported",
     };
   }
 }
