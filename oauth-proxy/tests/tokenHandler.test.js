@@ -263,6 +263,9 @@ describe("tokenHandler refresh", () => {
 });
 
 describe("tokenHandler code", () => {
+  let req;
+  let res;
+  let client;
   beforeEach(() => {
     req = new MockExpressRequest({
       body: {
@@ -314,9 +317,8 @@ describe("tokenHandler code", () => {
 
   it("Client Grant Error", async () => {
     client.grant = (reject) => {
-      reject(
-        new error("error")
-        )}
+      reject(new error("error"));
+    };
 
     await tokenHandler(
       config,
@@ -332,5 +334,4 @@ describe("tokenHandler code", () => {
     );
     expect(res.statusCode).toEqual(500);
   });
-
 });
