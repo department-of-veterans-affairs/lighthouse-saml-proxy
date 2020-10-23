@@ -101,7 +101,7 @@ class TokenHandlerClient {
       let returnError = new TokenHandlerError(
         "invalid_grant",
         "Could not find a valid patient identifier for the provided authorization code.",
-        400,
+        500,
         true
       );
       this.logger.error(returnError.error_description, error);
