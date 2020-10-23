@@ -2,7 +2,6 @@ require("jest");
 const MockExpressRequest = require("mock-express-request");
 const MockExpressResponse = require("mock-express-response");
 const { TokenSet } = require("openid-client");
-const { error } = require("winston");
 const { tokenHandler } = require("../oauthHandlers");
 const { encodeBasicAuthHeader } = require("../utils");
 const {
@@ -316,8 +315,8 @@ describe("tokenHandler code", () => {
   });
 
   it("Client Grant Error", async () => {
-    client.grant = (reject) => {
-      reject(new error("error"));
+    client.grant = () => {
+      throw new Error("error");
     };
 
     await tokenHandler(
