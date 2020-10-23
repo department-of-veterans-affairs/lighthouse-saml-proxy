@@ -27,8 +27,8 @@ class RefreshTokenStrategy {
       );
       stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
       throw new TokenHandlerError(
-        error.name || error.error,
-        error.message || error.error_description,
+        error.error,
+        error.error_description,
         statusCodeFromError(error)
       );
     }
