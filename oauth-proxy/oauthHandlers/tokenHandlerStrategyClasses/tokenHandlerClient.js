@@ -1,5 +1,4 @@
 const jwtDecode = require("jwt-decode");
-const { TokenHandlerError } = require("./tokenHandlerErrors");
 const { rethrowIfRuntimeError, parseBasicAuth } = require("../../utils");
 const { translateTokenSet } = require("../tokenResponse");
 
@@ -30,14 +29,38 @@ class TokenHandlerClient {
     this.next = next;
   }
   async handleToken() {
-    let clientMetadata = this.createClientMetaData();
+    let clientMetadata;
+    try {
+      clientMetadata = this.createClientMetaData();
+    } catch (error) {
+      if (error.error && error.error == "invalid_client") {
+        return {
+          statusCode: 401,
+          responseBody: {
+            error: error.error,
+            error_description: error.error_description,
+          },
+        };
+      }
+    }
 
     const client = new this.issuer.Client(clientMetadata);
 
-    let tokens = await this.tokenHandlerStrategy.getToken(
-      client,
-      this.redirect_uri
-    );
+    let tokens;
+    try {
+      tokens = await this.tokenHandlerStrategy.getToken(
+        client,
+        this.redirect_uri
+      );
+    } catch (error) {
+      return {
+        statusCode: error.statusCode,
+        responseBody: {
+          error: error.error,
+          error_description: error.error_description,
+        },
+      };
+    }
 
     let document = await this.tokenHandlerStrategy.pullDocumentFromDynamo();
     let state;
@@ -51,10 +74,12 @@ class TokenHandlerClient {
     var decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
       let patient = await this.createPatientInfo(tokens, decoded);
-      return { ...tokenResponseBase, patient, state };
+      return {
+        statusCode: 200,
+        responseBody: { ...tokenResponseBase, patient, state },
+      };
     }
-
-    return { ...tokenResponseBase, state };
+    return { statusCode: 200, responseBody: { ...tokenResponseBase, state } };
   }
 
   createClientMetaData() {
@@ -79,11 +104,10 @@ class TokenHandlerClient {
       clientMetadata.client_id = this.req.body.client_id;
       delete this.req.body.client_id;
     } else {
-      throw new TokenHandlerError(
-        "invalid_client",
-        "Client authentication failed",
-        401
-      );
+      throw {
+        error: "invalid_client",
+        error_description: "Client authentication failed",
+      };
     }
     return clientMetadata;
   }
@@ -98,12 +122,11 @@ class TokenHandlerClient {
       patient = validation_result.va_identifiers.icn;
     } catch (error) {
       rethrowIfRuntimeError(error);
-      let returnError = new TokenHandlerError(
-        "invalid_grant",
-        "Could not find a valid patient identifier for the provided authorization code.",
-        500,
-        true
-      );
+      let returnError = {
+        error: "invalid_grant",
+        error_description:
+          "Could not find a valid patient identifier for the provided authorization code.",
+      };
       this.logger.error(returnError.error_description, error);
       throw returnError;
     }

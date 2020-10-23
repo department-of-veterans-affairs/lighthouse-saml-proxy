@@ -1,5 +1,4 @@
 const process = require("process");
-const { TokenHandlerError } = require("./tokenHandlerErrors");
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
 
@@ -26,11 +25,11 @@ class RefreshTokenStrategy {
         error
       );
       stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
-      throw new TokenHandlerError(
-        error.error,
-        error.error_description,
-        statusCodeFromError(error)
-      );
+      throw {
+        error: error.error,
+        error_description: error.error_description,
+        statusCode: statusCodeFromError(error),
+      };
     }
 
     return tokens;
