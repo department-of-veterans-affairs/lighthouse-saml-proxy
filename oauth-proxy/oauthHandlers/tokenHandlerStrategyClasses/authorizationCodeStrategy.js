@@ -1,4 +1,5 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
+const { TokenHandlerError } = require("./tokenHandlerErrors");
 
 class AuthorizationCodeStrategy {
   constructor(req, logger, dynamo, dynamoClient) {
@@ -19,11 +20,11 @@ class AuthorizationCodeStrategy {
         "Failed to retrieve tokens using the OpenID client",
         error
       );
-      throw {
-        statusCode: statusCodeFromError(error),
-        error: error.error,
-        error_description: error.error_description,
-      };
+      throw new TokenHandlerError(
+        error.name || error.error,
+        error.message || error.error_description,
+        statusCodeFromError(error)
+      );
     }
     return token;
   }

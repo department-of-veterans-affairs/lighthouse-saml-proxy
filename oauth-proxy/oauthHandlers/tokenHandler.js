@@ -49,7 +49,7 @@ const tokenHandler = async (
   try {
     tokenResponse = await tokenHandlerClient.handleToken();
   } catch (err) {
-    if(err.name == "TokenHandlerError" && !err.sentry) {
+    if (err.name == "TokenHandlerError" && !err.sentry) {
       res.status(err.statusCode || 500).json({
         error: err.error,
         error_description: err.error_description,
