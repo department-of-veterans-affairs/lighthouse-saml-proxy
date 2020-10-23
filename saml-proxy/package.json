@@ -100,7 +100,7 @@
     "prom-client": "^11.5.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "samlp": "git+https://github.com/edpaget/node-samlp.git",
+    "samlp": "^4.0.0",
     "uswds": "^1.6.10",
     "uuid": "^3.3.2",
     "winston": "^3.3.3",
