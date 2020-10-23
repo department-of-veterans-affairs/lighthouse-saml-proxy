@@ -1,5 +1,5 @@
 const jwtDecode = require("jwt-decode");
-
+const { TokenHandlerError } = require("./tokenHandlerErrors");
 const { rethrowIfRuntimeError, parseBasicAuth } = require("../../utils");
 const { translateTokenSet } = require("../tokenResponse");
 
@@ -79,11 +79,11 @@ class TokenHandlerClient {
       clientMetadata.client_id = this.req.body.client_id;
       delete this.req.body.client_id;
     } else {
-      throw {
-        statusCode: 401,
-        error: "invalid_client",
-        error_description: "Client authentication failed",
-      };
+      throw new TokenHandlerError(
+        "invalid_client",
+        "Client authentication failed",
+        401
+      );
     }
     return clientMetadata;
   }
@@ -98,12 +98,12 @@ class TokenHandlerClient {
       patient = validation_result.va_identifiers.icn;
     } catch (error) {
       rethrowIfRuntimeError(error);
-      let returnError = {
-        statusCode: 400,
-        error: "invalid_grant",
-        error_description:
-          "Could not find a valid patient identifier for the provided authorization code.",
-      };
+      let returnError = new TokenHandlerError(
+        "invalid_grant",
+        "Could not find a valid patient identifier for the provided authorization code.",
+        400,
+        true
+      );
       this.logger.error(returnError.error_description, error);
       throw returnError;
     }
