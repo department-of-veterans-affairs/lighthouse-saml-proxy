@@ -252,6 +252,33 @@ describe("tokenHandler", () => {
     expect(res.statusCode).toEqual(401);
   });
 
+  it("Unsupported Grant Type Error", async () => {
+    let req = new MockExpressRequest({
+      method: "POST",
+      url: "/oauth2/token",
+      body: {
+        grant_type: "unsupported_grant_type",
+        client_id: "client123",
+        client_secret: "secret789",
+      },
+    });
+    let res = new MockExpressResponse();
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
+    expect(validateToken).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+  });
+
   it("errors properly for unauthorized (no client_secret) requests", async () => {
     let customConfig = { ...config, enable_pkce_authorization_flow: false };
     let req = new MockExpressRequest({
