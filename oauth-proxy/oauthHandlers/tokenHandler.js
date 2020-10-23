@@ -54,10 +54,9 @@ const tokenHandler = async (
         error: err.error,
         error_description: err.error_description,
       });
-      console.log("not sent to sentry");
       return next();
     }
-    console.log("sent to sentry");
+    //will be sent to Sentry
     req.query.error = err.error;
     req.query.error_description = err.error_description;
     return next(err);
