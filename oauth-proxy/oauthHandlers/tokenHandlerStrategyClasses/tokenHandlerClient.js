@@ -33,6 +33,7 @@ class TokenHandlerClient {
     try {
       tokens = await this.tokenHandlerStrategy.getTokenResponse();
     } catch (error) {
+      rethrowIfRuntimeError(error);
       return {
         statusCode: error.statusCode,
         responseBody: {
