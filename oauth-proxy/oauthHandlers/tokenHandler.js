@@ -71,8 +71,7 @@ const getTokenStrategy = (redirect_uri, logger, dynamo, dynamoClient, req) => {
       req,
       logger,
       dynamo,
-      dynamoClient,
-      redirect_uri
+      dynamoClient
     );
   } else {
     tokenHandlerStrategy = new UnsupportedGrantStrategy();
