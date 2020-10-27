@@ -9,7 +9,7 @@ class AuthorizationCodeStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getToken(client, redirect_uri) {
+  async getTokens(client, redirect_uri) {
     let token;
     try {
       token = await client.grant({ ...this.req.body, redirect_uri });

@@ -49,7 +49,7 @@ class TokenHandlerClient {
 
     let tokens;
     try {
-      tokens = await this.tokenHandlerStrategy.getToken(
+      tokens = await this.tokenHandlerStrategy.getTokens(
         client,
         this.redirect_uri
       );
