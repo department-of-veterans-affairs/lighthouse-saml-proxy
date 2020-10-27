@@ -31,7 +31,7 @@ class TokenHandlerClient {
   async handleToken() {
     let clientMetadata;
     try {
-      clientMetadata = this.createClientMetaData();
+      clientMetadata = this.createClientMetadata();
     } catch (error) {
       if (error.error && error.error === "invalid_client") {
         return {
@@ -83,7 +83,7 @@ class TokenHandlerClient {
     return { statusCode: 200, responseBody: { ...tokenResponseBase, state } };
   }
 
-  createClientMetaData() {
+  createClientMetadata() {
     let clientMetadata = {
       redirect_uris: [this.redirect_uri],
     };
