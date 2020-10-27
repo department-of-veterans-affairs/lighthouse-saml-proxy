@@ -33,6 +33,7 @@ class TokenHandlerClient {
     try {
       clientMetadata = this.createClientMetadata();
     } catch (error) {
+      rethrowIfRuntimeError(error);
       if (error.error && error.error === "invalid_client") {
         return {
           statusCode: 401,
@@ -42,7 +43,6 @@ class TokenHandlerClient {
           },
         };
       }
-      throw error;
     }
 
     const client = new this.issuer.Client(clientMetadata);
