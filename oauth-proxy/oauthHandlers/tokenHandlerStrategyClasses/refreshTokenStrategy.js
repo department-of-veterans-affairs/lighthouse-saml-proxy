@@ -12,11 +12,11 @@ class RefreshTokenStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getTokenResponse(client, redirect_uri) { // eslint-disable-line
+  async getTokenResponse() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens;
     try {
-      tokens = await client.refresh(this.req.body.refresh_token);
+      tokens = await this.client.refresh(this.req.body.refresh_token);
       stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
     } catch (error) {
       rethrowIfRuntimeError(error);

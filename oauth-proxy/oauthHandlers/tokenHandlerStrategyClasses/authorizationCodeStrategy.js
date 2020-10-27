@@ -16,7 +16,7 @@ class AuthorizationCodeStrategy {
     try {
       token = await this.client.grant({
         ...this.req.body,
-        ...this.redirect_uri,
+        redirect_uri: this.redirect_uri,
       });
     } catch (error) {
       rethrowIfRuntimeError(error);
