@@ -1,7 +1,7 @@
 class UnsupportedGrantStrategy {
   constructor() {}
 
-  async getTokens(client, redirect_uri) { // eslint-disable-line
+  async getTokenResponse(client, redirect_uri) { // eslint-disable-line
     throw {
       statusCode: 400,
       error: "unsupported_grant_type",
