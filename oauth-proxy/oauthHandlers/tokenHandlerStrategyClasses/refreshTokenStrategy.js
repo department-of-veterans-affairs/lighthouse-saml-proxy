@@ -51,12 +51,14 @@ class RefreshTokenStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       let state = document.state.S;
-      await this.dynamoClient.saveToDynamo(
-        this.dynamo,
-        state,
-        "refresh_token",
-        tokens.refresh_token
-      );
+      if(state) {
+        await this.dynamoClient.saveToDynamo(
+          this.dynamo,
+          state,
+          "refresh_token",
+          tokens.refresh_token
+        );
+      }
     } catch (error) {
       this.logger.error(
         "Could not update the refresh token in DynamoDB",
