@@ -33,7 +33,7 @@ class TokenHandlerClient {
     try {
       clientMetadata = this.createClientMetaData();
     } catch (error) {
-      if (error.error && error.error == "invalid_client") {
+      if (error.error && error.error === "invalid_client") {
         return {
           statusCode: 401,
           responseBody: {
