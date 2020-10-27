@@ -72,7 +72,7 @@ class TokenHandlerClient {
 
     //Creates a Token Response
     const tokenResponseBase = translateTokenSet(tokens);
-    var decoded = jwtDecode(tokens.access_token);
+    let decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
       let patient = await this.createPatientInfo(tokens, decoded);
       return {
