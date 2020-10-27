@@ -8,23 +8,22 @@ class RefreshTokenStrategy {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
-    this.oktaTokenRefreshStart;
   }
 
   //will throw error if cannot retrieve refresh token
   async getTokenResponse(client, redirect_uri) { // eslint-disable-line
-    this.oktaTokenRefreshStart = process.hrtime.bigint();
+    let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens;
     try {
       tokens = await client.refresh(this.req.body.refresh_token);
-      stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
+      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
     } catch (error) {
       rethrowIfRuntimeError(error);
       this.logger.error(
         "Could not refresh the client session with the provided refresh token",
         error
       );
-      stopTimer(oktaTokenRefreshGauge, this.oktaTokenRefreshStart);
+      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
       throw {
         error: error.error,
         error_description: error.error_description,
