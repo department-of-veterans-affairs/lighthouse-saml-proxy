@@ -42,6 +42,7 @@ class TokenHandlerClient {
           },
         };
       }
+      throw error;
     }
 
     const client = new this.issuer.Client(clientMetadata);
