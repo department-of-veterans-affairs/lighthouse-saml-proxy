@@ -51,7 +51,7 @@ class RefreshTokenStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       let state = document.state.S;
-      if(state) {
+      if (state) {
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
           state,
