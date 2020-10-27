@@ -37,6 +37,7 @@ class AuthorizationCodeStrategy {
         this.req.body.code
       );
     } catch (err) {
+      rethrowIfRuntimeError(error);
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);
     }
 
