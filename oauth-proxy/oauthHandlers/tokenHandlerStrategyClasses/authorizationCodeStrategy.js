@@ -1,18 +1,23 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 
 class AuthorizationCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient, redirect_uri, client) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
+    this.redirect_uri = redirect_uri;
+    this.client = client;
   }
 
   //will throw error if cannot retrieve refresh token
-  async getTokenResponse(client, redirect_uri) {
+  async getTokenResponse() {
     let token;
     try {
-      token = await client.grant({ ...this.req.body, redirect_uri });
+      token = await this.client.grant({
+        ...this.req.body,
+        ...this.redirect_uri,
+      });
     } catch (error) {
       rethrowIfRuntimeError(error);
       this.logger.error(

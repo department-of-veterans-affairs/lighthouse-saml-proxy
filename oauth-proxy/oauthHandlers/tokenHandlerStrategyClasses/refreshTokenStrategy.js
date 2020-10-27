@@ -3,11 +3,12 @@ const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
 
 class RefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient, client) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
+    this.client = client;
   }
 
   //will throw error if cannot retrieve refresh token
