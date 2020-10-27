@@ -26,7 +26,7 @@ const tokenHandler = async (
 ) => {
   let clientMetadata;
   try {
-    clientMetadata = createClientMetadata();
+    clientMetadata = createClientMetadata(redirect_uri, req, config);
   } catch (error) {
     rethrowIfRuntimeError(error);
     res.status(401).json({
@@ -72,27 +72,24 @@ const tokenHandler = async (
   return next();
 };
 
-function createClientMetadata() {
+function createClientMetadata(redirect_uri, req, config) {
   let clientMetadata = {
-    redirect_uris: [this.redirect_uri],
+    redirect_uris: [redirect_uri],
   };
 
-  const basicAuth = parseBasicAuth(this.req);
+  const basicAuth = parseBasicAuth(req);
   if (basicAuth) {
     clientMetadata.client_id = basicAuth.username;
     clientMetadata.client_secret = basicAuth.password;
-  } else if (this.req.body.client_id && this.req.body.client_secret) {
-    clientMetadata.client_id = this.req.body.client_id;
-    clientMetadata.client_secret = this.req.body.client_secret;
-    delete this.req.body.client_id;
-    delete this.req.body.client_secret;
-  } else if (
-    this.config.enable_pkce_authorization_flow &&
-    this.req.body.client_id
-  ) {
+  } else if (req.body.client_id && req.body.client_secret) {
+    clientMetadata.client_id = req.body.client_id;
+    clientMetadata.client_secret = req.body.client_secret;
+    delete req.body.client_id;
+    delete req.body.client_secret;
+  } else if (config.enable_pkce_authorization_flow && req.body.client_id) {
     clientMetadata.token_endpoint_auth_method = "none";
-    clientMetadata.client_id = this.req.body.client_id;
-    delete this.req.body.client_id;
+    clientMetadata.client_id = req.body.client_id;
+    delete req.body.client_id;
   } else {
     throw {
       error: "invalid_client",
