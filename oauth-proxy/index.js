@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { Issuer } = require("openid-client");
+const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
 const dynamoClient = require("./dynamo_client");
@@ -51,10 +51,7 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ];
 
-async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
-  if (upstream_issuer_timeout_ms) {
-    Issuer.defaultHttpOptions = { timeout: upstream_issuer_timeout_ms };
-  }
+async function createIssuer(upstream_issuer) {
   return await Issuer.discover(upstream_issuer);
 }
 
@@ -507,16 +504,20 @@ if (require.main === module) {
   (async () => {
     try {
       const config = processArgs();
-      const issuer = await createIssuer(
-        config.upstream_issuer,
-        config.upstream_issuer_timeout_ms
-      );
+
+      // configure OIDC client
+      if (config.upstream_issuer_timeout_ms) {
+        custom.setHttpOptionsDefaults({
+          timeout: config.upstream_issuer_timeout_ms,
+        });
+      }
+
+      const issuer = await createIssuer(config.upstream_issuer);
       const isolatedIssuers = {};
       if (config.routes && config.routes.categories) {
         for (const service_config of config.routes.categories) {
           isolatedIssuers[service_config.api_category] = await createIssuer(
-            service_config.upstream_issuer,
-            config.upstream_issuer_timeout_ms
+            service_config.upstream_issuer
           );
         }
       }
