@@ -19,6 +19,7 @@
   },
   "main": "./app.js",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "build": "tsc",
     "watch": "tsc --watch",
     "prestart": "yarn build && npx eslint .",
@@ -129,5 +130,8 @@
     "ts-jest": "^26.3.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.9.7"
+  },
+  "resolutions": {
+    "node-forge": ">=0.10.0"
   }
 }
