@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { Issuer } = require("openid-client");
+const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
 const dynamoClient = require("./dynamo_client");
@@ -53,7 +53,11 @@ const openidMetadataWhitelist = [
 
 async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
   if (upstream_issuer_timeout_ms) {
-    Issuer.defaultHttpOptions = { timeout: upstream_issuer_timeout_ms };
+    Issuer[custom.http_options] = function (options) {
+      options.timeout = upstream_issuer_timeout_ms;
+      return options;
+    };
+
   }
   return await Issuer.discover(upstream_issuer);
 }
