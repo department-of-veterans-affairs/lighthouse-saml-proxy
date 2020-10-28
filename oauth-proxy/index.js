@@ -57,7 +57,6 @@ async function createIssuer(upstream_issuer, upstream_issuer_timeout_ms) {
       options.timeout = upstream_issuer_timeout_ms;
       return options;
     };
-
   }
   return await Issuer.discover(upstream_issuer);
 }
