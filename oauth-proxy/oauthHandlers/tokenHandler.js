@@ -24,27 +24,25 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let clientMetadata;
+  let tokenHandlerStrategy;
   try {
-    clientMetadata = createClientMetadata(redirect_uri, req, config);
+    tokenHandlerStrategy = getTokenStrategy(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req
+    );
   } catch (error) {
     rethrowIfRuntimeError(error);
-    res.status(401).json({
+    res.status(error.status).json({
       error: error.error,
       error_description: error.error_description,
     });
     return next();
   }
-
-  const client = new issuer.Client(clientMetadata);
-  let tokenHandlerStrategy = getTokenStrategy(
-    redirect_uri,
-    client,
-    logger,
-    dynamo,
-    dynamoClient,
-    req
-  );
 
   let tokenHandlerClient = new TokenHandlerClient(
     tokenHandlerStrategy,
@@ -99,12 +97,28 @@ function createClientMetadata(redirect_uri, req, config) {
   return clientMetadata;
 }
 
+const getCient = (issuer, redirect_uri, req, config) => {
+  let clientMetadata;
+  try {
+    clientMetadata = createClientMetadata(redirect_uri, req, config);
+  } catch (error) {
+    rethrowIfRuntimeError(error);
+    throw {
+      status: 401,
+      error: error.error,
+      error_description: error.error_description,
+    };
+  }
+
+  return new issuer.Client(clientMetadata);
+};
 const getTokenStrategy = (
   redirect_uri,
-  client,
+  issuer,
   logger,
   dynamo,
   dynamoClient,
+  config,
   req
 ) => {
   let tokenHandlerStrategy;
@@ -114,7 +128,7 @@ const getTokenStrategy = (
       logger,
       dynamo,
       dynamoClient,
-      client
+      getCient(issuer, redirect_uri, req, config)
     );
   } else if (req.body.grant_type === "authorization_code") {
     tokenHandlerStrategy = new AuthorizationCodeStrategy(
@@ -123,7 +137,7 @@ const getTokenStrategy = (
       dynamo,
       dynamoClient,
       redirect_uri,
-      client
+      getCient(issuer, redirect_uri, req, config)
     );
   } else {
     tokenHandlerStrategy = new UnsupportedGrantStrategy();

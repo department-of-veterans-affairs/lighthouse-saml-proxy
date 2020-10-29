@@ -186,7 +186,7 @@ describe("tokenHandler refresh", () => {
     let req = new MockExpressRequest({
       method: "POST",
       url: "/oauth2/token",
-      body: {},
+      body: { grant_type: "refresh_token" },
     });
     let res = new MockExpressResponse();
     await tokenHandler(
