@@ -79,7 +79,6 @@ class TokenHandlerClient {
         error_description:
           "Could not find a valid patient identifier for the provided authorization code.",
       };
-      this.logger.error(returnError.error_description, error);
       throw returnError;
     }
     return patient;
