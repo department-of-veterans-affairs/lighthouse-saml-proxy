@@ -90,8 +90,6 @@ function createClientMetadata(redirect_uri, req, config) {
     clientMetadata.token_endpoint_auth_method = "none";
     clientMetadata.client_id = req.body.client_id;
     delete req.body.client_id;
-  } else if (req.body.grant_type === "client_credentials") {
-    //Unused by client credentials flow
   } else {
     throw {
       error: "invalid_client",
