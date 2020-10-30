@@ -36,7 +36,8 @@ const tokenHandler = async (
       dynamo,
       dynamoClient,
       config,
-      req
+      req,
+      validateToken
     );
   } catch (error) {
     rethrowIfRuntimeError(error);
@@ -122,7 +123,8 @@ const getTokenStrategy = (
   dynamo,
   dynamoClient,
   config,
-  req
+  req,
+  validateToken
 ) => {
   let tokenHandlerStrategy;
   if (req.body.grant_type === "refresh_token") {
@@ -131,7 +133,8 @@ const getTokenStrategy = (
       logger,
       dynamo,
       dynamoClient,
-      getClient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config),
+      validateToken
     );
   } else if (req.body.grant_type === "authorization_code") {
     tokenHandlerStrategy = new AuthorizationCodeStrategy(
@@ -140,7 +143,8 @@ const getTokenStrategy = (
       dynamo,
       dynamoClient,
       redirect_uri,
-      getClient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config),
+      validateToken
     );
   } else if (req.body.grant_type === "client_credentials") {
     tokenHandlerStrategy = new ClientCredentialsStrategy(
