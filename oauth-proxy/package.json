@@ -21,7 +21,7 @@
     ],
     "coverageThreshold": {
       "global": {
-        "lines": 74
+        "lines": 78
       }
     },
     "testPathIgnorePatterns": [

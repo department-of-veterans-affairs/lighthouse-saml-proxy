@@ -62,8 +62,6 @@ const tokenHandler = async (
   try {
     tokenResponse = await tokenHandlerClient.handleToken();
   } catch (err) {
-    req.query.error = err.error;
-    req.query.error_description = err.error_description;
     return next(err);
   }
   res.status(tokenResponse.statusCode).json(tokenResponse.responseBody);
@@ -97,7 +95,7 @@ function createClientMetadata(redirect_uri, req, config) {
   return clientMetadata;
 }
 
-const getCient = (issuer, redirect_uri, req, config) => {
+const getClient = (issuer, redirect_uri, req, config) => {
   let clientMetadata;
   try {
     clientMetadata = createClientMetadata(redirect_uri, req, config);
@@ -128,7 +126,7 @@ const getTokenStrategy = (
       logger,
       dynamo,
       dynamoClient,
-      getCient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config)
     );
   } else if (req.body.grant_type === "authorization_code") {
     tokenHandlerStrategy = new AuthorizationCodeStrategy(
@@ -137,7 +135,7 @@ const getTokenStrategy = (
       dynamo,
       dynamoClient,
       redirect_uri,
-      getCient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config)
     );
   } else {
     tokenHandlerStrategy = new UnsupportedGrantStrategy();

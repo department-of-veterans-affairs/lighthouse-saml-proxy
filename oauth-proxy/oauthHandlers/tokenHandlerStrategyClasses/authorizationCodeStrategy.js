@@ -51,8 +51,8 @@ class AuthorizationCodeStrategy {
 
   async saveDocumentToDynamo(document, tokens) {
     try {
-      let state = document.state.S;
-      if (tokens.refresh_token) {
+      if (document.state && tokens.refresh_token) {
+        let state = document.state.S;
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
           state,
@@ -66,7 +66,6 @@ class AuthorizationCodeStrategy {
         "Failed to save the new refresh token to DynamoDB",
         error
       );
-      document.state.S = null;
     }
   }
 }
