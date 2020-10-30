@@ -7,12 +7,12 @@ pipeline {
     label 'vetsgov-general-purpose'
   }
 
-agent { 
+  agent { 
     docker {
         registryUrl 'https://index.docker.io/v1/'
         registryCredentialsId 'vasdvdocker'
     }
-}
+  }
 
   stages {
     stage('Checkout Code') {
