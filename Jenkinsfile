@@ -17,7 +17,7 @@ pipeline {
     stage('Run saml-proxy tests') {
       agent {
         dockerfile {
-	  registryUrl 'https://index.docker.io/v1/'
+          registryUrl 'https://index.docker.io/v1/'
           registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
@@ -38,7 +38,7 @@ pipeline {
     stage('Run saml-proxy linting') {
       agent {
         dockerfile {
-	  registryUrl 'https://index.docker.io/v1/'
+          registryUrl 'https://index.docker.io/v1/'
           registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
@@ -59,7 +59,7 @@ pipeline {
     stage('Run oauth-proxy tests') {
       agent {
         dockerfile {
-	  registryUrl 'https://index.docker.io/v1/'
+          registryUrl 'https://index.docker.io/v1/'
           registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
@@ -80,7 +80,7 @@ pipeline {
     stage('Run oauth-proxy linting check') {
       agent {
         dockerfile {
-	  registryUrl 'https://index.docker.io/v1/'
+          registryUrl 'https://index.docker.io/v1/'
           registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
