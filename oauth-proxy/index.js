@@ -322,7 +322,7 @@ function buildApp(
     if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
     } else {
-      res.status(500).send("An unknown error has occured");
+      res.status(500).send("An unknown error has occurred");
     }
   });
 

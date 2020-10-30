@@ -1,13 +1,16 @@
-const jwtDecode = require("jwt-decode");
-const process = require("process");
-
+const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
 const {
-  rethrowIfRuntimeError,
-  statusCodeFromError,
-  parseBasicAuth,
-} = require("../utils");
-const { translateTokenSet } = require("./tokenResponse");
-const { oktaTokenRefreshGauge, stopTimer } = require("../metrics");
+  RefreshTokenStrategy,
+} = require("./tokenHandlerStrategyClasses/refreshTokenStrategy");
+const {
+  AuthorizationCodeStrategy,
+} = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
+const {
+  UnsupportedGrantStrategy,
+} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
+const {
+  TokenHandlerClient,
+} = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
 
 const tokenHandler = async (
   config,
@@ -21,7 +24,52 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  const clientMetadata = {
+  let tokenHandlerStrategy;
+  try {
+    tokenHandlerStrategy = getTokenStrategy(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req
+    );
+  } catch (error) {
+    rethrowIfRuntimeError(error);
+    res.status(error.status).json({
+      error: error.error,
+      error_description: error.error_description,
+    });
+    return next();
+  }
+
+  let tokenHandlerClient = new TokenHandlerClient(
+    tokenHandlerStrategy,
+    config,
+    redirect_uri,
+    logger,
+    issuer,
+    dynamo,
+    dynamoClient,
+    validateToken,
+    req,
+    res,
+    next
+  );
+
+  let tokenResponse;
+  try {
+    tokenResponse = await tokenHandlerClient.handleToken();
+  } catch (err) {
+    return next(err);
+  }
+  res.status(tokenResponse.statusCode).json(tokenResponse.responseBody);
+  return next();
+};
+
+function createClientMetadata(redirect_uri, req, config) {
+  let clientMetadata = {
     redirect_uris: [redirect_uri],
   };
 
@@ -39,132 +87,60 @@ const tokenHandler = async (
     clientMetadata.client_id = req.body.client_id;
     delete req.body.client_id;
   } else {
-    res.status(401).json({
+    throw {
       error: "invalid_client",
       error_description: "Client authentication failed",
-    });
-    return next();
+    };
+  }
+  return clientMetadata;
+}
+
+const getClient = (issuer, redirect_uri, req, config) => {
+  let clientMetadata;
+  try {
+    clientMetadata = createClientMetadata(redirect_uri, req, config);
+  } catch (error) {
+    rethrowIfRuntimeError(error);
+    throw {
+      status: 401,
+      error: error.error,
+      error_description: error.error_description,
+    };
   }
 
-  const client = new issuer.Client(clientMetadata);
-
-  let tokens, state;
+  return new issuer.Client(clientMetadata);
+};
+const getTokenStrategy = (
+  redirect_uri,
+  issuer,
+  logger,
+  dynamo,
+  dynamoClient,
+  config,
+  req
+) => {
+  let tokenHandlerStrategy;
   if (req.body.grant_type === "refresh_token") {
-    const oktaTokenRefreshStart = process.hrtime.bigint();
-    try {
-      tokens = await client.refresh(req.body.refresh_token);
-      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      logger.error(
-        "Could not refresh the client session with the provided refresh token",
-        error
-      );
-      const statusCode = statusCodeFromError(error);
-      res.status(statusCode).json({
-        error: error.error,
-        error_description: error.error_description,
-      });
-      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
-      return next();
-    }
-    let document;
-    try {
-      document = await dynamoClient.getFromDynamoBySecondary(
-        dynamo,
-        "refresh_token",
-        req.body.refresh_token
-      );
-    } catch (error) {
-      logger.error("Could not retrieve state from DynamoDB", error);
-    }
-
-    if (document && document.state) {
-      try {
-        state = document.state.S;
-        await dynamoClient.saveToDynamo(
-          dynamo,
-          state,
-          "refresh_token",
-          tokens.refresh_token
-        );
-      } catch (error) {
-        logger.error("Could not update the refresh token in DynamoDB", error);
-      }
-    }
-    // Set state to null if we were unable to retrieve it for any reason.
-    // Token response will not include a state value, but ONLY Apple cares
-    // about this: it's not actually part of the SMART on FHIR spec.
-    state = state || null;
+    tokenHandlerStrategy = new RefreshTokenStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      getClient(issuer, redirect_uri, req, config)
+    );
   } else if (req.body.grant_type === "authorization_code") {
-    try {
-      tokens = await client.grant({ ...req.body, redirect_uri });
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      logger.error("Failed to retrieve tokens using the OpenID client", error);
-      const statusCode = statusCodeFromError(error);
-      res.status(statusCode).json({
-        error: error.error,
-        error_description: error.error_description,
-      });
-      return next();
-    }
-    try {
-      const document = await dynamoClient.getFromDynamoBySecondary(
-        dynamo,
-        "code",
-        req.body.code
-      );
-      state = document.state.S;
-      if (tokens.refresh_token) {
-        await dynamoClient.saveToDynamo(
-          dynamo,
-          state,
-          "refresh_token",
-          tokens.refresh_token
-        );
-      }
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      logger.error("Failed to save the new refresh token to DynamoDB", error);
-      state = null;
-    }
+    tokenHandlerStrategy = new AuthorizationCodeStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      redirect_uri,
+      getClient(issuer, redirect_uri, req, config)
+    );
   } else {
-    res.status(400).json({
-      error: "unsupported_grant_type",
-      error_description:
-        "Only authorization and refresh_token grant types are supported",
-    });
-    return next();
+    tokenHandlerStrategy = new UnsupportedGrantStrategy();
   }
-  const tokenResponseBase = translateTokenSet(tokens);
-  var decoded = jwtDecode(tokens.access_token);
-  if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
-    try {
-      const validation_result = await validateToken(
-        tokens.access_token,
-        decoded.aud
-      );
-      const patient = validation_result.va_identifiers.icn;
-      res.json({ ...tokenResponseBase, patient, state });
-      return next();
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      logger.error(
-        "Could not find a valid patient identifier for the provided authorization code",
-        error
-      );
-      res.status(400).json({
-        error: "invalid_grant",
-        error_description:
-          "We were unable to find a valid patient identifier for the provided authorization code.",
-      });
-      return next(error);
-    }
-  } else {
-    res.json({ ...tokenResponseBase, state });
-    return next();
-  }
+  return tokenHandlerStrategy;
 };
 
 module.exports = tokenHandler;
