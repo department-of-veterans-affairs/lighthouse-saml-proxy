@@ -5,6 +5,10 @@ pipeline {
 
   agent {
     label 'vetsgov-general-purpose'
+    docker {
+        registryUrl 'https://index.docker.io/v1/'
+        registryCredentialsId 'vasdvdocker'
+    }
   }
 
   stages {
@@ -17,8 +21,6 @@ pipeline {
     stage('Run saml-proxy tests') {
       agent {
         dockerfile {
-          registryUrl 'https://index.docker.io/v1/'
-          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "saml-proxy/Dockerfile"
@@ -38,8 +40,6 @@ pipeline {
     stage('Run saml-proxy linting') {
       agent {
         dockerfile {
-          registryUrl 'https://index.docker.io/v1/'
-          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "saml-proxy/Dockerfile"
@@ -59,8 +59,6 @@ pipeline {
     stage('Run oauth-proxy tests') {
       agent {
         dockerfile {
-          registryUrl 'https://index.docker.io/v1/'
-          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "oauth-proxy/Dockerfile"
@@ -80,8 +78,6 @@ pipeline {
     stage('Run oauth-proxy linting check') {
       agent {
         dockerfile {
-          registryUrl 'https://index.docker.io/v1/'
-          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "oauth-proxy/Dockerfile"
