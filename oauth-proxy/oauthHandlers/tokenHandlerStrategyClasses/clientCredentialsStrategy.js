@@ -53,18 +53,16 @@ class ClientCredentialsStrategy {
   }
 
   async pullDocumentFromDynamo() {
-    //Unused
+    //Currently unused, follow on to pull & store launch context
   }
 
   async saveDocumentToDynamo(document, tokens) {
-    //Unused
+    //Currently unused, follow on to pull & store launch context
   }
 
   async createPatientInfo(tokens, decoded) {
-    console.log("createPatientInfo");
-    console.log(decoded);
-    return '123V123';
-    //return decoded.launch;
+    //TODO: some validation on the request body would be good here
+    return this.req.body.launch;
   }
 
 }
