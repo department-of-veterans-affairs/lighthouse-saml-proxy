@@ -55,7 +55,10 @@ class TokenHandlerClient {
     const tokenResponseBase = translateTokenSet(tokens);
     let decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
-      let patient = await this.tokenHandlerStrategy.createPatientInfo(tokens, decoded);
+      let patient = await this.tokenHandlerStrategy.createPatientInfo(
+        tokens,
+        decoded
+      );
       return {
         statusCode: 200,
         responseBody: { ...tokenResponseBase, patient, state },
@@ -63,7 +66,6 @@ class TokenHandlerClient {
     }
     return { statusCode: 200, responseBody: { ...tokenResponseBase, state } };
   }
-  
 }
 
 module.exports = { TokenHandlerClient };

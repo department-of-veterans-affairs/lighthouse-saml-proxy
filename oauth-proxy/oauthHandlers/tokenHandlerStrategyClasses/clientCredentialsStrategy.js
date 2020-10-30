@@ -1,9 +1,7 @@
-const process = require("process");
 const axios = require("axios");
-const qs = require('qs');
+const qs = require("qs");
 
-const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
-const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
+const { rethrowIfRuntimeError } = require("../../utils");
 
 class ClientCredentialsStrategy {
   constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
@@ -23,10 +21,10 @@ class ClientCredentialsStrategy {
     var data = qs.stringify(this.req.body);
     try {
       res = await axios({
-        method: 'post',
+        method: "post",
         url: this.token_endpoint,
         data: data,
-        headers: this.req.headers
+        headers: this.req.headers,
       });
       if (res.status == 200) {
         token = res.data;
@@ -56,15 +54,16 @@ class ClientCredentialsStrategy {
     //Currently unused, follow on to pull & store launch context
   }
 
+  // eslint-disable-next-line no-unused-vars
   async saveDocumentToDynamo(document, tokens) {
     //Currently unused, follow on to pull & store launch context
   }
 
+  // eslint-disable-next-line no-unused-vars
   async createPatientInfo(tokens, decoded) {
     //TODO: some validation on the request body would be good here
     return this.req.body.launch;
   }
-
 }
 
 module.exports = { ClientCredentialsStrategy };

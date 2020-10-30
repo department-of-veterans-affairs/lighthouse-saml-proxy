@@ -1,7 +1,15 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 
 class AuthorizationCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient, redirect_uri, client, validateToken) {
+  constructor(
+    req,
+    logger,
+    dynamo,
+    dynamoClient,
+    redirect_uri,
+    client,
+    validateToken
+  ) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
