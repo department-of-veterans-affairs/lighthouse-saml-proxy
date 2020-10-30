@@ -6,6 +6,9 @@ const {
   AuthorizationCodeStrategy,
 } = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
 const {
+  ClientCredentialsStrategy,
+} = require("./tokenHandlerStrategyClasses/clientCredentialsStrategy");
+const {
   UnsupportedGrantStrategy,
 } = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
 const {
@@ -86,6 +89,8 @@ function createClientMetadata(redirect_uri, req, config) {
     clientMetadata.token_endpoint_auth_method = "none";
     clientMetadata.client_id = req.body.client_id;
     delete req.body.client_id;
+  } else if (req.body.grant_type === "client_credentials") {
+    //Unused by client credentials flow
   } else {
     throw {
       error: "invalid_client",
@@ -136,6 +141,14 @@ const getTokenStrategy = (
       dynamoClient,
       redirect_uri,
       getClient(issuer, redirect_uri, req, config)
+    );
+  } else if (req.body.grant_type === "client_credentials") {
+    tokenHandlerStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      issuer.token_endpoint
     );
   } else {
     tokenHandlerStrategy = new UnsupportedGrantStrategy();
