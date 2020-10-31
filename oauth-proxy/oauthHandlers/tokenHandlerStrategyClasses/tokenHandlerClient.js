@@ -75,9 +75,11 @@ class TokenHandlerClient {
     } catch (error) {
       rethrowIfRuntimeError(error);
       if (error.response) {
-        this.logger.error({message: "Server returned status code " + error.response.status});
+        this.logger.error({
+          message: "Server returned status code " + error.response.status,
+        });
       } else {
-        this.logger.error({message: error.message});
+        this.logger.error({ message: error.message });
       }
       throw {
         error: "invalid_grant",
