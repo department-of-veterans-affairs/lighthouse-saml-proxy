@@ -70,7 +70,8 @@ class FakeIssuer {
     };
     this.metadata = {
       issuer: "https://fake.okta.com/oauth2/1234",
-      authorization_endpoint: "fake_enpoint",
+      authorization_endpoint: "fake_endpoint",
+      token_endpoint: "fake_endpoint",
     };
   }
 }

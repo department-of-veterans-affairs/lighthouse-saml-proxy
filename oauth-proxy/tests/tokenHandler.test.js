@@ -48,6 +48,45 @@ afterEach(() => {
   expect(next).toHaveBeenCalled();
 });
 
+describe("tokenHandler clientCredentials", () => {
+  it("handles the client_credentials flow", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+    dynamoClient = buildFakeDynamoClient({
+      state: "abc123",
+      code: "xyz789",
+      refresh_token: "the_fake_refresh_token",
+      redirect_uri: "http://localhost/thisDoesNotMatter",
+    });
+
+    let res = new MockExpressResponse();
+    //TODO: Below not actually used..
+    validateToken = () => {
+      return { va_identifiers: { icn: "0000000000000" } };
+    };
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(200);
+  });
+});
+
 describe("tokenHandler refresh", () => {
   it("handles the refresh flow", async () => {
     let req = new MockExpressRequest({
