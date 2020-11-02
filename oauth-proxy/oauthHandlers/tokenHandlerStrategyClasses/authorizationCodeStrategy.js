@@ -12,8 +12,6 @@ class AuthorizationCodeStrategy {
   ) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.redirect_uri = redirect_uri;
     this.client = client;
     this.validateToken = validateToken;

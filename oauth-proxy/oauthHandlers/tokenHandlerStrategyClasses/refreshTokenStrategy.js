@@ -6,8 +6,6 @@ class RefreshTokenStrategy {
   constructor(req, logger, dynamo, dynamoClient, client, validateToken) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.client = client;
     this.validateToken = validateToken;
   }

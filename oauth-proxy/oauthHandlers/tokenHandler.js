@@ -14,6 +14,15 @@ const {
 const {
   TokenHandlerClient,
 } = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
+const {
+  PullDocumentByCodeStrategy,
+} = require("./tokenHandlerStrategyClasses/pullDocumentByCodeStrategy");
+const {
+  PullDocumentByRefreshTokenStrategy,
+} = require("./tokenHandlerStrategyClasses/pullDocumentByRefreshTokenStrategy");
+const {
+  SaveDocumentStateStrategy,
+} = require("./tokenHandlerStrategyClasses/saveDocumentStateStrategy");
 
 const tokenHandler = async (
   config,
@@ -27,9 +36,9 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let tokenHandlerStrategy;
+  let strategies;
   try {
-    tokenHandlerStrategy = getTokenStrategy(
+    strategies = getStrategies(
       redirect_uri,
       issuer,
       logger,
@@ -49,13 +58,9 @@ const tokenHandler = async (
   }
 
   let tokenHandlerClient = new TokenHandlerClient(
-    tokenHandlerStrategy,
-    config,
-    redirect_uri,
-    logger,
-    issuer,
-    dynamo,
-    dynamoClient,
+    strategies.tokenHandlerStrategy,
+    strategies.pullDocumentFromDynamoStrategy,
+    strategies.saveDocumentToDynamoStrategy,
     validateToken,
     req,
     res,
@@ -114,7 +119,7 @@ const getClient = (issuer, redirect_uri, req, config) => {
 
   return new issuer.Client(clientMetadata);
 };
-const getTokenStrategy = (
+const getStrategies = (
   redirect_uri,
   issuer,
   logger,
@@ -124,48 +129,52 @@ const getTokenStrategy = (
   req,
   validateToken
 ) => {
-  let tokenHandlerStrategy;
+  let strategies;
   if (req.body.grant_type === "refresh_token") {
-    tokenHandlerStrategy = new RefreshTokenStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      getClient(issuer, redirect_uri, req, config),
-      validateToken
-    );
+    strategies = {
+      tokenHandlerStrategy: new RefreshTokenStrategy(
+        req,
+        logger,
+        getClient(issuer, redirect_uri, req, config)
+      ),
+      pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient
+      ),
+      saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient
+      ),
+    };
   } else if (req.body.grant_type === "authorization_code") {
-    tokenHandlerStrategy = new AuthorizationCodeStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      redirect_uri,
-      getClient(issuer, redirect_uri, req, config),
-      validateToken
-    );
-  } else if (req.body.grant_type === "client_credentials") {
-    if (
-      req.body.client_assertion_type !==
-      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-    ) {
-      throw {
-        status: 400,
-        error: "invalid_request",
-        error_description: "Client assertion type must be jwt-bearer.",
-      };
-    }
-    tokenHandlerStrategy = new ClientCredentialsStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      issuer.token_endpoint
-    );
+    strategies = {
+      tokenHandlerStrategy: new AuthorizationCodeStrategy(
+        req,
+        logger,
+        redirect_uri,
+        getClient(issuer, redirect_uri, req, config)
+      ),
+      pullDocumentFromDynamoStrategy: new PullDocumentByCodeStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient
+      ),
+      saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient
+      ),
+    };
   } else {
-    tokenHandlerStrategy = new UnsupportedGrantStrategy();
+    strategies = { tokenHandlerStrategy: new UnsupportedGrantStrategy() };
   }
-  return tokenHandlerStrategy;
+  return strategies;
 };
 
 module.exports = tokenHandler;
