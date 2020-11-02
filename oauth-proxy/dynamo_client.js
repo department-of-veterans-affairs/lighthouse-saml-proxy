@@ -6,11 +6,9 @@
 // that will have to wait until we have a proper test suite in place.
 const { config, DynamoDB } = require("aws-sdk");
 
-var TableName;
 
-function createDynamoHandle(awsConfig, local, tableName) {
+function createDynamoHandle(awsConfig, local) {
   config.update(awsConfig);
-  TableName = tableName;
 
   if (local) {
     return new DynamoDB({ endpoint: `http://${local}` });
