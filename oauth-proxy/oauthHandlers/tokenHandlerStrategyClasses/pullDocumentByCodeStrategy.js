@@ -1,11 +1,12 @@
 const { rethrowIfRuntimeError } = require("../../utils");
 
 class PullDocumentByCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
+    this.config = config;
   }
   async pullDocumentFromDynamo() {
     let document;
@@ -13,7 +14,8 @@ class PullDocumentByCodeStrategy {
       document = await this.dynamoClient.getFromDynamoBySecondary(
         this.dynamo,
         "code",
-        this.req.body.code
+        this.req.body.code,
+        this.config.oauth_Request_table_name
       );
     } catch (err) {
       rethrowIfRuntimeError(err);

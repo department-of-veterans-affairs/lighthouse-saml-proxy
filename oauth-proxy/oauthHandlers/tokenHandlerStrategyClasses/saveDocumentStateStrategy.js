@@ -1,9 +1,10 @@
 class SaveDocumentStateStrategy {
-  constructor(req, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
+    this.config = config;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
@@ -13,7 +14,8 @@ class SaveDocumentStateStrategy {
           this.dynamo,
           state,
           "refresh_token",
-          tokens.refresh_token
+          tokens.refresh_token,
+          this.config.oauth_Request_table_name
         );
       }
     } catch (error) {

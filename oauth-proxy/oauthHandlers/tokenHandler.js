@@ -136,13 +136,15 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient
+        dynamoClient,
+        config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
         req,
         logger,
         dynamo,
-        dynamoClient
+        dynamoClient,
+        config
       ),
     };
   } else if (req.body.grant_type === "authorization_code") {
@@ -157,13 +159,15 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient
+        dynamoClient,
+        config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
         req,
         logger,
         dynamo,
-        dynamoClient
+        dynamoClient,
+        config
       ),
     };
   } else {
