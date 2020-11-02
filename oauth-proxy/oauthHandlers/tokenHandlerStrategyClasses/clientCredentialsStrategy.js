@@ -29,22 +29,32 @@ class ClientCredentialsStrategy {
       if (res.status == 200) {
         token = res.data;
       } else {
-        //TODO: confirm appropriate error
         throw {
-          status: 500,
+          statusCode: 500,
           error: "token_failure",
           error_description: "Failed to retrieve access_token.",
         };
       }
     } catch (error) {
-      rethrowIfRuntimeError(error);
-      return {
-        statusCode: error.statusCode,
-        responseBody: {
-          error: error.error,
-          error_description: error.error_description,
-        },
-      };
+      if (error.response.status == 400) {
+        throw {
+          statusCode: 400,
+          error: error.response.data.errorCode,
+          error_description: error.response.data.errorSummary,
+        };
+      } else if (error.response.status == 401) {
+        throw {
+          statusCode: 401,
+          error: error.response.data.error,
+          error_description: error.response.data.error_description,
+        };
+      } else {
+        throw {
+          statusCode: 500,
+          error: "token_failure",
+          error_description: "Failed to retrieve access_token.",
+        };
+      }
     }
 
     return token;
