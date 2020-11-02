@@ -463,7 +463,7 @@ function startApp(config, issuer, isolatedIssuers) {
       config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
     ),
     config.dynamo_local,
-    config.OAuth_Request_table_name
+    config.oauth_Request_table_name
   );
 
   const validateToken = configureTokenValidator(
