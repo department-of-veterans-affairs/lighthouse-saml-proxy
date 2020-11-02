@@ -60,18 +60,8 @@ describe("tokenHandler clientCredentials", () => {
         launch: "123V456",
       },
     });
-    dynamoClient = buildFakeDynamoClient({
-      state: "abc123",
-      code: "xyz789",
-      refresh_token: "the_fake_refresh_token",
-      redirect_uri: "http://localhost/thisDoesNotMatter",
-    });
 
     let res = new MockExpressResponse();
-    //TODO: Below not actually used..
-    validateToken = () => {
-      return { va_identifiers: { icn: "0000000000000" } };
-    };
     issuer = new FakeIssuer(dynamoClient);
     await tokenHandler(
       config,
@@ -86,6 +76,33 @@ describe("tokenHandler clientCredentials", () => {
       next
     );
     expect(res.statusCode).toEqual(200);
+  });
+
+  it("handles invalid client_credentials request", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    let res = new MockExpressResponse();
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      null,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
   });
 });
 
