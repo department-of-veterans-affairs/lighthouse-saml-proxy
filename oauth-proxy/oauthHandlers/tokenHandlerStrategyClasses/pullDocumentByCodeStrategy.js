@@ -15,7 +15,7 @@ class PullDocumentByCodeStrategy {
         this.dynamo,
         "code",
         this.req.body.code,
-        this.config.oauth_Request_table_name
+        this.config.dynamo_table_name
       );
     } catch (err) {
       rethrowIfRuntimeError(err);

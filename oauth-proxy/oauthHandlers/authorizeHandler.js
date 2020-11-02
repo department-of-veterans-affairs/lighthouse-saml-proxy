@@ -55,7 +55,7 @@ const authorizeHandler = async (
       state,
       "redirect_uri",
       client_redirect,
-      config.oauth_Request_table_name
+      config.dynamo_table_name
     );
   } catch (error) {
     logger.error(

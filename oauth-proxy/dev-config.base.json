@@ -4,7 +4,7 @@
   "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
   "upstream_issuer_timeout_ms": 15000,
   "dynamo_local": "dynamodb:8000",
-  "oauth_Request_table_name": "OAuthRequests",
+  "dynamo_table_name": "OAuthRequests",
   "okta_url": "https://deptva-eval.okta.com",
   "validate_endpoint": "https://sandbox-api.va.gov/internal/auth/v0/validation",
   "validate_post_endpoint": "https://sandbox-api.va.gov/internal/auth/v1/validation",

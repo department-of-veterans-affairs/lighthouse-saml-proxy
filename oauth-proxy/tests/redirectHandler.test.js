@@ -27,7 +27,7 @@ beforeEach(() => {
   next = jest.fn();
   req = new MockExpressRequest();
   res = new MockExpressResponse();
-  config = { oauth_Request_table_name: "tableName" };
+  config = { dynamo_table_name: "tableName" };
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
     code: "the_fake_authorization_code",
