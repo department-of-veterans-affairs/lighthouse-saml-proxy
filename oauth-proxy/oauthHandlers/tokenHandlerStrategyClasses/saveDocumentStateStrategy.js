@@ -15,7 +15,7 @@ class SaveDocumentStateStrategy {
           state,
           "refresh_token",
           tokens.refresh_token,
-          this.config.oauth_Request_table_name
+          this.config.dynamo_table_name
         );
       }
     } catch (error) {

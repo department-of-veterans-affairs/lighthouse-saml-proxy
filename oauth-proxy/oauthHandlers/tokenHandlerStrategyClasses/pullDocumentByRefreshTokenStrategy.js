@@ -13,7 +13,7 @@ class PullDocumentByRefreshTokenStrategy {
         this.dynamo,
         "refresh_token",
         this.req.body.refresh_token,
-        this.config.oauth_Request_table_name
+        this.config.dynamo_table_name
       );
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);

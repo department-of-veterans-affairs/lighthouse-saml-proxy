@@ -27,7 +27,7 @@ const redirectHandler = async (
         state,
         "code",
         req.query.code,
-        config.oauth_Request_table_name
+        config.dynamo_table_name
       );
     } catch (error) {
       logger.error(
@@ -40,7 +40,7 @@ const redirectHandler = async (
     const document = await dynamoClient.getFromDynamoByState(
       dynamo,
       state,
-      config.oauth_Request_table_name
+      config.dynamo_table_name
     );
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
