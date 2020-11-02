@@ -79,13 +79,18 @@ class RefreshTokenStrategy {
       patient = validation_result.va_identifiers.icn;
     } catch (error) {
       rethrowIfRuntimeError(error);
-      let returnError = {
+      if (error.response) {
+        this.logger.error({
+          message: "Server returned status code " + error.response.status,
+        });
+      } else {
+        this.logger.error({ message: error.message });
+      }
+      throw {
         error: "invalid_grant",
         error_description:
           "Could not find a valid patient identifier for the provided authorization code.",
       };
-      this.logger.error(returnError.error_description, error);
-      throw returnError;
     }
     return patient;
   }
