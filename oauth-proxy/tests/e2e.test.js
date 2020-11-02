@@ -407,6 +407,8 @@ describe("OpenID Connect Conformance", () => {
       qs.stringify({
         grant_type: "client_credentials",
         client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
         launch: "123V456",
       }),
