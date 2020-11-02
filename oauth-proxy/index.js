@@ -231,7 +231,7 @@ function buildApp(
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers
-      .redirectHandler(logger, dynamo, dynamoClient, req, res, next)
+      .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
       .catch(next);
   });
 

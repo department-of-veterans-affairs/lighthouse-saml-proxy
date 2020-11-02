@@ -1,9 +1,10 @@
 class PullDocumentByRefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient) {
+  constructor(req, logger, dynamo, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
+    this.config = config;
   }
   async pullDocumentFromDynamo() {
     let document;
@@ -11,7 +12,8 @@ class PullDocumentByRefreshTokenStrategy {
       document = await this.dynamoClient.getFromDynamoBySecondary(
         this.dynamo,
         "refresh_token",
-        this.req.body.refresh_token
+        this.req.body.refresh_token,
+        this.config.oauth_Request_table_name
       );
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
