@@ -145,6 +145,13 @@ const getTokenStrategy = (
       validateToken
     );
   } else if (req.body.grant_type === "client_credentials") {
+    if (req.body.client_assertion_type !== "urn:ietf:params:oauth:client-assertion-type:jwt-bearer") {
+      throw {
+        status: 400,
+        error: "Client assertion error",
+        error_description: "Client assertion type must be jwt-bearer.",
+      };
+    }
     tokenHandlerStrategy = new ClientCredentialsStrategy(
       req,
       logger,

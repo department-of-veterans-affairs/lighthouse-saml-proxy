@@ -35,11 +35,19 @@ class ClientCredentialsStrategy {
       }
     } catch (error) {
       if (error.response.status == 400) {
-        throw {
-          statusCode: 400,
-          error: error.response.data.errorCode,
-          error_description: error.response.data.errorSummary,
-        };
+        if (error.response.data.errorCode) {
+          throw {
+            statusCode: 400,
+            error: error.response.data.errorCode,
+            error_description: error.response.data.errorSummary,
+          };
+        } else {
+          throw {
+            statusCode: 400,
+            error: error.response.data.error,
+            error_description: error.response.data.error_description,
+          };
+        }
       } else if (error.response.status == 401) {
         throw {
           statusCode: 401,
