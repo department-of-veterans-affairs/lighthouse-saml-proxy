@@ -1,11 +1,9 @@
 const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 
 class AuthorizationCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient, redirect_uri, client) {
+  constructor(req, logger, redirect_uri, client) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.redirect_uri = redirect_uri;
     this.client = client;
   }
@@ -31,42 +29,6 @@ class AuthorizationCodeStrategy {
       };
     }
     return token;
-  }
-
-  async pullDocumentFromDynamo() {
-    let document;
-    try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "code",
-        this.req.body.code
-      );
-    } catch (err) {
-      rethrowIfRuntimeError(err);
-      this.logger.error("Failed to retrieve document from Dynamo DB.", err);
-    }
-
-    return document;
-  }
-
-  async saveDocumentToDynamo(document, tokens) {
-    try {
-      if (document.state && tokens.refresh_token) {
-        let state = document.state.S;
-        await this.dynamoClient.saveToDynamo(
-          this.dynamo,
-          state,
-          "refresh_token",
-          tokens.refresh_token
-        );
-      }
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      this.logger.error(
-        "Failed to save the new refresh token to DynamoDB",
-        error
-      );
-    }
   }
 }
 

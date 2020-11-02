@@ -3,11 +3,9 @@ const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
 
 class RefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient, client) {
+  constructor(req, logger, client) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.client = client;
   }
 
@@ -33,39 +31,6 @@ class RefreshTokenStrategy {
     }
 
     return tokens;
-  }
-
-  async pullDocumentFromDynamo() {
-    let document;
-    try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "refresh_token",
-        this.req.body.refresh_token
-      );
-    } catch (error) {
-      this.logger.error("Could not retrieve state from DynamoDB", error);
-    }
-    return document;
-  }
-
-  async saveDocumentToDynamo(document, tokens) {
-    try {
-      if (document.state) {
-        let state = document.state.S;
-        await this.dynamoClient.saveToDynamo(
-          this.dynamo,
-          state,
-          "refresh_token",
-          tokens.refresh_token
-        );
-      }
-    } catch (error) {
-      this.logger.error(
-        "Could not update the refresh token in DynamoDB",
-        error
-      );
-    }
   }
 }
 
