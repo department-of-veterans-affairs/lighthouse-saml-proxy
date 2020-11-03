@@ -151,7 +151,7 @@ const getTokenStrategy = (
     ) {
       throw {
         status: 400,
-        error: "Client assertion error",
+        error: "invalid_request",
         error_description: "Client assertion type must be jwt-bearer.",
       };
     }
