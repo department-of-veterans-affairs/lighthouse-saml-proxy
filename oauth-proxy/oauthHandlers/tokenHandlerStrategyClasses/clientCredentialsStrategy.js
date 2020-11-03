@@ -34,6 +34,7 @@ class ClientCredentialsStrategy {
         };
       }
     } catch (error) {
+      rethrowIfRuntimeError(error);
       if (error.response.status == 400) {
         if (error.response.data.errorCode) {
           throw {
@@ -55,7 +56,6 @@ class ClientCredentialsStrategy {
           error_description: error.response.data.error_description,
         };
       } else {
-        rethrowIfRuntimeError(error);
         if (error.response) {
           this.logger.error({
             message: "Server returned status code " + error.response.status,

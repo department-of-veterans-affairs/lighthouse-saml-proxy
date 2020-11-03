@@ -139,6 +139,43 @@ describe("tokenHandler clientCredentials", () => {
     }
   });
 
+  it("handles invalid client_credentials request unknown error", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "unknown-failed-assertion",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    const errResp = {
+      status: 500,
+      error: "unexpected_error",
+      response: { error: "unexpected_error" },
+    };
+    mock.onPost(token_endpoint).reply(500, errResp);
+
+    let clientCredentialsStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      token_endpoint
+    );
+
+    try {
+      await clientCredentialsStrategy.getTokenResponse();
+    } catch (error) {
+      expect(error.statusCode).toEqual(500);
+      expect(logger.error).toHaveBeenCalledWith({
+        message: "Server returned status code 500",
+      });
+    }
+  });
+
   it("handles client_credentials launch", async () => {
     let req = new MockExpressRequest({
       body: {
