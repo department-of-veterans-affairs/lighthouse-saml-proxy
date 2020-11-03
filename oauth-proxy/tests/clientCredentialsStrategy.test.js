@@ -32,7 +32,7 @@ describe("tokenHandler clientCredentials", () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: "valid-assertion",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -61,11 +61,50 @@ describe("tokenHandler clientCredentials", () => {
     expect(token).toEqual(data);
   });
 
-  it("handles invalid client_credentials request", async () => {
+  it("handles invalid client_credentials request invalid_client", async () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: "invalid-client-assertion",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    const errResp = {
+      status: 400,
+      errorCode: "invalid_client",
+      errorSummary: "Invalid value for 'client_id' parameter.",
+      response: { error: "invalid_clients" },
+    };
+    mock.onPost(token_endpoint).reply(400, errResp);
+
+    let clientCredentialsStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      token_endpoint
+    );
+
+    try {
+      await clientCredentialsStrategy.getTokenResponse();
+    } catch (error) {
+      expect(error.statusCode).toEqual(400);
+      expect(error.error).toEqual("invalid_client");
+      expect(error.error_description).toEqual(
+        "Invalid value for 'client_id' parameter."
+      );
+    }
+  });
+
+  it("handles invalid client_credentials request expired assertion", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "expired-assertion",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -94,6 +133,9 @@ describe("tokenHandler clientCredentials", () => {
     } catch (error) {
       expect(error.statusCode).toEqual(401);
       expect(error.error).toEqual("invalid_client");
+      expect(error.error_description).toEqual(
+        "The client_assertion token is expired."
+      );
     }
   });
 
