@@ -10,7 +10,6 @@ class ClientCredentialsStrategy {
     this.token_endpoint = token_endpoint;
   }
 
-  //will throw error if cannot retrieve refresh token
   async getTokenResponse() {
     let token;
     let res;
