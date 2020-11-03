@@ -76,7 +76,7 @@ class ClientCredentialsStrategy {
 
   // eslint-disable-next-line no-unused-vars
   async createPatientInfo(tokens, decoded) {
-    //TODO: some validation on the request body would be good here
+    //Consider some validation on the request body here
     return this.req.body.launch;
   }
 }
