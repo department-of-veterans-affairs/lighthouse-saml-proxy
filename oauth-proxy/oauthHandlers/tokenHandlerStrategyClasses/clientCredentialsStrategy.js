@@ -1,5 +1,6 @@
 const axios = require("axios");
 const qs = require("qs");
+const { rethrowIfRuntimeError } = require("../../utils");
 
 class ClientCredentialsStrategy {
   constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
@@ -54,6 +55,14 @@ class ClientCredentialsStrategy {
           error_description: error.response.data.error_description,
         };
       } else {
+        rethrowIfRuntimeError(error);
+        if (error.response) {
+          this.logger.error({
+            message: "Server returned status code " + error.response.status,
+          });
+        } else {
+          this.logger.error({ message: error.message });
+        }
         throw {
           statusCode: 500,
           error: "token_failure",
