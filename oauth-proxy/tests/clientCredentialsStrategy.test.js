@@ -5,7 +5,7 @@ const MockExpressRequest = require("mock-express-request");
 const { buildFakeDynamoClient } = require("./testUtils");
 const {
   ClientCredentialsStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/clientCredentialsStrategy");
+} = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
 
 let logger;
 let dynamo;
