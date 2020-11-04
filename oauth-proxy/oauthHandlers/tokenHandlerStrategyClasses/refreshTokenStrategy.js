@@ -3,7 +3,7 @@ const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
 
 class RefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient, client, validateToken) {
+  constructor(req, logger, client) {
     this.req = req;
     this.logger = logger;
     this.client = client;
@@ -32,65 +32,6 @@ class RefreshTokenStrategy {
     }
 
     return tokens;
-  }
-
-  async pullDocumentFromDynamo() {
-    let document;
-    try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "refresh_token",
-        this.req.body.refresh_token
-      );
-    } catch (error) {
-      this.logger.error("Could not retrieve state from DynamoDB", error);
-    }
-    return document;
-  }
-
-  async saveDocumentToDynamo(document, tokens) {
-    try {
-      if (document.state) {
-        let state = document.state.S;
-        await this.dynamoClient.saveToDynamo(
-          this.dynamo,
-          state,
-          "refresh_token",
-          tokens.refresh_token
-        );
-      }
-    } catch (error) {
-      this.logger.error(
-        "Could not update the refresh token in DynamoDB",
-        error
-      );
-    }
-  }
-
-  async createPatientInfo(tokens, decoded) {
-    let patient;
-    try {
-      const validation_result = await this.validateToken(
-        tokens.access_token,
-        decoded.aud
-      );
-      patient = validation_result.va_identifiers.icn;
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      if (error.response) {
-        this.logger.error({
-          message: "Server returned status code " + error.response.status,
-        });
-      } else {
-        this.logger.error({ message: error.message });
-      }
-      throw {
-        error: "invalid_grant",
-        error_description:
-          "Could not find a valid patient identifier for the provided authorization code.",
-      };
-    }
-    return patient;
   }
 }
 
