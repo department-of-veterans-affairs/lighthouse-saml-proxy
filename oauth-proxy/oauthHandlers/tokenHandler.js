@@ -6,6 +6,9 @@ const {
   AuthorizationCodeStrategy,
 } = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
 const {
+  ClientCredentialsStrategy,
+} = require("./tokenHandlerStrategyClasses/clientCredentialsStrategy");
+const {
   UnsupportedGrantStrategy,
 } = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
 const {
@@ -33,7 +36,8 @@ const tokenHandler = async (
       dynamo,
       dynamoClient,
       config,
-      req
+      req,
+      validateToken
     );
   } catch (error) {
     rethrowIfRuntimeError(error);
@@ -117,7 +121,8 @@ const getTokenStrategy = (
   dynamo,
   dynamoClient,
   config,
-  req
+  req,
+  validateToken
 ) => {
   let tokenHandlerStrategy;
   if (req.body.grant_type === "refresh_token") {
@@ -126,7 +131,8 @@ const getTokenStrategy = (
       logger,
       dynamo,
       dynamoClient,
-      getClient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config),
+      validateToken
     );
   } else if (req.body.grant_type === "authorization_code") {
     tokenHandlerStrategy = new AuthorizationCodeStrategy(
@@ -135,7 +141,26 @@ const getTokenStrategy = (
       dynamo,
       dynamoClient,
       redirect_uri,
-      getClient(issuer, redirect_uri, req, config)
+      getClient(issuer, redirect_uri, req, config),
+      validateToken
+    );
+  } else if (req.body.grant_type === "client_credentials") {
+    if (
+      req.body.client_assertion_type !==
+      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    ) {
+      throw {
+        status: 400,
+        error: "invalid_request",
+        error_description: "Client assertion type must be jwt-bearer.",
+      };
+    }
+    tokenHandlerStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      issuer.token_endpoint
     );
   } else {
     tokenHandlerStrategy = new UnsupportedGrantStrategy();

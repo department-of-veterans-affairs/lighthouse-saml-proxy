@@ -48,6 +48,64 @@ afterEach(() => {
   expect(next).toHaveBeenCalled();
 });
 
+describe("tokenHandler clientCredentials", () => {
+  it("handles the client_credentials flow", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    let res = new MockExpressResponse();
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it("handles invalid client_credentials request", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    let res = new MockExpressResponse();
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      null,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
+});
+
 describe("tokenHandler refresh", () => {
   it("handles the refresh flow", async () => {
     let req = new MockExpressRequest({

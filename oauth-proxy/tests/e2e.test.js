@@ -401,6 +401,36 @@ describe("OpenID Connect Conformance", () => {
     });
   });
 
+  it("returns an OIDC conformant token response to client_credentials", async () => {
+    const resp = await axios.post(
+      "http://localhost:9090/testServer/token",
+      qs.stringify({
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      }),
+      {
+        headers: {
+          origin: "http://localhost:8080",
+        },
+        auth: { username: "clientId123", password: "secretXyz" },
+      }
+    );
+
+    expect(resp.status).toEqual(200);
+    const parsedResp = resp.data;
+    const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
+    expect(parsedResp).toMatchObject({
+      access_token: expect.stringMatching(JWT_PATTERN),
+      scope: expect.stringMatching(/.+/),
+      patient: expect.stringMatching("123V456"),
+      token_type: "Bearer",
+    });
+  });
+
   it("returns an OIDC conformant status 200 on token introspection", async () => {
     await axios
       .post(
