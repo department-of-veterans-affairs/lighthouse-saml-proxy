@@ -1,4 +1,3 @@
-
 const { rethrowIfRuntimeError } = require("../../../utils");
 class GetPatientInfoFromValidateEndpointStrategy {
   constructor(validateToken) {
