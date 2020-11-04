@@ -27,6 +27,9 @@ class ClientCredentialsStrategy {
       if (res.status == 200) {
         token = res.data;
       } else {
+        this.logger.error({
+          message: "Server returned status code " + res.status,
+        });
         throw {
           statusCode: 500,
           error: "token_failure",
