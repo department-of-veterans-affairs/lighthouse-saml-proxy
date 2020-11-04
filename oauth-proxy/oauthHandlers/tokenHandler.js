@@ -25,6 +25,8 @@ const tokenHandler = async (
       dynamoClient,
       config,
       req,
+      res,
+      next,
       validateToken
     );
   } catch (error) {
