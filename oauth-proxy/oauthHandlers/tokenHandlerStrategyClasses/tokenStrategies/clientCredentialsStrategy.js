@@ -77,15 +77,6 @@ class ClientCredentialsStrategy {
     return token;
   }
 
-  async pullDocumentFromDynamo() {
-    //Currently unused, follow on to pull & store launch context
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  async saveDocumentToDynamo(document, tokens) {
-    //Currently unused, follow on to pull & store launch context
-  }
-
   // eslint-disable-next-line no-unused-vars
   async createPatientInfo(tokens, decoded) {
     //Consider some validation on the request body here

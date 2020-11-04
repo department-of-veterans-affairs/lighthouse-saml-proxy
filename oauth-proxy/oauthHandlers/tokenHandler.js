@@ -175,6 +175,26 @@ const getStrategies = (
         config
       ),
     };
+  } else if (req.body.grant_type === "client_credentials") {
+    if (
+      req.body.client_assertion_type !==
+      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    ) {
+      throw {
+        status: 400,
+        error: "invalid_request",
+        error_description: "Client assertion type must be jwt-bearer.",
+      };
+    }
+    strategies = {
+      tokenHandlerStrategy: new ClientCredentialsStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient,
+        issuer.token_endpoint
+      )
+    }
   } else {
     strategies = { tokenHandlerStrategy: new UnsupportedGrantStrategy() };
   }
