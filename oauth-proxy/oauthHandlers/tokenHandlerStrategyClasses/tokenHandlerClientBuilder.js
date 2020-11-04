@@ -99,7 +99,8 @@ const getStrategies = (
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
-        validateToken
+        validateToken,
+        logger
       ),
     };
   } else if (req.body.grant_type === "authorization_code") {
@@ -125,7 +126,8 @@ const getStrategies = (
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
-        validateToken
+        validateToken,
+        logger
       ),
     };
   } else if (req.body.grant_type === "client_credentials") {

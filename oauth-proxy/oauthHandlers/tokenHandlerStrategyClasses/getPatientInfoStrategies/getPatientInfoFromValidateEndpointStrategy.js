@@ -1,6 +1,7 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 class GetPatientInfoFromValidateEndpointStrategy {
-  constructor(validateToken) {
+  constructor(validateToken, logger) {
+    this.logger = logger;
     this.validateToken = validateToken;
   }
   async createPatientInfo(tokens, decoded) {
