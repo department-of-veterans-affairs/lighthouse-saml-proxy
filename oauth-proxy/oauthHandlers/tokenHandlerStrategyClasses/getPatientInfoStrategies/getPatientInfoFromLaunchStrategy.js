@@ -6,3 +6,4 @@ class GetPatientInfoFromLaunchStrategy {
     return this.req.body.launch;
   }
 }
+module.exports = { GetPatientInfoFromLaunchStrategy };
