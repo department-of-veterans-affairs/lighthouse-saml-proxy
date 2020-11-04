@@ -18,8 +18,14 @@ const {
   PullDocumentByRefreshTokenStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
+  PullDocumentNoStrategy,
+} = require("./pullDocumentStrategies/pullDocumentNoStrategy");
+const {
   SaveDocumentStateStrategy,
 } = require("./saveDocumentStrategies/saveDocumentStateStrategy");
+const {
+  SaveDocumentNoStrategy,
+} = require("./saveDocumentStrategies/saveDocumentNoStrategy");
 const {
   GetPatientInfoFromValidateEndpointStrategy,
 } = require("./getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
@@ -140,6 +146,8 @@ const getStrategies = (
         dynamoClient,
         issuer.token_endpoint
       ),
+      pullDocumentFromDynamoStrategy: new PullDocumentNoStrategy(),
+      saveDocumentToDynamoStrategy: new SaveDocumentNoStrategy(),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
