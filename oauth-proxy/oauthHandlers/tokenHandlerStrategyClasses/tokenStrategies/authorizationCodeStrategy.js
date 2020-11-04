@@ -9,7 +9,6 @@ class AuthorizationCodeStrategy {
     this.logger = logger;
     this.redirect_uri = redirect_uri;
     this.client = client;
-    this.validateToken = validateToken;
   }
 
   //will throw error if cannot retrieve refresh token

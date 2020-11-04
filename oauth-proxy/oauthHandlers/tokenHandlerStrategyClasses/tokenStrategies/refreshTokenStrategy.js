@@ -10,7 +10,6 @@ class RefreshTokenStrategy {
     this.req = req;
     this.logger = logger;
     this.client = client;
-    this.validateToken = validateToken;
   }
 
   //will throw error if cannot retrieve refresh token

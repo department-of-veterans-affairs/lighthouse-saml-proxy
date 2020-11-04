@@ -1,4 +1,7 @@
 const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
+const {
+  buildTokenHandlerClient,
+} = require("./tokenHandlerStrategyClasses/tokenHandlerClientBuilder");
 
 const tokenHandler = async (
   config,
@@ -12,9 +15,10 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let strategies;
+  let tokenHandlerClient;
   try {
-    strategies = getStrategies(
+    let metadata = createClientMetadata(redirect_uri, req, config);
+    tokenHandlerClient = buildTokenHandlerClient(
       redirect_uri,
       issuer,
       logger,
@@ -22,6 +26,7 @@ const tokenHandler = async (
       dynamoClient,
       config,
       req,
+      metadata,
       validateToken
     );
   } catch (error) {
@@ -32,16 +37,6 @@ const tokenHandler = async (
     });
     return next();
   }
-
-  let tokenHandlerClient = new TokenHandlerClient(
-    strategies.tokenHandlerStrategy,
-    strategies.pullDocumentFromDynamoStrategy,
-    strategies.saveDocumentToDynamoStrategy,
-    validateToken,
-    req,
-    res,
-    next
-  );
 
   let tokenResponse;
   try {

@@ -41,6 +41,8 @@ const buildTokenHandlerClient = (
   dynamoClient,
   config,
   req,
+  res,
+  next,
   clientMetadata,
   validateToken
 ) => {
@@ -74,6 +76,7 @@ const getStrategies = (
   dynamoClient,
   config,
   req,
+  clientMetadata,
   validateToken
 ) => {
   let strategies;
