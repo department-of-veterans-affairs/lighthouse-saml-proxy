@@ -7,7 +7,7 @@ class TokenHandlerClient {
     getTokenResponseStrategy,
     pullDocumentFromDynamoStrategy,
     saveDocumentToDynamoStrategy,
-    validateToken,
+    getPatientInfoStrategy,
     req,
     res,
     next
@@ -15,7 +15,7 @@ class TokenHandlerClient {
     this.getTokenResponseStrategy = getTokenResponseStrategy;
     this.pullDocumentFromDynamoStrategy = pullDocumentFromDynamoStrategy;
     this.saveDocumentToDynamoStrategy = saveDocumentToDynamoStrategy;
-    this.validateToken = validateToken;
+    this.getPatientInfoStrategy = getPatientInfoStrategy;
     this.req = req;
     this.res = res;
     this.next = next;
@@ -50,7 +50,7 @@ class TokenHandlerClient {
     const tokenResponseBase = translateTokenSet(tokens);
     let decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
-      let patient = await this.tokenHandlerStrategy.createPatientInfo(
+      let patient = await this.getPatientInfoStrategy.createPatientInfo(
         tokens,
         decoded
       );
