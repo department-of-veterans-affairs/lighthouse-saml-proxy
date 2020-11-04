@@ -1,28 +1,28 @@
 const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
 const {
   RefreshTokenStrategy,
-} = require("./tokenHandlerStrategyClasses/refreshTokenStrategy");
+} = require("./tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
 const {
   AuthorizationCodeStrategy,
-} = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
+} = require("./tokenHandlerStrategyClasses/tokenStrategies/authorizationCodeStrategy");
 const {
   ClientCredentialsStrategy,
-} = require("./tokenHandlerStrategyClasses/clientCredentialsStrategy");
+} = require("./tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
 const {
   UnsupportedGrantStrategy,
-} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
+} = require("./tokenHandlerStrategyClasses/tokenStrategies/unsupportedGrantStrategy");
 const {
   TokenHandlerClient,
 } = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
 const {
   PullDocumentByCodeStrategy,
-} = require("./tokenHandlerStrategyClasses/pullDocumentByCodeStrategy");
+} = require("./tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByCodeStrategy");
 const {
   PullDocumentByRefreshTokenStrategy,
-} = require("./tokenHandlerStrategyClasses/pullDocumentByRefreshTokenStrategy");
+} = require("./tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
   SaveDocumentStateStrategy,
-} = require("./tokenHandlerStrategyClasses/saveDocumentStateStrategy");
+} = require("./tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
 
 const tokenHandler = async (
   config,
