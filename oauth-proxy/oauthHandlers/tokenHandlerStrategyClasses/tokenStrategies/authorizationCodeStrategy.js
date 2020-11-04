@@ -1,4 +1,4 @@
-const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
+const { rethrowIfRuntimeError, statusCodeFromError } = require("../../../utils");
 
 class AuthorizationCodeStrategy {
   constructor(req, logger, redirect_uri, client) {

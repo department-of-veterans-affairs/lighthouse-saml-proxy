@@ -1,6 +1,6 @@
 const process = require("process");
-const { rethrowIfRuntimeError, statusCodeFromError } = require("../../utils");
-const { oktaTokenRefreshGauge, stopTimer } = require("../../metrics");
+const { rethrowIfRuntimeError, statusCodeFromError } = require("../../../utils");
+const { oktaTokenRefreshGauge, stopTimer } = require("../../../metrics");
 
 class RefreshTokenStrategy {
   constructor(req, logger, client) {

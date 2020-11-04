@@ -1,6 +1,6 @@
 const axios = require("axios");
 const qs = require("qs");
-const { rethrowIfRuntimeError } = require("../../utils");
+const { rethrowIfRuntimeError } = require("../../../utils");
 
 class ClientCredentialsStrategy {
   constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
