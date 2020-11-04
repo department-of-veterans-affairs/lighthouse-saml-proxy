@@ -59,22 +59,6 @@ const buildTokenHandlerClient = (
   );
 };
 
-const getClient = (issuer, redirect_uri, req, config) => {
-  let clientMetadata;
-  try {
-    clientMetadata = createClientMetadata(redirect_uri, req, config);
-  } catch (error) {
-    rethrowIfRuntimeError(error);
-    throw {
-      status: 401,
-      error: error.error,
-      error_description: error.error_description,
-    };
-  }
-
-  return new issuer.Client(clientMetadata);
-};
-
 const getStrategies = (
   redirect_uri,
   issuer,
@@ -91,7 +75,7 @@ const getStrategies = (
       tokenHandlerStrategy: new RefreshTokenStrategy(
         req,
         logger,
-        getClient(issuer, redirect_uri, req, config)
+        new issuer.Client(clientMetadata)
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(
         req,
@@ -117,7 +101,7 @@ const getStrategies = (
         req,
         logger,
         redirect_uri,
-        getClient(issuer, redirect_uri, req, config)
+        new issuer.Client(clientMetadata)
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByCodeStrategy(
         req,
