@@ -1,4 +1,4 @@
-const { rethrowIfRuntimeError } = require("../../utils");
+const { rethrowIfRuntimeError } = require("../../../utils");
 
 class PullDocumentByCodeStrategy {
   constructor(req, logger, dynamo, dynamoClient, config) {
