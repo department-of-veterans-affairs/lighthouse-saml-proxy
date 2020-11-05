@@ -27,6 +27,9 @@ const {
   SaveDocumentNoStrategy,
 } = require("./saveDocumentStrategies/saveDocumentNoStrategy");
 const {
+  SaveDocumentLaunchStrategy,
+} = require("./saveDocumentStrategies/saveDocumentLaunchStrategy");
+const {
   GetPatientInfoFromValidateEndpointStrategy,
 } = require("./getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
 const {
@@ -160,7 +163,7 @@ const getStrategies = (
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
-    strategies = { tokenHandlerStrategy: new UnsupportedGrantStrategy() };
+    strategies = { tokenHandlerStrategy: new SaveDocumentLaunchStrategy(logger, dynamo, dynamoClient, config) };
   }
   return strategies;
 };
