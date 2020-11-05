@@ -4,8 +4,6 @@ const {
   GetPatientInfoFromValidateEndpointStrategy,
 } = require("../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
 
-
-
 describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
   let logger;
   let mockValidate;
@@ -14,13 +12,18 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
     logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
   });
   it("Type Error", async () => {
-    mockValidate = {validateToken: async ()=> {
-      throw {}
-    }}; 
-    let strategy = new GetPatientInfoFromValidateEndpointStrategy(mockValidate, logger);
-    try{
+    mockValidate = {
+      validateToken: async () => {
+        throw {};
+      },
+    };
+    let strategy = new GetPatientInfoFromValidateEndpointStrategy(
+      mockValidate,
+      logger
+    );
+    try {
       await strategy.createPatientInfo(null, null);
-    }catch(err) {
+    } catch (err) {
       expect(true).toBe(true);
       return;
     }
@@ -28,13 +31,19 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
   });
 
   it("Validate error", async () => {
-    mockValidate = async (param1, param2) => {
-      throw {}
-    }; 
-    let strategy = new GetPatientInfoFromValidateEndpointStrategy(mockValidate, logger);
-    try{
-      await strategy.createPatientInfo({access_token: "token"}, {aud: "aud"});
-    }catch(err) {
+    mockValidate = async () => {
+      throw {};
+    };
+    let strategy = new GetPatientInfoFromValidateEndpointStrategy(
+      mockValidate,
+      logger
+    );
+    try {
+      await strategy.createPatientInfo(
+        { access_token: "token" },
+        { aud: "aud" }
+      );
+    } catch (err) {
       expect(true).toBe(true);
       return;
     }
