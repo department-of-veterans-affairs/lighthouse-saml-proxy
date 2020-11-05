@@ -18,6 +18,9 @@ const {
   PullDocumentByRefreshTokenStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
+  PullDocumentByLaunchStrategy,
+} = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
+const {
   PullDocumentNoStrategy,
 } = require("./pullDocumentStrategies/pullDocumentNoStrategy");
 const {
