@@ -1,7 +1,7 @@
-class PullDocumentByCodeStrategy {
+class PullDocumentByLaunchStrategy {
   constructor() {}
   async pullDocumentFromDynamo() {
   }
 }
 
-module.exports = { PullDocumentByCodeStrategy };
+module.exports = { PullDocumentByLaunchStrategy };
