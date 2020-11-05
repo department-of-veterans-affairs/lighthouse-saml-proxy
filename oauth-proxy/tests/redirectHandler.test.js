@@ -18,6 +18,7 @@ let dynamoClient;
 let next;
 let req;
 let res;
+let config;
 
 beforeEach(() => {
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
@@ -26,7 +27,7 @@ beforeEach(() => {
   next = jest.fn();
   req = new MockExpressRequest();
   res = new MockExpressResponse();
-
+  config = { dynamo_table_name: "tableName" };
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
     code: "the_fake_authorization_code",
@@ -47,18 +48,18 @@ describe("redirectHandler", () => {
       state: "abc123",
     };
 
-    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
     expect(res.redirect).toHaveBeenCalled();
   });
 
   it("No state, returns 400", async () => {
-    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("State is empty, returns 400", async () => {
     req.query = { state: null };
-    await redirectHandler(logger, dynamo, dynamoClient, req, res, next);
+    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 });

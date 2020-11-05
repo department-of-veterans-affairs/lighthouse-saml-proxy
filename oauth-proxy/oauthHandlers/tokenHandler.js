@@ -1,19 +1,7 @@
-const { rethrowIfRuntimeError, parseBasicAuth } = require("../utils");
+const { rethrowIfRuntimeError } = require("../utils");
 const {
-  RefreshTokenStrategy,
-} = require("./tokenHandlerStrategyClasses/refreshTokenStrategy");
-const {
-  AuthorizationCodeStrategy,
-} = require("./tokenHandlerStrategyClasses/authorizationCodeStrategy");
-const {
-  ClientCredentialsStrategy,
-} = require("./tokenHandlerStrategyClasses/clientCredentialsStrategy");
-const {
-  UnsupportedGrantStrategy,
-} = require("./tokenHandlerStrategyClasses/unsupportedGrantStrategy");
-const {
-  TokenHandlerClient,
-} = require("./tokenHandlerStrategyClasses/tokenHandlerClient");
+  buildTokenHandlerClient,
+} = require("./tokenHandlerStrategyClasses/tokenHandlerClientBuilder");
 
 const tokenHandler = async (
   config,
@@ -27,9 +15,9 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  let tokenHandlerStrategy;
+  let tokenHandlerClient;
   try {
-    tokenHandlerStrategy = getTokenStrategy(
+    tokenHandlerClient = buildTokenHandlerClient(
       redirect_uri,
       issuer,
       logger,
@@ -37,6 +25,8 @@ const tokenHandler = async (
       dynamoClient,
       config,
       req,
+      res,
+      next,
       validateToken
     );
   } catch (error) {
@@ -48,20 +38,6 @@ const tokenHandler = async (
     return next();
   }
 
-  let tokenHandlerClient = new TokenHandlerClient(
-    tokenHandlerStrategy,
-    config,
-    redirect_uri,
-    logger,
-    issuer,
-    dynamo,
-    dynamoClient,
-    validateToken,
-    req,
-    res,
-    next
-  );
-
   let tokenResponse;
   try {
     tokenResponse = await tokenHandlerClient.handleToken();
@@ -70,102 +46,6 @@ const tokenHandler = async (
   }
   res.status(tokenResponse.statusCode).json(tokenResponse.responseBody);
   return next();
-};
-
-function createClientMetadata(redirect_uri, req, config) {
-  let clientMetadata = {
-    redirect_uris: [redirect_uri],
-  };
-
-  const basicAuth = parseBasicAuth(req);
-  if (basicAuth) {
-    clientMetadata.client_id = basicAuth.username;
-    clientMetadata.client_secret = basicAuth.password;
-  } else if (req.body.client_id && req.body.client_secret) {
-    clientMetadata.client_id = req.body.client_id;
-    clientMetadata.client_secret = req.body.client_secret;
-    delete req.body.client_id;
-    delete req.body.client_secret;
-  } else if (config.enable_pkce_authorization_flow && req.body.client_id) {
-    clientMetadata.token_endpoint_auth_method = "none";
-    clientMetadata.client_id = req.body.client_id;
-    delete req.body.client_id;
-  } else {
-    throw {
-      error: "invalid_client",
-      error_description: "Client authentication failed",
-    };
-  }
-  return clientMetadata;
-}
-
-const getClient = (issuer, redirect_uri, req, config) => {
-  let clientMetadata;
-  try {
-    clientMetadata = createClientMetadata(redirect_uri, req, config);
-  } catch (error) {
-    rethrowIfRuntimeError(error);
-    throw {
-      status: 401,
-      error: error.error,
-      error_description: error.error_description,
-    };
-  }
-
-  return new issuer.Client(clientMetadata);
-};
-const getTokenStrategy = (
-  redirect_uri,
-  issuer,
-  logger,
-  dynamo,
-  dynamoClient,
-  config,
-  req,
-  validateToken
-) => {
-  let tokenHandlerStrategy;
-  if (req.body.grant_type === "refresh_token") {
-    tokenHandlerStrategy = new RefreshTokenStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      getClient(issuer, redirect_uri, req, config),
-      validateToken
-    );
-  } else if (req.body.grant_type === "authorization_code") {
-    tokenHandlerStrategy = new AuthorizationCodeStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      redirect_uri,
-      getClient(issuer, redirect_uri, req, config),
-      validateToken
-    );
-  } else if (req.body.grant_type === "client_credentials") {
-    if (
-      req.body.client_assertion_type !==
-      "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-    ) {
-      throw {
-        status: 400,
-        error: "invalid_request",
-        error_description: "Client assertion type must be jwt-bearer.",
-      };
-    }
-    tokenHandlerStrategy = new ClientCredentialsStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      issuer.token_endpoint
-    );
-  } else {
-    tokenHandlerStrategy = new UnsupportedGrantStrategy();
-  }
-  return tokenHandlerStrategy;
 };
 
 module.exports = tokenHandler;

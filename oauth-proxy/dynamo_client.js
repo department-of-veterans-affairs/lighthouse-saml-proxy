@@ -6,11 +6,8 @@
 // that will have to wait until we have a proper test suite in place.
 const { config, DynamoDB } = require("aws-sdk");
 
-var TableName;
-
-function createDynamoHandle(awsConfig, local, tableName) {
+function createDynamoHandle(awsConfig, local) {
   config.update(awsConfig);
-  TableName = tableName;
 
   if (local) {
     return new DynamoDB({ endpoint: `http://${local}` });
@@ -18,7 +15,7 @@ function createDynamoHandle(awsConfig, local, tableName) {
   return new DynamoDB();
 }
 
-function getFromDynamoBySecondary(client, key, value) {
+function getFromDynamoBySecondary(client, key, value, TableName) {
   const params = {
     IndexName: `oauth_${key}_index`,
     KeyConditionExpression: "#key= :k",
@@ -44,7 +41,7 @@ function getFromDynamoBySecondary(client, key, value) {
   });
 }
 
-function getFromDynamoByState(client, state) {
+function getFromDynamoByState(client, state, TableName) {
   const params = {
     Key: {
       state: {
@@ -65,7 +62,7 @@ function getFromDynamoByState(client, state) {
   });
 }
 
-function saveToDynamo(client, state, key, value) {
+function saveToDynamo(client, state, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
       "#K": key,

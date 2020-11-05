@@ -5,8 +5,10 @@ const MockExpressRequest = require("mock-express-request");
 const { buildFakeDynamoClient } = require("./testUtils");
 const {
   ClientCredentialsStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/clientCredentialsStrategy");
-
+} = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
+const {
+  GetPatientInfoFromLaunchStrategy,
+} = require("../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
 let logger;
 let dynamo;
 let dynamoClient;
@@ -188,14 +190,7 @@ describe("tokenHandler clientCredentials", () => {
       },
     });
 
-    let clientCredentialsStrategy = new ClientCredentialsStrategy(
-      req,
-      logger,
-      dynamo,
-      dynamoClient,
-      token_endpoint
-    );
-
+    let clientCredentialsStrategy = new GetPatientInfoFromLaunchStrategy(req);
     let expectedPatient = await clientCredentialsStrategy.createPatientInfo(
       null,
       null

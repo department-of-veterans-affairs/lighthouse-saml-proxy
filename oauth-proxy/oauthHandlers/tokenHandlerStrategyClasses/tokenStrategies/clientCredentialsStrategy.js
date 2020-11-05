@@ -1,6 +1,6 @@
 const axios = require("axios");
 const qs = require("qs");
-const { rethrowIfRuntimeError } = require("../../utils");
+const { rethrowIfRuntimeError } = require("../../../utils");
 
 class ClientCredentialsStrategy {
   constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
@@ -75,21 +75,6 @@ class ClientCredentialsStrategy {
     }
 
     return token;
-  }
-
-  async pullDocumentFromDynamo() {
-    //Currently unused, follow on to pull & store launch context
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  async saveDocumentToDynamo(document, tokens) {
-    //Currently unused, follow on to pull & store launch context
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  async createPatientInfo(tokens, decoded) {
-    //Consider some validation on the request body here
-    return this.req.body.launch;
   }
 }
 

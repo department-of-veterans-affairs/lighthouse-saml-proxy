@@ -5,6 +5,7 @@ const redirectHandler = async (
   logger,
   dynamo,
   dynamoClient,
+  config,
   req,
   res,
   next
@@ -21,7 +22,13 @@ const redirectHandler = async (
 
   if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
-      await dynamoClient.saveToDynamo(dynamo, state, "code", req.query.code);
+      await dynamoClient.saveToDynamo(
+        dynamo,
+        state,
+        "code",
+        req.query.code,
+        config.dynamo_table_name
+      );
     } catch (error) {
       logger.error(
         "Failed to save authorization code in redirect handler",
@@ -30,7 +37,11 @@ const redirectHandler = async (
     }
   }
   try {
-    const document = await dynamoClient.getFromDynamoByState(dynamo, state);
+    const document = await dynamoClient.getFromDynamoByState(
+      dynamo,
+      state,
+      config.dynamo_table_name
+    );
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`);

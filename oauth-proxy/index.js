@@ -231,7 +231,7 @@ function buildApp(
 
   router.get(appRoutes.redirect, async (req, res, next) => {
     await oauthHandlers
-      .redirectHandler(logger, dynamo, dynamoClient, req, res, next)
+      .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
       .catch(next);
   });
 
@@ -462,8 +462,7 @@ function startApp(config, issuer, isolatedIssuers) {
       config.aws_id === null ? null : { accessKeyId: config.aws_id },
       config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
     ),
-    config.dynamo_local,
-    config.dynamo_table_name
+    config.dynamo_local
   );
 
   const validateToken = configureTokenValidator(

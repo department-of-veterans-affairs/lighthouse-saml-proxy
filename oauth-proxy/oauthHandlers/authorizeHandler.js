@@ -54,7 +54,8 @@ const authorizeHandler = async (
       dynamo,
       state,
       "redirect_uri",
-      client_redirect
+      client_redirect,
+      config.dynamo_table_name
     );
   } catch (error) {
     logger.error(
