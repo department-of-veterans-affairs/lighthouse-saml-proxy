@@ -1,7 +1,6 @@
 class PullDocumentByLaunchStrategy {
   constructor() {}
-  async pullDocumentFromDynamo() {
-  }
+  async pullDocumentFromDynamo() {}
 }
 
 module.exports = { PullDocumentByLaunchStrategy };
