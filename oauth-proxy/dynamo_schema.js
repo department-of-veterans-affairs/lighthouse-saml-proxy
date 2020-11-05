@@ -102,7 +102,7 @@ tableParams = {
   },
   GlobalSecondaryIndexes: [
     {
-      IndexName: "launch_index",
+      IndexName: "oauth_launch_index",
       KeySchema: [
         {
           AttributeName: "launch",

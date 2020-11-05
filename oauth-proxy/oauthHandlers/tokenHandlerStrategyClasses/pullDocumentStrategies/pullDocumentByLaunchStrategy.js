@@ -12,9 +12,8 @@ class PullDocumentByLaunchStrategy {
     let document;
     let accessToken = getHashedAccessToken(this.accessToken);
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
+      document = await this.dynamoClient.getFromDynamoByAccessToken(
         this.dynamo,
-        "access_token",
         accessToken,
         this.config.dynamo_client_credentials_table
       );

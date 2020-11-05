@@ -21,9 +21,6 @@ const {
   PullDocumentByLaunchStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
 const {
-  PullDocumentNoStrategy,
-} = require("./pullDocumentStrategies/pullDocumentNoStrategy");
-const {
   SaveDocumentStateStrategy,
 } = require("./saveDocumentStrategies/saveDocumentStateStrategy");
 const {
@@ -152,7 +149,13 @@ const getStrategies = (
         dynamoClient,
         issuer.token_endpoint
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentNoStrategy(),
+      pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(
+        logger,
+        dynamo,
+        dynamoClient,
+        req.body.client_assertion,
+        config
+      ),
       saveDocumentToDynamoStrategy: new SaveDocumentNoStrategy(),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
