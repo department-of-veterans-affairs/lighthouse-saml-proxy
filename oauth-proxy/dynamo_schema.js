@@ -93,7 +93,7 @@ dynamo.createTable(tableParams, (err, data) => {
 tableParams = {
   AttributeDefinitions: [
     { AttributeName: "access_token", AttributeType: "S" },
-    { AttributeName: "launch", AttributeType: "S" }
+    { AttributeName: "launch", AttributeType: "S" },
   ],
   KeySchema: [{ AttributeName: "access_token", KeyType: "HASH" }],
   ProvisionedThroughput: {
@@ -116,7 +116,7 @@ tableParams = {
         ReadCapacityUnits: 10,
         WriteCapacityUnits: 10,
       },
-    }
+    },
   ],
   TableName: "ClientCredentials",
 };
