@@ -153,7 +153,7 @@ const getStrategies = (
         logger,
         dynamo,
         dynamoClient,
-        req.body.client_assertion,
+        req,
         config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentNoStrategy(),

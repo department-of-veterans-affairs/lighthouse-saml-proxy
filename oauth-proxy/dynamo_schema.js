@@ -92,20 +92,20 @@ dynamo.createTable(tableParams, (err, data) => {
 
 tableParams = {
   AttributeDefinitions: [
-    { AttributeName: "access_token", AttributeType: "S" },
     { AttributeName: "launch", AttributeType: "S" },
+    { AttributeName: "access_token", AttributeType: "S" },
   ],
-  KeySchema: [{ AttributeName: "access_token", KeyType: "HASH" }],
+  KeySchema: [{ AttributeName: "launch", KeyType: "HASH" }],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
     WriteCapacityUnits: 10,
   },
   GlobalSecondaryIndexes: [
     {
-      IndexName: "oauth_launch_index",
+      IndexName: "oauth_access_token_index",
       KeySchema: [
         {
-          AttributeName: "launch",
+          AttributeName: "access_token",
           KeyType: "HASH",
         },
       ],

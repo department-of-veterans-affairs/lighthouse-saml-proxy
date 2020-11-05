@@ -1,20 +1,24 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 
 class PullDocumentByLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, accessToken, config) {
+  constructor(logger, dynamo, dynamoClient, req, config) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
-    this.accessToken = accessToken;
+    this.req = req;
     this.config = config;
   }
   async pullDocumentFromDynamo() {
+    let launch = this.req.body.launch;
+    if (launch == null || launch === undefined || launch === "") {
+      return null;
+    }
+
     let document;
-    let accessToken = getHashedAccessToken(this.accessToken);
     try {
-      document = await this.dynamoClient.getFromDynamoByAccessToken(
+      document = await this.dynamoClient.getFromDynamoByLaunch(
         this.dynamo,
-        accessToken,
+        launch,
         this.config.dynamo_client_credentials_table
       );
     } catch (err) {
@@ -25,9 +29,5 @@ class PullDocumentByLaunchStrategy {
     return document;
   }
 }
-
-const getHashedAccessToken = (accessToken) => {
-  return accessToken;
-};
 
 module.exports = { PullDocumentByLaunchStrategy };
