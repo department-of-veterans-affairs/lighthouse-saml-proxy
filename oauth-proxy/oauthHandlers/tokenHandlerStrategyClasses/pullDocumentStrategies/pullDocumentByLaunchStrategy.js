@@ -26,6 +26,14 @@ class PullDocumentByLaunchStrategy {
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);
     }
 
+    if (document == null || document === undefined) {
+      document = {
+        launch: {
+          S: launch,
+        },
+      };
+    }
+
     return document;
   }
 }

@@ -36,15 +36,12 @@ class TokenHandlerClient {
     }
 
     let document = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo();
-    let state;
-    if (document && tokens) {
-      await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(
-        document,
-        tokens
-      );
-      state = (document.state && document.state.S) || null;
-    }
-    state = state || null;
+
+    await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(
+      document,
+      tokens
+    );
+    let state = (document.state && document.state.S) || null;
 
     //Creates a Token Response
     const tokenResponseBase = translateTokenSet(tokens);
