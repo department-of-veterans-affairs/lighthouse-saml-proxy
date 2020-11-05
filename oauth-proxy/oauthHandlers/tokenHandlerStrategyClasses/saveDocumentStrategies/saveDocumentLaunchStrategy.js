@@ -1,6 +1,34 @@
 class SaveDocumentLaunchStrategy {
-  // eslint-disable-next-line no-unused-vars
-  async saveDocumentToDynamo(document, tokens) {}
+  constructor(logger, dynamo, dynamoClient, config) {
+    this.logger = logger;
+    this.dynamo = dynamo;
+    this.dynamoClient = dynamoClient;
+    this.config = config;
+  }
+  async saveDocumentToDynamo(document, tokens) {
+    try {
+      if (document.launch) {
+        let launch = document.launch.S;
+        let accessToken = hashAccessToken(tokens.access_token);
+        await this.dynamoClient.saveToDynamo(
+          this.dynamo,
+          launch,
+          "access_token",
+          accessToken,
+          this.config.dynamo_client_credentials_table
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        "Could not update the refresh token in DynamoDB",
+        error
+      );
+    }
+  }
 }
+
+const hashAccessToken = (accessToken) => {
+  return accessToken;
+};
 
 module.exports = { SaveDocumentLaunchStrategy };
