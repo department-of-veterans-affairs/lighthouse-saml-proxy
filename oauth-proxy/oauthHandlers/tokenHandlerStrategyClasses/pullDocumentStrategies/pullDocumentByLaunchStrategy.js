@@ -1,12 +1,6 @@
-const { rethrowIfRuntimeError } = require("../../../utils");
-
 class PullDocumentByLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, req, config) {
-    this.logger = logger;
-    this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
+  constructor(req) {
     this.req = req;
-    this.config = config;
   }
   async pullDocumentFromDynamo() {
     let launch = this.req.body.launch;
@@ -15,11 +9,10 @@ class PullDocumentByLaunchStrategy {
     }
 
     let document = {
-        launch: {
-          S: launch,
-        },
-      };
-    
+      launch: {
+        S: launch,
+      },
+    };
 
     return document;
   }

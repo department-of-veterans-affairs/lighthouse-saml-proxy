@@ -19,8 +19,8 @@ const {
   PullDocumentByRefreshTokenStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
-  PullDocumentNoStrategy,
-} = require("./pullDocumentStrategies/pullDocumentNoStrategy");
+  PullDocumentByLaunchStrategy,
+} = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
 const {
   SaveDocumentStateStrategy,
 } = require("./saveDocumentStrategies/saveDocumentStateStrategy");
@@ -150,7 +150,7 @@ const getStrategies = (
         dynamoClient,
         issuer.token_endpoint
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentNoStrategy(),
+      pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
         logger,
         dynamo,

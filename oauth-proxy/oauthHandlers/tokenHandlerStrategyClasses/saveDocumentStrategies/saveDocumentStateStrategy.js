@@ -7,9 +7,6 @@ class SaveDocumentStateStrategy {
     this.config = config;
   }
   async saveDocumentToDynamo(document, tokens) {
-    if (document === undefined || document == null) {
-      return;
-    }
     try {
       if (document.state) {
         let state = document.state.S;
