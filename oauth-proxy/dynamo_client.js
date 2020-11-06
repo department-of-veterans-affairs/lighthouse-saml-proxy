@@ -114,7 +114,7 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
-function saveToDynamoLaunch(client, launch, key, value, TableName) {
+function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
       "#K": key,
@@ -125,8 +125,8 @@ function saveToDynamoLaunch(client, launch, key, value, TableName) {
       },
     },
     Key: {
-      launch: {
-        S: launch,
+      access_token: {
+        S: accessToken,
       },
     },
     ReturnValues: "ALL_NEW",
@@ -150,6 +150,6 @@ module.exports = {
   saveToDynamo,
   getFromDynamoByState,
   getFromDynamoByLaunch,
-  saveToDynamoLaunch,
+  saveToDynamoAccessToken,
   getFromDynamoBySecondary,
 };

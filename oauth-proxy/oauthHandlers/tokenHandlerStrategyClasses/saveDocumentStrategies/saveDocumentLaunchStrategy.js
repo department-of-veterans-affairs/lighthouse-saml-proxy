@@ -14,11 +14,11 @@ class SaveDocumentLaunchStrategy {
           tokens.access_token,
           this.config.hmac_secret
         );
-        await this.dynamoClient.saveToDynamoLaunch(
+        await this.dynamoClient.saveToDynamoAccessToken(
           this.dynamo,
-          launch,
-          "access_token",
           accessToken,
+          "launch",
+          launch,
           this.config.dynamo_client_credentials_table
         );
       }
