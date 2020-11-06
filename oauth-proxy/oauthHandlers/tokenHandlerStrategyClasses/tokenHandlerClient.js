@@ -45,7 +45,6 @@ class TokenHandlerClient {
       state = (document.state && document.state.S) || null;
     }
     state = state || null;
-    
 
     //Creates a Token Response
     const tokenResponseBase = translateTokenSet(tokens);
