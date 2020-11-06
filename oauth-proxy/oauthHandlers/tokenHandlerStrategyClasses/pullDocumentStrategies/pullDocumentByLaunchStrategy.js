@@ -14,25 +14,12 @@ class PullDocumentByLaunchStrategy {
       return null;
     }
 
-    let document;
-    try {
-      document = await this.dynamoClient.getFromDynamoByLaunch(
-        this.dynamo,
-        launch,
-        this.config.dynamo_client_credentials_table
-      );
-    } catch (err) {
-      rethrowIfRuntimeError(err);
-      this.logger.error("Failed to retrieve document from Dynamo DB.", err);
-    }
-
-    if (document == null || document === undefined) {
-      document = {
+    let document = {
         launch: {
           S: launch,
         },
       };
-    }
+    
 
     return document;
   }
