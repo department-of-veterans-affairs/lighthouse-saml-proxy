@@ -37,7 +37,7 @@ class TokenHandlerClient {
 
     let document = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo();
     let state;
-    if (document && tokens) {
+    if (tokens) {
       await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(
         document,
         tokens
