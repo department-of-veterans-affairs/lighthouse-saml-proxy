@@ -114,10 +114,42 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
+function saveToDynamoLaunch(client, launch, key, value, TableName) {
+  const params = {
+    ExpressionAttributeNames: {
+      "#K": key,
+    },
+    ExpressionAttributeValues: {
+      ":k": {
+        S: value,
+      },
+    },
+    Key: {
+      launch: {
+        S: launch,
+      },
+    },
+    ReturnValues: "ALL_NEW",
+    UpdateExpression: "SET #K = :k",
+    TableName,
+  };
+
+  return new Promise((resolve, reject) => {
+    client.updateItem(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
   getFromDynamoByLaunch,
+  saveToDynamoLaunch,
   getFromDynamoBySecondary,
 };

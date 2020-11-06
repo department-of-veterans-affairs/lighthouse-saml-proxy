@@ -10,8 +10,8 @@ class SaveDocumentLaunchStrategy {
     try {
       if (document.launch) {
         let launch = document.launch.S;
-        let accessToken = hashAccessToken(tokens.access_token);
-        await this.dynamoClient.saveToDynamo(
+        let accessToken = hashAccessToken(tokens.access_token, this.config.hmac_secret);
+        await this.dynamoClient.saveToDynamoLaunch(
           this.dynamo,
           launch,
           "access_token",
@@ -21,16 +21,16 @@ class SaveDocumentLaunchStrategy {
       }
     } catch (error) {
       this.logger.error(
-        "Could not update the refresh token in DynamoDB",
+        "Could not update the access token token in DynamoDB",
         error
       );
     }
   }
 }
 
-const hashAccessToken = (accessToken) => {
-  const hmac = crypto.createHmac('sha256', config.hmac_secret);
-  let hashedAccessToken = hmac.update(accessToken)
+const hashAccessToken = (accessToken, secret) => {
+  const hmac = crypto.createHmac('sha256', secret);
+  let hashedAccessToken = hmac.update(accessToken).digest('hex');
   return hashedAccessToken;
 };
 
