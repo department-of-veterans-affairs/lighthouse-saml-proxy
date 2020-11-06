@@ -42,7 +42,12 @@ class TokenHandlerClient {
         document,
         tokens
       );
-      state = (document.state && document.state.S) || null;
+      state =
+        (document !== undefined &&
+          document != null &&
+          document.state &&
+          document.state.S) ||
+        null;
     }
     state = state || null;
 
