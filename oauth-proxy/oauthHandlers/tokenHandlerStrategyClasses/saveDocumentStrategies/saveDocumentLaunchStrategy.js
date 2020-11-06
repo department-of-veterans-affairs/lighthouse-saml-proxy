@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 class SaveDocumentLaunchStrategy {
   constructor(logger, dynamo, dynamoClient, config) {
     this.logger = logger;
@@ -28,7 +29,9 @@ class SaveDocumentLaunchStrategy {
 }
 
 const hashAccessToken = (accessToken) => {
-  return accessToken;
+  const hmac = crypto.createHmac('sha256', config.hmac_secret);
+  let hashedAccessToken = hmac.update(accessToken)
+  return hashedAccessToken;
 };
 
 module.exports = { SaveDocumentLaunchStrategy };
