@@ -1,16 +1,19 @@
-const crypto = require('crypto');
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, config) {
+  constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
+    this.hashingFunction = hashingFunction;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.launch) {
         let launch = document.launch.S;
-        let accessToken = hashAccessToken(tokens.access_token, this.config.hmac_secret);
+        let accessToken = this.hashingFunction(
+          tokens.access_token,
+          this.config.hmac_secret
+        );
         await this.dynamoClient.saveToDynamoLaunch(
           this.dynamo,
           launch,
@@ -27,11 +30,5 @@ class SaveDocumentLaunchStrategy {
     }
   }
 }
-
-const hashAccessToken = (accessToken, secret) => {
-  const hmac = crypto.createHmac('sha256', secret);
-  let hashedAccessToken = hmac.update(accessToken).digest('hex');
-  return hashedAccessToken;
-};
 
 module.exports = { SaveDocumentLaunchStrategy };

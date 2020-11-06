@@ -1,3 +1,4 @@
+const { hashString } = require("../../utils");
 const {
   RefreshTokenStrategy,
 } = require("./tokenStrategies/refreshTokenStrategy");
@@ -160,7 +161,8 @@ const getStrategies = (
         logger,
         dynamo,
         dynamoClient,
-        config
+        config,
+        hashString
       ),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
