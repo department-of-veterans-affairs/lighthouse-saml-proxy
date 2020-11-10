@@ -153,7 +153,13 @@ const getStrategies = (
         dynamoClient,
         issuer.token_endpoint
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
+      pullDocumentFromDynamoStrategy: new PullDocumentByAccessTokenStrategy(
+        req,
+        logger,
+        dynamo,
+        dynamoClient,
+        config
+      ),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
         logger,
         dynamo,

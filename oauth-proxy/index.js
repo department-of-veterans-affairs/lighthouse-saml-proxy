@@ -430,6 +430,17 @@ function buildApp(
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
+
+    if (api_category.contains("client-credentials") {
+      router.get(api_category + app_routes.launch, (req, res) =>
+        proxyRequestToOkta(
+          req,
+          res,
+          service_issuer.metadata.userinfo_endpoint,
+          "GET"
+        )
+        );
+    }
   }
 
   return app;

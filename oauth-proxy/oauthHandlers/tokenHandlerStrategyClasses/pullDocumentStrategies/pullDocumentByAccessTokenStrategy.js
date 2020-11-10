@@ -1,6 +1,6 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 
-class PullDocumentByAccessCodeStrategy {
+class PullDocumentByAccessTokenStrategy {
   constructor(req, logger, dynamo, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
@@ -26,4 +26,4 @@ class PullDocumentByAccessCodeStrategy {
   }
 }
 
-module.exports = { PullDocumentByAccessCodeStrategy };
+module.exports = { PullDocumentByAccessTokenStrategy };
