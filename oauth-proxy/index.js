@@ -391,7 +391,7 @@ function buildApp(
         .catch(next);
     });
 
-    if (api_category.contains("client-credentials")) {
+    if (api_category.includes("client-credentials")) {
       router.get(api_category + app_routes.launch, async (req, res, next) => {
         await oauthHandlers
           .tokenHandler(
@@ -409,7 +409,7 @@ function buildApp(
           .catch(next);
       });
     }
-    
+
     router.get(api_category + app_routes.manage, (req, res) =>
       res.redirect(config.manage_endpoint)
     );
