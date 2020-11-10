@@ -7,11 +7,13 @@ import assignIn from "lodash.assignin";
 import samlp from "samlp";
 import * as url from "url";
 import logger from "../logger";
+import xml2js from "xml2js";
 import {
   MVIRequestMetrics,
   VSORequestMetrics,
   IRequestMetrics,
 } from "../metrics";
+import NodeCache from "node-cache";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -166,6 +168,51 @@ export const testLevelOfAssuranceOrRedirect = (
   } else {
     next();
   }
+};
+
+export const validateIdpResponse = (cache: NodeCache) => {
+  return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+    samlp.getSamlResponse(req.idp.options, req.user, function (
+      err,
+      samlResponse
+    ) {
+      if (err) {
+        logger.error("Idp Saml Response was invalid.");
+        return "error.hbs";
+      }
+      if (samlResponse) {
+        const parser = new xml2js.Parser();
+        parser.parseString(samlResponse, function (err: any, result: any) {
+          if (err) {
+            logger.info(
+              "Unable to parse saml response from identity provider."
+            );
+            return "error.hbs";
+          }
+          if (result) {
+            const id = result["samlp:Response"]["$"]["ID"];
+            if (cache.has(id) === true) {
+              logger.error(
+                "Detected SAML replay. Saml Response with id " +
+                  id +
+                  " was previously cached."
+              );
+              return "error.hbs";
+            }
+            cache.set(id, null);
+            logger.info("Caching valid Idp Saml Response with id " + id);
+            next();
+          } else {
+            logger.error("Idp Saml Response did not contain necessary data.");
+            return "error.hbs";
+          }
+        });
+      } else {
+        logger.error("No Saml Response was able to be retrieved.");
+        return "error.hbs";
+      }
+    });
+  };
 };
 
 export const serializeAssertions = (

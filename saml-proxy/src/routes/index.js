@@ -9,6 +9,7 @@ import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from "uuid/v4";
 import rTracer from "cls-rtracer";
+import NodeCache from "node-cache";
 
 import {
   loggingMiddleware as morganMiddleware,
@@ -64,6 +65,7 @@ export default function configureExpress(
       },
     });
   }
+
   const [passport, strategy] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
@@ -168,7 +170,11 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions);
+  /* exported variableName */
+  const cache = new NodeCache();
+  let success = cache.set("Ben", "Test");
+  logger.info("Cache set was " + success);
+  addRoutes(app, idpOptions, spOptions, cache);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

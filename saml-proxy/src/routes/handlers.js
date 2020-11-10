@@ -4,6 +4,7 @@ import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import {
   buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
+  validateIdpResponse,
   loadICN,
   scrubUserClaims,
   serializeAssertions,
@@ -138,17 +139,18 @@ export const getParticipant = (req) => {
   return participant;
 };
 
-const processAcs = (acsUrl) => [
+const processAcs = (acsUrl, cache) => [
   buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
+  validateIdpResponse(cache),
   loadICN,
   scrubUserClaims,
   serializeAssertions,
 ];
 
-export const acsFactory = (app, acsUrl) => {
-  app.get(getPath(acsUrl), processAcs(acsUrl));
-  app.post(getPath(acsUrl), processAcs(acsUrl));
+export const acsFactory = (app, acsUrl, cache) => {
+  app.get(getPath(acsUrl), processAcs(acsUrl, cache));
+  app.post(getPath(acsUrl), processAcs(acsUrl, cache));
 };
 
 export const handleError = (req, res) => {
