@@ -391,6 +391,25 @@ function buildApp(
         .catch(next);
     });
 
+    if (api_category.contains("client-credentials")) {
+      router.get(api_category + app_routes.launch, async (req, res, next) => {
+        await oauthHandlers
+          .tokenHandler(
+            config,
+            redirect_uri,
+            logger,
+            service_issuer,
+            dynamo,
+            dynamoClient,
+            validateToken,
+            req,
+            res,
+            next
+          )
+          .catch(next);
+      });
+    }
+    
     router.get(api_category + app_routes.manage, (req, res) =>
       res.redirect(config.manage_endpoint)
     );
@@ -430,17 +449,8 @@ function buildApp(
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
-
-    if (api_category.contains("client-credentials") {
-      router.get(api_category + app_routes.launch, (req, res) =>
-        proxyRequestToOkta(
-          req,
-          res,
-          service_issuer.metadata.userinfo_endpoint,
-          "GET"
-        )
-        );
-    }
+  
+    
   }
 
   return app;
