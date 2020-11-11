@@ -10,11 +10,13 @@ class PullDocumentByAccessTokenStrategy {
   }
   async pullDocumentFromDynamo() {
     let document;
+    const token_index = req.header.authorization.indexOf("Bearer") + "Bearer ".length;
+    const access_token = req.header.authorization.substr(token_index);
     try {
       document = await this.dynamoClient.getFromDynamoBySecondary(
         this.dynamo,
         "access_token",
-        this.req.body.access_token,
+        access_token,
         this.config.dynamo_client_credentials_table
       );
     } catch (err) {
