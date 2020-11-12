@@ -4,7 +4,7 @@ class PullDocumentByLaunchStrategy {
   }
   async pullDocumentFromDynamo() {
     let launch = this.req.body.launch;
-    if (launch == null || launch === undefined || launch === "") {
+    if (launch == null) {
       return null;
     }
 
