@@ -29,8 +29,8 @@ class LaunchRequestHandlerClient {
     const token_index = this.req.headers.authorization.indexOf("Bearer") + "Bearer ".length;
     const access_token = this.req.headers.authorization.substr(token_index);
   
-    let launch = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo(access_token);
-    return { statusCode: 200, responseBody: launch };
+    let document = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo(access_token);
+    return { statusCode: 200, responseBody: document.launch.S };
   }
 }
 
