@@ -62,27 +62,6 @@ function getFromDynamoByState(client, state, TableName) {
   });
 }
 
-function getFromDynamoByLaunch(client, launch, TableName) {
-  const params = {
-    Key: {
-      launch: {
-        S: launch,
-      },
-    },
-    TableName,
-  };
-
-  return new Promise((resolve, reject) => {
-    client.getItem(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data.Item);
-      }
-    });
-  });
-}
-
 function saveToDynamo(client, state, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
@@ -149,7 +128,6 @@ module.exports = {
   createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
-  getFromDynamoByLaunch,
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
 };
