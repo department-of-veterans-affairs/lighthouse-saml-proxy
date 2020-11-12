@@ -25,7 +25,7 @@ class GetPatientInfoFromValidateEndpointStrategy {
         error: "invalid_grant",
         error_description:
           "Could not find a valid patient identifier for the provided authorization code.",
-        status: 500
+        status: 500,
       };
     }
     return patient;
