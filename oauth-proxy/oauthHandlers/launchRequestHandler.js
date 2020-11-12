@@ -1,11 +1,9 @@
 const { rethrowIfRuntimeError } = require("../utils");
 const {
-  PullDocumentByAccessTokenStrategy,
-} = require("./pullDocumentStrategies/pullDocumentByAccessTokenStrategy");
+  LaunchRequestHandlerClient,
+} = require("./tokenHandlerStrategyClasses/launchRequestHandlerClient")
 
-
-
-const tokenHandler = async (
+const launchRequestHandler = async (
   config,
   logger,
   dynamo,
@@ -14,19 +12,19 @@ const tokenHandler = async (
   res,
   next
 ) => {
-  const pullDocumentByAccessTokenStrategy = new PullDocumentByAccessTokenStrategy(
-    logger,
-    dynamo,
-    dynamoClient,
-    config
-  );
   
-  const token_index = req.header.authorization.indexOf("Bearer") + "Bearer ".length;
-  const access_token = req.header.authorization.substr(token_index);
-
   let launch;
   try {
-    launch = await pullDocumentByAccessTokenStrategy.pullDocumentFromDynamo(access_token);
+    let launchRequestHandlerClient = new LaunchRequestHandlerClient(
+      config,
+      logger,
+      dynamo,
+      dynamoClient,
+      req,
+      res,
+      next,
+    );
+    launch = await launchRequestHandlerClient.handleRequest();
   } catch (err) {
     return next(err);
   }
@@ -34,4 +32,4 @@ const tokenHandler = async (
   return next();
 };
 
-module.exports = tokenHandler;
+module.exports = launchRequestHandler;

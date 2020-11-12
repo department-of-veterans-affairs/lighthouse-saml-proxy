@@ -5,4 +5,5 @@ module.exports = {
   tokenHandler: require("./tokenHandler"),
   redirectHandler: require("./redirectHandler"),
   revokeUserGrantHandler: require("./revokeUserGrantHandler"),
+  launchRequestHandler: require("./launchRequestHandler"),
 };

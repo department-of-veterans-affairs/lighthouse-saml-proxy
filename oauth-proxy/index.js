@@ -396,12 +396,9 @@ function buildApp(
         await oauthHandlers
           .launchRequestHandler(
             config,
-            redirect_uri,
             logger,
-            service_issuer,
             dynamo,
             dynamoClient,
-            validateToken,
             req,
             res,
             next
