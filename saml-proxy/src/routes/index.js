@@ -172,8 +172,6 @@ export default function configureExpress(
 
   /* exported variableName */
   const cache = new NodeCache();
-  let success = cache.set("Ben", "Test");
-  logger.info("Cache set was " + success);
   addRoutes(app, idpOptions, spOptions, cache);
 
   // Catches errors
