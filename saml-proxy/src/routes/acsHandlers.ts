@@ -173,23 +173,28 @@ export const testLevelOfAssuranceOrRedirect = (
 export const validateIdpResponse = (cache: NodeCache) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const sessionIndex = req?.user?.authnContext?.sessionIndex;
-    if (sessionIndex) {
-      if (cache.has(sessionIndex) === true) {
-        logger.error(
-          "Detected SAML replay. Saml Response with session index " +
-            sessionIndex +
-            " was previously cached."
-        );
-        throw {
-          message: "Bad request.",
-          status: 400,
-        };
-      }
-      cache.set(sessionIndex, null);
-      logger.info(
-        "Caching valid Idp Saml Response with session index " + sessionIndex
-      );
+    if (!sessionIndex) {
+      logger.error("No session index found in the saml response.");
+      throw {
+        message: "Bad request.",
+        status: 400,
+      };
     }
+    if (cache.has(sessionIndex) === true) {
+      logger.error(
+        "Detected SAML replay. Saml Response with session index " +
+          sessionIndex +
+          " was previously cached."
+      );
+      throw {
+        message: "Bad request.",
+        status: 400,
+      };
+    }
+    cache.set(sessionIndex, null);
+    logger.info(
+      "Caching valid Idp Saml Response with session index " + sessionIndex
+    );
     next();
   };
 };

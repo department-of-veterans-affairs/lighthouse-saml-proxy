@@ -258,8 +258,8 @@ describe("validateIdpResponse", () => {
       },
     };
 
-    let validateFn = await handlers.validateIdpResponse(cache);
-    await validateFn(req, { }, nextFn);
+    const validateFn = await handlers.validateIdpResponse(cache);
+    await validateFn(req, {}, nextFn);
     expect(nextFn).toHaveBeenCalled();
   });
 });
