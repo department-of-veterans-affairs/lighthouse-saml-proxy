@@ -1,3 +1,4 @@
+const { hashString } = require("../../utils");
 const jwtDecode = require("jwt-decode");
 const { rethrowIfRuntimeError } = require("../../utils");
 const { translateTokenSet } = require("../tokenResponse");
@@ -5,10 +6,10 @@ const { PullDocumentByAccessTokenStrategy } = require("./pullDocumentStrategies/
 
 class LaunchRequestHandlerClient {
   constructor(
+    config,
     logger,
     dynamo,
     dynamoClient,
-    config,
     req,
     res,
     next
@@ -17,15 +18,16 @@ class LaunchRequestHandlerClient {
       logger,
       dynamo,
       dynamoClient,
-      config
+      config,
+      hashString
     );
     this.req = req;
     this.res = res;
     this.next = next;
   }
   async handleRequest() {
-    const token_index = this.req.header.authorization.indexOf("Bearer") + "Bearer ".length;
-    const access_token = this.req.header.authorization.substr(token_index);
+    const token_index = this.req.headers.authorization.indexOf("Bearer") + "Bearer ".length;
+    const access_token = this.req.headers.authorization.substr(token_index);
   
     let launch = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo(access_token);
     return { statusCode: 200, responseBody: launch };

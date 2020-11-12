@@ -1,11 +1,12 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 
 class PullDocumentByAccessTokenStrategy {
-  constructor(logger, dynamo, dynamoClient, config) {
+  constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
+    this.hashingFunction = hashingFunction;
   }
   async pullDocumentFromDynamo(access_token) {
     let document;
