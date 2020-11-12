@@ -49,7 +49,8 @@ function processArgs() {
         required: true,
       },
       hmac_secret: {
-        description: "hmac secret to hash access tokens being stored in client credentials table.",
+        description:
+          "hmac secret to hash access tokens being stored in client credentials table.",
         required: true,
       },
       okta_url: {
