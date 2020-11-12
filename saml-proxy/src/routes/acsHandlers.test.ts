@@ -258,8 +258,59 @@ describe("validateIdpResponse", () => {
       },
     };
 
-    const validateFn = await handlers.validateIdpResponse(cache);
-    await validateFn(req, {}, nextFn);
+    const validateFn = handlers.validateIdpResponse(cache);
+    validateFn(req, {}, nextFn);
     expect(nextFn).toHaveBeenCalled();
+    expect(cache.has(testSessionIndex));
+  });
+
+  it("should throw an error on repeated idp saml response", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new NodeCache();
+    let thrownError = null;
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache);
+    validateFn(req, {}, nextFn);
+    try {
+      validateFn(req, {}, nextFn);
+    } catch (err) {
+      thrownError = err;
+    }
+
+    expect(thrownError.message === "Bad request.");
+    expect(thrownError.status === 400);
+  });
+
+  it("should throw an error with status code 400 for a saml response with no session index", async () => {
+    const nextFn = jest.fn();
+    const cache = new NodeCache();
+    let thrownError = null;
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {},
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache);
+    try {
+      validateFn(req, {}, nextFn);
+    } catch (err) {
+      thrownError = err;
+    }
+    // For expect sytax explination checkout https://github.com/facebook/jest/issues/1700
+    expect(thrownError.message === "Bad request.");
+    expect(thrownError.status === 400);
   });
 });
