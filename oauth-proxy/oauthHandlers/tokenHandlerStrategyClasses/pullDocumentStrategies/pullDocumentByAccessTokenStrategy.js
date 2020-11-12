@@ -15,9 +15,8 @@ class PullDocumentByAccessTokenStrategy {
       this.config.hmac_secret
     );
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
+      document = await this.dynamoClient.getFromDynamoByAccessToken(
         this.dynamo,
-        "access_token",
         hashedToken,
         this.config.dynamo_client_credentials_table
       );

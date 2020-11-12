@@ -62,11 +62,11 @@ function getFromDynamoByState(client, state, TableName) {
   });
 }
 
-function getFromDynamoByLaunch(client, launch, TableName) {
+function getFromDynamoByAccessToken(client, access_token, TableName) {
   const params = {
     Key: {
-      launch: {
-        S: launch,
+      access_token: {
+        S: access_token,
       },
     },
     TableName,
@@ -149,7 +149,7 @@ module.exports = {
   createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
-  getFromDynamoByLaunch,
+  getFromDynamoByAccessToken,
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
 };
