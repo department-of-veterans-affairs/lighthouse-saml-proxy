@@ -19,9 +19,6 @@ const {
   PullDocumentByRefreshTokenStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
-  PullDocumentByAccessTokenStrategy,
-} = require("./pullDocumentStrategies/pullDocumentByAccessTokenStrategy");
-const {
   PullDocumentByLaunchStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
 const {
@@ -162,19 +159,6 @@ const getStrategies = (
         hashString
       ),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
-    };
-  } else if (req.path.includes("client-credentials")) {
-    strategies = {
-      tokenHandlerStrategy: {},
-      pullDocumentFromDynamoStrategy: new PullDocumentByAccessTokenStrategy(
-        req,
-        logger,
-        dynamo,
-        dynamoClient,
-        config
-      ),    
-      saveDocumentToDynamoStrategy: {},
-      getPatientInfoStrategy: {},
     };
   } else {
     strategies = { tokenHandlerStrategy: new UnsupportedGrantStrategy() };
