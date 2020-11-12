@@ -3,6 +3,7 @@ import "jest";
 import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
+import NodeCache = require("../../node_modules/node-cache");
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -239,5 +240,26 @@ describe("requestWithMetrics", () => {
     await expect(
       handlers.requestWithMetrics(MVIRequestMetrics, func)
     ).rejects.toThrowError();
+  });
+});
+
+describe("validateIdpResponse", () => {
+  it("should cache session index for a given saml response", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new NodeCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    let validateFn = await handlers.validateIdpResponse(cache);
+    await validateFn(req, { }, nextFn);
+    expect(nextFn).toHaveBeenCalled();
   });
 });
