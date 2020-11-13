@@ -696,7 +696,7 @@ describe("OpenID Connect Conformance", () => {
   it("returns a launch context given an access token from a client creds flow", async () => {
     await axios
       .get(
-        "http://localhost:9090/testServer/client-credentials/v1/smart/launch",
+        "http://localhost:9090/testServer/smart/launch",
         {
           headers: {
             authorization:
@@ -717,7 +717,7 @@ describe("OpenID Connect Conformance", () => {
   it("missing authorization on a request for launch context given an access token from a client creds flow", async () => {
     await axios
       .get(
-        "http://localhost:9090/testServer/client-credentials/v1/smart/launch"
+        "http://localhost:9090/testServer/smart/launch"
       )
       .then(() => {
         expect(true).toEqual(false); // Don't expect to be here
@@ -731,7 +731,7 @@ describe("OpenID Connect Conformance", () => {
   it("bad jwt on a request for launch context given an access token from a client creds flow", async () => {
     await axios
       .get(
-        "http://localhost:9090/testServer/client-credentials/v1/smart/launch",
+        "http://localhost:9090/testServer/smart/launch",
         {
           headers: {
             authorization: "Bearer xxx.xx.x.x.x-x.x.x",
