@@ -36,10 +36,15 @@ const defaultTestingConfig = {
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
   manage_endpoint: "http://localhost:9091/account",
+  hmac_secret: "testsecret",
   routes: {
     categories: [
       {
         api_category: "/veteran-verification-apis/v1",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+      },
+      {
+        api_category: "/client-credentials/v1",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
       },
     ],
@@ -52,6 +57,7 @@ const defaultTestingConfig = {
       revoke: "/revoke",
       jwks: "/keys",
       grants: "/grants",
+      launch: "/smart/launch"
     },
   },
 };
@@ -99,6 +105,16 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         } else {
           reject(`no such state value on ${tableName}`);
         }
+      });
+    }
+  );
+  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
+    (handle, access_token, tableName) => {
+      const fakeLaunchRecord = {
+        launch:  "123V456"
+      };  
+      return new Promise((resolve, reject) => {
+        resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
       });
     }
   );
@@ -153,7 +169,7 @@ describe("OpenID Connect Conformance", () => {
         },
       };
     };
-
+    
     const app = buildApp(
       defaultTestingConfig,
       issuer,
@@ -678,4 +694,25 @@ describe("OpenID Connect Conformance", () => {
         expect(true).toEqual(false);
       });
   });
+
+  it("returns a launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get(
+        "http://localhost:9090/testServer/client-credentials/v1/smart/launch",
+        {
+          headers: {
+            authorization: "Bearer eyJraWQiOiIzZkJCV0trc2JfY2ZmRGtYbVlSbmN1dGNtamFFMEFjeVdkdWFZc1NVa3o4IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmdtNVFDSl96dXVCbF9DZU1mSzRKNkNzMjR3MThxUG5zcXlQQzFBQWszZTAiLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9hdXM4amExNXp6YjNwM21uWTJwNyIsImF1ZCI6Imh0dHBzOi8vc2FuZGJveC1hcGkudmEuZ292L3NlcnZpY2VzL2NjIiwiaWF0IjoxNjA1Mjg1NTI5LCJleHAiOjE2MDUyODU4MjksImNpZCI6IjBvYThvNzlsM2pXMFd6WjFMMnA3Iiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sInN1YiI6IjBvYThvNzlsM2pXMFd6WjFMMnA3IiwiYWJjIjoiMTIzIiwidGVzdCI6IjEyMyJ9.L1y9yEzUt3uvRC5RSDHxlaOGqqdulFj9a1SpFKCGiDNvQ2JMuqhQ9uvNqAnWGUWf74D-pXJjjtz66uCQFHosYqNp1hd9T88EDJxMWsYOkUJR5XV180aMFVycJHw3ZyRgHfwrOihhxyB3Q3V6DhpL8EOOsAkLLJ_FvF40SYUjiqvNUslMYNJfzcJkwlcVBKoQKaszSnfYW0XnsOSHS4Ny7WA2m6hK2ReFcyWs78obQ0wM3GndjlkQPwq6wO9qDKcEZdN8YZ7wTzcID_NECEn6n4LxwD9NmfJrfie8312bq76Ca7tqLOXoqw49ClLXpGTfYSmHaNC9svMFVHedAAoMKweyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+          },
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data.launch).toEqual("123V456");
+      })
+      .catch((err) => {
+        console.error(err);
+        expect(true).toEqual(false); // Don't expect to be here
+      });
+  });
+  
 });
