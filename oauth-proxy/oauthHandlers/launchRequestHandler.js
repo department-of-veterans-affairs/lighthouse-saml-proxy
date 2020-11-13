@@ -12,8 +12,10 @@ const launchRequestHandler = async (
   res,
   next
 ) => {
-  
-  let launch;
+
+  let launchResp;
+  let statusCode;
+  let responseBody;
   try {
     let launchRequestHandlerClient = new LaunchRequestHandlerClient(
       config,
@@ -24,11 +26,18 @@ const launchRequestHandler = async (
       res,
       next,
     );
-    launch = await launchRequestHandlerClient.handleRequest();
+    launchResp = await launchRequestHandlerClient.handleRequest();
+    statusCode = launchResp.statusCode;
+    responseBody = launchResp.responseBody;
   } catch (err) {
-    return next(err);
+    if (err.statusCode) {
+      statusCode = err.statusCode;
+      responseBody = err;
+    } else {
+      return next(err);
+    }
   }
-  res.status(200).json(launch);
+  res.status(statusCode).json(responseBody);
   return next();
 };
 
