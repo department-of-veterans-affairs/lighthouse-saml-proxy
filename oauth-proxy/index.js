@@ -446,8 +446,6 @@ function buildApp(
         .revokeUserGrantHandler(okta_client, config, req, res, next)
         .catch(next);
     });
-  
-    
   }
 
   return app;

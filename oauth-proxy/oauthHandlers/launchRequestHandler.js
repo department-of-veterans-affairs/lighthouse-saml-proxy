@@ -1,7 +1,6 @@
-const { rethrowIfRuntimeError } = require("../utils");
 const {
   LaunchRequestHandlerClient,
-} = require("./tokenHandlerStrategyClasses/launchRequestHandlerClient")
+} = require("./tokenHandlerStrategyClasses/launchRequestHandlerClient");
 
 const launchRequestHandler = async (
   config,
@@ -12,7 +11,6 @@ const launchRequestHandler = async (
   res,
   next
 ) => {
-
   let launchResp;
   let statusCode;
   let responseBody;
@@ -24,7 +22,7 @@ const launchRequestHandler = async (
       dynamoClient,
       req,
       res,
-      next,
+      next
     );
     launchResp = await launchRequestHandlerClient.handleRequest();
     statusCode = launchResp.statusCode;
