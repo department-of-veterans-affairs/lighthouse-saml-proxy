@@ -715,4 +715,19 @@ describe("OpenID Connect Conformance", () => {
       });
   });
   
+  it("missing authorization on a request for launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get(
+        "http://localhost:9090/testServer/client-credentials/v1/smart/launch",
+        {
+        }
+      )
+      .then((resp) => {
+        expect(resp.status).toEqual(401);
+      })
+      .catch((err) => {
+        console.error(err);
+        expect(true).toEqual(false); // Don't expect to be here
+      });
+  });
 });
