@@ -719,15 +719,14 @@ describe("OpenID Connect Conformance", () => {
     await axios
       .get(
         "http://localhost:9090/testServer/client-credentials/v1/smart/launch",
-        {
-        }
       )
       .then((resp) => {
-        expect(resp.status).toEqual(401);
+        expect(true).toEqual(false); // Don't expect to be here
       })
       .catch((err) => {
         console.error(err);
-        expect(true).toEqual(false); // Don't expect to be here
+        expect(err.response.status).toEqual(401);
+        expect(err.response.statusText).toEqual("Unauthorized");
       });
   });
 });
