@@ -57,7 +57,7 @@ const defaultTestingConfig = {
       revoke: "/revoke",
       jwks: "/keys",
       grants: "/grants",
-      launch: "/smart/launch"
+      launch: "/smart/launch",
     },
   },
 };
@@ -108,16 +108,14 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
-    (handle, access_token, tableName) => {
-      const fakeLaunchRecord = {
-        launch:  "123V456"
-      };  
-      return new Promise((resolve, reject) => {
-        resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
-      });
-    }
-  );
+  dynamoClient.getFromDynamoByAccessToken.mockImplementation(() => {
+    const fakeLaunchRecord = {
+      launch: "123V456",
+    };
+    return new Promise((resolve) => {
+      resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
+    });
+  });
   return dynamoClient;
 }
 
@@ -169,7 +167,7 @@ describe("OpenID Connect Conformance", () => {
         },
       };
     };
-    
+
     const app = buildApp(
       defaultTestingConfig,
       issuer,
