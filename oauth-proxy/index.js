@@ -392,7 +392,7 @@ function buildApp(
     });
 
     if (api_category.includes("client-credentials")) {
-      router.get(api_category + app_routes.launch, async (req, res, next) => {
+      router.get(app_routes.launch, async (req, res, next) => {
         await oauthHandlers
           .launchRequestHandler(
             config,
