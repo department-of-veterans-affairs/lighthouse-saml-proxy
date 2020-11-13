@@ -28,10 +28,11 @@ const launchRequestHandler = async (
     statusCode = launchResp.statusCode;
     responseBody = launchResp.responseBody;
   } catch (err) {
-    if (err.statusCode) {
-      statusCode = err.statusCode;
+    if (err.statusCode || err.message.includes("tokens")) {
+      statusCode = err.statusCode ? err.statusCode : 401;
       responseBody = err;
     } else {
+      logger.error(err);
       return next(err);
     }
   }

@@ -27,6 +27,11 @@ class LaunchRequestHandlerClient {
     const token_index =
       this.req.headers.authorization.indexOf("Bearer") + "Bearer ".length;
     const access_token = this.req.headers.authorization.substr(token_index);
+    try {
+      jwtDecode(access_token);
+    } catch (error) {
+      throw createError(401, error);
+    }
     let documentResponse = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo(
       access_token
     );
