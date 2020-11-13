@@ -392,7 +392,8 @@ function buildApp(
     });
 
     if (api_category.includes("client-credentials")) {
-      router.get(app_routes.launch, async (req, res, next) => {
+      let launchroute = app_routes.launch ? app_routes.launch : "/smart/launch";
+      router.get(launchroute, async (req, res, next) => {
         await oauthHandlers
           .launchRequestHandler(
             config,
