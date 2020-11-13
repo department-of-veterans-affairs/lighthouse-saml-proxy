@@ -724,7 +724,6 @@ describe("OpenID Connect Conformance", () => {
         expect(true).toEqual(false); // Don't expect to be here
       })
       .catch((err) => {
-        console.error(err);
         expect(err.response.status).toEqual(401);
         expect(err.response.statusText).toEqual("Unauthorized");
       });
@@ -744,7 +743,6 @@ describe("OpenID Connect Conformance", () => {
         expect(true).toEqual(false); // Don't expect to be here
       })
       .catch((err) => {
-        console.error(err);
         expect(err.response.status).toEqual(401);
         expect(err.response.statusText).toEqual("Unauthorized");
       });
