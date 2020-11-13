@@ -34,10 +34,12 @@ class LaunchRequestHandlerClient {
     }
     const token_index = this.req.headers.authorization.indexOf("Bearer") + "Bearer ".length;
     const access_token = this.req.headers.authorization.substr(token_index);
-  
     let documentResponse = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo(access_token);
-    res.status(documentResponse.statusCode).json(documentResponse.responseBody);
-    return { statusCode: 200, responseBody: { launch: document.launch.S }};
+    if (documentResponse && documentResponse.launch) {
+      return { statusCode: 200, responseBody: { launch: documentResponse.launch.S }}
+    } else {
+      throw createError(404, "Not found for this value");
+    }  
   }
 }
 
