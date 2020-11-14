@@ -37,6 +37,7 @@ const defaultTestingConfig = {
   validate_apiKey: "fakeApiKey",
   manage_endpoint: "http://localhost:9091/account",
   hmac_secret: "testsecret",
+  dynamo_client_credentials_table: "client_creds_table",
   routes: {
     categories: [
       {
@@ -108,14 +109,24 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  dynamoClient.getFromDynamoByAccessToken.mockImplementation(() => {
-    const fakeLaunchRecord = {
-      launch: "123V456",
-    };
-    return new Promise((resolve) => {
-      resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
-    });
-  });
+  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
+    (handle, access_token, tableName) => {
+      const fakeLaunchRecord = {
+        launch: "123V456",
+      };
+      return new Promise((resolve, reject) => {
+        if (
+          tableName === "client_creds_table" &&
+          access_token ===
+            "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a"
+        ) {
+          resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
+        } else {
+          reject(`no such access_token value on ${tableName}`);
+        }
+      });
+    }
+  );
   return dynamoClient;
 }
 
@@ -708,6 +719,24 @@ describe("OpenID Connect Conformance", () => {
       .catch((err) => {
         console.error(err);
         expect(true).toEqual(false); // Don't expect to be here
+      });
+  });
+
+  it("launch context not found for an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbmUgRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.cMErWtEf7DxCXJl8C9q0L7ttkm-Ex54UWHsOCMGbtUc",
+        },
+      })
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        console.error(err);
+        expect(err.response.status).toEqual(404);
+        expect(err.response.statusText).toEqual("Not Found");
       });
   });
 
