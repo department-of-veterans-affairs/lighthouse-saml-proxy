@@ -68,7 +68,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     );
     await strategy.saveDocumentToDynamo(document, tokens);
 
-    // // Expect saveToDynamoAccessToken to have been called with the correct values
+    // Expect saveToDynamoAccessToken to have been called with the correct values
     expect(saveToDynamoAccessTokenCalledWith.client).toBe(mockDynamo);
     expect(saveToDynamoAccessTokenCalledWith.accessToken).toBe(
       mockHashingFunction()
@@ -114,7 +114,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     );
     await strategy.saveDocumentToDynamo(document, tokens);
 
-    // // Expect saveToDynamoAccessToken to have been called with the correct values
+    // Expect an exception to have occurred and been logged
     expect(loggerCalledWith.message).toBe(
       "Could not update the access token token in DynamoDB"
     );
