@@ -7,7 +7,7 @@ require("jest");
 describe("pullDocumentByLaunchStrategy tests", () => {
   it("undefined launch", async () => {
     let req = {
-      body: {}
+      body: {},
     };
 
     const strategy = new PullDocumentByLaunchStrategy(req);
@@ -19,8 +19,8 @@ describe("pullDocumentByLaunchStrategy tests", () => {
   it("empty launch", async () => {
     let req = {
       body: {
-        launch: ""
-      }
+        launch: "",
+      },
     };
 
     const strategy = new PullDocumentByLaunchStrategy(req);
@@ -32,8 +32,8 @@ describe("pullDocumentByLaunchStrategy tests", () => {
   it("non-empty launch", async () => {
     let req = {
       body: {
-        launch: "42"
-      }
+        launch: "42",
+      },
     };
 
     const strategy = new PullDocumentByLaunchStrategy(req);
