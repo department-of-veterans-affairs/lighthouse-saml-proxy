@@ -1,42 +1,37 @@
+const { hashString } = require("../utils");
 const {
-  LaunchRequestHandlerClient,
-} = require("./tokenHandlerStrategyClasses/launchRequestHandlerClient");
+  PullDocumentByAccessTokenStrategy,
+} = require("./tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByAccessTokenStrategy");
 
+/*
+ * Handler for looking up SMART launch context by access_token.
+ */
 const launchRequestHandler = async (
   config,
   logger,
   dynamo,
   dynamoClient,
-  req,
   res,
   next
 ) => {
-  let launchResp;
-  let statusCode;
-  let responseBody;
-  try {
-    let launchRequestHandlerClient = new LaunchRequestHandlerClient(
-      config,
-      logger,
-      dynamo,
-      dynamoClient,
-      req,
-      res,
-      next
-    );
-    launchResp = await launchRequestHandlerClient.handleRequest();
-    statusCode = launchResp.statusCode;
-    responseBody = launchResp.responseBody;
-  } catch (err) {
-    if (err.statusCode || err.message.includes("tokens")) {
-      statusCode = err.statusCode ? err.statusCode : 401;
-      responseBody = err;
-    } else {
-      logger.error(err);
-      return next(err);
-    }
+  const pullDocumentStrategy = new PullDocumentByAccessTokenStrategy(
+    logger,
+    dynamo,
+    dynamoClient,
+    config,
+    hashString
+  );
+
+  let documentResponse = await pullDocumentStrategy.pullDocumentFromDynamo(
+    res.locals.jwt
+  );
+
+  if (documentResponse && documentResponse.launch) {
+    res.json({ launch: documentResponse.launch.S });
+  } else {
+    return res.sendStatus(401);
   }
-  res.status(statusCode).json(responseBody);
+
   return next();
 };
 

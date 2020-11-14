@@ -732,8 +732,7 @@ describe("OpenID Connect Conformance", () => {
       })
       .catch((err) => {
         console.error(err);
-        expect(err.response.status).toEqual(404);
-        expect(err.response.statusText).toEqual("Not Found");
+        expect(err.response.status).toEqual(401);
       });
   });
 

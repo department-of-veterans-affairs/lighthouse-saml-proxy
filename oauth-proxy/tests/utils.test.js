@@ -5,6 +5,7 @@ const {
   statusCodeFromError,
   parseBasicAuth,
   parseClientId,
+  parseBearerAuthorization,
 } = require("../utils");
 
 describe("statusCodeFromError", () => {
@@ -138,5 +139,23 @@ describe("parseClientId", () => {
       let result = parseClientId(clientId);
       expect(result).toEqual(false);
     });
+  });
+});
+
+describe("parseBearerAuthorization", () => {
+  it("undefined", () => {
+    expect(parseBearerAuthorization()).toBe(null);
+  });
+  it("Unmatched regex 1", () => {
+    expect(parseBearerAuthorization("ABC")).toBe(null);
+  });
+  it("Unmatched regex 2", () => {
+    expect(parseBearerAuthorization("Bearer")).toBe(null);
+  });
+  it("Unmatched regex 3", () => {
+    expect(parseBearerAuthorization("Bearer a b")).toBe(null);
+  });
+  it("Match", () => {
+    expect(parseBearerAuthorization("Bearer jwt")).toBe("jwt");
   });
 });
