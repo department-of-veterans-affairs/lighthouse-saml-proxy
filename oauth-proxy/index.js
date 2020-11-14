@@ -16,6 +16,9 @@ const { logger, middlewareLogFormat } = require("./logger");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 
+/**
+ * @deprecated - Prefer config.routes.app_routes
+ */
 const appRoutes = {
   authorize: "/authorization",
   token: "/token",
@@ -293,6 +296,24 @@ function buildApp(
         );
       }
     );
+    if (config.enable_smart_launch_service) {
+      router.get(
+        config.routes.app_routes.smart_launch,
+        async (req, res, next) => {
+          await oauthHandlers
+            .launchRequestHandler(
+              config,
+              logger,
+              dynamo,
+              dynamoClient,
+              req,
+              res,
+              next
+            )
+            .catch(next);
+        }
+      );
+    }
   }
 
   app.use(well_known_base_path, router);
@@ -390,23 +411,6 @@ function buildApp(
         )
         .catch(next);
     });
-
-    if (api_category.includes("client-credentials")) {
-      let launchroute = app_routes.launch ? app_routes.launch : "/smart/launch";
-      router.get(launchroute, async (req, res, next) => {
-        await oauthHandlers
-          .launchRequestHandler(
-            config,
-            logger,
-            dynamo,
-            dynamoClient,
-            req,
-            res,
-            next
-          )
-          .catch(next);
-      });
-    }
 
     router.get(api_category + app_routes.manage, (req, res) =>
       res.redirect(config.manage_endpoint)
