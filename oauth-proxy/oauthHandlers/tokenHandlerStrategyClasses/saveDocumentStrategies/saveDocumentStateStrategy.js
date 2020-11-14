@@ -8,7 +8,7 @@ class SaveDocumentStateStrategy {
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
-      if (document.state) {
+      if (document.state && document.refresh_token) {
         let state = document.state.S;
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
