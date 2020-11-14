@@ -6,18 +6,18 @@ require("jest");
 
 describe("pullDocumentByLaunchStrategy tests", () => {
   it("undefined launch", async () => {
-    let req = {
+    const req = {
       body: {},
     };
 
     const strategy = new PullDocumentByLaunchStrategy(req);
 
-    let document = await strategy.pullDocumentFromDynamo();
+    const document = await strategy.pullDocumentFromDynamo();
     expect(document).toBe(null);
   });
 
   it("empty launch", async () => {
-    let req = {
+    const req = {
       body: {
         launch: "",
       },
@@ -25,12 +25,12 @@ describe("pullDocumentByLaunchStrategy tests", () => {
 
     const strategy = new PullDocumentByLaunchStrategy(req);
 
-    let document = await strategy.pullDocumentFromDynamo();
+    const document = await strategy.pullDocumentFromDynamo();
     expect(document).toBe(null);
   });
 
   it("non-empty launch", async () => {
-    let req = {
+    const req = {
       body: {
         launch: "42",
       },
@@ -38,7 +38,7 @@ describe("pullDocumentByLaunchStrategy tests", () => {
 
     const strategy = new PullDocumentByLaunchStrategy(req);
 
-    let document = await strategy.pullDocumentFromDynamo();
+    const document = await strategy.pullDocumentFromDynamo();
     expect(document.launch.S).toBe("42");
   });
 });
