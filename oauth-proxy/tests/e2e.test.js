@@ -38,14 +38,11 @@ const defaultTestingConfig = {
   manage_endpoint: "http://localhost:9091/account",
   hmac_secret: "testsecret",
   dynamo_client_credentials_table: "client_creds_table",
+  enable_smart_launch_service: true,
   routes: {
     categories: [
       {
         api_category: "/veteran-verification-apis/v1",
-        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
-      },
-      {
-        api_category: "/client-credentials/v1",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
       },
     ],
@@ -58,7 +55,7 @@ const defaultTestingConfig = {
       revoke: "/revoke",
       jwks: "/keys",
       grants: "/grants",
-      launch: "/smart/launch",
+      smart_launch: "/smart/launch",
     },
   },
 };
