@@ -45,6 +45,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       );
     } catch (err) {
       expect(true).toBe(true);
+      expect(err.status).toBe(500);
       return;
     }
     expect(true).toBe(false);
