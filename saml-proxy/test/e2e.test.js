@@ -214,7 +214,7 @@ describe("Logins for idp", () => {
         expect(icn).toEqual("123");
       });
 
-      it("treats the user as a VSO if the lookup from mvi fails", async () => { 
+      it("treats the user as a VSO if the lookup from mvi fails", async () => {
         const requestSamlResponse = await buildSamlResponse(idp, "3");
         vetsApiClient.findUserInMVI = false;
         vetsApiClient.userIsVSO = true;
