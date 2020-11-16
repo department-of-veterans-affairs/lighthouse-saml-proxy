@@ -7,7 +7,6 @@ import assignIn from "lodash.assignin";
 import samlp from "samlp";
 import * as url from "url";
 import logger from "../logger";
-//import xml2js from "xml2js";
 import {
   MVIRequestMetrics,
   VSORequestMetrics,
