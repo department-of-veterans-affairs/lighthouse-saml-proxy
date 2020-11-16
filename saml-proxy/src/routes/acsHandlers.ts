@@ -1,6 +1,6 @@
 import { SP_VERIFY, SP_LOGIN_URL } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
-import { IConfiguredRequest } from "./types";
+import { ICache, IConfiguredRequest } from "./types";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
@@ -12,7 +12,6 @@ import {
   VSORequestMetrics,
   IRequestMetrics,
 } from "../metrics";
-import NodeCache from "node-cache";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -169,7 +168,7 @@ export const testLevelOfAssuranceOrRedirect = (
   }
 };
 
-export const validateIdpResponse = (cache: NodeCache) => {
+export const validateIdpResponse = (cache: ICache) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const sessionIndex = req?.user?.authnContext?.sessionIndex;
     if (!sessionIndex) {

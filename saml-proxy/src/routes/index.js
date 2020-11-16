@@ -9,7 +9,7 @@ import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from "uuid/v4";
 import rTracer from "cls-rtracer";
-import NodeCache from "node-cache";
+import { Cache } from "./types";
 
 import {
   loggingMiddleware as morganMiddleware,
@@ -171,7 +171,7 @@ export default function configureExpress(
   });
 
   /* exported variableName */
-  const cache = new NodeCache();
+  const cache = new Cache();
   addRoutes(app, idpOptions, spOptions, cache);
 
   // Catches errors
