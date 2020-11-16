@@ -42,6 +42,7 @@ function buildUpstreamOAuthTestApp() {
       ],
       grant_types_supported: [
         "authorization_code",
+        "client_credentials",
         "implicit",
         "refresh_token",
         "password",
@@ -56,6 +57,7 @@ function buildUpstreamOAuthTestApp() {
         "phone",
         "offline_access",
         "groups",
+        "launch/patient",
       ],
       token_endpoint_auth_methods_supported: [
         "client_secret_basic",

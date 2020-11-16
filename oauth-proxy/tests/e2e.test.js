@@ -81,25 +81,27 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     });
   });
   dynamoClient.getFromDynamoBySecondary.mockImplementation(
-    (handle, attr, value) => {
+    (handle, attr, value, tableName) => {
       return new Promise((resolve, reject) => {
         if (fakeDynamoRecord[attr] === value) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
         } else {
-          reject(`no such ${attr} value`);
+          reject(`no such ${attr} value on ${tableName}`);
         }
       });
     }
   );
-  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
-    return new Promise((resolve, reject) => {
-      if (state === fakeDynamoRecord.state) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-      } else {
-        reject("no such state value");
-      }
-    });
-  });
+  dynamoClient.getFromDynamoByState.mockImplementation(
+    (handle, state, tableName) => {
+      return new Promise((resolve, reject) => {
+        if (state === fakeDynamoRecord.state) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such state value on ${tableName}`);
+        }
+      });
+    }
+  );
   return dynamoClient;
 }
 
@@ -397,6 +399,36 @@ describe("OpenID Connect Conformance", () => {
       id_token: expect.stringMatching(JWT_PATTERN),
       refresh_token: expect.stringMatching(/[-_a-zA-Z0-9]+/),
       scope: expect.stringMatching(/.+/),
+      token_type: "Bearer",
+    });
+  });
+
+  it("returns an OIDC conformant token response to client_credentials", async () => {
+    const resp = await axios.post(
+      "http://localhost:9090/testServer/token",
+      qs.stringify({
+        grant_type: "client_credentials",
+        client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      }),
+      {
+        headers: {
+          origin: "http://localhost:8080",
+        },
+        auth: { username: "clientId123", password: "secretXyz" },
+      }
+    );
+
+    expect(resp.status).toEqual(200);
+    const parsedResp = resp.data;
+    const JWT_PATTERN = /[-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+[.][-_a-zA-Z0-9]+/;
+    expect(parsedResp).toMatchObject({
+      access_token: expect.stringMatching(JWT_PATTERN),
+      scope: expect.stringMatching(/.+/),
+      patient: expect.stringMatching("123V456"),
       token_type: "Bearer",
     });
   });

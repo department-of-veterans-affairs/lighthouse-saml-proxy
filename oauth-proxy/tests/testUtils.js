@@ -39,25 +39,27 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     });
   });
   dynamoClient.getFromDynamoBySecondary.mockImplementation(
-    (handle, attr, value) => {
+    (handle, attr, value, tableName) => {
       return new Promise((resolve, reject) => {
         if (fakeDynamoRecord[attr] === value) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
         } else {
-          reject(`no such ${attr} value`);
+          reject(`no such ${attr} value on ${tableName}`);
         }
       });
     }
   );
-  dynamoClient.getFromDynamoByState.mockImplementation((handle, state) => {
-    return new Promise((resolve, reject) => {
-      if (state === fakeDynamoRecord.state) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-      } else {
-        reject("no such state value");
-      }
-    });
-  });
+  dynamoClient.getFromDynamoByState.mockImplementation(
+    (handle, state, tableName) => {
+      return new Promise((resolve, reject) => {
+        if (state === fakeDynamoRecord.state) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such state value on ${tableName}`);
+        }
+      });
+    }
+  );
   return dynamoClient;
 }
 
@@ -70,7 +72,8 @@ class FakeIssuer {
     };
     this.metadata = {
       issuer: "https://fake.okta.com/oauth2/1234",
-      authorization_endpoint: "fake_enpoint",
+      authorization_endpoint: "fake_endpoint",
+      token_endpoint: "fake_endpoint",
     };
   }
 }
