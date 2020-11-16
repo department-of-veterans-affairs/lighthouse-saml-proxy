@@ -101,6 +101,7 @@
     "passport": "^0.4.0",
     "passport-wsfed-saml2": "git+https://github.com/department-of-veterans-affairs/lighthouse-passport-wsfed-saml2.git",
     "prom-client": "^11.5.2",
+    "redis": "^3.0.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "samlp": "^4.0.0",
