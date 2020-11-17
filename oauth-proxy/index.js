@@ -30,6 +30,7 @@ const appRoutes = {
   jwks: "/keys",
   redirect: "/redirect",
   grants: "/grants",
+  smart_launch: "/smart/launch",
 };
 const openidMetadataWhitelist = [
   "issuer",
@@ -299,7 +300,7 @@ function buildApp(
     );
     if (config.enable_smart_launch_service) {
       router.get(
-        config.routes.app_routes.smart_launch,
+        appRoutes.smart_launch,
         jwtAuthorizationHandler,
         async (req, res, next) => {
           await oauthHandlers
