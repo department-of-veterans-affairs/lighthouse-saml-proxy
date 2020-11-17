@@ -28,7 +28,7 @@ console.log(
 );
 const dynamo = new DynamoDB({ endpoint });
 
-const tableParams = {
+let tableParams = {
   AttributeDefinitions: [
     { AttributeName: "state", AttributeType: "S" },
     { AttributeName: "code", AttributeType: "S" },
@@ -74,6 +74,51 @@ const tableParams = {
     },
   ],
   TableName: "OAuthRequests",
+};
+
+dynamo.createTable(tableParams, (err, data) => {
+  if (err) {
+    console.error(
+      "Unable to create table. Error JSON:",
+      JSON.stringify(err, null, 2)
+    );
+  } else {
+    console.log(
+      "Created table. Table description JSON:",
+      JSON.stringify(data, null, 2)
+    );
+  }
+});
+
+tableParams = {
+  AttributeDefinitions: [
+    { AttributeName: "access_token", AttributeType: "S" },
+    { AttributeName: "launch", AttributeType: "S" },
+  ],
+  KeySchema: [{ AttributeName: "access_token", KeyType: "HASH" }],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 10,
+    WriteCapacityUnits: 10,
+  },
+  GlobalSecondaryIndexes: [
+    {
+      IndexName: "oauth_launch_index",
+      KeySchema: [
+        {
+          AttributeName: "launch",
+          KeyType: "HASH",
+        },
+      ],
+      Projection: {
+        ProjectionType: "ALL",
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 10,
+        WriteCapacityUnits: 10,
+      },
+    },
+  ],
+  TableName: "ClientCredentials",
 };
 
 dynamo.createTable(tableParams, (err, data) => {

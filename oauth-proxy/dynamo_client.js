@@ -93,9 +93,41 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
+function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
+  const params = {
+    ExpressionAttributeNames: {
+      "#K": key,
+    },
+    ExpressionAttributeValues: {
+      ":k": {
+        S: value,
+      },
+    },
+    Key: {
+      access_token: {
+        S: accessToken,
+      },
+    },
+    ReturnValues: "ALL_NEW",
+    UpdateExpression: "SET #K = :k",
+    TableName,
+  };
+
+  return new Promise((resolve, reject) => {
+    client.updateItem(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
+  saveToDynamoAccessToken,
   getFromDynamoBySecondary,
 };

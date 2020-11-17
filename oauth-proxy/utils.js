@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 function statusCodeFromError(error) {
   if (error.response && error.response.statusCode) {
     return error.response.statusCode;
@@ -71,6 +73,12 @@ function parseClientId(clientId) {
   return isValid;
 }
 
+const hashString = (accessToken, secret) => {
+  const hmac = crypto.createHmac("sha256", secret);
+  let hashedAccessToken = hmac.update(accessToken).digest("hex");
+  return hashedAccessToken;
+};
+
 module.exports = {
   isRuntimeError,
   rethrowIfRuntimeError,
@@ -78,4 +86,5 @@ module.exports = {
   encodeBasicAuthHeader,
   parseBasicAuth,
   parseClientId,
+  hashString,
 };

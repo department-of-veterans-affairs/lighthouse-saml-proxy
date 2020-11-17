@@ -44,6 +44,15 @@ function processArgs() {
         description: "flag to use local DynamoDB instance",
         required: false,
       },
+      dynamo_client_credentials_table: {
+        description: "name of client credentials table.",
+        required: true,
+      },
+      hmac_secret: {
+        description:
+          "hmac secret to hash access tokens being stored in client credentials table.",
+        required: true,
+      },
       okta_url: {
         description: "base URL of okta organization",
         required: true,

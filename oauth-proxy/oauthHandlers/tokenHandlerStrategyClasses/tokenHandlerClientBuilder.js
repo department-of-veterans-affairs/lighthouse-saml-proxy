@@ -1,3 +1,4 @@
+const { hashString } = require("../../utils");
 const {
   RefreshTokenStrategy,
 } = require("./tokenStrategies/refreshTokenStrategy");
@@ -18,14 +19,14 @@ const {
   PullDocumentByRefreshTokenStrategy,
 } = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 const {
-  PullDocumentNoStrategy,
-} = require("./pullDocumentStrategies/pullDocumentNoStrategy");
+  PullDocumentByLaunchStrategy,
+} = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
 const {
   SaveDocumentStateStrategy,
 } = require("./saveDocumentStrategies/saveDocumentStateStrategy");
 const {
-  SaveDocumentNoStrategy,
-} = require("./saveDocumentStrategies/saveDocumentNoStrategy");
+  SaveDocumentLaunchStrategy,
+} = require("./saveDocumentStrategies/saveDocumentLaunchStrategy");
 const {
   GetPatientInfoFromValidateEndpointStrategy,
 } = require("./getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
@@ -149,8 +150,14 @@ const getStrategies = (
         dynamoClient,
         issuer.token_endpoint
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentNoStrategy(),
-      saveDocumentToDynamoStrategy: new SaveDocumentNoStrategy(),
+      pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
+      saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
+        logger,
+        dynamo,
+        dynamoClient,
+        config,
+        hashString
+      ),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
