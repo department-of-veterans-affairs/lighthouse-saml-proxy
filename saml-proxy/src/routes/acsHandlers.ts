@@ -169,7 +169,7 @@ export const testLevelOfAssuranceOrRedirect = (
 };
 
 export const validateIdpResponse = (cache: ICache) => {
-  return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+  return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const sessionIndex = req?.user?.authnContext?.sessionIndex;
     if (!sessionIndex) {
       logger.error("No session index found in the saml response.");
@@ -178,7 +178,8 @@ export const validateIdpResponse = (cache: ICache) => {
         status: 400,
       };
     }
-    if (cache.has(sessionIndex) === true) {
+    let sessionIndexCached = await cache.has(sessionIndex);
+    if (sessionIndexCached) {
       logger.error(
         "Detected SAML replay. Saml Response with session index " +
           sessionIndex +
@@ -189,7 +190,7 @@ export const validateIdpResponse = (cache: ICache) => {
         status: 400,
       };
     }
-    cache.set(sessionIndex, null);
+    await cache.set(sessionIndex, null);
     logger.info(
       "Caching valid Idp Saml Response with session index " + sessionIndex
     );

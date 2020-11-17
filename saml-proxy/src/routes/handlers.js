@@ -139,7 +139,7 @@ export const getParticipant = (req) => {
   return participant;
 };
 
-const processAcs = (acsUrl, cache) => [
+const processAcs = async (acsUrl, cache) => [
   buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
   validateIdpResponse(cache),

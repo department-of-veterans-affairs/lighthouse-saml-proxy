@@ -3,7 +3,7 @@ import "jest";
 import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
-import NodeCache = require("../../node_modules/node-cache");
+import { TestCache } from "./types";
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -247,7 +247,7 @@ describe("validateIdpResponse", () => {
   it("should cache session index for a given saml response", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
-    const cache = new NodeCache();
+    const cache = new TestCache();
     const req = {
       vetsAPIClient: client,
       user: {
@@ -259,7 +259,7 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache);
-    validateFn(req, {}, nextFn);
+    await validateFn(req, {}, nextFn);
     expect(nextFn).toHaveBeenCalled();
     expect(cache.has(testSessionIndex));
   });
@@ -267,7 +267,7 @@ describe("validateIdpResponse", () => {
   it("should throw an error on repeated idp saml response", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
-    const cache = new NodeCache();
+    const cache = new TestCache();
     let thrownError = null;
     const req = {
       vetsAPIClient: client,
@@ -280,9 +280,9 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache);
-    validateFn(req, {}, nextFn);
+    await validateFn(req, {}, nextFn);
     try {
-      validateFn(req, {}, nextFn);
+      await validateFn(req, {}, nextFn);
     } catch (err) {
       thrownError = err;
     }
@@ -293,7 +293,7 @@ describe("validateIdpResponse", () => {
 
   it("should throw an error with status code 400 for a saml response with no session index", async () => {
     const nextFn = jest.fn();
-    const cache = new NodeCache();
+    const cache = new TestCache();
     let thrownError = null;
     const req = {
       vetsAPIClient: client,
@@ -305,7 +305,7 @@ describe("validateIdpResponse", () => {
 
     const validateFn = handlers.validateIdpResponse(cache);
     try {
-      validateFn(req, {}, nextFn);
+      await validateFn(req, {}, nextFn);
     } catch (err) {
       thrownError = err;
     }
