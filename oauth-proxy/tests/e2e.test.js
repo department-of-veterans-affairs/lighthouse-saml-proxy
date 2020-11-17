@@ -36,6 +36,9 @@ const defaultTestingConfig = {
   validate_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
   manage_endpoint: "http://localhost:9091/account",
+  hmac_secret: "testsecret",
+  dynamo_client_credentials_table: "client_creds_table",
+  enable_smart_launch_service: true,
   routes: {
     categories: [
       {
@@ -52,6 +55,7 @@ const defaultTestingConfig = {
       revoke: "/revoke",
       jwks: "/keys",
       grants: "/grants",
+      smart_launch: "/smart/launch",
     },
   },
 };
@@ -98,6 +102,24 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
         } else {
           reject(`no such state value on ${tableName}`);
+        }
+      });
+    }
+  );
+  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
+    (handle, access_token, tableName) => {
+      const fakeLaunchRecord = {
+        launch: "123V456",
+      };
+      return new Promise((resolve, reject) => {
+        if (
+          tableName === "client_creds_table" &&
+          access_token ===
+            "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a"
+        ) {
+          resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
+        } else {
+          reject(`no such access_token value on ${tableName}`);
         }
       });
     }
@@ -676,6 +698,69 @@ describe("OpenID Connect Conformance", () => {
       })
       .catch(() => {
         expect(true).toEqual(false);
+      });
+  });
+
+  it("returns a launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5ceyJraWQiOiIzZkJCV0trc2JfY2ZmRGtYbVlSbmN1dGNtamFFMEFjeVdkdWFZc1NVa3o4IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmdtNVFDSl96dXVCbF9DZU1mSzRKNkNzMjR3MThxUG5zcXlQQzFBQWszZTAiLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9hdXM4amExNXp6YjNwM21uWTJwNyIsImF1ZCI6Imh0dHBzOi8vc2FuZGJveC1hcGkudmEuZ292L3NlcnZpY2VzL2NjIiwiaWF0IjoxNjA1Mjg1NTI5LCJleHAiOjE2MDUyODU4MjksImNpZCI6IjBvYThvNzlsM2pXMFd6WjFMMnA3Iiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sInN1YiI6IjBvYThvNzlsM2pXMFd6WjFMMnA3IiwiYWJjIjoiMTIzIiwidGVzdCI6IjEyMyJ9.L1y9yEzUt3uvRC5RSDHxlaOGqqdulFj9a1SpFKCGiDNvQ2JMuqhQ9uvNqAnWGUWf74D-pXJjjtz66uCQFHosYqNp1hd9T88EDJxMWsYOkUJR5XV180aMFVycJHw3ZyRgHfwrOihhxyB3Q3V6DhpL8EOOsAkLLJ_FvF40SYUjiqvNUslMYNJfzcJkwlcVBKoQKaszSnfYW0XnsOSHS4Ny7WA2m6hK2ReFcyWs78obQ0wM3GndjlkQPwq6wO9qDKcEZdN8YZ7wTzcID_NECEn6n4LxwD9NmfJrfie8312bq76Ca7tqLOXoqw49ClLXpGTfYSmHaNC9svMFVHedAAoMKweyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        },
+      })
+      .then((resp) => {
+        expect(resp.status).toEqual(200);
+        expect(resp.data.launch).toEqual("123V456");
+      })
+      .catch((err) => {
+        console.error(err);
+        expect(true).toEqual(false); // Don't expect to be here
+      });
+  });
+
+  it("launch context not found for an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbmUgRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.cMErWtEf7DxCXJl8C9q0L7ttkm-Ex54UWHsOCMGbtUc",
+        },
+      })
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        console.error(err);
+        expect(err.response.status).toEqual(401);
+      });
+  });
+
+  it("missing authorization on a request for launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch")
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(401);
+        expect(err.response.statusText).toEqual("Unauthorized");
+      });
+  });
+
+  it("bad jwt on a request for launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization: "Bearer xxx.xx.x.x.x-x.x.x",
+        },
+      })
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(401);
+        expect(err.response.statusText).toEqual("Unauthorized");
       });
   });
 });

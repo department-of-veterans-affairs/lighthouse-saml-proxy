@@ -62,6 +62,27 @@ function getFromDynamoByState(client, state, TableName) {
   });
 }
 
+function getFromDynamoByAccessToken(client, access_token, TableName) {
+  const params = {
+    Key: {
+      access_token: {
+        S: access_token,
+      },
+    },
+    TableName,
+  };
+
+  return new Promise((resolve, reject) => {
+    client.getItem(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.Item);
+      }
+    });
+  });
+}
+
 function saveToDynamo(client, state, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
@@ -128,6 +149,7 @@ module.exports = {
   createDynamoHandle,
   saveToDynamo,
   getFromDynamoByState,
+  getFromDynamoByAccessToken,
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
 };

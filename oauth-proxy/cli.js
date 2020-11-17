@@ -103,6 +103,11 @@ function processArgs() {
         required: false,
         default: false,
       },
+      enable_smart_launch_service: {
+        description: "Enable SMART launch lookup service?",
+        required: false,
+        default: false,
+      },
       routes: {
         description:
           "An object that describes route configurations for isolated api categories",
@@ -166,6 +171,11 @@ function processArgs() {
             description: "The path component for the grants endpoint",
             required: true,
             default: "/grants",
+          },
+          smart_launch: {
+            description: "The path component for the SMART launch service",
+            required: true,
+            default: "/smart/launch",
           },
         },
       },

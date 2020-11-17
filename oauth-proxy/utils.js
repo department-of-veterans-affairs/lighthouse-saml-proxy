@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 
+const bearerAuthorizationRegex = /^Bearer\s([^\s]+)$/;
+
 function statusCodeFromError(error) {
   if (error.response && error.response.statusCode) {
     return error.response.statusCode;
@@ -79,6 +81,20 @@ const hashString = (accessToken, secret) => {
   return hashedAccessToken;
 };
 
+function parseBearerAuthorization(authorization) {
+  if (!authorization) {
+    return null;
+  }
+
+  let match = bearerAuthorizationRegex.exec(authorization);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1];
+}
+
 module.exports = {
   isRuntimeError,
   rethrowIfRuntimeError,
@@ -87,4 +103,5 @@ module.exports = {
   parseBasicAuth,
   parseClientId,
   hashString,
+  parseBearerAuthorization,
 };
