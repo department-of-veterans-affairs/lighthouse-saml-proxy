@@ -1,355 +1,396 @@
 import yargs from "yargs";
 import path from "path";
-import {
-  cwd
-} from "process";
+import { cwd } from "process";
 import {
   makeCertFileCoercer,
   certToPEM,
   loadFileSync,
-  KEY_CERT_HELP_TEXT
+  KEY_CERT_HELP_TEXT,
 } from "./coercing";
-import {
-  checkEncryptionCerts,
-  checkIdpProfileMapper,
-  checkWhenNoMetadata
-} from "./checks";
-import {
-  BINDINGS
-} from "../samlConstants";
+import { checkEncryptionCerts, checkWhenNoMetadata } from "./checks";
+import { BINDINGS } from "../samlConstants";
 
 export function processArgs() {
   return yargs
-    .usage('\nSimple IdP for SAML 2.0 WebSSO & SLO Profile\n\n' +
-      'Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n' +
-      'Usage:\n\t$0 -acs {url} -aud {uri}')
+    .usage(
+      "\nSimple IdP for SAML 2.0 WebSSO & SLO Profile\n\n" +
+        "Launches an IdP web server that mints SAML assertions or logout responses for a Service Provider (SP)\n\n" +
+        "Usage:\n\t$0 -acs {url} -aud {uri}"
+    )
     .config()
     .env()
     .options({
       port: {
-        description: 'IdP Web Server Listener Port',
+        description: "IdP Web Server Listener Port",
         required: true,
-        default: 7000
+        default: 7000,
       },
       idpCert: {
-        description: 'IdP Signature PublicKey Certificate',
+        description: "IdP Signature PublicKey Certificate",
         required: true,
-        default: path.resolve(cwd(), './idp-public-cert.pem'),
-        coerce: makeCertFileCoercer('certificate', 'IdP Signature PublicKey Certificate', KEY_CERT_HELP_TEXT)
+        default: path.resolve(cwd(), "./idp-public-cert.pem"),
+        coerce: makeCertFileCoercer(
+          "certificate",
+          "IdP Signature PublicKey Certificate",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       idpKey: {
-        description: 'IdP Signature PrivateKey Certificate',
+        description: "IdP Signature PrivateKey Certificate",
         required: true,
-        default: path.resolve(cwd(), './idp-private-key.pem'),
-        coerce: makeCertFileCoercer('private key', 'IdP Signature PrivateKey Certificate', KEY_CERT_HELP_TEXT)
+        default: path.resolve(cwd(), "./idp-private-key.pem"),
+        coerce: makeCertFileCoercer(
+          "private key",
+          "IdP Signature PrivateKey Certificate",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       idpIssuer: {
-        description: 'IdP Issuer URI',
+        description: "IdP Issuer URI",
         required: true,
-        default: 'urn:example:idp'
+        default: "urn:example:idp",
       },
       idpAcsUrl: {
-        description: 'SP Assertion Consumer URL',
-        required: true
+        description: "SP Assertion Consumer URL",
+        required: true,
       },
       idpSloUrl: {
-        description: 'SP Single Logout URL',
-        required: false
+        description: "SP Single Logout URL",
+        required: false,
       },
       idpAudience: {
-        description: 'SP Audience URI',
-        required: true
+        description: "SP Audience URI",
+        required: true,
       },
       idpServiceProviderId: {
-        description: 'SP Issuer/Entity URI',
+        description: "SP Issuer/Entity URI",
         required: false,
-        string: true
+        string: true,
       },
       idpRelayState: {
-        description: 'Default SAML RelayState for SAMLResponse',
-        required: false
+        description: "Default SAML RelayState for SAMLResponse",
+        required: false,
       },
       idpDisableRequestAcsUrl: {
-        description: 'Disables ability for SP AuthnRequest to specify Assertion Consumer URL',
+        description:
+          "Disables ability for SP AuthnRequest to specify Assertion Consumer URL",
         required: false,
         boolean: true,
-        default: false
+        default: false,
       },
       idpEncryptAssertion: {
-        description: 'Encrypts assertion with SP Public Key',
+        description: "Encrypts assertion with SP Public Key",
         required: false,
         boolean: true,
-        default: false
+        default: false,
       },
       idpEncryptionCert: {
-        description: 'SP Certificate (pem) for Assertion Encryption',
+        description: "SP Certificate (pem) for Assertion Encryption",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('certificate', 'Encryption cert')
+        coerce: makeCertFileCoercer("certificate", "Encryption cert"),
       },
       idpEncryptionPublicKey: {
-        description: 'SP RSA Public Key (pem) for Assertion Encryption ' +
-          '(e.g. openssl x509 -pubkey -noout -in sp-cert.pem)',
+        description:
+          "SP RSA Public Key (pem) for Assertion Encryption " +
+          "(e.g. openssl x509 -pubkey -noout -in sp-cert.pem)",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('public key', 'Encryption public key')
+        coerce: makeCertFileCoercer("public key", "Encryption public key"),
       },
       idpHttpsPrivateKey: {
-        description: 'Web Server TLS/SSL Private Key (pem)',
+        description: "Web Server TLS/SSL Private Key (pem)",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('private key')
+        coerce: makeCertFileCoercer("private key"),
       },
       idpHttpsCert: {
-        description: 'Web Server TLS/SSL Certificate (pem)',
+        description: "Web Server TLS/SSL Certificate (pem)",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('certificate')
+        coerce: makeCertFileCoercer("certificate"),
       },
       idpHttps: {
-        description: 'Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)',
+        description:
+          "Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)",
         required: true,
         boolean: true,
-        default: false
+        default: false,
       },
       idpSignResponse: {
-        description: 'Enables signing of responses',
+        description: "Enables signing of responses",
         required: false,
         boolean: true,
-        default: true
+        default: true,
       },
       idpRollSession: {
-        description: 'Create a new session for every authn request instead of reusing an existing session',
+        description:
+          "Create a new session for every authn request instead of reusing an existing session",
         required: false,
         boolean: true,
-        default: false
+        default: false,
       },
       idpAuthnContextClassRef: {
-        description: 'Authentication Context Class Reference',
+        description: "Authentication Context Class Reference",
         required: false,
         string: true,
-        default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+        default:
+          "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       },
       idpAuthnContextDecl: {
-        description: 'Authentication Context Declaration (XML FilePath)',
+        description: "Authentication Context Declaration (XML FilePath)",
         required: false,
         string: true,
-        coerce: loadFileSync
+        coerce: loadFileSync,
       },
       idpBaseUrl: {
-        description: 'IdP Base URL',
+        description: "IdP Base URL",
         required: false,
-        string: true
+        string: true,
       },
       sentryDSN: {
-        description: 'URL of the sentry project to send errors',
+        description: "URL of the sentry project to send errors",
         required: false,
-        string: true
+        string: true,
       },
       sentryEnvironment: {
-        description: 'Environment of the Sentry project',
+        description: "Environment of the Sentry project",
         required: false,
-        string: true
+        string: true,
       },
       sessionSecret: {
-        description: 'Secret used to sign the session cookie',
+        description: "Secret used to sign the session cookie",
         required: true,
-        string: true
+        string: true,
       },
       spProtocol: {
-        description: 'Federation Protocol',
+        description: "Federation Protocol",
         required: true,
         string: true,
-        default: 'samlp'
+        default: "samlp",
       },
       spIdpIssuer: {
-        description: 'IdP Issuer URI',
+        description: "IdP Issuer URI",
         required: false,
         string: true,
-        default: 'urn:example:idp'
+        default: "urn:example:idp",
       },
       spIdpSsoUrl: {
-        description: 'IdP Single Sign-On Service URL (SSO URL)',
+        description: "IdP Single Sign-On Service URL (SSO URL)",
         required: false,
-        string: true
+        string: true,
       },
       spIdpSsoBinding: {
-        description: 'IdP Single Sign-On AuthnRequest Binding',
+        description: "IdP Single Sign-On AuthnRequest Binding",
         required: true,
         string: true,
-        default: BINDINGS.REDIRECT
+        default: BINDINGS.REDIRECT,
       },
       spIdpSloUrl: {
-        description: 'IdP Single Logout Service URL (SLO URL) (SAMLP)',
+        description: "IdP Single Logout Service URL (SLO URL) (SAMLP)",
         required: false,
-        string: true
+        string: true,
       },
       spIdpSloBinding: {
-        description: 'IdP Single Logout Request Binding (SAMLP)',
+        description: "IdP Single Logout Request Binding (SAMLP)",
         required: true,
         string: true,
-        default: BINDINGS.REDIRECT
+        default: BINDINGS.REDIRECT,
       },
       spIdpCert: {
-        description: 'IdP Public Key Signing Certificate (PEM)',
+        description: "IdP Public Key Signing Certificate (PEM)",
         required: false,
         string: true,
-        coerce: (value) => {
-          return certToPEM(makeCertFileCoercer('certificate', 'IdP Public Key Signing Certificate (PEM)', KEY_CERT_HELP_TEXT));
-        }
+        coerce: () => {
+          return certToPEM(
+            makeCertFileCoercer(
+              "certificate",
+              "IdP Public Key Signing Certificate (PEM)",
+              KEY_CERT_HELP_TEXT
+            )
+          );
+        },
       },
       spIdpThumbprint: {
-        description: 'IdP Public Key Signing Certificate SHA1 Thumbprint',
+        description: "IdP Public Key Signing Certificate SHA1 Thumbprint",
         required: false,
         string: true,
         coerce: (value) => {
-          return value ? value.replace(/:/g, '') : value;
-        }
+          return value ? value.replace(/:/g, "") : value;
+        },
       },
       spIdpMetaUrl: {
-        description: 'IdP SAML Metadata URL',
+        description: "IdP SAML Metadata URL",
         required: false,
-        string: true
+        string: true,
       },
       spAudience: {
-        description: 'SP Audience URI / RP Realm',
+        description: "SP Audience URI / RP Realm",
         required: false,
         string: true,
-        default: 'urn:example:sp'
+        default: "urn:example:sp",
       },
       spProviderName: {
-        description: 'SP Provider Name',
+        description: "SP Provider Name",
         required: false,
         string: true,
-        default: 'Simple SAML Service Provider'
+        default: "Simple SAML Service Provider",
       },
       spAcsUrls: {
-        description: 'SP Assertion Consumer Service (ACS) URLs (Relative URL)',
+        description: "SP Assertion Consumer Service (ACS) URLs (Relative URL)",
         required: true,
         array: true,
-        default: ['/saml/sso']
+        default: ["/saml/sso"],
       },
       spSignAuthnRequests: {
-        description: 'Sign AuthnRequest Messages (SAMLP)',
+        description: "Sign AuthnRequest Messages (SAMLP)",
         required: true,
         boolean: true,
-        default: true
+        default: true,
       },
       spSignatureAlgorithm: {
-        description: 'Signature Algorithm',
+        description: "Signature Algorithm",
         required: false,
         string: true,
-        default: 'rsa-sha256'
+        default: "rsa-sha256",
       },
       spDigestAlgorithm: {
-        description: 'Digest Algorithm',
+        description: "Digest Algorithm",
         required: false,
         string: true,
-        default: 'sha256'
+        default: "sha256",
       },
       spRequestNameIDFormat: {
-        description: 'Request Subject NameID Format (SAMLP)',
+        description: "Request Subject NameID Format (SAMLP)",
         required: false,
         boolean: true,
-        default: true
+        default: true,
       },
       spValidateNameIDFormat: {
-        description: 'Validate format of Assertion Subject NameID',
+        description: "Validate format of Assertion Subject NameID",
         required: false,
         boolean: true,
-        default: true
+        default: true,
       },
       spNameIDFormat: {
-        description: 'Assertion Subject NameID Format',
+        description: "Assertion Subject NameID Format",
         required: false,
         string: true,
-        default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        default: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       },
       spRequestAuthnContext: {
-        description: 'Request Authentication Context (SAMLP)',
+        description: "Request Authentication Context (SAMLP)",
         required: false,
         boolean: true,
-        default: true
+        default: true,
       },
       spAuthnContextClassRef: {
-        description: 'Authentication Context Class Reference',
+        description: "Authentication Context Class Reference",
         required: false,
         string: true,
-        default: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+        default:
+          "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       },
       spCert: {
-        description: 'SP/RP Public Key Signature Certificate (PEM)',
+        description: "SP/RP Public Key Signature Certificate (PEM)",
         string: true,
         required: false,
-        default: path.resolve(cwd(), './sp-cert.pem'),
-        coerce: makeCertFileCoercer('certificate', 'SP Signing Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
+        default: path.resolve(cwd(), "./sp-cert.pem"),
+        coerce: makeCertFileCoercer(
+          "certificate",
+          "SP Signing Public Key Certificate (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spKey: {
-        description: 'SP/RP Private Key Signature Certificate(PEM)',
+        description: "SP/RP Private Key Signature Certificate(PEM)",
         string: true,
         required: false,
-        default: path.resolve(cwd(), './sp-key.pem'),
-        coerce: makeCertFileCoercer('private key', 'SP Signing Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        default: path.resolve(cwd(), "./sp-key.pem"),
+        coerce: makeCertFileCoercer(
+          "private key",
+          "SP Signing Private Key (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spEncryptionCert: {
-        description: 'SP/RP Public Key Encryption Certificate (PEM)',
+        description: "SP/RP Public Key Encryption Certificate (PEM)",
         string: true,
         required: false,
-        coerce: makeCertFileCoercer('certificate', 'SP Encryption Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer(
+          "certificate",
+          "SP Encryption Public Key Certificate (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spEncryptionKey: {
-        description: 'SP/RP Private Key Decryption Certificate(PEM)',
+        description: "SP/RP Private Key Decryption Certificate(PEM)",
         string: true,
         required: false,
-        coerce: makeCertFileCoercer('private key', 'SP Encryption Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer(
+          "private key",
+          "SP Encryption Private Key (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spHttpsPrivateKey: {
-        description: 'Web Server TLS/SSL Private Key (PEM)',
+        description: "Web Server TLS/SSL Private Key (PEM)",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('private key', 'Web Server TLS/SSL Private Key (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer(
+          "private key",
+          "Web Server TLS/SSL Private Key (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spHttpsCert: {
-        description: 'Web Server TLS/SSL Certificate (PEM)',
+        description: "Web Server TLS/SSL Certificate (PEM)",
         required: false,
         string: true,
-        coerce: makeCertFileCoercer('certificate', 'Web Server TLS/SSL Public Key Certificate (PEM)', KEY_CERT_HELP_TEXT)
+        coerce: makeCertFileCoercer(
+          "certificate",
+          "Web Server TLS/SSL Public Key Certificate (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
       },
       spHttps: {
-        description: 'Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)',
+        description:
+          "Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)",
         required: false,
         boolean: true,
-        default: false
+        default: false,
       },
       spRelayState: {
-        description: 'Default Relay State',
+        description: "Default Relay State",
         required: false,
-        string: true
+        string: true,
       },
       vetsAPIHost: {
         // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
         // where it runs environment variables through a camelcase function that transforms
         // API to Api. Without these aliases, yargs will complain that these arguments are
         // missing.
-        alias: 'vetsApiHost',
-        description: 'The URL prefix for the vets-api host used to perform MVI lookups.',
+        alias: "vetsApiHost",
+        description:
+          "The URL prefix for the vets-api host used to perform MVI lookups.",
         required: true,
         string: true,
       },
       vetsAPIToken: {
-        alias: 'vetsApiToken',
-        description: 'Token used to authorize calls to vets-api while performing MVI lookups.',
+        alias: "vetsApiToken",
+        description:
+          "Token used to authorize calls to vets-api while performing MVI lookups.",
         required: true,
         string: true,
       },
     })
-    .example('\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV', '')
+    .example(
+      "\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV",
+      ""
+    )
     .check(checkEncryptionCerts)
     .check(checkWhenNoMetadata)
-    .wrap(yargs.terminalWidth())
-    .argv;
+    .wrap(yargs.terminalWidth()).argv;
 }
 
-export {
-  certToPEM
-};
+export { certToPEM };

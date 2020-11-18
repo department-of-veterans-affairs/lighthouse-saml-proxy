@@ -1,4 +1,4 @@
-import * as request from 'request-promise-native';
+import * as request from "request-promise-native";
 
 export interface SAMLUser {
   uuid: string;
@@ -13,8 +13,8 @@ export interface SAMLUser {
   icn?: string;
 }
 
-const MVI_PATH = '/internal/auth/v0/mvi-user';
-const VSO_SEARCH_PATH = '/services/veteran/v0/representatives/find_rep';
+const MVI_PATH = "/internal/auth/v0/mvi-user";
+const VSO_SEARCH_PATH = "/services/veteran/v0/representatives/find_rep";
 
 export class VetsAPIClient {
   token: string;
@@ -25,24 +25,25 @@ export class VetsAPIClient {
     this.token = token;
     this.apiHost = apiHost;
     this.headers = {
-      'apiKey': this.token,
+      apiKey: this.token,
     };
   }
 
-  public async getMVITraitsForLoa3User(user: SAMLUser) : Promise<{ icn: string, first_name: string, last_name: string }> {
-
+  public async getMVITraitsForLoa3User(
+    user: SAMLUser
+  ): Promise<{ icn: string; first_name: string; last_name: string }> {
     const body = {
-      'idp_uuid': user.uuid,
-      'user_email': user.email,
-      'dslogon_edipi': user.edipi || null,
-      'mhv_icn': user.icn || null,
-      'ssn': user.ssn || null,
-      'first_name': user.firstName || null,
-      'middle_name': user.middleName || null,
-      'last_name': user.lastName || null,
-      'dob': user.dateOfBirth || null,
-      'gender': user.gender || null,
-      'level_of_assurance': '3',
+      idp_uuid: user.uuid,
+      user_email: user.email,
+      dslogon_edipi: user.edipi || null,
+      mhv_icn: user.icn || null,
+      ssn: user.ssn || null,
+      first_name: user.firstName || null,
+      middle_name: user.middleName || null,
+      last_name: user.lastName || null,
+      dob: user.dateOfBirth || null,
+      gender: user.gender || null,
+      level_of_assurance: "3",
     };
 
     const response = await request.post({
@@ -54,12 +55,14 @@ export class VetsAPIClient {
     return response.data.attributes;
   }
 
-  public async getVSOSearch(firstName: string, lastName: string) : Promise<{poa: string}> {
-
+  public async getVSOSearch(
+    firstName: string,
+    lastName: string
+  ): Promise<{ poa: string }> {
     const qs = {
-      'first_name': firstName,
-      'last_name': lastName
-    }
+      first_name: firstName,
+      last_name: lastName,
+    };
 
     const response = await request.get({
       url: `${this.apiHost}${VSO_SEARCH_PATH}`,
@@ -67,6 +70,6 @@ export class VetsAPIClient {
       headers: this.headers,
       qs,
     });
-    return response.data.attributes
+    return response.data.attributes;
   }
 }

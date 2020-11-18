@@ -1,31 +1,31 @@
-const client = require('prom-client');
+const client = require("prom-client");
 
-const defaultLabels = { app: 'oauth_proxy' };
+const defaultLabels = { app: "oauth_proxy" };
 client.register.setDefaultLabels(defaultLabels);
 
 const loginBegin = new client.Counter({
-  name: 'oauth_proxy_login_begin',
-  help: 'counter of number of times the OAuth login process has begun',
+  name: "oauth_proxy_login_begin",
+  help: "counter of number of times the OAuth login process has begun",
 });
 
 const loginEnd = new client.Counter({
-  name: 'oauth_proxy_login_end',
-  help: 'counter of number of times the OAuth login process has ended',
+  name: "oauth_proxy_login_end",
+  help: "counter of number of times the OAuth login process has ended",
 });
 
 const oktaTokenRefreshGauge = new client.Gauge({
-  name: 'oauth_proxy_okta_token_refresh_gauge',
-  help: 'metric for timing of okta token_refresh flow'
+  name: "oauth_proxy_okta_token_refresh_gauge",
+  help: "metric for timing of okta token_refresh flow",
 });
 
 const validationGauge = new client.Gauge({
-  name: 'oauth_proxy_validation_gauge',
-  help: 'metric for timing of validation flow'
+  name: "oauth_proxy_validation_gauge",
+  help: "metric for timing of validation flow",
 });
 
 function stopTimer(gauge, start) {
   const end = process.hrtime.bigint();
-  gauge.set(Number(end - start)/1000000000);
+  gauge.set(Number(end - start) / 1000000000);
 }
 
 module.exports = {
@@ -33,5 +33,5 @@ module.exports = {
   loginEnd,
   oktaTokenRefreshGauge,
   validationGauge,
-  stopTimer
+  stopTimer,
 };

@@ -17,6 +17,8 @@ pipeline {
     stage('Run saml-proxy tests') {
       agent {
         dockerfile {
+          registryUrl 'https://index.docker.io/v1/'
+          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "saml-proxy/Dockerfile"
@@ -33,9 +35,32 @@ pipeline {
       }
     }
 
+    stage('Run saml-proxy linting') {
+      agent {
+        dockerfile {
+          registryUrl 'https://index.docker.io/v1/'
+          registryCredentialsId 'vasdvdocker'
+          args "--entrypoint='' -u root"
+          dir "."
+          filename "saml-proxy/Dockerfile"
+          label 'vetsgov-general-purpose'
+          additionalBuildArgs '--pull'
+        }
+      }
+
+      steps {
+        sh '''
+          cd /home/node
+          npm run-script lint
+        '''
+      }
+    }
+
     stage('Run oauth-proxy tests') {
       agent {
         dockerfile {
+          registryUrl 'https://index.docker.io/v1/'
+          registryCredentialsId 'vasdvdocker'
           args "--entrypoint='' -u root"
           dir "."
           filename "oauth-proxy/Dockerfile"
@@ -48,6 +73,27 @@ pipeline {
         sh '''
           cd /home/node
           npm run test
+        '''
+      }
+    }
+
+    stage('Run oauth-proxy linting check') {
+      agent {
+        dockerfile {
+          registryUrl 'https://index.docker.io/v1/'
+          registryCredentialsId 'vasdvdocker'
+          args "--entrypoint='' -u root"
+          dir "."
+          filename "oauth-proxy/Dockerfile"
+          label 'vetsgov-general-purpose'
+          additionalBuildArgs '--pull'
+        }
+      }
+
+      steps {
+        sh '''
+          cd /home/node
+          npm run-script lint
         '''
       }
     }
