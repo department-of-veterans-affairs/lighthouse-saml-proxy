@@ -2,6 +2,7 @@ import { Request } from "express";
 import { PassportStatic, Strategy } from "passport";
 import Redis, { RedisClient } from "redis";
 import NodeCache = require("../../node_modules/node-cache");
+import { promisify } from "util";
 
 import { VetsAPIClient } from "../VetsAPIClient";
 
@@ -22,7 +23,7 @@ export interface IConfiguredRequest extends Request {
  * The cache interface that our saml proxy will rely on in the handler code.
  */
 export interface ICache {
-  set(Key: any, Value: any): Promise<boolean>;
+  set(Key: string, Value: string): Promise<unknown>;
   get(Key: any): Promise<any>;
   has(Key: any): Promise<boolean>;
 }
@@ -30,15 +31,17 @@ export interface ICache {
 export class RedisCache implements ICache {
   theCache: RedisClient;
 
-  set(Key: any, Value: any): Promise<boolean> {
-    return new Promise((resolve, reject)=>{this.theCache.set(Key, Value)});
+  set(Key: string, Value: string): Promise<unknown> {
+    const setAsync = promisify(this.theCache.set).bind(this.theCache);
+    return setAsync(Key, Value);
   }
   get(Key: any): Promise<any> {
-    return new Promise((resolve, reject)=>{this.theCache.get(Key)});
+    const getAsync = promisify(this.theCache.get).bind(this.theCache);
+    return getAsync(Key);
   }
-  has(Key: any): Promise<boolean> {
-    return new Promise((resolve, reject)=>{resolve(this.theCache.get(Key))}).
-    then((value)=>{return value === undefined;});
+  has(Key: any): Promise<any> {
+    const getAsync = promisify(this.theCache.get).bind(this.theCache);
+    return getAsync(Key);
   }
   constructor() {
     this.theCache = Redis.createClient();
@@ -53,13 +56,46 @@ export class TestCache implements ICache {
   theCache: NodeCache;
 
   set(Key: any, Value: any): Promise<boolean> {
-    return new Promise((resolve, reject)=>{return this.theCache.set(Key, Value)});
+    return new Promise((resolve, reject) => {
+      try {
+        const status = this.theCache.set(Key, Value);
+        if (status == true) {
+          resolve();
+        } else {
+          reject();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
-  get(Key: any):Promise<any> {
-    return new Promise((resolve, reject)=>{return this.theCache.get(Key)});
+  get(Key: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      try {
+        const value = this.theCache.get(Key);
+        if (value != undefined) {
+          resolve(value);
+        } else {
+          reject();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
-  has(Key: any): Promise<boolean> {
-    return new Promise((resolve, reject)=>{return resolve(this.theCache.has(Key))});
+  has(Key: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      try {
+        const value = this.theCache.get(Key);
+        if (value != undefined) {
+          resolve(value);
+        } else {
+          reject();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
   constructor() {
     this.theCache = new NodeCache();
