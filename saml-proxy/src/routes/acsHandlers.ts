@@ -178,7 +178,11 @@ export const validateIdpResponse = (cache: ICache) => {
         status: 400,
       };
     }
-    const sessionIndexCached = await cache.has(sessionIndex);
+    const sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
+      logger.error(
+        "Cache was unable to retrieve session index." + JSON.stringify(err)
+      );
+    });
     if (sessionIndexCached) {
       logger.error(
         "Detected SAML replay. Saml Response with session index " +

@@ -55,47 +55,17 @@ export class RedisCache implements ICache {
 export class TestCache implements ICache {
   theCache: NodeCache;
 
-  set(Key: any, Value: any): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      try {
-        const status = this.theCache.set(Key, Value);
-        if (status == true) {
-          resolve();
-        } else {
-          reject();
-        }
-      } catch (err) {
-        reject(err);
-      }
-    });
+  set(Key: string, Value: string): Promise<unknown> {
+    const setAsync = promisify(this.theCache.set).bind(this.theCache);
+    return setAsync(Key, Value);
   }
   get(Key: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      try {
-        const value = this.theCache.get(Key);
-        if (value != undefined) {
-          resolve(value);
-        } else {
-          reject();
-        }
-      } catch (err) {
-        reject(err);
-      }
-    });
+    const getAsync = promisify(this.theCache.get).bind(this.theCache);
+    return getAsync(Key);
   }
   has(Key: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      try {
-        const value = this.theCache.get(Key);
-        if (value != undefined) {
-          resolve(value);
-        } else {
-          reject();
-        }
-      } catch (err) {
-        reject(err);
-      }
-    });
+    const hasAsync = promisify(this.theCache.get).bind(this.theCache);
+    return hasAsync(Key);
   }
   constructor() {
     this.theCache = new NodeCache();
