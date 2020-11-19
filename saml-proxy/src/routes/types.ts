@@ -44,7 +44,11 @@ export class RedisCache implements ICache {
   }
   has(Key: any): Promise<any> {
     const getAsync = promisify(this.theCache.get).bind(this.theCache);
-    return getAsync(Key);
+    return new Promise((resolve) => {
+      getAsync(Key).then((value) => {
+        resolve(value == undefined);
+      });
+    });
   }
   constructor() {
     this.theCache = Redis.createClient();
@@ -62,19 +66,19 @@ export class TestCache implements ICache {
     return new Promise((resolve) => {
       this.theCache.set(Key, Value);
       resolve(false);
-    })
+    });
   }
   get(Key: any): Promise<any> {
     return new Promise((resolve) => {
-      let val = this.theCache.get(Key);
+      const val = this.theCache.get(Key);
       resolve(val);
-    })
+    });
   }
   has(Key: any): Promise<any> {
     return new Promise((resolve) => {
-      let val = this.theCache.has(Key);
+      const val = this.theCache.has(Key);
       resolve(val);
-    })
+    });
   }
   constructor() {
     this.theCache = new NodeCache();

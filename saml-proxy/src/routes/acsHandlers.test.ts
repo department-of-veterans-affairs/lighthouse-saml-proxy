@@ -3,7 +3,7 @@ import "jest";
 import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
-import { TestCache, IConfiguredRequest } from "./types";
+import { TestCache } from "./types";
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -18,7 +18,6 @@ const claimsWithICN = {
   level_of_assurance: "0",
   mhv_account_type: "Premium",
 };
-
 
 const claimsWithEDIPI = {
   dateOfBirth: "1990-01-01",
