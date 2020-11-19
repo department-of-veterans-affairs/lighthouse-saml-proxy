@@ -185,7 +185,7 @@ export const validateIdpResponse = (cache: ICache) => {
     });
     if (sessionIndexCached) {
       logger.error(
-        "Detected SAML replay. Saml Response with session index " +
+        "SAML response with session index " +
           sessionIndex +
           " was previously cached."
       );
