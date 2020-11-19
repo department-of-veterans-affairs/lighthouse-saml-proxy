@@ -56,16 +56,22 @@ export class TestCache implements ICache {
   theCache: NodeCache;
 
   set(Key: string, Value: string): Promise<unknown> {
-    const setAsync = promisify(this.theCache.set).bind(this.theCache);
-    return setAsync(Key, Value);
+    return new Promise((resolve) => {
+      this.theCache.set(Key, Value);
+      resolve(false);
+    })
   }
   get(Key: any): Promise<any> {
-    const getAsync = promisify(this.theCache.get).bind(this.theCache);
-    return getAsync(Key);
+    return new Promise((resolve) => {
+      let val = this.theCache.get(Key);
+      resolve(val);
+    })
   }
   has(Key: any): Promise<any> {
-    const hasAsync = promisify(this.theCache.get).bind(this.theCache);
-    return hasAsync(Key);
+    return new Promise((resolve) => {
+      let val = this.theCache.has(Key);
+      resolve(val);
+    })
   }
   constructor() {
     this.theCache = new NodeCache();
