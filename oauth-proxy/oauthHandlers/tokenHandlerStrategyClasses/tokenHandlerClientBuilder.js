@@ -156,7 +156,8 @@ const getStrategies = (
         dynamo,
         dynamoClient,
         config,
-        hashString
+        hashString,
+        req
       ),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };

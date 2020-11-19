@@ -1,10 +1,11 @@
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
+  constructor(logger, dynamo, dynamoClient, config, hashingFunction, token_expires_on) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
     this.hashingFunction = hashingFunction;
+    this.token_expires_on = token_expires_on;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
@@ -19,7 +20,8 @@ class SaveDocumentLaunchStrategy {
           accessToken,
           "launch",
           launch,
-          this.config.dynamo_client_credentials_table
+          this.config.dynamo_client_credentials_table,
+          this.token_expires_on
         );
       }
     } catch (error) {

@@ -114,7 +114,7 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
-function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
+function saveToDynamoAccessToken(client, accessToken, key, value, TableName, expires_on) {
   const params = {
     ExpressionAttributeNames: {
       "#K": key,
@@ -133,6 +133,10 @@ function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
     UpdateExpression: "SET #K = :k",
     TableName,
   };
+
+  if (expires_on) {
+    params.ExpressionAttributeValues.expires_on = expires_on;
+  }
 
   return new Promise((resolve, reject) => {
     client.updateItem(params, (err, data) => {
