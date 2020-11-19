@@ -1,11 +1,11 @@
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, config, hashingFunction, token_expires_on) {
+  constructor(logger, dynamo, dynamoClient, config, hashingFunction, assert_info) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
     this.hashingFunction = hashingFunction;
-    this.token_expires_on = token_expires_on;
+    this.assert_info = assert_info;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
@@ -15,6 +15,11 @@ class SaveDocumentLaunchStrategy {
           tokens.access_token,
           this.config.hmac_secret
         );
+
+        if (this.assert_info && this.assert_info.decodedJwt) {
+          this.token_expires_on = this.assert_info.decodedJwt.exp;
+        }
+
         await this.dynamoClient.saveToDynamoAccessToken(
           this.dynamo,
           accessToken,
