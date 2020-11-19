@@ -28,6 +28,9 @@ export interface ICache {
   has(Key: any): Promise<boolean>;
 }
 
+/**
+ * Implementation of ICache via Redis caching library.
+ */
 export class RedisCache implements ICache {
   theCache: RedisClient;
 
