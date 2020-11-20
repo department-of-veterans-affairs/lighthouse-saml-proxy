@@ -1,7 +1,15 @@
 require("jest");
 
 describe("pullDocumentByRefreshTokenStrategy tests", () => {
-  it("Delete this when Tests are created", () => {
+  it("Happy Path - Unhashed Token", () => {
     expect(true).toBe(true);
-  });
+  })
+
+  it("Happy Path - Hashed Token", () => {
+    expect(true).toBe(true);
+  })
+
+  it("Could not retrieve Token", () => {
+    expect(true).toBe(true);
+  })
 });
