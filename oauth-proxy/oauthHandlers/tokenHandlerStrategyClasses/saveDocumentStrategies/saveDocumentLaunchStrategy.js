@@ -20,13 +20,16 @@ class SaveDocumentLaunchStrategy {
           this.token_expires_on = this.assert_info.decodedJwt.exp;
         }
 
-        await this.dynamoClient.saveToDynamoAccessToken(
-          this.dynamo,
-          accessToken,
-          "launch",
-          launch,
+        let payload = {
+          access_token: accessToken,
+          launch: launch,
+          expires_on: this.token_expires_on,
+        };
+
+        await this.dynamoClient.savePayloadToDynamo(
+          this.config,
+          payload,
           this.config.dynamo_client_credentials_table,
-          this.token_expires_on
         );
       }
     } catch (error) {

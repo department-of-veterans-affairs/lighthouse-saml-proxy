@@ -145,16 +145,40 @@ function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
   });
 }
 
-function savePayloadToDynamo(client, payload, tableName) {
+function awsConfigFrom(config) {
+  let dynamoDbConfig =  Object.assign(
+    {},
+    { region: config.aws_region },
+    config.aws_id === null ? null : { accessKeyId: config.aws_id },
+    config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
+  );
+  
+  if (config.dynamo_local) {
+    dynamoDbConfig.endpoint = `http://${config.dynamo_local}`
+  }
+  return dynamoDbConfig;
+}
+
+function savePayloadToDynamo(config, payload, tableName) {
+  var awsConfig = awsConfigFrom(config);
+  var AWS = require("aws-sdk");
+  AWS.config.update({
+    awsConfig
+  });
+  var docClient = new AWS.DynamoDB.DocumentClient();
+
   var params = {
     TableName:tableName,
     Item:{
-      payload
     }
   };
 
+  Object.assign(params.Item, payload);
+
+
   return new Promise((resolve, reject) => {
-    client.put(params, (err, data) => {
+    
+    docClient.put(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
