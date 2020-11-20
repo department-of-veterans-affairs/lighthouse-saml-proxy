@@ -14,7 +14,7 @@ class PullDocumentByCodeStrategy {
 
     // Backwards compatability.
     // Remove after 42 Days of PR merge (DATE - Fill out before PR).
-    if (document != null) {
+    if (document == null) {
       this.logger.warn("Hashed Code not found. Searching for unhashed code.");
       document = await this.getDocumentDynamo(this.req.body.code);
     }

@@ -33,6 +33,6 @@ const getHashedDocument = async (document, tokens, config) => {
   return {
     state: hashString(document.state.S, config.hmac_secret),
     refresh_token: hashString(tokens.refresh_token, config.hmac_secret),
-  }
-}
+  };
+};
 module.exports = { SaveDocumentStateStrategy };

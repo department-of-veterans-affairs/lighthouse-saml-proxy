@@ -7,8 +7,8 @@ const {
 const {
   buildFakeDynamoClient,
   buildFakeLogger,
-  buildFakeConfig,
-} = require("./testUtils");
+  createFakeConfig,
+} = require("../testUtils");
 const MockExpressRequest = require("mock-express-request");
 
 const HMAC_SECRET = "secret";
@@ -36,7 +36,7 @@ let logger;
 let req;
 describe("pullDocumentByCodeStrategy tests", () => {
   beforeEach(() => {
-    config = buildFakeConfig();
+    config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
     dynamo = jest.mock();
     logger = buildFakeLogger();
@@ -64,10 +64,10 @@ describe("pullDocumentByCodeStrategy tests", () => {
     );
     let document = await strategy.pullDocumentFromDynamo();
     expect(document).toEqual({
-      state: STATE_HASH_PAIR[0],
-      code: CODE_HASH_PAIR[0],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[0],
+      state: { S: STATE_HASH_PAIR[0] },
+      code: { S: CODE_HASH_PAIR[0] },
+      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[0] },
+      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[0] },
     });
   });
 
@@ -88,14 +88,15 @@ describe("pullDocumentByCodeStrategy tests", () => {
     );
     let document = await strategy.pullDocumentFromDynamo();
     expect(document).toEqual({
-      state: STATE_HASH_PAIR[1],
-      code: CODE_HASH_PAIR[1],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[1],
+      state: { S: STATE_HASH_PAIR[1] },
+      code: { S: CODE_HASH_PAIR[1] },
+      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[1] },
+      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[1] },
     });
   });
 
   it("Could not retrieve Token", async () => {
+    dynamoClient = buildFakeDynamoClient({});
     let strategy = new PullDocumentByCodeStrategy(
       req,
       logger,
@@ -104,7 +105,7 @@ describe("pullDocumentByCodeStrategy tests", () => {
       config
     );
 
-    let document = strategy.pullDocumentFromDynamo();
-    expect(document).toBe(null);
+    let document = await strategy.pullDocumentFromDynamo();
+    expect(document).toEqual(undefined);
   });
 });

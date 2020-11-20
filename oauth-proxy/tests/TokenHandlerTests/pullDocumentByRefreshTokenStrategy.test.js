@@ -1,13 +1,13 @@
 require("jest");
 
 const {
-  PullDocumentByCodeStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByCodeStrategy");
+  PullDocumentByRefreshTokenStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
 
 const {
   buildFakeDynamoClient,
   buildFakeLogger,
-  buildFakeConfig,
+  createFakeConfig,
 } = require("../testUtils");
 const MockExpressRequest = require("mock-express-request");
 
@@ -36,9 +36,8 @@ let logger;
 let req;
 
 describe("pullDocumentByRefreshTokenStrategy tests", () => {
-  
   beforeEach(() => {
-    config = buildFakeConfig();
+    config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
     dynamo = jest.mock();
     logger = buildFakeLogger();
@@ -57,7 +56,7 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI_HASH_PAIR[0],
     });
 
-    let strategy = new PullDocumentByCodeStrategy(
+    let strategy = new PullDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
@@ -65,11 +64,12 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       config
     );
     let document = await strategy.pullDocumentFromDynamo();
+
     expect(document).toEqual({
-      state: STATE_HASH_PAIR[0],
-      code: CODE_HASH_PAIR[0],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[0],
+      state: { S: STATE_HASH_PAIR[0] },
+      code: { S: CODE_HASH_PAIR[0] },
+      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[0] },
+      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[0] },
     });
   });
 
@@ -81,7 +81,7 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI_HASH_PAIR[1],
     });
 
-    let strategy = new PullDocumentByCodeStrategy(
+    let strategy = new PullDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
@@ -89,16 +89,18 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       config
     );
     let document = await strategy.pullDocumentFromDynamo();
+
     expect(document).toEqual({
-      state: STATE_HASH_PAIR[1],
-      code: CODE_HASH_PAIR[1],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[1],
+      state: { S: STATE_HASH_PAIR[1] },
+      code: { S: CODE_HASH_PAIR[1] },
+      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[1] },
+      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[1] },
     });
   });
 
   it("Could not retrieve Token", async () => {
-    let strategy = new PullDocumentByCodeStrategy(
+    dynamoClient = buildFakeDynamoClient();
+    let strategy = new PullDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
@@ -106,7 +108,7 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       config
     );
 
-    let document = strategy.pullDocumentFromDynamo();
-    expect(document).toBe(null);
+    let document = await strategy.pullDocumentFromDynamo();
+    expect(document).toEqual(undefined);
   });
 });
