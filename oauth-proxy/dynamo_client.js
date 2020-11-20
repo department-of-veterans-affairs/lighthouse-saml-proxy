@@ -6,7 +6,6 @@
 // that will have to wait until we have a proper test suite in place.
 const AWS = require("aws-sdk");
 function createDynamoHandle(awsConfig, local) {
-
   let dynamoDb;
   if (local) {
     awsConfig.endpoint = `http://${local}`;
@@ -14,12 +13,12 @@ function createDynamoHandle(awsConfig, local) {
     dynamoDb = new AWS.DynamoDB({ endpoint: `http://${local}` });
     AWS.config.update({
       region: "us-west-2",
-      endpoint: `http://${local}`
+      endpoint: `http://${local}`,
     });
     dynamoDb.dbDocClient = new AWS.DynamoDB.DocumentClient();
   } else {
     AWS.config.update(awsConfig);
-    dynamoDb =  new AWS.DynamoDB();
+    dynamoDb = new AWS.DynamoDB();
     AWS.config.update(awsConfig);
     dynamoDb.dbDocClient = new AWS.DynamoDB.DocumentClient();
   }
@@ -157,39 +156,15 @@ function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
   });
 }
 
-function awsConfigFrom(config) {
-  let dynamoDbConfig =  Object.assign(
-    {},
-    { region: config.aws_region },
-    config.aws_id === null ? null : { accessKeyId: config.aws_id },
-    config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
-  );
-  
-  if (config.dynamo_local) {
-    dynamoDbConfig.endpoint = `http://${config.dynamo_local}`
-  }
-  return dynamoDbConfig;
-}
-
 function savePayloadToDynamo(dynamoDb, payload, tableName) {
-  // var awsConfig = awsConfigFrom(config);
-  var AWS = require("aws-sdk");
-  // AWS.config.update({
-  //   awsConfig
-  // });
-  // var docClient = new DynamoDB.DocumentClient();
-
   var params = {
-    TableName:tableName,
-    Item:{
-    }
+    TableName: tableName,
+    Item: {},
   };
 
   Object.assign(params.Item, payload);
 
-
   return new Promise((resolve, reject) => {
-    
     dynamoDb.dbDocClient.put(params, (err, data) => {
       if (err) {
         reject(err);

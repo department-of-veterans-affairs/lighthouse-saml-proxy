@@ -1,5 +1,12 @@
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, config, hashingFunction, assert_info) {
+  constructor(
+    logger,
+    dynamo,
+    dynamoClient,
+    config,
+    hashingFunction,
+    assert_info
+  ) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
@@ -29,7 +36,7 @@ class SaveDocumentLaunchStrategy {
         await this.dynamoClient.savePayloadToDynamo(
           this.dynamo,
           payload,
-          this.config.dynamo_client_credentials_table,
+          this.config.dynamo_client_credentials_table
         );
       }
     } catch (error) {
