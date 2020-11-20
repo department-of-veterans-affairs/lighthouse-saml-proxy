@@ -173,10 +173,12 @@ export const validateIdpResponse = (cache: ICache) => {
     const sessionIndex = req?.user?.authnContext?.sessionIndex;
     if (!sessionIndex) {
       logger.error("No session index found in the saml response.");
-      throw {
+      const err = {
         message: "Bad request.",
         status: 400,
       };
+      next(err);
+      //throw err;
     }
     let sessionIndexCached = null;
     sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
@@ -191,10 +193,9 @@ export const validateIdpResponse = (cache: ICache) => {
           sessionIndex +
           " was previously cached."
       );
-      throw {
-        message: "Bad request.",
-        status: 400,
-      };
+      const err = new Error("Bad request");
+      next(err);
+      //throw err;
     }
     await cache.set(sessionIndex, "");
     logger.info(

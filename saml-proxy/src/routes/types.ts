@@ -42,13 +42,10 @@ export class RedisCache implements ICache {
     const getAsync = promisify(this.theCache.get).bind(this.theCache);
     return getAsync(Key);
   }
-  has(Key: any): Promise<any> {
+  async has(Key: any): Promise<any> {
     const getAsync = promisify(this.theCache.get).bind(this.theCache);
-    return new Promise((resolve) => {
-      getAsync(Key).then((value) => {
-        resolve(value == undefined);
-      });
-    });
+    const val = await getAsync(Key);
+    return val != null;
   }
   constructor() {
     this.theCache = Redis.createClient();
