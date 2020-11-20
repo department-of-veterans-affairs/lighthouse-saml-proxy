@@ -94,7 +94,6 @@ tableParams = {
   AttributeDefinitions: [
     { AttributeName: "access_token", AttributeType: "S" },
     { AttributeName: "launch", AttributeType: "S" },
-    { AttributeName: "expires_on", AttributeType: "N" },
   ],
   KeySchema: [{ AttributeName: "access_token", KeyType: "HASH" }],
   ProvisionedThroughput: {
@@ -107,22 +106,6 @@ tableParams = {
       KeySchema: [
         {
           AttributeName: "launch",
-          KeyType: "HASH",
-        },
-      ],
-      Projection: {
-        ProjectionType: "ALL",
-      },
-      ProvisionedThroughput: {
-        ReadCapacityUnits: 10,
-        WriteCapacityUnits: 10,
-      },
-    },
-    {
-      IndexName: "oauth_expires_on_index",
-      KeySchema: [
-        {
-          AttributeName: "expires_on",
           KeyType: "HASH",
         },
       ],
