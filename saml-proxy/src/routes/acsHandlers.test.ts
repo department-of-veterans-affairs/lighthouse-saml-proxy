@@ -268,7 +268,6 @@ describe("validateIdpResponse", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
-    let thrownError = null;
     const req = {
       vetsAPIClient: client,
       user: {
@@ -280,21 +279,20 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache);
-    await validateFn(req, {}, nextFn);
-    try {
-      await validateFn(req, {}, nextFn);
-    } catch (err) {
-      thrownError = err;
-    }
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
 
-    expect(thrownError.message === "Bad request.");
-    expect(thrownError.status === 400);
+    expect(nextFn).toHaveBeenCalledTimes(2);
+    expect(nextFn.mock.calls[1].toString() == "Error: Bad request");
   });
 
-  it("should throw an error with status code 400 for a saml response with no session index", async () => {
+  it("should throw an error when processing a saml response with no session index", async () => {
     const nextFn = jest.fn();
     const cache = new TestCache();
-    let thrownError = null;
     const req = {
       vetsAPIClient: client,
       user: {
@@ -304,13 +302,11 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache);
-    try {
-      await validateFn(req, {}, nextFn);
-    } catch (err) {
-      thrownError = err;
-    }
-    // For expect sytax explination checkout https://github.com/facebook/jest/issues/1700
-    expect(thrownError.message === "Bad request.");
-    expect(thrownError.status === 400);
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
+
+    expect(nextFn).toHaveBeenCalledTimes(1);
+    expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
   });
 });
