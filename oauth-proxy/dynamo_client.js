@@ -10,16 +10,18 @@ function createDynamoHandle(awsConfig, local) {
   let dynamoDb;
   if (local) {
     awsConfig.endpoint = `http://${local}`;
+    AWS.config.update(awsConfig);
     dynamoDb = new AWS.DynamoDB({ endpoint: `http://${local}` });
     AWS.config.update({
       region: "us-west-2",
       endpoint: `http://${local}`
     });
-    dynamoDb.docClient = new AWS.DynamoDB.DocumentClient();
+    dynamoDb.dbDocClient = new AWS.DynamoDB.DocumentClient();
   } else {
     AWS.config.update(awsConfig);
     dynamoDb =  new AWS.DynamoDB();
-    dynamoDb.docClient = new AWS.DynamoDB.DocumentClient();
+    AWS.config.update(awsConfig);
+    dynamoDb.dbDocClient = new AWS.DynamoDB.DocumentClient();
   }
 
   return dynamoDb;
@@ -188,7 +190,7 @@ function savePayloadToDynamo(dynamoDb, payload, tableName) {
 
   return new Promise((resolve, reject) => {
     
-    dynamoDb.docClient.put(params, (err, data) => {
+    dynamoDb.dbDocClient.put(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
