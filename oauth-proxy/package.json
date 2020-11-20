@@ -66,11 +66,15 @@
     "yargs": "^15.3.1"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.12.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-private-methods": "^7.12.1",
     "axios-mock-adapter": "^1.19.0",
     "babel-eslint": "^10.1.0",
     "crypto": "^1.0.1",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.4.0",
     "mock-express-request": "^0.2.2",

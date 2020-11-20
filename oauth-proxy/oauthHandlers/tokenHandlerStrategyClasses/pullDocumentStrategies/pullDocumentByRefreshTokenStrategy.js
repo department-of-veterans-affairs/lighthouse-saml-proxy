@@ -7,12 +7,25 @@ class PullDocumentByRefreshTokenStrategy {
     this.config = config;
   }
   async pullDocumentFromDynamo() {
+    let hashedCode = hashString(this.req.body.code, this.config.hmac_secret);
+    let document = await this.getDocumentDynamo(hashedCode);
+
+    // Backwards compatability.
+    // Remove after 42 Days of PR merge (DATE - Fill out before PR).
+    if (document != null) {
+      this.logger.warn("Hashed Refresh Token not found. Searching for unhashed code.");
+      document = await this.getDocumentDynamo(this.req.body.code);
+    }
+    return document;
+  }
+
+  async getDocumentDynamo(refresh_token) {
     let document;
     try {
       document = await this.dynamoClient.getFromDynamoBySecondary(
         this.dynamo,
         "refresh_token",
-        this.req.body.refresh_token,
+        refresh_token,
         this.config.dynamo_table_name
       );
     } catch (error) {

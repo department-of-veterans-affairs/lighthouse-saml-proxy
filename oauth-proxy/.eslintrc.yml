@@ -1,3 +1,4 @@
+parser: babel-eslint
 env:
   node: true
   commonjs: true
@@ -9,7 +10,6 @@ extends:
 plugins:
   - prettier
   - jest
-parser: "babel-eslint"
 parserOptions:
   ecmaVersion: 11
 rules:
