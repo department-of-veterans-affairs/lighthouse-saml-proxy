@@ -114,7 +114,7 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
-function saveToDynamoAccessToken(client, accessToken, key, value, TableName, expires_on) {
+function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
       "#K": key,
@@ -134,12 +134,27 @@ function saveToDynamoAccessToken(client, accessToken, key, value, TableName, exp
     TableName,
   };
 
-  if (expires_on) {
-    params.ExpressionAttributeValues.expires_on = expires_on;
-  }
-
   return new Promise((resolve, reject) => {
     client.updateItem(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+function savePayloadToDynamo(client, payload, tableName) {
+  var params = {
+    TableName:tableName,
+    Item:{
+      payload
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    client.put(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -156,4 +171,5 @@ module.exports = {
   getFromDynamoByAccessToken,
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
+  savePayloadToDynamo,
 };
