@@ -177,8 +177,8 @@ export const validateIdpResponse = (cache: ICache) => {
         message: "Bad request.",
         status: 400,
       };
-      next(err);
-      //throw err;
+      //next(err);
+      throw err;
     }
     let sessionIndexCached = null;
     sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
@@ -194,8 +194,8 @@ export const validateIdpResponse = (cache: ICache) => {
           " was previously cached."
       );
       const err = new Error("Bad request");
-      next(err);
-      //throw err;
+      //next(err);
+      throw err;
     }
     await cache.set(sessionIndex, "");
     logger.info(
