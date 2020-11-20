@@ -12,6 +12,7 @@ const {
   buildFakeDynamoClient,
   buildFakeOktaClient,
   buildFakeGetAuthorizationServerInfoResponse,
+  createFakeConfig,
 } = require("./testUtils");
 const getAuthorizationServerInfoMock = jest.fn();
 
@@ -30,7 +31,7 @@ let req;
 let res;
 
 beforeEach(() => {
-  config = jest.mock();
+  config = createFakeConfig();
   redirect_uri = jest.mock();
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
