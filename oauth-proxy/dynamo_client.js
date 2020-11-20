@@ -4,15 +4,25 @@
 // construct a DynamoDB handle and methods to use that handle. It should
 // probably export an object that ties methods to a particular handle. Alas
 // that will have to wait until we have a proper test suite in place.
-const { config, DynamoDB } = require("aws-sdk");
-
+const AWS = require("aws-sdk");
 function createDynamoHandle(awsConfig, local) {
-  config.update(awsConfig);
 
+  let dynamoDb;
   if (local) {
-    return new DynamoDB({ endpoint: `http://${local}` });
+    awsConfig.endpoint = `http://${local}`;
+    dynamoDb = new AWS.DynamoDB({ endpoint: `http://${local}` });
+    AWS.config.update({
+      region: "us-west-2",
+      endpoint: `http://${local}`
+    });
+    dynamoDb.docClient = new AWS.DynamoDB.DocumentClient();
+  } else {
+    AWS.config.update(awsConfig);
+    dynamoDb =  new AWS.DynamoDB();
+    dynamoDb.docClient = new AWS.DynamoDB.DocumentClient();
   }
-  return new DynamoDB();
+
+  return dynamoDb;
 }
 
 function getFromDynamoBySecondary(client, key, value, TableName) {
@@ -159,13 +169,13 @@ function awsConfigFrom(config) {
   return dynamoDbConfig;
 }
 
-function savePayloadToDynamo(config, payload, tableName) {
-  var awsConfig = awsConfigFrom(config);
+function savePayloadToDynamo(dynamoDb, payload, tableName) {
+  // var awsConfig = awsConfigFrom(config);
   var AWS = require("aws-sdk");
-  AWS.config.update({
-    awsConfig
-  });
-  var docClient = new AWS.DynamoDB.DocumentClient();
+  // AWS.config.update({
+  //   awsConfig
+  // });
+  // var docClient = new DynamoDB.DocumentClient();
 
   var params = {
     TableName:tableName,
@@ -178,7 +188,7 @@ function savePayloadToDynamo(config, payload, tableName) {
 
   return new Promise((resolve, reject) => {
     
-    docClient.put(params, (err, data) => {
+    dynamoDb.docClient.put(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
