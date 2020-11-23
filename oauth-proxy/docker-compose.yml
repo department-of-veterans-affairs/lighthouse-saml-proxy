@@ -4,6 +4,7 @@ services:
     image: amazon/dynamodb-local
     ports:
       - 8000:8000
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
   dynamodb-migration:
     image: node:alpine
     depends_on:

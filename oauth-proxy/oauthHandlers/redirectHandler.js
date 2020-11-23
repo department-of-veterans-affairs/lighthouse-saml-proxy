@@ -25,7 +25,7 @@ const redirectHandler = async (
     try {
       await dynamoClient.saveToDynamo(
         dynamo,
-        hashString(state, config.hmac_secret),
+        state,
         "code",
         hashString(req.query.code, config.hmac_secret),
         config.dynamo_table_name
@@ -37,28 +37,14 @@ const redirectHandler = async (
       );
     }
   }
-  let document;
+
   try {
-    document = await dynamoClient.getFromDynamoByState(
+    let document = await dynamoClient.getFromDynamoByState(
       dynamo,
-      hashString(state, config.hmac_secret),
+      state,
       config.dynamo_table_name
     );
-  } catch {
-    console.log(
-      "Could not fetch hashed token. Will attempt to fetch unhashed token."
-    );
-  }
-  try {
-    // Backwards compatability.
-    // Remove after 42 Days of PR merge (DATE - Fill out before PR).
-    if (document == null) {
-      document = await dynamoClient.getFromDynamoByState(
-        dynamo,
-        state,
-        config.dynamo_table_name
-      );
-    }
+    
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`);
