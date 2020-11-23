@@ -1,6 +1,5 @@
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
-const { hashString } = require("../utils");
 
 const authorizeHandler = async (
   config,
@@ -53,7 +52,7 @@ const authorizeHandler = async (
   try {
     await dynamoClient.saveToDynamo(
       dynamo,
-      state, config.hmac_secret,
+      state,
       "redirect_uri",
       client_redirect,
       config.dynamo_table_name

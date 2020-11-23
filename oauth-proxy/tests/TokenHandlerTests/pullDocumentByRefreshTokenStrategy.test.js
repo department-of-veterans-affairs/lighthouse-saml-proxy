@@ -12,10 +12,7 @@ const {
 const MockExpressRequest = require("mock-express-request");
 
 const HMAC_SECRET = "secret";
-const STATE_HASH_PAIR = [
-  "abc123",
-  "abc123",
-];
+const STATE_HASH_PAIR = ["abc123", "abc123"];
 const CODE_HASH_PAIR = [
   "the_fake_authorization_code",
   "9daf298b2cb68502791f6f264aef8ebb56dc0ddd3542fbd1c4bd675538fd9cb8",
