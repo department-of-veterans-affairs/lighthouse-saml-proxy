@@ -29,9 +29,9 @@ class SaveDocumentStateStrategy {
   }
 }
 
-const getHashedDocument = async (document, tokens, config) => {
+const getHashedDocument = (document, tokens, config) => {
   return {
-    state: hashString(document.state.S, config.hmac_secret),
+    state: document.state.S,
     refresh_token: hashString(tokens.refresh_token, config.hmac_secret),
   };
 };
