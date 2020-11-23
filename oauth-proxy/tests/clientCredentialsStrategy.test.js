@@ -1,4 +1,6 @@
 require("jest");
+const jwt  = require('njwt')
+const fs   = require('fs');
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
@@ -42,11 +44,16 @@ describe("tokenHandler clientCredentials", () => {
       },
     });
 
+    const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_sub', jti: 'ut_jti' }
+    const privateKey = fs.readFileSync('./ut_key', 'utf8');
+    const encodedClaims = jwt.create(claims, privateKey, 'RS256')
+    encodedClaims.setExpiration(new Date().getTime() + 300*1000)
+
     const data = {
       token_type: "Bearer",
       expires_in: 3600,
       access_token:
-        "eyJraWQiOiIzZkJCV0trc2JfY2ZmRGtYbVlSbmN1dGNtamFFMEFjeVdkdWFZc1NVa3o4IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULnBwTUFxTG9UZ2VGamlCdUVnbmE0eWpCUGMzQWtUTndjRS1mVlgxVm4wVGMiLCJpc3MiOiJodHRwczovL2RlcHR2YS1ldmFsLm9rdGEuY29tL29hdXRoMi9hdXM4amExNXp6YjNwM21uWTJwNyIsImF1ZCI6Imh0dHBzOi8vc2FuZGJveC1hcGkudmEuZ292L3NlcnZpY2VzL2NjIiwiaWF0IjoxNjA0MzY5NDMxLCJleHAiOjE2MDQzNzMwMzEsImNpZCI6IjBvYThvNzlsM2pXMFd6WjFMMnA3Iiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sInN1YiI6IjBvYThvNzlsM2pXMFd6WjFMMnA3IiwiYWJjIjoiMTIzIiwidGVzdCI6IjEyMyJ9.d4xtIXW4vmJIZoqdUu3UDr2jeQ0Boveibl-6qfvbjI9ETPvw8ZCiXtqqokUoZ3G2M6g1ZN6WOFlDTCFQc85qWGpLDT3VVNLmgML-26faC3Enj7fGSeJQKDOkwriGLr9Ep6upZm2Tl5dZFjeRseSHLA50YkVz1U55NH9fKT5Vsp4Ew9lllEqQs3-S0gGsiUBxGkvC7VGlsy8fXBYXd1e8T20Jw1hKyu4jSpS74gqSxhu_m0x_Aa7gUjF_A5irVv0xiVqxPdOnfN1od8JI0KnMYDgGzLgFrVft83cVD8imHUj_TvbTKehF-72-3jz3pg8a_vLu2Ld4Opzflk6J4ut-2w",
+      encodedClaims,
       scope: "launch/patient",
     };
     mock.onPost(token_endpoint).reply(200, data);
@@ -88,7 +95,8 @@ describe("tokenHandler clientCredentials", () => {
       logger,
       dynamo,
       dynamoClient,
-      token_endpoint
+      token_endpoint,
+      {}
     );
 
     try {
@@ -182,7 +190,7 @@ describe("tokenHandler clientCredentials", () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL3V0L3YxL3Rva2VuIiwiaXNzIjoidXRfaXNzIiwic3ViIjoidXRfc3ViIiwianRpIjoiOTdiN2ZkZjAtMmRjZi0xMWViLTkxOTAtMTk0M2IxMDE4NjczIiwiaWF0IjoxNjA2MTY1NTE5LCJleHAiOjE2MDYxNjU4MTl9.G_33TMKNTgH2HBTpq2Ir5KVYJIkB_3TDidhukBWSdOxEe1THZMwaCgCh4hfgYEPS_ttKBttYo5Zfe40G8sthUKHHHxj3_Ly8tHxkiRTmyRT_aDUXjMsPOLQB3aIf0o4bo8RmtSJc8ev7gk-tDdZHDFL1MYQFbr_DwbWsZIvOeocQ6T9Fk1S0ACTaeXZFV3ZiFU3iE-oS91VcsPDEZE-X7wZ-hbDYv2N3lRIihqIYKXTjPLo3d-MMJ4L3ssavmVchlKy9-D58pmQA9sIfzSk9p0Ip2UXJtPiWsY5qFuuFqgTCwrXNnX5qaCRHHmU03cqLHLmcJwKSo9PymAhpcd-AHA",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",

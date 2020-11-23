@@ -27,14 +27,14 @@ describe("dynamo client tests", () => {
     let awsConfig = {};
     let local  = "local";
 
-    let dynamoDb = dynamoclient.createDynamoHandle(awsConfig, local);
-    const payload = {
-      body: {
-        access_token: "utaccesstoken",
-        launch: "uttestlaunch",
-        expire_time: 36000
-      },
-    };
+    // let dynamoDb = dynamoclient.createDynamoHandle(awsConfig, local);
+    // const payload = {
+    //   body: {
+    //     access_token: "utaccesstoken",
+    //     launch: "uttestlaunch",
+    //     expire_time: 36000
+    //   },
+    // };
 
     // let result = dynamoclient.savePayloadToDynamo(
     //   dynamoDb,

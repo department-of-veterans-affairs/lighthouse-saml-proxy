@@ -53,7 +53,7 @@ describe("tokenHandler clientCredentials", () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL3V0L3YxL3Rva2VuIiwiaXNzIjoidXRfaXNzIiwic3ViIjoidXRfc3ViIiwianRpIjoiOTdiN2ZkZjAtMmRjZi0xMWViLTkxOTAtMTk0M2IxMDE4NjczIiwiaWF0IjoxNjA2MTY1NTE5LCJleHAiOjE2MDYxNjU4MTl9.G_33TMKNTgH2HBTpq2Ir5KVYJIkB_3TDidhukBWSdOxEe1THZMwaCgCh4hfgYEPS_ttKBttYo5Zfe40G8sthUKHHHxj3_Ly8tHxkiRTmyRT_aDUXjMsPOLQB3aIf0o4bo8RmtSJc8ev7gk-tDdZHDFL1MYQFbr_DwbWsZIvOeocQ6T9Fk1S0ACTaeXZFV3ZiFU3iE-oS91VcsPDEZE-X7wZ-hbDYv2N3lRIihqIYKXTjPLo3d-MMJ4L3ssavmVchlKy9-D58pmQA9sIfzSk9p0Ip2UXJtPiWsY5qFuuFqgTCwrXNnX5qaCRHHmU03cqLHLmcJwKSo9PymAhpcd-AHA",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
