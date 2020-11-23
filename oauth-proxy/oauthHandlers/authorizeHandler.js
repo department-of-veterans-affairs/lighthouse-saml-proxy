@@ -55,7 +55,7 @@ const authorizeHandler = async (
       dynamo,
       hashString(state, config.hmac_secret),
       "redirect_uri",
-      client_redirect, config.hmac_secret,
+      client_redirect,
       config.dynamo_table_name
     );
   } catch (error) {
