@@ -14,7 +14,7 @@ const MockExpressRequest = require("mock-express-request");
 const HMAC_SECRET = "secret";
 const STATE_HASH_PAIR = [
   "abc123",
-  "5ae5ac802a1a5c94fb683e1bfa121f9f700a26995213ff2fc1c503eb43ec71c6",
+  "abc123",
 ];
 const CODE_HASH_PAIR = [
   "the_fake_authorization_code",
@@ -26,7 +26,7 @@ const REFRESH_TOKEN_HASH_PAIR = [
 ];
 const REDIRECT_URI_HASH_PAIR = [
   "http://localhost/thisDoesNotMatter",
-  "546aac15121c5a4ab9ffa9cac0c69afaef0875793c5ece478b303c6f50234284",
+  "http://localhost/thisDoesNotMatter",
 ];
 
 let dynamoClient;
