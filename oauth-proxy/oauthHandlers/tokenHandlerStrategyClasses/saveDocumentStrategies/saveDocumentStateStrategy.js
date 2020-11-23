@@ -10,7 +10,7 @@ class SaveDocumentStateStrategy {
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
-      if (document.state && document.refresh_token) {
+      if (document.state && tokens.refresh_token) {
         let hashedDocument = getHashedDocument(document, tokens, this.config);
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
