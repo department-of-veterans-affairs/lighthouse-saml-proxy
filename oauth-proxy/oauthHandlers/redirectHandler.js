@@ -44,7 +44,7 @@ const redirectHandler = async (
       state,
       config.dynamo_table_name
     );
-    
+
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`);
