@@ -32,7 +32,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
   });
 
   it("happy path", async () => {
-    const saveToDynamoAccessTokenCalledWith = {};
+    const savePayloadToDynamoCalledWith = {};
 
     const mockDynamo = {};
     const mockHashingFunction = () => {
@@ -40,12 +40,10 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     };
     const mockLogger = { error: () => {} };
     const mockDynamoClient = {
-      saveToDynamoAccessToken: (client, accessToken, key, value, TableName) => {
-        saveToDynamoAccessTokenCalledWith.client = client;
-        saveToDynamoAccessTokenCalledWith.accessToken = accessToken;
-        saveToDynamoAccessTokenCalledWith.key = key;
-        saveToDynamoAccessTokenCalledWith.value = value;
-        saveToDynamoAccessTokenCalledWith.TableName = TableName;
+      savePayloadToDynamo: (dynamohandle, payload, TableName) => {
+        savePayloadToDynamoCalledWith.dynamohandle = dynamohandle;
+        savePayloadToDynamoCalledWith.payload = payload;
+        savePayloadToDynamoCalledWith.TableName = TableName;
         return new Promise((resolve) => {
           resolve(true);
         });
@@ -69,13 +67,12 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     await strategy.saveDocumentToDynamo(document, tokens);
 
     // Expect saveToDynamoAccessToken to have been called with the correct values
-    expect(saveToDynamoAccessTokenCalledWith.client).toBe(mockDynamo);
-    expect(saveToDynamoAccessTokenCalledWith.accessToken).toBe(
+    expect(savePayloadToDynamoCalledWith.dynamohandle).toBe(mockDynamo);
+    expect(savePayloadToDynamoCalledWith.payload.access_token).toBe(
       mockHashingFunction()
     );
-    expect(saveToDynamoAccessTokenCalledWith.key).toBe("launch");
-    expect(saveToDynamoAccessTokenCalledWith.value).toBe(document.launch.S);
-    expect(saveToDynamoAccessTokenCalledWith.TableName).toBe(
+    expect(savePayloadToDynamoCalledWith.payload.launch).toBe(document.launch.S);
+    expect(savePayloadToDynamoCalledWith.TableName).toBe(
       config.dynamo_client_credentials_table
     );
   });
