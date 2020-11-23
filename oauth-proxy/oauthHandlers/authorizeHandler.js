@@ -53,7 +53,7 @@ const authorizeHandler = async (
   try {
     await dynamoClient.saveToDynamo(
       dynamo,
-      hashString(state, config.hmac_secret),
+      state, config.hmac_secret,
       "redirect_uri",
       client_redirect,
       config.dynamo_table_name
