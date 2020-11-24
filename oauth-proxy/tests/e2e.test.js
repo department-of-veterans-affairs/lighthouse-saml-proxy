@@ -6,7 +6,7 @@ const qs = require("qs");
 const { Issuer } = require("openid-client");
 const { randomBytes } = require("crypto");
 
-const { convertObjectToDynamoAttributeValues } = require("./testUtils");
+const { convertObjectToDynamoAttributeValues, jwtEncodeClaims } = require("./testUtils");
 const {
   buildBackgroundServerModule,
 } = require("../../common/backgroundServer");
@@ -426,11 +426,20 @@ describe("OpenID Connect Conformance", () => {
   });
 
   it("returns an OIDC conformant token response to client_credentials", async () => {
+    const claims = {
+      aud: "https://ut/v1/token",
+      iss: "ut_iss",
+      sub: "ut_sub",
+      jti: "ut_jti",
+    };
+    const expire_on = new Date().getTime() + 300 * 1000;
+    const encodedClaims = jwtEncodeClaims(claims, expire_on);
+
     const resp = await axios.post(
       "http://localhost:9090/testServer/token",
       qs.stringify({
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: encodedClaims,
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -731,7 +740,6 @@ describe("OpenID Connect Conformance", () => {
         expect(true).toEqual(false); // Don't expect to be here
       })
       .catch((err) => {
-        console.error(err);
         expect(err.response.status).toEqual(401);
       });
   });
