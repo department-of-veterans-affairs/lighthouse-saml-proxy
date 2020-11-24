@@ -30,8 +30,11 @@ class SaveDocumentLaunchStrategy {
         let payload = {
           access_token: accessToken,
           launch: launch,
-          expires_on: this.token_expires_on,
         };
+
+        if (this.token_expires_on) {
+          payload.expires_on = this.token_expires_on;
+        }
 
         await this.dynamoClient.savePayloadToDynamo(
           this.dynamo,

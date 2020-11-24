@@ -24,7 +24,8 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       null,
       mockDynamoClient,
       null,
-      null
+      null,
+      {}
     );
     await strategy.saveDocumentToDynamo(document, null);
 
@@ -91,7 +92,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       return "hash";
     };
     const mockDynamoClient = {
-      saveToDynamoAccessToken: () => {
+      savePayloadToDynamo: () => {
         throw expectedError;
       },
     };
@@ -106,8 +107,9 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       mockLogger,
       null,
       mockDynamoClient,
-      config,
-      mockHashingFunction
+      config, 
+      mockHashingFunction,
+      {}
     );
     await strategy.saveDocumentToDynamo(document, tokens);
 
