@@ -45,14 +45,14 @@ describe("tokenHandler clientCredentials", () => {
     });
 
     const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_sub', jti: 'ut_jti' }
-    const privateKey = fs.readFileSync('./tests/ut_key', 'utf8');
+    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
     const encodedClaims = jwt.create(claims, privateKey, 'RS256')
     encodedClaims.setExpiration(new Date().getTime() + 300*1000)
 
     const data = {
       token_type: "Bearer",
       expires_in: 3600,
-      access_token: encodedClaims,
+      access_token: encodedClaims.compact(),
       scope: "launch/patient",
     };
     mock.onPost(token_endpoint).reply(200, data);
@@ -72,14 +72,14 @@ describe("tokenHandler clientCredentials", () => {
 
   it("handles invalid client_credentials request invalid_client", async () => {
     const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_invalid', jti: 'ut_invalid' }
-    const privateKey = fs.readFileSync('./tests/ut_key', 'utf8');
+    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
     const encodedClaims = jwt.create(claims, privateKey, 'RS256')
     encodedClaims.setExpiration(new Date().getTime() + 300*1000)
 
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: encodedClaims,
+        client_assertion: encodedClaims.compact(),
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -116,10 +116,14 @@ describe("tokenHandler clientCredentials", () => {
   });
 
   it("handles invalid client_credentials request expired assertion", async () => {
+    const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_invalid', jti: 'ut_invalid' }
+    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
+    const encodedClaims = jwt.create(claims, privateKey, 'RS256')
+    encodedClaims.setExpiration(new Date().getTime() - 1); // expired
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "expired-assertion",
+        client_assertion: encodedClaims.compact(),
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -140,7 +144,8 @@ describe("tokenHandler clientCredentials", () => {
       logger,
       dynamo,
       dynamoClient,
-      token_endpoint
+      token_endpoint,
+      {}
     );
 
     try {
