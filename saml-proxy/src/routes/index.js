@@ -10,7 +10,6 @@ import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from "uuid/v4";
 import rTracer from "cls-rtracer";
 import { RedisCache } from "./types";
-
 import {
   loggingMiddleware as morganMiddleware,
   winstonMiddleware,

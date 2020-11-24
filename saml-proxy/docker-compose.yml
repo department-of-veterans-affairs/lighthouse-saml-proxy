@@ -1,5 +1,11 @@
 version: '2.1'
 services:
+  redis:
+    image: redis
+    networks: 
+      - 'default'
+    expose:
+      - '6379'
   saml-proxy:
     build:
       context: ../.

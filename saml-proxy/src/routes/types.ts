@@ -47,8 +47,8 @@ export class RedisCache implements ICache {
     const val = await getAsync(Key);
     return val != null;
   }
-  constructor() {
-    this.theCache = Redis.createClient();
+  constructor(redisPort: number, redisHost: string) {
+    this.theCache = Redis.createClient(redisPort, redisHost);
   }
 }
 
