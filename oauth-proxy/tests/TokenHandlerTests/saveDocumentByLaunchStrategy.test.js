@@ -72,7 +72,9 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     expect(savePayloadToDynamoCalledWith.payload.access_token).toBe(
       mockHashingFunction()
     );
-    expect(savePayloadToDynamoCalledWith.payload.launch).toBe(document.launch.S);
+    expect(savePayloadToDynamoCalledWith.payload.launch).toBe(
+      document.launch.S
+    );
     expect(savePayloadToDynamoCalledWith.TableName).toBe(
       config.dynamo_client_credentials_table
     );
@@ -107,7 +109,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       mockLogger,
       null,
       mockDynamoClient,
-      config, 
+      config,
       mockHashingFunction,
       {}
     );

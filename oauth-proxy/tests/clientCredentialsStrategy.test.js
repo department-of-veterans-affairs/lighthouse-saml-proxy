@@ -1,10 +1,8 @@
 require("jest");
-const jwt  = require('njwt')
-const fs   = require('fs');
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
-const { buildFakeDynamoClient } = require("./testUtils");
+const { buildFakeDynamoClient, jwtEncodeClaims } = require("./testUtils");
 const {
   ClientCredentialsStrategy,
 } = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
@@ -44,15 +42,19 @@ describe("tokenHandler clientCredentials", () => {
       },
     });
 
-    const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_sub', jti: 'ut_jti' }
-    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
-    const encodedClaims = jwt.create(claims, privateKey, 'RS256')
-    encodedClaims.setExpiration(new Date().getTime() + 300*1000)
+    const claims = {
+      aud: "https://ut/v1/token",
+      iss: "ut_iss",
+      sub: "ut_sub",
+      jti: "ut_jti",
+    };
+    const expire_on = new Date().getTime() + 300 * 1000;
+    const encodedClaims = jwtEncodeClaims(claims, expire_on);
 
     const data = {
       token_type: "Bearer",
       expires_in: 3600,
-      access_token: encodedClaims.compact(),
+      access_token: encodedClaims,
       scope: "launch/patient",
     };
     mock.onPost(token_endpoint).reply(200, data);
@@ -62,8 +64,7 @@ describe("tokenHandler clientCredentials", () => {
       logger,
       dynamo,
       dynamoClient,
-      token_endpoint,
-    
+      token_endpoint
     );
 
     let token = await clientCredentialsStrategy.getTokenResponse();
@@ -71,15 +72,19 @@ describe("tokenHandler clientCredentials", () => {
   });
 
   it("handles invalid client_credentials request invalid_client", async () => {
-    const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_invalid', jti: 'ut_invalid' }
-    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
-    const encodedClaims = jwt.create(claims, privateKey, 'RS256')
-    encodedClaims.setExpiration(new Date().getTime() + 300*1000)
+    const claims = {
+      aud: "https://ut/v1/token",
+      iss: "ut_iss",
+      sub: "ut_invalid",
+      jti: "ut_invalid",
+    };
+    const expire_on = new Date().getTime() + 300 * 1000;
+    const encodedClaims = jwtEncodeClaims(claims, expire_on);
 
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: encodedClaims.compact(),
+        client_assertion: encodedClaims,
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -116,14 +121,18 @@ describe("tokenHandler clientCredentials", () => {
   });
 
   it("handles invalid client_credentials request expired assertion", async () => {
-    const claims = { aud: 'https://ut/v1/token', iss: 'ut_iss', sub: 'ut_invalid', jti: 'ut_invalid' }
-    const privateKey = fs.readFileSync('./tests/ut_key.pem', 'utf8');
-    const encodedClaims = jwt.create(claims, privateKey, 'RS256')
-    encodedClaims.setExpiration(new Date().getTime() - 1); // expired
+    const claims = {
+      aud: "https://ut/v1/token",
+      iss: "ut_iss",
+      sub: "ut_invalid",
+      jti: "ut_invalid",
+    };
+    const expire_on = new Date().getTime() - 1; // expired
+    const encodedClaims = jwtEncodeClaims(claims, expire_on);
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: encodedClaims.compact(),
+        client_assertion: encodedClaims,
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -188,6 +197,7 @@ describe("tokenHandler clientCredentials", () => {
 
     try {
       await clientCredentialsStrategy.getTokenResponse();
+      expect(false).toEqual(true); // fail if this spot is reached
     } catch (error) {
       expect(error.statusCode).toEqual(500);
       expect(logger.error).toHaveBeenCalledWith({
@@ -200,7 +210,8 @@ describe("tokenHandler clientCredentials", () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL3V0L3YxL3Rva2VuIiwiaXNzIjoidXRfaXNzIiwic3ViIjoidXRfc3ViIiwianRpIjoiOTdiN2ZkZjAtMmRjZi0xMWViLTkxOTAtMTk0M2IxMDE4NjczIiwiaWF0IjoxNjA2MTY1NTE5LCJleHAiOjE2MDYxNjU4MTl9.G_33TMKNTgH2HBTpq2Ir5KVYJIkB_3TDidhukBWSdOxEe1THZMwaCgCh4hfgYEPS_ttKBttYo5Zfe40G8sthUKHHHxj3_Ly8tHxkiRTmyRT_aDUXjMsPOLQB3aIf0o4bo8RmtSJc8ev7gk-tDdZHDFL1MYQFbr_DwbWsZIvOeocQ6T9Fk1S0ACTaeXZFV3ZiFU3iE-oS91VcsPDEZE-X7wZ-hbDYv2N3lRIihqIYKXTjPLo3d-MMJ4L3ssavmVchlKy9-D58pmQA9sIfzSk9p0Ip2UXJtPiWsY5qFuuFqgTCwrXNnX5qaCRHHmU03cqLHLmcJwKSo9PymAhpcd-AHA",
+        client_assertion:
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJodHRwczovL3V0L3YxL3Rva2VuIiwiaXNzIjoidXRfaXNzIiwic3ViIjoidXRfc3ViIiwianRpIjoiOTdiN2ZkZjAtMmRjZi0xMWViLTkxOTAtMTk0M2IxMDE4NjczIiwiaWF0IjoxNjA2MTY1NTE5LCJleHAiOjE2MDYxNjU4MTl9.G_33TMKNTgH2HBTpq2Ir5KVYJIkB_3TDidhukBWSdOxEe1THZMwaCgCh4hfgYEPS_ttKBttYo5Zfe40G8sthUKHHHxj3_Ly8tHxkiRTmyRT_aDUXjMsPOLQB3aIf0o4bo8RmtSJc8ev7gk-tDdZHDFL1MYQFbr_DwbWsZIvOeocQ6T9Fk1S0ACTaeXZFV3ZiFU3iE-oS91VcsPDEZE-X7wZ-hbDYv2N3lRIihqIYKXTjPLo3d-MMJ4L3ssavmVchlKy9-D58pmQA9sIfzSk9p0Ip2UXJtPiWsY5qFuuFqgTCwrXNnX5qaCRHHmU03cqLHLmcJwKSo9PymAhpcd-AHA",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",

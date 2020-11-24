@@ -1,4 +1,6 @@
 const { RequestError } = require("request-promise-native/errors");
+const jwt = require("njwt");
+const fs = require("fs");
 
 function buildDynamoAttributeValue(value) {
   // BEWARE: This doesn't work with number sets and a few other Dynamo types.
@@ -217,6 +219,13 @@ const buildExpiredRefreshTokenClient = () => {
   });
 };
 
+const jwtEncodeClaims = (claims, expires_on) => {
+  const privateKey = fs.readFileSync("./tests/ut_key.pem", "utf8");
+  const encodedClaims = jwt.create(claims, privateKey, "RS256");
+  encodedClaims.setExpiration(expires_on);
+  return encodedClaims.compact();
+};
+
 module.exports = {
   buildDynamoAttributeValue,
   convertObjectToDynamoAttributeValues,
@@ -226,4 +235,5 @@ module.exports = {
   buildOpenIDClient,
   buildExpiredRefreshTokenClient,
   FakeIssuer,
+  jwtEncodeClaims,
 };
