@@ -10,7 +10,9 @@ class ClientCredentialsStrategy {
     this.dynamoClient = dynamoClient;
     this.token_endpoint = token_endpoint;
     this.assert_info = assert_info;
-    this.assert_info.decodedJwt = decodeJwt(this.req.body.client_assertion);
+    if (this.assert_info) {
+      this.assert_info.decodedJwt = decodeJwt(this.req.body.client_assertion);
+    }
   }
 
   async getTokenResponse() {
