@@ -24,8 +24,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       null,
       mockDynamoClient,
       null,
-      null,
-      {}
+      null
     );
     await strategy.saveDocumentToDynamo(document, null);
 

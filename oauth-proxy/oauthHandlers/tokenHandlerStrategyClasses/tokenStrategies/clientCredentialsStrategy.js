@@ -1,18 +1,14 @@
 const axios = require("axios");
 const qs = require("qs");
-const { rethrowIfRuntimeError, decodeJwt } = require("../../../utils");
+const { rethrowIfRuntimeError } = require("../../../utils");
 
 class ClientCredentialsStrategy {
-  constructor(req, logger, dynamo, dynamoClient, token_endpoint, assert_info) {
+  constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.token_endpoint = token_endpoint;
-    this.assert_info = assert_info;
-    if (this.assert_info) {
-      this.assert_info.decodedJwt = decodeJwt(this.req.body.client_assertion);
-    }
   }
 
   async getTokenResponse() {

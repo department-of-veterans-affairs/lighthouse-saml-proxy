@@ -142,15 +142,13 @@ const getStrategies = (
         error_description: "Client assertion type must be jwt-bearer.",
       };
     }
-    const assert_info = {};
     strategies = {
       tokenHandlerStrategy: new ClientCredentialsStrategy(
         req,
         logger,
         dynamo,
         dynamoClient,
-        issuer.token_endpoint,
-        assert_info
+        issuer.token_endpoint
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
@@ -158,8 +156,7 @@ const getStrategies = (
         dynamo,
         dynamoClient,
         config,
-        hashString,
-        assert_info
+        hashString
       ),
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
