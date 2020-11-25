@@ -5,13 +5,15 @@ require("jest");
 const dynamoclient = require("../dynamo_client");
 
 describe("dynamo client tests", () => {
+
+
   it("savePayloadToDynamo happy", async () => {
     const mockDynamo = {};
-    let testPutIsCalled = false;
+    let isCalled = false;
 
     mockDynamo.dbDocClient = {
       put: (payloadDoc, result) => {
-        testPutIsCalled = true;
+        isCalled = true;
         result(false, payloadDoc);
       },
     };
@@ -22,7 +24,7 @@ describe("dynamo client tests", () => {
         { pay: "load" },
         "ClientCredentials"
       );
-      expect(testPutIsCalled).toEqual(true);
+      expect(isCalled).toEqual(true);
     } catch (err) {
       // should not reach here
       expect(true).toEqual(false);
@@ -49,4 +51,31 @@ describe("dynamo client tests", () => {
       expect(err.message).toEqual("Missing key");
     }
   });
+
+  it("saveToDynamoAccessToken happy", async () => {
+    // const mockDynamo = {};
+    let isCalled = false;
+
+    const mockDynamo = {
+      updateItem: (params, result) => {
+        isCalled = true;
+        result(false, params);
+      },
+    };
+
+    try {
+      await dynamoclient.saveToDynamoAccessToken(
+        mockDynamo,
+        "ut_access_token",
+        "ut_key",
+        "ut_value",
+        "ut_table"
+      );
+      expect(isCalled).toEqual(true);
+    } catch (err) {
+      // should not reach here
+      expect(true).toEqual(false);
+    }
+  });
+
 });
