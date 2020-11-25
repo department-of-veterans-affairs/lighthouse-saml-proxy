@@ -77,7 +77,6 @@
     "mock-express-response": "^0.2.2",
     "njwt": "^1.0.0",
     "prettier": "2.0.5",
-    "timekeeper": "^2.2.0",
-    "uuid": "^8.3.1"
+    "timekeeper": "^2.2.0"
   }
 }
