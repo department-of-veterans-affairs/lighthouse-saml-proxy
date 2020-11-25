@@ -1,6 +1,7 @@
 const {
   SaveDocumentLaunchStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentLaunchStrategy");
+const { jwtEncodeClaims } = require("../testUtils");
 
 require("jest");
 
@@ -55,7 +56,9 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       hmac_secret: "hmac_secret",
     };
     const document = { launch: { S: "42" } };
-    const tokens = { access_token: "access_token" };
+    const claims = { aud: "https://ut/v1/token", iss: "ut_iss", sub: "ut_sub" };
+    const expire_on = new Date().getTime() + 300 * 1000;
+    const tokens = { access_token: jwtEncodeClaims(claims, expire_on) };
 
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
@@ -102,15 +105,16 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       hmac_secret: "hmac_secret",
     };
     const document = { launch: { S: "42" } };
-    const tokens = { access_token: "access_token" };
+    const claims = { aud: "https://ut/v1/token", iss: "ut_iss", sub: "ut_sub" };
+    const expire_on = new Date().getTime() + 300 * 1000;
+    const tokens = { access_token: jwtEncodeClaims(claims, expire_on) };
 
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
       null,
       mockDynamoClient,
       config,
-      mockHashingFunction,
-      {}
+      mockHashingFunction
     );
     await strategy.saveDocumentToDynamo(document, tokens);
 
