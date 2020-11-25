@@ -5,8 +5,6 @@ require("jest");
 const dynamoclient = require("../dynamo_client");
 
 describe("dynamo client tests", () => {
-
-
   it("savePayloadToDynamo happy", async () => {
     const mockDynamo = {};
     let isCalled = false;
@@ -77,5 +75,4 @@ describe("dynamo client tests", () => {
       expect(true).toEqual(false);
     }
   });
-
 });
