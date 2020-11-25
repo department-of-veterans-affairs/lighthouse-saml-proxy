@@ -220,7 +220,7 @@ const buildExpiredRefreshTokenClient = () => {
 };
 
 const jwtEncodeClaims = (claims, expires_on) => {
-  const privateKey = fs.readFileSync("./tests/ut_key.pem", "utf8");
+  const privateKey = fs.readFileSync("./tests/ut_key", "utf8");
   const encodedClaims = jwt.create(claims, privateKey, "RS256");
   encodedClaims.setExpiration(expires_on);
   return encodedClaims.compact();
