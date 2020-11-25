@@ -6,7 +6,10 @@ const qs = require("qs");
 const { Issuer } = require("openid-client");
 const { randomBytes } = require("crypto");
 
-const { convertObjectToDynamoAttributeValues, jwtEncodeClaims } = require("./testUtils");
+const {
+  convertObjectToDynamoAttributeValues,
+  jwtEncodeClaims,
+} = require("./testUtils");
 const {
   buildBackgroundServerModule,
 } = require("../../common/backgroundServer");

@@ -27,11 +27,7 @@ const rethrowIfRuntimeError = (err) => {
 };
 
 function decodeJwt(encodedJwt) {
-  try {
-    return jwtDecode(encodedJwt);
-  } catch (err) {
-    throw err;
-  }
+  return jwtDecode(encodedJwt);
 }
 
 function encodeBasicAuthHeader(username, password) {
