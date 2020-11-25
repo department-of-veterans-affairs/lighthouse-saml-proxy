@@ -1,4 +1,4 @@
-const { decodeJwt } = require("../../../utils");
+const jwtDecode = require("jwt-decode");
 class SaveDocumentLaunchStrategy {
   constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
     this.logger = logger;
@@ -16,7 +16,7 @@ class SaveDocumentLaunchStrategy {
           this.config.hmac_secret
         );
 
-        let decodedToken = decodeJwt(tokens.access_token);
+        let decodedToken = jwtDecode(tokens.access_token);
         let payload = {
           access_token: accessToken,
           launch: launch,

@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const jwtDecode = require("jwt-decode");
 
 const bearerAuthorizationRegex = /^Bearer\s([^\s]+)$/;
 
@@ -25,10 +24,6 @@ const rethrowIfRuntimeError = (err) => {
     throw err;
   }
 };
-
-function decodeJwt(encodedJwt) {
-  return jwtDecode(encodedJwt);
-}
 
 function encodeBasicAuthHeader(username, password) {
   const encodedCredentials = Buffer.from(`${username}:${password}`).toString(
@@ -109,5 +104,4 @@ module.exports = {
   parseClientId,
   hashString,
   parseBearerAuthorization,
-  decodeJwt,
 };
