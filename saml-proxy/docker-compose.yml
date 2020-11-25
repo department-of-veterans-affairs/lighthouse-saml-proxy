@@ -4,6 +4,8 @@ services:
     image: redis
     networks: 
       - 'default'
+    ports: 
+      - '6379:6379'
     expose:
       - '6379'
   saml-proxy:
@@ -11,5 +13,5 @@ services:
       context: ../.
       dockerfile: saml-proxy/Dockerfile
     ports:
-      - "7000:7000"
+      - '7000:7000'
     command: 'node build/app.js --config dev-config.json'

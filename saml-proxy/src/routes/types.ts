@@ -23,7 +23,12 @@ export interface IConfiguredRequest extends Request {
  * The cache interface that our saml proxy will rely on in the handler code.
  */
 export interface ICache {
-  set(Key: string, Value: string): Promise<unknown>;
+  set(
+    Key: string,
+    Value: string,
+    Option?: string,
+    OptionValue?: number
+  ): Promise<unknown>;
   get(Key: any): Promise<any>;
   has(Key: any): Promise<boolean>;
 }
@@ -34,7 +39,18 @@ export interface ICache {
 export class RedisCache implements ICache {
   theCache: RedisClient;
 
-  set(Key: string, Value: string): Promise<unknown> {
+  set(
+    Key: string,
+    Value: string,
+    Option?: string,
+    OptionValue?: number
+  ): Promise<unknown> {
+    if (Option && OptionValue) {
+      const setAsync = <
+        (key: string, Value: string, mode: string, duration: number) => any
+      >promisify(this.theCache.set).bind(this.theCache);
+      return setAsync(Key, Value, Option, OptionValue);
+    }
     const setAsync = promisify(this.theCache.set).bind(this.theCache);
     return setAsync(Key, Value);
   }

@@ -198,7 +198,8 @@ export const validateIdpResponse = (cache: ICache) => {
       };
       return next(err);
     }
-    await cache.set(sessionIndex, "");
+    // Set the session index to expire after 6hrs, or 21600 seconds.
+    await cache.set(sessionIndex, "", "EX", 21600);
     logger.info(
       "Caching valid Idp Saml Response with session index " + sessionIndex
     );
