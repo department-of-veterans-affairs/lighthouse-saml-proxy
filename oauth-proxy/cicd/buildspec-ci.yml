@@ -64,7 +64,7 @@ phases:
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_NUMBER}
       # run unit tests
-      - docker run --rm --entrypoint='' -w "/home/node" -i dvp/oauth-proxy:${COMMIT_HASH} npm run test
+      - make test
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login

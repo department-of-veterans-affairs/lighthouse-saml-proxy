@@ -43,7 +43,6 @@ login:
 .PHONY: build
 build: 
 	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
-	## build:	Build Docker image 
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
@@ -52,6 +51,16 @@ build:
 		--build-arg VERSION=$(BUILD_VERSION) \
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
+
+## test: Unit Tests
+.PHONY: test
+test:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+	docker run --rm --entrypoint='' \
+		-w "/home/node" \
+		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		npm run test
+
 
 ## push: 	Pushes an image to ECR
 .PHONY: push
