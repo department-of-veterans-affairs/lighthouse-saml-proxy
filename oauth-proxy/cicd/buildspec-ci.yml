@@ -20,9 +20,6 @@ env:
     # Honor Docker ignore at folder level
     DOCKER_BUILDKIT: 1
     IMAGE: "oauth-proxy"
-  parameter-store:
-    DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
-    DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
   exported-variables:
     - DOCKER_BUILDKIT
 phases:
@@ -57,7 +54,6 @@ phases:
     commands:
       # Login to Docker Hub prior to pulling base images to avoid rate limiting
       - echo Logging into Docker Hub
-      - echo "${DOCKER_PASSWORD}" | docker login --username ${DOCKER_USERNAME} --password-stdin
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
