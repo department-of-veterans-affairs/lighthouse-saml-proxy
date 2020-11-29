@@ -49,7 +49,7 @@ phases:
           BRANCH=default
         fi
       # print env variables to Cloud Watch incase of failure
-      - print env
+      - printenv
   build:
     commands:
       # Login to Docker Hub prior to pulling base images to avoid rate limiting
