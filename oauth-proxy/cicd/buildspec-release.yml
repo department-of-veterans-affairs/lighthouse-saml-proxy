@@ -21,12 +21,12 @@ env:
   shell: bash
   variables:
     DEPLOY: "true"
-    REPO: "/repos/department-of-veterans-affairs/vets-saml-proxy"
+    REPO: "/repos/duganth-va/vets-saml-proxy"
     IMAGE: "oauth-proxy"
   parameter-store:
-    GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
+    GITHUB_TOKEN: "/github_token"
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
-    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook_lighthouse"
+    SLACK_WEBHOOK: "/slack_web_hook"
 phases:
   pre_build:
     commands:
