@@ -53,6 +53,15 @@ build:
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
 
+## test: Unit Tests
+.PHONY: test
+test:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+	docker run --rm --entrypoint='' \
+		-w "/home/node" \
+		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		npm run test
+
 ## push: 	Pushes an image to ECR
 .PHONY: push
 push:

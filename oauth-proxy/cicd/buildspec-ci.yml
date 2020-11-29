@@ -51,8 +51,8 @@ phases:
           echo No branch found... setting to \"default\"
           BRANCH=default
         fi
-      # print env variables to Cloud Watch incase of failure
-      - print env
+      # printenv variables to Cloud Watch incase of failure
+      - printenv
   build:
     commands:
       # Login to Docker Hub prior to pulling base images to avoid rate limiting
@@ -68,7 +68,7 @@ phases:
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_NUMBER}
       # run unit tests
-      - docker run --rm --entrypoint='' -w "/home/node" -i dvp/oauth-proxy:${COMMIT_HASH} npm run test
+      - make test IMAGE=${COMMIT_HASH}
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login

@@ -40,13 +40,13 @@ phases:
     commands:
       - slackpost.sh -t started "started OAuth Proxy release..."
       # check ci status of current commit hash
-      - ci_status=$(gh api ${repo}/commits/${commit_hash}/status | jq -r .state)
+      - ci_status=$(gh api ${REPO}/commits/${COMMIT_HASH}/status | jq -r .state)
       - |
         echo "commit status: ${ci_status}"
       - |
         while [[ ${ci_status} == "pending" ]]; do
           echo "ci still running -- sleep"
-          ci_status=$(gh api ${repo}/commits/${commit_hash}/status | jq -r .state)
+          ci_status=$(gh api ${REPO}/commits/${COMMIT_HASH}/status | jq -r .state)
           echo "commit status: ${ci_status}"
           sleep 10
         done
@@ -65,18 +65,18 @@ phases:
       - gh release create ${new_tag}
       - echo tag image
       # tag ecr image with release
-      - make tag tag=${commit_hash:0:7} new_tag=${new_tag}
+      - make tag tag=${COMMIT_HASH:0:7} new_tag=${new_tag#*/}
       - |
-        if [[ ${deploy} == "true" ]]; then
+        if [[ ${DEPLOY} == "true" ]]; then
           echo "initiating deploy for ${new_tag}"
-          aws codebuild start-build --project-name oauth-proxy-deploy --environment-variables-override name=release,value=${new_tag}
+          aws codebuild start-build --project-name oauth-proxy-deploy --environment-variables-override name=RELEASE,value=${new_tag}
         fi
   post_build:
     commands:
       # post to slack.
       - |
         if [[ ${codebuild_build_succeeding} -eq 0 ]]; then
-          slackpost.sh -t failure "there was an error with the release process for ${codebuild_build_id}."
+          slackpost.sh -t failure "there was an error with the release process for ${CODEBUILD_BUILD_ID}."
         else
           slackpost.sh -t success "api gateway release ${new_tag} was successful."
         fi

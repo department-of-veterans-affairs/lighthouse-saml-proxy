@@ -24,7 +24,7 @@
 ######################################################################
 version: 0.2
 env:
-  shell: bas
+  shell: bash
   variables:
     # These are the default deploy environments
     ENVIRONMENTS: "dev staging"
@@ -69,12 +69,13 @@ phases:
           CLUSTER="dvp-${env}-${AWS_APP_NAME}-cluster"
           # Set Service Name
           SERVICE="dvp-${env}-${AWS_APP_NAME}-service"
-          slackpost.sh -t started "Deploying ${CONTAINER} with ${IMAGE}:${DEPLOY_TAG} to ${env}."
+          slackpost.sh -t started "Deploying OAuth Proxy to ${env}."
           # Actual deploy of new container.
           ecs deploy --no-deregister \
             ${CLUSTER} \
             ${SERVICE} \
-            --timeout 1200
+            --tag ${DEPLOY_TAG} \
+            --timeout 300 || exit 1
             slackpost.sh -t success "Deployed OAuth Proxy to ${env}."
         done
   post_build:
