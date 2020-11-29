@@ -1,61 +1,85 @@
+ ######################################################################
+#  OAuth Proxy CodeBuild Deploy
+#
+# ***  Maintenance Request Needed for Production deployments   ***
+#
+# Maintenance Request Documentation:
+#  - https://github.com/department-of-veterans-affairs/lighthouse-maintenance
+#  - https://community.max.gov/pages/viewpage.action?pageId=2172170301
+#  - https://github.com/department-of-veterans-affairs/lighthouse-devops-support
+#
+# Tool Links:
+#  - CodeBuild - https://docs.aws.amazon.com/codebuild/index.html
+#  - CodeBuild Environmental Variables - https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html
+#  - CodeBuild Source Image - ecs-deployer - https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/ecs-deployer
+#  - AWS CLI 2.0 - https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+#  - ECS Deploy - https://github.com/fabfuel/ecs-deploy
+#
+# All Custom scripts are on the CodeBuild Environment container.
+# https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/
+#
+# Custom Scripts:
+#  - slackpost.sh
+#
+######################################################################
 version: 0.2
-
 env:
-  git-credential-helper: yes
+  shell: bas
   variables:
-    # SERVICE_NAME should match the ECS service name without the project or environment
-    # Example: ECS Service name: dvp-staging-saml-proxy = SERVICE_NAME: "saml-proxy"
-    SERVICE_NAME: "oauth-proxy"
-    # CI_JOB_NAME should match the Codebuild CI job's name
-    CI_JOB_NAME: "oauth-proxy-ci"
-    # REPOSITORY should be the ECR Repository where the container is stored
-    REPOSITORY: "dvp/oauth-proxy"
-    # FRIENDLY_NAME should be the name used in Parameter store, e.g.: /dvp/environment/friendly-name
-    FRIENDLY_NAME: "oauth-proxy"
-    # Set DEPLOY_ENVS to match the environments you would like to deploy to when this buildspec is triggered. e.g.: "sandbox prod"
-    DEPLOY_ENVS: "prod"
+    # These are the default deploy environments
+    ENVIRONMENTS: "dev staging"
+    # These are the deployable environments
+    DEPLOYABLE_ENVIRONMENTS: "dev staging sandbox prod"
+    # Variables needed for ecs deployment
+    AWS_APP_NAME: "ecs-oauth-proxy"
   parameter-store:
-    GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
-    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook"
+    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook_lighthouse"
 phases:
   pre_build:
     commands:
-      - echo Logging into ECR
-      - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
-      - slackpost.sh "Beginning a deploy for ${FRIENDLY_NAME} in envs - ${DEPLOY_ENVS}..."
-      - echo Getting latest tag...
-      # To get the latest release version, we will increment the last version number found in Github
-      - |
-        if [ -n "$DEPLOY_TAG" ]; then
-          echo Found DEPLOY_TAG in job variables: "$DEPLOY_TAG".
-        else
-          DEPLOY_TAG=$(hub tag|sort --version-sort |tail -1); export DEPLOY_TAG
-          echo Got latest tag from Github: "$DEPLOY_TAG"
-        fi
-      - slackpost.sh "Release version - ${DEPLOY_TAG} - will be deployed..."
+      - printenv
   build:
     commands:
-      # We trigger the deploys here. The list of environments to automatically deploy to is placed at the end of the command below, separated
-      # by spaces, e.g.: deploy_to_ecs.sh <tag> <service> <friendly-name> [dev staging]
-      - echo Triggering deploys...
+      # Set deploy tag to latest if release, commit hash, or deploy tag is not set.
       - |
-        for ENV in $DEPLOY_ENVS; do
-          SERVICE="dvp-${ENV}-${SERVICE_NAME}"
-          CLUSTER="${ENV}_${SERVICE_NAME//-/_}_cluster"
-          if ecs deploy --no-deregister \
-            -t "$DEPLOY_TAG" \
-            -e "${SERVICE}" CHAMBER_ENV "${ENV}" \
-            -e "${SERVICE}" AWS_APP_NAME "${FRIENDLY_NAME}" \
-            --timeout 1200 "${CLUSTER}" "${SERVICE}" \
-            | tee "$CODEBUILD_SRC_DIR"/deploy_output.txt; then
-            slackpost.sh "Deploy of version ${DEPLOY_TAG} of ${SERVICE_NAME} to ${ENV} complete."
-          else
-            PROJECT=$(echo "${CODEBUILD_BUILD_ID}"|awk -F":" '{print $1}')
-            BUILD=$(echo "${CODEBUILD_BUILD_ID}"|awk -F":" '{print $2}')
-            slackpost.sh -d "$(cat "${CODEBUILD_SRC_DIR}"/deploy_output.txt)" "Deploy of version ${DEPLOY_TAG} of ${SERVICE_NAME} to ${ENV} failed."
-            slackpost.sh "<https://console.amazonaws-us-gov.com/codesuite/codebuild/projects/${PROJECT}/build/${PROJECT}%3A${BUILD}/log?region=${AWS_REGION}|CodeBuild Project>"
+        if [[ -n ${DEPLOY_TAG} ]]; then
+          echo Deploy Tag set
+        elif [[ ${RELEASE} ]]; then
+          DEPLOY_TAG=${RELEASE}
+        elif [[ ${COMMIT_HASH} ]]; then
+          DEPLOY_TAG=${COMMIT_HASH:0:7}
+        else
+          DEPLOY_TAG=$(git tag --sort=-creatordate | grep fargate-oauth-proxy | head -1)
+        fi
+      - echo "Deployment target set to ${DEPLOY_TAG}"
+      - |
+        for env in ${ENVIRONMENTS}; do
+          if  [[ ! ${DEPLOYABLE_ENVIRONMENTS[@]} =~ ${env} ]]; then
+            echo "${env} is not deployable!"
+            exit 1
           fi
+          # Production deploys will require a MR number be set. This MR will not be check for validity but will serve as small safety measure for production deploys and reminder to enforce the process.
+          if  [[ (${env} == "prod" || ${env} == "sandbox") && ! ${MR} ]]; then
+            echo "${env} deployments need a maintenance request prior to deployment!"
+            exit 1
+          fi
+          echo Deploying to ${env}
+          # Set Cluster Name
+          CLUSTER="dvp-${env}-${AWS_APP_NAME}-cluster"
+          # Set Service Name
+          SERVICE="dvp-${env}-${AWS_APP_NAME}-service"
+          slackpost.sh -t started "Deploying ${CONTAINER} with ${IMAGE}:${DEPLOY_TAG} to ${env}."
+          # Actual deploy of new container.
+          ecs deploy --no-deregister \
+            ${CLUSTER} \
+            ${SERVICE} \
+            --timeout 1200
+            slackpost.sh -t success "Deployed OAuth Proxy to ${env}."
         done
   post_build:
     commands:
+      - |
+        if [[ ${CODEBUILD_BUILD_SUCCEEDING} -eq 0 ]]; then
+          slackpost.sh -t failure "There was an error with the deployment process of OAuth Proxy!"
+        fi
