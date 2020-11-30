@@ -5,6 +5,9 @@
 // probably export an object that ties methods to a particular handle. Alas
 // that will have to wait until we have a proper test suite in place.
 const AWS = require("aws-sdk");
+/**
+ * @deprecated, prefer a constructor with nessary clients encapsulated.
+ */
 function createDynamoHandle(awsConfig, local) {
   let dynamoDb;
   if (local) {
@@ -26,6 +29,9 @@ function createDynamoHandle(awsConfig, local) {
   return dynamoDb;
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoBySecondary(client, key, value, TableName) {
   const params = {
     IndexName: `oauth_${key}_index`,
@@ -52,6 +58,9 @@ function getFromDynamoBySecondary(client, key, value, TableName) {
   });
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoByState(client, state, TableName) {
   const params = {
     Key: {
@@ -73,6 +82,9 @@ function getFromDynamoByState(client, state, TableName) {
   });
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoByAccessToken(client, access_token, TableName) {
   const params = {
     Key: {
@@ -94,6 +106,9 @@ function getFromDynamoByAccessToken(client, access_token, TableName) {
   });
 }
 
+/**
+ * @deprecated - Prefer savePayloadToDynamo
+ */
 function saveToDynamo(client, state, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
@@ -125,6 +140,9 @@ function saveToDynamo(client, state, key, value, TableName) {
   });
 }
 
+/**
+ * @deprecated - Prefer savePayloadToDynamo
+ */
 function saveToDynamoAccessToken(client, accessToken, key, value, TableName) {
   const params = {
     ExpressionAttributeNames: {
