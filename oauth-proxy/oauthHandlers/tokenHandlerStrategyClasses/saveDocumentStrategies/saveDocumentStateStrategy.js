@@ -1,3 +1,5 @@
+const { hashString } = require("../../../utils");
+
 class SaveDocumentStateStrategy {
   constructor(req, logger, dynamo, dynamoClient, config) {
     this.req = req;
@@ -8,13 +10,12 @@ class SaveDocumentStateStrategy {
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
-      if (document.state && document.refresh_token) {
-        let state = document.state.S;
+      if (document.state && tokens.refresh_token) {
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
-          state,
+          document.state.S,
           "refresh_token",
-          tokens.refresh_token,
+          hashString(tokens.refresh_token, this.config.hmac_secret),
           this.config.dynamo_table_name
         );
       }

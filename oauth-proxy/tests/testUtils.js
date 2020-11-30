@@ -217,6 +217,63 @@ const buildExpiredRefreshTokenClient = () => {
   });
 };
 
+const buildFakeLogger = () => {
+  return { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+};
+
+const createFakeConfig = () => {
+  return {
+    host: "http://localhost:7100",
+    well_known_base_path: "/oauth2",
+    upstream_issuer: "https://deptva-eval.okta.com/oauth2/default",
+    upstream_issuer_timeout_ms: 15000,
+    dynamo_local: "dynamodb:8000",
+    dynamo_table_name: "OAuthRequests",
+    dynamo_client_credentials_table: "ClientCredentials",
+    hmac_secret: "secret",
+    okta_url: "https://deptva-eval.okta.com",
+    validate_endpoint: "https://sandbox-api.va.gov/internal/auth/v0/validation",
+    validate_post_endpoint:
+      "https://sandbox-api.va.gov/internal/auth/v1/validation",
+    manage_endpoint: "https://staging.va.gov/account",
+    validate_apiKey: "validate_apiKey",
+    okta_token: "okta_token",
+    enable_pkce_authorization_flow: true,
+    enable_okta_consent_endpoint: true,
+    enable_smart_launch_service: true,
+    routes: {
+      categories: [
+        {
+          api_category: "/health/v1",
+          upstream_issuer:
+            "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
+        },
+        {
+          api_category: "/benefits/v1",
+          upstream_issuer:
+            "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
+        },
+        {
+          api_category: "/veteran-verification/v1",
+          upstream_issuer:
+            "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+        },
+      ],
+      app_routes: {
+        authorize: "/authorization",
+        token: "/token",
+        userinfo: "/userinfo",
+        introspection: "/introspect",
+        manage: "/manage",
+        revoke: "/revoke",
+        jwks: "/keys",
+        grants: "/grants",
+        smart_launch: "/smart/launch",
+      },
+    },
+  };
+};
+
 module.exports = {
   buildDynamoAttributeValue,
   convertObjectToDynamoAttributeValues,
@@ -226,4 +283,6 @@ module.exports = {
   buildOpenIDClient,
   buildExpiredRefreshTokenClient,
   FakeIssuer,
+  buildFakeLogger,
+  createFakeConfig,
 };

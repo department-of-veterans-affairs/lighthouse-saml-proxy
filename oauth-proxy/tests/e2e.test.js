@@ -713,8 +713,7 @@ describe("OpenID Connect Conformance", () => {
         expect(resp.status).toEqual(200);
         expect(resp.data.launch).toEqual("123V456");
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         expect(true).toEqual(false); // Don't expect to be here
       });
   });
@@ -731,7 +730,6 @@ describe("OpenID Connect Conformance", () => {
         expect(true).toEqual(false); // Don't expect to be here
       })
       .catch((err) => {
-        console.error(err);
         expect(err.response.status).toEqual(401);
       });
   });
