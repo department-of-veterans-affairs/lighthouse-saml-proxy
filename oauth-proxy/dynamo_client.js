@@ -5,8 +5,9 @@
 // probably export an object that ties methods to a particular handle. Alas
 // that will have to wait until we have a proper test suite in place.
 const AWS = require("aws-sdk");
+
 /**
- * @deprecated, prefer a constructor with nessary clients encapsulated.
+ * @deprecated, prefer a constructor with the necessary db clients encapsulated.
  */
 function createDynamoHandle(awsConfig, local) {
   let dynamoDb;
