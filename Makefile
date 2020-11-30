@@ -60,7 +60,7 @@ test:
 	docker run --rm --entrypoint='' \
 		-w "/home/node" \
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
-		npm run test
+		npm run test:ci
 
 ## push: 	Pushes an image to ECR
 .PHONY: push
