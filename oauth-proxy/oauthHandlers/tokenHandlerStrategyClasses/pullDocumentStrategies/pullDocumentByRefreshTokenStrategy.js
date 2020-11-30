@@ -16,7 +16,7 @@ class PullDocumentByRefreshTokenStrategy {
     let document = await this.getDocumentDynamo(hashedRefreshToken);
 
     // Backwards compatability.
-    // Remove after 42 Days of PR merge (DATE - Fill out before PR).
+    // Remove after 42 Days of PR merge (DATE - 11/30/2020).
     if (document == null) {
       this.logger.warn(
         "Hashed Refresh Token not found. Searching for unhashed code."
