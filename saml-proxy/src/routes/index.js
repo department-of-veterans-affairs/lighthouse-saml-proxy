@@ -170,8 +170,6 @@ export default function configureExpress(
     }
   });
 
-  /* exported variableName */
-  //const cache = new RedisCache();
   addRoutes(app, idpOptions, spOptions, cache);
 
   // Catches errors
