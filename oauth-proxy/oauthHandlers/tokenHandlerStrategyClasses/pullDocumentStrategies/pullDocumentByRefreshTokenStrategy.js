@@ -15,11 +15,11 @@ class PullDocumentByRefreshTokenStrategy {
     );
     let document = await this.getDocumentDynamo(hashedRefreshToken);
 
-    // Backwards compatability.
+    // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
     if (document == null) {
       this.logger.warn(
-        "Hashed Refresh Token not found. Searching for unhashed code."
+        "Hashed refresh_token not found. Searching for unhashed refresh_token."
       );
       document = await this.getDocumentDynamo(this.req.body.refresh_token);
     }

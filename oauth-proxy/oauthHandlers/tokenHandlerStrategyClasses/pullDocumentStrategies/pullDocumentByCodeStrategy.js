@@ -12,10 +12,10 @@ class PullDocumentByCodeStrategy {
     let hashedCode = hashString(this.req.body.code, this.config.hmac_secret);
     let document = await this.getDocumentDynamo(hashedCode);
 
-    // Backwards compatability.
+    // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
     if (document == null) {
-      this.logger.warn("Hashed Code not found. Searching for unhashed code.");
+      this.logger.warn("Hashed code not found. Searching for unhashed code.");
       document = await this.getDocumentDynamo(this.req.body.code);
     }
     return document;

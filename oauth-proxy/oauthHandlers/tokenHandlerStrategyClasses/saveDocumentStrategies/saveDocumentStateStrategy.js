@@ -11,12 +11,11 @@ class SaveDocumentStateStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.state && tokens.refresh_token) {
-        let hashedDocument = getHashedDocument(document, tokens, this.config);
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
-          hashedDocument.state,
+          document.state.S,
           "refresh_token",
-          hashedDocument.refresh_token,
+          hashString(tokens.refresh_token, this.config.hmac_secret),
           this.config.dynamo_table_name
         );
       }
@@ -29,10 +28,4 @@ class SaveDocumentStateStrategy {
   }
 }
 
-const getHashedDocument = (document, tokens, config) => {
-  return {
-    state: document.state.S,
-    refresh_token: hashString(tokens.refresh_token, config.hmac_secret),
-  };
-};
 module.exports = { SaveDocumentStateStrategy };
