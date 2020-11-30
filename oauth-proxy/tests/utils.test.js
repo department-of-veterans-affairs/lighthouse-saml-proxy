@@ -6,6 +6,7 @@ const {
   parseBasicAuth,
   parseClientId,
   parseBearerAuthorization,
+  hashString,
 } = require("../utils");
 
 describe("statusCodeFromError", () => {
@@ -75,6 +76,14 @@ describe("parseBasicAuth", () => {
     });
     expect(credentials.username).toEqual("user1");
     expect(credentials.password).toEqual("pass1");
+  });
+
+  it("hashString", () => {
+    let unhashedString = "this_is_the_string_to_be_hashed";
+    let expectedHashString =
+      "b8006bab9baf73277873c694f0d37b7a04e372cb0575720fd5a3fa1dcb4d62aa";
+    let actualHashString = hashString(unhashedString, "secret");
+    expect(expectedHashString).toEqual(actualHashString);
   });
 });
 

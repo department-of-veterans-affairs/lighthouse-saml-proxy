@@ -1,5 +1,6 @@
 const { URLSearchParams } = require("url");
 const { loginEnd } = require("../metrics");
+const { hashString } = require("../utils");
 
 const redirectHandler = async (
   logger,
@@ -26,7 +27,7 @@ const redirectHandler = async (
         dynamo,
         state,
         "code",
-        req.query.code,
+        hashString(req.query.code, config.hmac_secret),
         config.dynamo_table_name
       );
     } catch (error) {
@@ -36,12 +37,14 @@ const redirectHandler = async (
       );
     }
   }
+
   try {
-    const document = await dynamoClient.getFromDynamoByState(
+    let document = await dynamoClient.getFromDynamoByState(
       dynamo,
       state,
       config.dynamo_table_name
     );
+
     const params = new URLSearchParams(req.query);
     loginEnd.inc();
     res.redirect(`${document.redirect_uri.S}?${params.toString()}`);

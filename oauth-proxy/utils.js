@@ -75,10 +75,10 @@ function parseClientId(clientId) {
   return isValid;
 }
 
-const hashString = (accessToken, secret) => {
+const hashString = (unhashedString, secret) => {
   const hmac = crypto.createHmac("sha256", secret);
-  let hashedAccessToken = hmac.update(accessToken).digest("hex");
-  return hashedAccessToken;
+  let hashedString = hmac.update(unhashedString).digest("hex");
+  return hashedString;
 };
 
 function parseBearerAuthorization(authorization) {
