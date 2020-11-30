@@ -12,7 +12,7 @@ const {
 const MockExpressRequest = require("mock-express-request");
 
 const HMAC_SECRET = "secret";
-const STATE_HASH_PAIR = ["abc123", "abc123"];
+const STATE = "abc123";
 const CODE_HASH_PAIR = [
   "the_fake_authorization_code",
   "9daf298b2cb68502791f6f264aef8ebb56dc0ddd3542fbd1c4bd675538fd9cb8",
@@ -21,10 +21,7 @@ const REFRESH_TOKEN_HASH_PAIR = [
   "the_fake_refresh_token",
   "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
 ];
-const REDIRECT_URI_HASH_PAIR = [
-  "http://localhost/thisDoesNotMatter",
-  "http://localhost/thisDoesNotMatter",
-];
+const REDIRECT_URI = "http://localhost/thisDoesNotMatter";
 
 let dynamoClient;
 let config;
@@ -47,10 +44,10 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
 
   it("Happy Path - Unhashed Token", async () => {
     dynamoClient = buildFakeDynamoClient({
-      state: STATE_HASH_PAIR[0],
+      state: STATE,
       code: CODE_HASH_PAIR[0],
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
     });
 
     let strategy = new PullDocumentByRefreshTokenStrategy(
@@ -63,19 +60,19 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
     let document = await strategy.pullDocumentFromDynamo();
 
     expect(document).toEqual({
-      state: { S: STATE_HASH_PAIR[0] },
+      state: { S: STATE },
       code: { S: CODE_HASH_PAIR[0] },
       refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[0] },
-      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[0] },
+      redirect_uri: { S: REDIRECT_URI },
     });
   });
 
   it("Happy Path - Hashed Token", async () => {
     dynamoClient = buildFakeDynamoClient({
-      state: STATE_HASH_PAIR[1],
+      state: STATE,
       code: CODE_HASH_PAIR[1],
       refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
     });
 
     let strategy = new PullDocumentByRefreshTokenStrategy(
@@ -88,10 +85,10 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
     let document = await strategy.pullDocumentFromDynamo();
 
     expect(document).toEqual({
-      state: { S: STATE_HASH_PAIR[1] },
+      state: { S: STATE },
       code: { S: CODE_HASH_PAIR[1] },
       refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[1] },
-      redirect_uri: { S: REDIRECT_URI_HASH_PAIR[1] },
+      redirect_uri: { S: REDIRECT_URI },
     });
   });
 
