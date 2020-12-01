@@ -310,7 +310,7 @@ describe("validateIdpResponse", () => {
     expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
   });
 
-  it("should do caching when cache is not enabled", async () => {
+  it("should not cache anything when cache is not enabled", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
