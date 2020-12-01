@@ -69,8 +69,11 @@ function runServer(argv) {
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
       const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
-      const cache = new RedisCache(argv.redisPort, argv.redisHost);
+      let cache = null;
       const cacheEnabled = argv.cacheEnabled;
+      if (cacheEnabled) {
+        cache = new RedisCache(argv.redisPort, argv.redisHost);
+      }
       configureExpress(
         app,
         argv,
