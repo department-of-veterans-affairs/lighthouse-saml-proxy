@@ -139,18 +139,18 @@ export const getParticipant = (req) => {
   return participant;
 };
 
-const processAcs = (acsUrl, cache) => [
+const processAcs = (acsUrl, cache, cacheEnabled) => [
   buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
-  validateIdpResponse(cache),
+  validateIdpResponse(cache, cacheEnabled),
   loadICN,
   scrubUserClaims,
   serializeAssertions,
 ];
 
-export const acsFactory = (app, acsUrl, cache) => {
-  app.get(getPath(acsUrl), processAcs(acsUrl, cache));
-  app.post(getPath(acsUrl), processAcs(acsUrl, cache));
+export const acsFactory = (app, acsUrl, cache, cacheEnabled) => {
+  app.get(getPath(acsUrl), processAcs(acsUrl, cache, cacheEnabled));
+  app.post(getPath(acsUrl), processAcs(acsUrl, cache, cacheEnabled));
 };
 
 export const handleError = (req, res) => {

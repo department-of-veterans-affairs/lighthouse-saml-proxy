@@ -258,7 +258,7 @@ describe("validateIdpResponse", () => {
       },
     };
 
-    const validateFn = handlers.validateIdpResponse(cache);
+    const validateFn = handlers.validateIdpResponse(cache, true);
     await validateFn(req, {}, nextFn);
     expect(nextFn).toHaveBeenCalled();
     expect(cache.has(testSessionIndex));
@@ -278,7 +278,7 @@ describe("validateIdpResponse", () => {
       },
     };
 
-    const validateFn = handlers.validateIdpResponse(cache);
+    const validateFn = handlers.validateIdpResponse(cache, true);
     await validateFn(req, {}, nextFn).catch((err) => {
       fail("Test failure due to unexpected error " + err);
     });
@@ -301,12 +301,32 @@ describe("validateIdpResponse", () => {
       },
     };
 
-    const validateFn = handlers.validateIdpResponse(cache);
+    const validateFn = handlers.validateIdpResponse(cache, true);
     await validateFn(req, {}, nextFn).catch((err) => {
       fail("Test failure due to unexpected error " + err);
     });
 
     expect(nextFn).toHaveBeenCalledTimes(1);
     expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
+  });
+
+  it("should do nothing when cache is not enabled", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new TestCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache, false);
+    await validateFn(req, {}, nextFn);
+    expect(nextFn).not.toHaveBeenCalled();
+    expect(!cache.has(testSessionIndex));
   });
 });

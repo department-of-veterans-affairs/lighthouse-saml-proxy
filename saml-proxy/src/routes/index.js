@@ -36,7 +36,8 @@ export default function configureExpress(
   idpOptions,
   spOptions,
   vetsApiClient,
-  cache = new RedisCache()
+  cache = new RedisCache(),
+  cacheEnabled = true
 ) {
   const useSentry =
     argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
@@ -170,7 +171,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions, cache);
+  addRoutes(app, idpOptions, spOptions, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

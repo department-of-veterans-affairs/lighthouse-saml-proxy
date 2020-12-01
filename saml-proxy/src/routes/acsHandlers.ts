@@ -168,42 +168,44 @@ export const testLevelOfAssuranceOrRedirect = (
   }
 };
 
-export const validateIdpResponse = (cache: ICache) => {
+export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
   return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
-    const sessionIndex = req?.user?.authnContext?.sessionIndex;
-    if (!sessionIndex) {
-      logger.error("No session index found in the saml response.");
-      const err = {
-        message: "Bad request.",
-        status: 400,
-      };
-      return next(err);
-    }
-    let sessionIndexCached = null;
-    sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
-      logger.error(
-        "Cache was unable to retrieve session index." + JSON.stringify(err)
-      );
-    });
+    if (cacheEnabled) {
+      const sessionIndex = req?.user?.authnContext?.sessionIndex;
+      if (!sessionIndex) {
+        logger.error("No session index found in the saml response.");
+        const err = {
+          message: "Bad request.",
+          status: 400,
+        };
+        return next(err);
+      }
+      let sessionIndexCached = null;
+      sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
+        logger.error(
+          "Cache was unable to retrieve session index." + JSON.stringify(err)
+        );
+      });
 
-    if (sessionIndexCached) {
-      logger.error(
-        "SAML response with session index " +
-          sessionIndex +
-          " was previously cached."
+      if (sessionIndexCached) {
+        logger.error(
+          "SAML response with session index " +
+            sessionIndex +
+            " was previously cached."
+        );
+        const err = {
+          message: "Bad request.",
+          status: 400,
+        };
+        return next(err);
+      }
+      // Set the session index to expire after 6hrs, or 21600 seconds.
+      await cache.set(sessionIndex, "", "EX", 21600);
+      logger.info(
+        "Caching valid Idp Saml Response with session index " + sessionIndex
       );
-      const err = {
-        message: "Bad request.",
-        status: 400,
-      };
-      return next(err);
+      next();
     }
-    // Set the session index to expire after 6hrs, or 21600 seconds.
-    await cache.set(sessionIndex, "", "EX", 21600);
-    logger.info(
-      "Caching valid Idp Saml Response with session index " + sessionIndex
-    );
-    next();
   };
 };
 
