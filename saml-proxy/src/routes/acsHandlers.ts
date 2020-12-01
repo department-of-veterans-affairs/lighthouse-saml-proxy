@@ -204,8 +204,9 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
       logger.info(
         "Caching valid Idp Saml Response with session index " + sessionIndex
       );
-      next();
+      return next();
     }
+    return next();
   };
 };
 

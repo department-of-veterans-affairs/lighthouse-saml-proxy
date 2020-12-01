@@ -310,7 +310,7 @@ describe("validateIdpResponse", () => {
     expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
   });
 
-  it("should do nothing when cache is not enabled", async () => {
+  it("should do caching when cache is not enabled", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
@@ -326,7 +326,7 @@ describe("validateIdpResponse", () => {
 
     const validateFn = handlers.validateIdpResponse(cache, false);
     await validateFn(req, {}, nextFn);
-    expect(nextFn).not.toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
     expect(!cache.has(testSessionIndex));
   });
 });
