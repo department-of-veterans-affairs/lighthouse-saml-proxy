@@ -9,7 +9,7 @@ import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
 import uuidv4 from "uuid/v4";
 import rTracer from "cls-rtracer";
-
+import { RedisCache } from "./types";
 import {
   loggingMiddleware as morganMiddleware,
   winstonMiddleware,
@@ -35,7 +35,9 @@ export default function configureExpress(
   argv,
   idpOptions,
   spOptions,
-  vetsApiClient
+  vetsApiClient,
+  cache = new RedisCache(),
+  cacheEnabled = true
 ) {
   const useSentry =
     argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
@@ -64,6 +66,7 @@ export default function configureExpress(
       },
     });
   }
+
   const [passport, strategy] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
@@ -168,7 +171,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions);
+  addRoutes(app, idpOptions, spOptions, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

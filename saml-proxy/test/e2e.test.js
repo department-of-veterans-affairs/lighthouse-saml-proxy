@@ -34,10 +34,14 @@ const MIME_HTML = "text/html";
 const PORT = 1111;
 const vetsApiClient = new MockVetsApiClient();
 
+let sessionIndex = 1;
 function buildSamlResponse(type, level_of_assurance) {
   const user = getUser(type, level_of_assurance);
+  let config = idpConfig;
+  config.sessionIndex = sessionIndex;
+  sessionIndex++;
   return new Promise((resolve) => {
-    getSamlResponse(idpConfig, user, (_, samlResponse) => {
+    getSamlResponse(config, user, (_, samlResponse) => {
       resolve(btoa(samlResponse));
     });
   });

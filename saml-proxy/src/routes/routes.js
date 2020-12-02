@@ -23,7 +23,13 @@ const METADATA_TEMPLATE = template(
   fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
 );
 
-export default function addRoutes(app, idpConfig, spConfig) {
+export default function addRoutes(
+  app,
+  idpConfig,
+  spConfig,
+  cache,
+  cacheEnabled
+) {
   app.get(
     ["/", "/idp", IDP_SSO],
     parseSamlRequest,
@@ -47,7 +53,7 @@ export default function addRoutes(app, idpConfig, spConfig) {
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  spConfig.acsUrls.forEach((url) => acsFactory(app, url));
+  spConfig.acsUrls.forEach((url) => acsFactory(app, url, cache, cacheEnabled));
 
   app.get(SP_ERROR_URL, handleError);
 

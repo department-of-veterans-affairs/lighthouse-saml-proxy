@@ -13,6 +13,7 @@ import VetsAPIConfig from "./VetsAPIConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
 import { VetsAPIClient } from "./VetsAPIClient";
+import { RedisCache } from "./routes/types";
 
 /**
  * Globals
@@ -68,7 +69,20 @@ function runServer(argv) {
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
       const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
-      configureExpress(app, argv, idpConfig, spConfig, vetsApiClient);
+      let cache = null;
+      const cacheEnabled = argv.cacheEnabled;
+      if (cacheEnabled) {
+        cache = new RedisCache(argv.redisPort, argv.redisHost);
+      }
+      configureExpress(
+        app,
+        argv,
+        idpConfig,
+        spConfig,
+        vetsApiClient,
+        cache,
+        cacheEnabled
+      );
 
       const env = app.get("env"),
         port = app.get("port");

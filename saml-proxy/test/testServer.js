@@ -3,6 +3,7 @@ import express from "express";
 import { certToPEM } from "../src/cli/coercing";
 import IDPConfig from "../src/IDPConfig";
 import configureExpress from "../src/routes";
+import { TestCache } from "../src/routes/types";
 import SPConfig from "../src/SPConfig";
 import { removeHeaders } from "../src/utils";
 
@@ -38,7 +39,7 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
-export function getTestExpressApp(vetsApiClient) {
+export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
   const spConfig = new SPConfig(defaultTestingConfig);
   configureExpress(
@@ -46,7 +47,8 @@ export function getTestExpressApp(vetsApiClient) {
     defaultTestingConfig,
     idpConfig,
     spConfig,
-    vetsApiClient
+    vetsApiClient,
+    cache
   );
   return app;
 }

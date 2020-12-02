@@ -1,6 +1,6 @@
 import { SP_VERIFY, SP_LOGIN_URL } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
-import { IConfiguredRequest } from "./types";
+import { ICache, IConfiguredRequest } from "./types";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
@@ -166,6 +166,48 @@ export const testLevelOfAssuranceOrRedirect = (
   } else {
     next();
   }
+};
+
+export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
+  return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+    if (cacheEnabled) {
+      const sessionIndex = req?.user?.authnContext?.sessionIndex;
+      if (!sessionIndex) {
+        logger.error("No session index found in the saml response.");
+        const err = {
+          message: "Bad request.",
+          status: 400,
+        };
+        return next(err);
+      }
+      let sessionIndexCached = null;
+      sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
+        logger.error(
+          "Cache was unable to retrieve session index." + JSON.stringify(err)
+        );
+      });
+
+      if (sessionIndexCached) {
+        logger.error(
+          "SAML response with session index " +
+            sessionIndex +
+            " was previously cached."
+        );
+        const err = {
+          message: "Bad request.",
+          status: 400,
+        };
+        return next(err);
+      }
+      // Set the session index to expire after 6hrs, or 21600 seconds.
+      await cache.set(sessionIndex, "", "EX", 21600);
+      logger.info(
+        "Caching valid Idp Saml Response with session index " + sessionIndex
+      );
+      return next();
+    }
+    return next();
+  };
 };
 
 export const serializeAssertions = (

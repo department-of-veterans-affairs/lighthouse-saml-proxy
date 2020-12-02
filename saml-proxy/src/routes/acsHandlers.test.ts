@@ -3,6 +3,7 @@ import "jest";
 import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
+import { TestCache } from "./types";
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -239,5 +240,93 @@ describe("requestWithMetrics", () => {
     await expect(
       handlers.requestWithMetrics(MVIRequestMetrics, func)
     ).rejects.toThrowError();
+  });
+});
+
+describe("validateIdpResponse", () => {
+  it("should cache session index for a given saml response", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new TestCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache, true);
+    await validateFn(req, {}, nextFn);
+    expect(nextFn).toHaveBeenCalled();
+    expect(cache.has(testSessionIndex));
+  });
+
+  it("should throw an error on repeated idp saml response", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new TestCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache, true);
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
+
+    expect(nextFn).toHaveBeenCalledTimes(2);
+    expect(nextFn.mock.calls[1].toString() == "Error: Bad request");
+  });
+
+  it("should throw an error when processing a saml response with no session index", async () => {
+    const nextFn = jest.fn();
+    const cache = new TestCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {},
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache, true);
+    await validateFn(req, {}, nextFn).catch((err) => {
+      fail("Test failure due to unexpected error " + err);
+    });
+
+    expect(nextFn).toHaveBeenCalledTimes(1);
+    expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
+  });
+
+  it("should not cache anything when cache is not enabled", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const cache = new TestCache();
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+
+    const validateFn = handlers.validateIdpResponse(cache, false);
+    await validateFn(req, {}, nextFn);
+    expect(nextFn).toHaveBeenCalled();
+    expect(!cache.has(testSessionIndex));
   });
 });
