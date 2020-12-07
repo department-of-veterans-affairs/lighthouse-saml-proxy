@@ -246,7 +246,7 @@ describe("OpenID Connect Conformance", () => {
     await axios.get(parsedMeta.jwks_uri);
     await axios.get(parsedMeta.userinfo_endpoint);
     axios.post(parsedMeta.introspection_endpoint);
-    
+
     const authorizeConfig = {
       maxRedirects: 0,
       validateStatus: function (status) {
