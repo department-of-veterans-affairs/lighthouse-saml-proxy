@@ -20,18 +20,6 @@ const { configureTokenValidator } = require("./tokenValidation");
 /**
  * @deprecated - Prefer config.routes.app_routes
  */
-// const config.routes.app_routes = {
-//   authorize: "/authorization",
-//   token: "/token",
-//   userinfo: "/userinfo",
-//   introspection: "/introspect",
-//   manage: "/manage",
-//   revoke: "/revoke",
-//   jwks: "/keys",
-//   redirect: "/redirect",
-//   grants: "/grants",
-//   smart_launch: "/smart/launch",
-// };
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
@@ -150,7 +138,7 @@ function buildApp(
   /**
    * @deprecated - To be removed following AuthZ Server reorganization
    */
-  const metadataRewrite = buildMetadataRewriteTable(config, config.routes.app_routes);
+  const metadataRewrite = buildMetadataRewriteTable(config);
 
   const app = express();
   const router = new express.Router();
@@ -357,7 +345,6 @@ function buildApp(
   ) {
     var servicesMetadataRewrite = buildMetadataRewriteTable(
       config,
-      app_routes,
       api_category
     );
     router.get(
