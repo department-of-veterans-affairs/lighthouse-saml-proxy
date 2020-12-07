@@ -243,20 +243,10 @@ describe("OpenID Connect Conformance", () => {
       introspection_endpoint: expect.stringMatching(testServerBaseUrlPattern),
     });
 
-    try {
-      await axios.get(parsedMeta.jwks_uri);
-    } catch (err) {
-      console.log(err);
-    }
-
-    try {
-      await axios.get(parsedMeta.userinfo_endpoint);
-    } catch (err) {
-      console.log(err);
-    }
-
+    await axios.get(parsedMeta.jwks_uri);
+    await axios.get(parsedMeta.userinfo_endpoint);
     axios.post(parsedMeta.introspection_endpoint);
-
+    
     const authorizeConfig = {
       maxRedirects: 0,
       validateStatus: function (status) {
