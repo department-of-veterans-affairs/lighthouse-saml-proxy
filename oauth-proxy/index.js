@@ -17,9 +17,6 @@ const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 
-/**
- * @deprecated - Prefer config.routes.app_routes
- */
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
