@@ -473,7 +473,6 @@ function startApp(config, issuer, isolatedIssuers) {
   );
 
   const validateToken = configureTokenValidator(
-    config.validate_endpoint,
     config.validate_post_endpoint,
     config.validate_apiKey
   );

@@ -33,7 +33,7 @@ const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
   well_known_base_path: "/testServer",
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
-  validate_endpoint: "http://localhost",
+  validate_post_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
   manage_endpoint: "http://localhost:9091/account",
   hmac_secret: "testsecret",

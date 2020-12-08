@@ -234,7 +234,6 @@ const createFakeConfig = () => {
     dynamo_client_credentials_table: "ClientCredentials",
     hmac_secret: "secret",
     okta_url: "https://deptva-eval.okta.com",
-    validate_endpoint: "https://sandbox-api.va.gov/internal/auth/v0/validation",
     validate_post_endpoint:
       "https://sandbox-api.va.gov/internal/auth/v1/validation",
     manage_endpoint: "https://staging.va.gov/account",
