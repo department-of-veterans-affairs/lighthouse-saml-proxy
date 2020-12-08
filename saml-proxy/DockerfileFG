@@ -1,5 +1,26 @@
 FROM vasdvp/lighthouse-node-application-base:node12
 
+# Build Args
+ARG BUILD_DATE_TIME
+ARG VERSION
+ARG BUILD_NUMBER
+ARG BUILD_TOOL
+
+# Static Labels
+LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
+      org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/vets-saml-proxy/tree/master/saml-proxy/DockerfileFG" \
+      org.opencontainers.image.documentation="https://github.com/department-of-veterans-affairs/vets-saml-proxy/tree/master/saml-proxy/README.md" \
+      org.opencontainers.image.vendor="lighthouse" \
+      org.opencontainers.image.title="saml-proxy" \
+      org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/vets-saml-proxy/tree/master/saml-proxy" \
+      org.opencontainers.image.description="SAML Proxy for Lighthouse APIs"
+
+# Dynamic Labels
+LABEL org.opencontainers.image.created=${BUILD_DATE_TIME} \
+      org.opencontainers.image.version=${VERSION} \
+      gov.va.build.number=${BUILD_NUMBER} \
+      gov.va.build.tool=${BUILD_TOOL}
+
 WORKDIR /home/node
 
 RUN git config --global url."https://".insteadOf git://
@@ -23,6 +44,6 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
 RUN chown -R node:node /home/node
 
 USER node
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/home/node/bin/config.sh"]
 
-CMD ["node", "build/app.js", "--config", "/home/node/config.json"]
+ENTRYPOINT ["/usr/local/bin/tini", "--"]
+CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
