@@ -7,12 +7,7 @@ const axios = require("axios");
 // allowed to bubble up to the caller. You probably don't want to call this
 // directly. See configureTokenValidator below for a friendlier version.
 
-const validateToken = async (
-  post_endpoint,
-  api_key,
-  access_token,
-  aud
-) => {
+const validateToken = async (post_endpoint, api_key, access_token, aud) => {
   const validateTokenStart = process.hrtime.bigint();
   const response = await axios({
     method: "post",
