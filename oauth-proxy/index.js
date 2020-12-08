@@ -337,7 +337,17 @@ function buildApp(
   }
 
   app.use(function (err, req, res, next) {
-    logger.error(err);
+    let errPayload = {};
+    if (err.status) {
+      errPayload.status = err.status;
+    }
+    if (err.message) {
+      errPayload.message = err.message;
+    }
+    if (err.error_description) {
+      errPayload.error_description = err.error_description;
+    }
+    logger.error(errPayload);
 
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
