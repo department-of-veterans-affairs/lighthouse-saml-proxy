@@ -17,21 +17,6 @@ const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 
-/**
- * @deprecated - Prefer config.routes.app_routes
- */
-const appRoutes = {
-  authorize: "/authorization",
-  token: "/token",
-  userinfo: "/userinfo",
-  introspection: "/introspect",
-  manage: "/manage",
-  revoke: "/revoke",
-  jwks: "/keys",
-  redirect: "/redirect",
-  grants: "/grants",
-  smart_launch: "/smart/launch",
-};
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
@@ -60,17 +45,17 @@ async function createIssuer(upstream_issuer) {
   return await Issuer.discover(upstream_issuer);
 }
 
-function buildMetadataRewriteTable(config, appRoutes, api_category) {
+function buildMetadataRewriteTable(config, api_category) {
   if (api_category === undefined) {
     api_category = "";
   }
   return {
-    authorization_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.authorize}`,
-    token_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.token}`,
-    userinfo_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.userinfo}`,
-    revocation_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.revoke}`,
-    introspection_endpoint: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.introspection}`,
-    jwks_uri: `${config.host}${config.well_known_base_path}${api_category}${appRoutes.jwks}`,
+    authorization_endpoint: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.authorize}`,
+    token_endpoint: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.token}`,
+    userinfo_endpoint: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.userinfo}`,
+    revocation_endpoint: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.revoke}`,
+    introspection_endpoint: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.introspection}`,
+    jwks_uri: `${config.host}${config.well_known_base_path}${api_category}${config.routes.app_routes.jwks}`,
   };
 }
 
@@ -145,12 +130,12 @@ function buildApp(
   };
 
   const { well_known_base_path } = config;
-  const redirect_uri = `${config.host}${well_known_base_path}${appRoutes.redirect}`;
+  const redirect_uri = `${config.host}${well_known_base_path}${config.routes.app_routes.redirect}`;
 
   /**
    * @deprecated - To be removed following AuthZ Server reorganization
    */
-  const metadataRewrite = buildMetadataRewriteTable(config, appRoutes);
+  const metadataRewrite = buildMetadataRewriteTable(config);
 
   const app = express();
   const router = new express.Router();
@@ -198,22 +183,22 @@ function buildApp(
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.get(appRoutes.manage, (req, res) => {
+  router.get(config.routes.app_routes.manage, (req, res) => {
     res.redirect(config.manage_endpoint);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.get(appRoutes.jwks, (req, res) =>
+  router.get(config.routes.app_routes.jwks, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET")
   );
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.get(appRoutes.userinfo, (req, res) =>
+  router.get(config.routes.app_routes.userinfo, (req, res) =>
     proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET")
   );
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.post(appRoutes.introspection, (req, res) =>
+  router.post(config.routes.app_routes.introspection, (req, res) =>
     proxyRequestToOkta(
       req,
       res,
@@ -224,7 +209,7 @@ function buildApp(
   );
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.post(appRoutes.revoke, (req, res) => {
+  router.post(config.routes.app_routes.revoke, (req, res) => {
     proxyRequestToOkta(
       req,
       res,
@@ -234,14 +219,14 @@ function buildApp(
     );
   });
 
-  router.get(appRoutes.redirect, async (req, res, next) => {
+  router.get(config.routes.app_routes.redirect, async (req, res, next) => {
     await oauthHandlers
       .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
       .catch(next);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.get(appRoutes.authorize, async (req, res, next) => {
+  router.get(config.routes.app_routes.authorize, async (req, res, next) => {
     await oauthHandlers
       .authorizeHandler(
         config,
@@ -259,7 +244,7 @@ function buildApp(
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.post(appRoutes.token, async (req, res, next) => {
+  router.post(config.routes.app_routes.token, async (req, res, next) => {
     await oauthHandlers
       .tokenHandler(
         config,
@@ -277,7 +262,7 @@ function buildApp(
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
-  router.delete(appRoutes.grants, async (req, res, next) => {
+  router.delete(config.routes.app_routes.grants, async (req, res, next) => {
     await oauthHandlers
       .revokeUserGrantHandler(oktaClient, config, req, res, next)
       .catch(next);
@@ -300,7 +285,7 @@ function buildApp(
     );
     if (config.enable_smart_launch_service) {
       router.get(
-        appRoutes.smart_launch,
+        config.routes.app_routes.smart_launch,
         jwtAuthorizationHandler,
         async (req, res, next) => {
           await oauthHandlers
@@ -357,7 +342,6 @@ function buildApp(
   ) {
     var servicesMetadataRewrite = buildMetadataRewriteTable(
       config,
-      app_routes,
       api_category
     );
     router.get(

@@ -54,6 +54,7 @@ const defaultTestingConfig = {
       manage: "/manage",
       revoke: "/revoke",
       jwks: "/keys",
+      redirect: "/redirect",
       grants: "/grants",
       smart_launch: "/smart/launch",
     },
@@ -284,7 +285,7 @@ describe("OpenID Connect Conformance", () => {
     // signaure requirement.
   });
 
-  it("responds to the issolated api category endpoints described in the OIDC metadata response", async (done) => {
+  it("responds to the isolated api category endpoints described in the OIDC metadata response", async (done) => {
     // This test is making multiple requests. Theoretically it could be broken
     // up, with each request being made in a separate test. That would make it
     // much more difficult to use the metadata response to drive the requests
