@@ -16,7 +16,6 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
-const { minimalError } = require("./utils");
 
 const openidMetadataWhitelist = [
   "issuer",
