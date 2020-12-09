@@ -1,6 +1,6 @@
 const axios = require("axios");
 const qs = require("qs");
-const { rethrowIfRuntimeError, minimalError } = require("../../../utils");
+const { rethrowIfRuntimeError } = require("../../../utils");
 
 class ClientCredentialsStrategy {
   constructor(req, logger, dynamo, dynamoClient, token_endpoint) {
@@ -48,14 +48,14 @@ class ClientCredentialsStrategy {
         } else {
           throw {
             statusCode: 400,
-            error: minimalError(error.response.data.error),
+            error: error.response.data.error,
             error_description: error.response.data.error_description,
           };
         }
       } else if (error.response.status == 401) {
         throw {
           statusCode: 401,
-          error: minimalError(error.response.data.error),
+          error: error.response.data.error,
           error_description: error.response.data.error_description,
         };
       } else {

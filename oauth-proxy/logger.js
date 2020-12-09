@@ -26,19 +26,20 @@ const logger = createLogger({
   ],
 });
 
-const middlewareLogFormat = (morgan, req, res) => {
-  let logContent;
-  logContent = {
-    "remote-address": morgan["remote-addr"](req, res),
-    time: morgan.date(req, res, "iso"),
-    method: morgan.method(req, res),
-    url: morgan.url(req, res),
-    "status-code": morgan.status(req, res),
-    "content-length": morgan.res(req, res, "content-length"),
-    referrer: morgan.referrer(req, res),
-  };
-
-  return JSON.stringify(logContent, null, 2);
+const middlewareLogFormat = (tokens, req, res) => {
+  return JSON.stringify(
+    {
+      "remote-address": tokens["remote-addr"](req, res),
+      time: tokens.date(req, res, "iso"),
+      method: tokens.method(req, res),
+      url: tokens.url(req, res),
+      "status-code": tokens.status(req, res),
+      "content-length": tokens.res(req, res, "content-length"),
+      referrer: tokens.referrer(req, res),
+    },
+    null,
+    2
+  );
 };
 
 module.exports = {
