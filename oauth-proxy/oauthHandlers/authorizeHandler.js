@@ -49,7 +49,8 @@ const authorizeHandler = async (
 
     res.status(400).json({
       error: "invalid_client",
-      error_description: "The client specified by the application is not valid."
+      error_description:
+        "The client specified by the application is not valid.",
     });
 
     return next();

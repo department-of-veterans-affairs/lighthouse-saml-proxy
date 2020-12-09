@@ -208,7 +208,7 @@ describe("authorizeHandler", () => {
   it("Should return a 400 status code on invalid client_id", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
-    
+
     req.query = {
       state: "fake_state",
       client_id: "invalid",
