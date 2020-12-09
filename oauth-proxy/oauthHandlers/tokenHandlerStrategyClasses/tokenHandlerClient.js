@@ -29,7 +29,7 @@ class TokenHandlerClient {
       return {
         statusCode: error.statusCode,
         responseBody: {
-          error: minimalError(error.error),
+          error: error.error,
           error_description: error.error_description,
         },
       };
