@@ -16,6 +16,7 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
+const { minimalError } = require("./utils");
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -322,18 +323,7 @@ function buildApp(
   }
 
   app.use(function (err, req, res, next) {
-    let errPayload = {};
-    if (err.status) {
-      errPayload.status = err.status;
-    }
-    if (err.message) {
-      errPayload.message = err.message;
-    }
-    if (err.error_description) {
-      errPayload.error_description = err.error_description;
-    }
-    logger.error(errPayload);
-
+    logger.error(minimalError(err));
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
     const { error, error_description } = req.query;

@@ -82,20 +82,24 @@ const hashString = (unhashedString, secret) => {
 };
 
 const minimalError = (error) => {
-  let errorOut = {};
+  let errPayload = {};
   if (error.message) {
-    errorOut.message = error.message;
+    errPayload.message = error.message;
   }
   if (error.name) {
-    errorOut.name = error.name;
+    errPayload.name = error.name;
   }
   if (error.statusCode) {
-    errorOut.statusCode = error.statusCode;
+    errPayload.statusCode = error.statusCode;
   }
   if (error.error_description) {
-    errorOut.error_description = error.error_description;
+    errPayload.error_description = error.error_description;
   }
-  return errorOut;
+  if (error.status) {
+    errPayload.status = error.status;
+  }
+
+  return errPayload;
 };
 
 function parseBearerAuthorization(authorization) {
