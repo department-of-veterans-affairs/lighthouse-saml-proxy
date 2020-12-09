@@ -21,9 +21,13 @@ class AuthorizationCodeStrategy {
       });
     } catch (error) {
       rethrowIfRuntimeError(error);
+      let errorOut = { message: error.message}
+      if (error.statusCode) {
+        errorOut.statusCode = error.statusCode;
+      }
       this.logger.error(
         "Failed to retrieve tokens using the OpenID client",
-        error
+        errorOut
       );
       throw {
         error: error.error,
