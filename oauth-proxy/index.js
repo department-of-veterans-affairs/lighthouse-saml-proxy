@@ -323,7 +323,8 @@ function buildApp(
   }
 
   app.use(function (err, req, res, next) {
-    logger.error(minimalError(err));
+    logger.error(err);
+
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
     const { error, error_description } = req.query;
