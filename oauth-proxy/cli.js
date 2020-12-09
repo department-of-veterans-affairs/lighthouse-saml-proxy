@@ -61,14 +61,10 @@ function processArgs() {
         description: "okta API token",
         required: true,
       },
-      validate_endpoint: {
-        description: "va.gov token validation endpoint",
-        required: true,
-        default: "https://sandbox-api.va.gov/internal/auth/v0/validation",
-      },
       validate_post_endpoint: {
         description: "va.gov token validation endpoint",
-        required: false,
+        required: true,
+        default: "https://sandbox-api.va.gov/internal/auth/v1/validation",
       },
       manage_endpoint: {
         description:
