@@ -1,6 +1,6 @@
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
-
+const { minimalError } = require("../utils");
 const authorizeHandler = async (
   config,
   redirect_uri,
@@ -42,7 +42,7 @@ const authorizeHandler = async (
   } catch (error) {
     logger.error(
       "Unrecoverable error: could not get the Okta client app",
-      error
+      minimalError(error)
     );
     // This error is unrecoverable because we would be unable to verify
     // that we are redirecting to a whitelisted client url

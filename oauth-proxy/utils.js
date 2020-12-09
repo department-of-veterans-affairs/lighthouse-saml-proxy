@@ -81,6 +81,23 @@ const hashString = (unhashedString, secret) => {
   return hashedString;
 };
 
+const minimalError = (error) => {
+  let errorOut = {};
+  if (error.message) {
+    errorOut.message = error.message;
+  }
+  if (error.name) {
+    errorOut.name = error.name;
+  }
+  if (error.statusCode) {
+    errorOut.statusCode = error.statusCode;
+  }
+  if (error.error_description) {
+    errorOut.error_description = error.error_description;
+  }
+  return errorOut;
+};
+
 function parseBearerAuthorization(authorization) {
   if (!authorization) {
     return null;
@@ -104,4 +121,5 @@ module.exports = {
   parseClientId,
   hashString,
   parseBearerAuthorization,
+  minimalError,
 };

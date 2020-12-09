@@ -1,5 +1,5 @@
 const jwtDecode = require("jwt-decode");
-const { rethrowIfRuntimeError } = require("../../utils");
+const { rethrowIfRuntimeError, minimalError } = require("../../utils");
 const { translateTokenSet } = require("../tokenResponse");
 
 class TokenHandlerClient {
@@ -29,7 +29,7 @@ class TokenHandlerClient {
       return {
         statusCode: error.statusCode,
         responseBody: {
-          error: error.error,
+          error: minimalError(error.error),
           error_description: error.error_description,
         },
       };
