@@ -205,6 +205,32 @@ describe("authorizeHandler", () => {
     expect(res.statusCode).toEqual(400);
   });
 
+  it("Should return a 400 status code on invalid client_id", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+
+    req.query = {
+      state: "fake_state",
+      client_id: "invalid",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
+
   it("State is empty, returns 400", async () => {
     req.query = { state: null };
     await authorizeHandler(
