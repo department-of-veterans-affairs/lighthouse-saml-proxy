@@ -196,17 +196,20 @@ expect_status() {
 #
 expect_json_body() {
   # write body to a file
-  local expectedFile
-  expectedFile="$(mktemp)"
-  echo "$1" > "$expectedFile"
+  local expected_file
+  expected_file="$(mktemp)"
+  echo "$1" > "$expected_file"
 
-  actualFile=$curl_body
+  local actual_file
+  actual_file=$curl_body
 
-  if [ "$(cmp <(jq -cS . "$actualFile") <(jq -cS . "$expectedFile"))" ]; then
+  if [ "$(cmp <(jq -cS . "$actual_file") <(jq -cS . "$expected_file"))" ]; then
     echo "----"
     echo "FAIL:"
-    echo "  actual:   $(jq -cS . "$actualFile")"
-    echo "  expected: $(jq -cS . "$expectedFile")"
+    echo "  actual:   $(jq -cS . "$actual_file
+")"
+    echo "  expected: $(jq -cS . "$expected_file
+")"
     echo "----"
     PASS=0
   fi
@@ -218,32 +221,34 @@ expect_json_body() {
 # expected value ($2)
 #
 expect_json_property() {
-  expectedProperty="$1"
-  expectedValue="$2"
+  local expected_property="$1"
+  local expected_value="$2"
 
-  actualValue="$(jq -r ".$expectedProperty" "$curl_body")"
+  local actual_value
+  actual_value="$(jq -r ".$expected_property" "$curl_body")"
 
-  if [ "$actualValue" != "$expectedValue" ]; then
+  if [ "$actual_value" != "$expected_value" ]; then
     echo "----"
     echo "FAIL:"
-    echo "  actual:   $actualValue"
-    echo "  expected: $expectedValue"
+    echo "  actual:   $actual_value"
+    echo "  expected: $expected_value"
     echo "----"
     PASS=0
   fi
 }
 
 #
-# Will return true if JSON body has expectedProperty ($1)
+# Will return true if JSON body has expected_property ($1)
 #
 has_json_property() {
-  expectedProperty="$1"
-  value="$(jq -r ".$expectedProperty" "$curl_body")"
+  local expected_property="$1"
+  local value=
+  value="$(jq -r ".$expected_property" "$curl_body")"
 
   if [ "$value" = "null" ]; then
     echo "----"
     echo "FAIL:"
-    echo "  could not find property:   $expectedProperty"
+    echo "  could not find property:   $expected_property"
     echo "----"
     PASS=0
   fi
@@ -354,10 +359,12 @@ expect_json_property "refresh_token" "$(echo "$TOKENS" | jq ".refresh_token" | t
 expect_json_property "token_type" "Bearer"
 has_json_property "scope" 
 has_json_property "expires_in" 
+
 if [[ "$(cat "$curl_body" | jq .scope)" == *"launch/patient"* ]];
 then
   has_json_property "patient"
 fi
+
 has_json_property "state" 
 
 echo "Running ... Token Handler expired code"
