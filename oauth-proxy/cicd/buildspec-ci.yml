@@ -1,0 +1,83 @@
+######################################################################
+#  Oauth Proxy CodeBuild CI
+#   This job will build the Oauth Proxy image, run unit tests and push to ECR for deployment.
+#
+# Tool Links:
+#  - CodeBuild - https://docs.aws.amazon.com/codebuild/index.html
+#  - CodeBuild Environmental Variables - https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html
+#  - Runner for CodeBuild Enironment - https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/docker-runner
+#  - AWS CLI 2.0 - https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+#
+# All Custom scripts are on the CodeBuild Environment container.
+# https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/
+#
+#
+######################################################################
+version: 0.2
+env:
+  shell: bash
+  variables:
+    # Honor Docker ignore at folder level
+    DOCKER_BUILDKIT: 1
+    IMAGE: "oauth-proxy"
+  parameter-store:
+    DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
+    DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
+  exported-variables:
+    - DOCKER_BUILDKIT
+phases:
+  install:
+    commands:
+      # There is considerable slow down in the provisioning phase when using Amazon provided images.
+      # Therefore we use our own Alpine based image. In order to activate the Docker Daemon these lines are needed.
+      - /usr/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      # Set Start time
+      - time="Start - $(date +%r)"
+      # Generate short ref
+      - COMMIT_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
+      # Get usable branch name
+      - GET_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#"refs/heads/"}
+      # set branch if not set from webhook
+      - |
+        if [[ $BRANCH ]]; then
+          echo branch set as -- ${BRANCH} -- from console
+        elif [[ ${GET_BRANCH} ]]; then
+          echo branch set as -- ${GET_BRANCH} -- from webhook
+          BRANCH=${GET_BRANCH}
+        else
+          echo No branch found... setting to \"default\"
+          BRANCH=default
+        fi
+      # printenv variables to Cloud Watch incase of failure
+      - printenv
+  build:
+    commands:
+      # Login to Docker Hub prior to pulling base images to avoid rate limiting
+      - echo Logging into Docker Hub
+      - echo "${DOCKER_PASSWORD}" | docker login --username ${DOCKER_USERNAME} --password-stdin
+      # Build the image
+      - echo Building commit ${TAG}
+      - time="${time}\nBuild - $(date +%r) - started"
+      - |
+        make build  \
+         TAG=${COMMIT_HASH} \
+         VERSION=${COMMIT_HASH} \
+         BUILD_TOOL=CodeBuild \
+         BUILD_NUMBER=${CODEBUILD_BUILD_NUMBER}
+      # run unit tests
+      - make test IMAGE=${COMMIT_HASH}
+      # Login to ECR prior to push
+      - echo Logging into ECR
+      - make login
+      # Push image to ECR tagged with commit hash.
+      - echo Pushing image to ECR
+      - time="${time}\nPush - $(date +%r) - started"
+      - make push TAG=${COMMIT_HASH}
+      - time="${time}\nRelease - $(date +%r) - started"
+      - |
+        if [[ ${BRANCH} == 'master' ]]; then
+          aws codebuild start-build --project-name oauth-proxy-release --source-version ${CODEBUILD_RESOLVED_SOURCE_VERSION}
+        fi
