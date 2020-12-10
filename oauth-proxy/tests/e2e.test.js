@@ -480,8 +480,9 @@ describe("OpenID Connect Conformance", () => {
       })
       .catch((err) => {
         expect(err.response.status).toEqual(400);
-        expect(err.response.data).toEqual(
-          "invalid_request: Invalid or unsupported content-type"
+        expect(err.response.data.error).toEqual("invalid_request");
+        expect(err.response.data.error_description).toEqual(
+          "Invalid or unsupported content-type"
         );
       });
   });

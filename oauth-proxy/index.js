@@ -335,7 +335,10 @@ function buildApp(
     }
     let message;
     if (err.message && statusCode === 400) {
-      message = "invalid_request: Invalid or unsupported content-type";
+      message = {
+        error: "invalid_request",
+        error_description: "Invalid or unsupported content-type",
+      };
     } else if (error && error_description) {
       message = `${error}: ${error_description}`;
     } else {
