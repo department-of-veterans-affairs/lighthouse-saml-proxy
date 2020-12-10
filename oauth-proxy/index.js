@@ -327,19 +327,21 @@ function buildApp(
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
     const { error, error_description } = req.query;
-    let statusCode;
+    let statusCode = 500;
     if (err.statusCode) {
       statusCode = err.statusCode;
     } else if (err.status) {
       statusCode = err.status;
     }
-    if (err.message && statusCode) {
-      res.status(statusCode).send(err.message);
+    let message;
+    if (err.message) {
+      message = err.message;
     } else if (error && error_description) {
-      res.status(500).send(`${error}: ${error_description}`);
+      message = `${error}: ${error_description}`;
     } else {
-      res.status(500).send("An unknown error has occurred");
+      message = "An unknown error has occurred";
     }
+    res.status(statusCode).send(message);
   });
 
   function buildMetadataForOpenIdConfiguration(
