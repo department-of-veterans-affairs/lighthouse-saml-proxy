@@ -1,6 +1,7 @@
 const {
   rethrowIfRuntimeError,
   statusCodeFromError,
+  minimalError,
 } = require("../../../utils");
 
 class AuthorizationCodeStrategy {
@@ -23,7 +24,7 @@ class AuthorizationCodeStrategy {
       rethrowIfRuntimeError(error);
       this.logger.error(
         "Failed to retrieve tokens using the OpenID client",
-        error
+        minimalError(error)
       );
       throw {
         error: error.error,

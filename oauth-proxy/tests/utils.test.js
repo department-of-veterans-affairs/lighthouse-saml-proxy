@@ -7,6 +7,7 @@ const {
   parseClientId,
   parseBearerAuthorization,
   hashString,
+  minimalError,
 } = require("../utils");
 
 describe("statusCodeFromError", () => {
@@ -166,5 +167,45 @@ describe("parseBearerAuthorization", () => {
   });
   it("Match", () => {
     expect(parseBearerAuthorization("Bearer jwt")).toBe("jwt");
+  });
+});
+
+describe("minimalError", () => {
+  it("API-3493 verbose log on timeout fix verification", () => {
+    let testError = {
+      name: "TimeoutError",
+      code: "ETIMEDOUT",
+      hostname: "deptva-eval.okta.com",
+      method: "POST",
+      url: "https://xxx/oauth2/xxxxxx/v1/token",
+      event: "request",
+      level: "error",
+      message:
+        "Failed to retrieve tokens using the OpenID client Timeout awaiting 'request' for 10000ms",
+      time: "2020-12-08T18:54:51.085Z",
+    };
+    let result = minimalError(testError);
+    expect(result.message).toBe(
+      "Failed to retrieve tokens using the OpenID client Timeout awaiting 'request' for 10000ms"
+    );
+    expect(result.name).toBe("TimeoutError");
+    expect(Object.keys(result)).toHaveLength(2);
+  });
+  it("pass through error as a string", () => {
+    expect(minimalError("Some error")).toBe("Some error");
+  });
+
+  it("verify whitelist of other fields", () => {
+    let testErr = {
+      statusCode: 500,
+      error: "ut_token_failure",
+      error_description: "Failed to retrieve access_token.",
+      status: "Internal server error",
+    };
+    let result = minimalError(testErr);
+    expect(result.statusCode).toBe(500);
+    expect(result.status).toBe("Internal server error");
+    expect(result.error).toBe("ut_token_failure");
+    expect(result.error_description).toBe("Failed to retrieve access_token.");
   });
 });

@@ -81,6 +81,35 @@ const hashString = (unhashedString, secret) => {
   return hashedString;
 };
 
+const isString = (obj) => typeof obj === "string" || obj instanceof String;
+
+const minimalError = (error) => {
+  if (isString(error)) {
+    return error;
+  }
+  let errPayload = {};
+  if (error.error && isString(error.error)) {
+    errPayload.error = error.error;
+  }
+  if (error.message) {
+    errPayload.message = error.message;
+  }
+  if (error.name) {
+    errPayload.name = error.name;
+  }
+  if (error.statusCode) {
+    errPayload.statusCode = error.statusCode;
+  }
+  if (error.error_description) {
+    errPayload.error_description = error.error_description;
+  }
+  if (error.status) {
+    errPayload.status = error.status;
+  }
+
+  return errPayload;
+};
+
 function parseBearerAuthorization(authorization) {
   if (!authorization) {
     return null;
@@ -104,4 +133,5 @@ module.exports = {
   parseClientId,
   hashString,
   parseBearerAuthorization,
+  minimalError,
 };

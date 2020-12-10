@@ -2,6 +2,7 @@ const process = require("process");
 const {
   rethrowIfRuntimeError,
   statusCodeFromError,
+  minimalError,
 } = require("../../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../../metrics");
 
@@ -23,7 +24,7 @@ class RefreshTokenStrategy {
       rethrowIfRuntimeError(error);
       this.logger.error(
         "Could not refresh the client session with the provided refresh token",
-        error
+        minimalError(error)
       );
       stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
       throw {
