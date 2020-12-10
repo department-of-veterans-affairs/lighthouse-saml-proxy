@@ -81,8 +81,7 @@ const hashString = (unhashedString, secret) => {
   return hashedString;
 };
 
-const isString = (error) =>
-  typeof error === "string" || error instanceof String;
+const isString = (obj) => typeof obj === "string" || obj instanceof String;
 
 const minimalError = (error) => {
   if (isString(error)) {
