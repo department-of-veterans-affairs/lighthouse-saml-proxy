@@ -173,7 +173,6 @@ describe("parseBearerAuthorization", () => {
 describe("minimalError", () => {
   it("API-3493 verbose log on timeout fix verification", () => {
     let testError = {
-      service: "oauth-proxy",
       name: "TimeoutError",
       code: "ETIMEDOUT",
       hostname: "deptva-eval.okta.com",
