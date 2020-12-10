@@ -81,8 +81,17 @@ const hashString = (unhashedString, secret) => {
   return hashedString;
 };
 
+const isString = (error) =>
+  typeof error === "string" || error instanceof String;
+
 const minimalError = (error) => {
+  if (isString(error)) {
+    return error;
+  }
   let errPayload = {};
+  if (error.error && isString(error.error)) {
+    errPayload.error = error.error;
+  }
   if (error.message) {
     errPayload.message = error.message;
   }

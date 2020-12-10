@@ -248,4 +248,21 @@ describe("minimalError", () => {
     expect(result.name).toBe("TimeoutError");
     expect(Object.keys(result)).toHaveLength(2);
   });
+  it("pass through error as a string", () => {
+    expect(minimalError("Some error")).toBe("Some error");
+  });
+
+  it("verify whitelist of other fields", () => {
+    let testErr = {
+      statusCode: 500,
+      error: "ut_token_failure",
+      error_description: "Failed to retrieve access_token.",
+      status: "Internal server error",
+    };
+    let result = minimalError(testErr);
+    expect(result.statusCode).toBe(500);
+    expect(result.status).toBe("Internal server error");
+    expect(result.error).toBe("ut_token_failure");
+    expect(result.error_description).toBe("Failed to retrieve access_token.");
+  });
 });
