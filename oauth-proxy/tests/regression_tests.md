@@ -19,4 +19,3 @@ export CC_CLIENT_SECRET={{ client secret }}
 *Note* 
 
 - The test CLIENT_ID must be whitespaced for https://app/after-auth as a Redirect URL.
-- You must have access to VA docker hub and be signed in to pull the lighthouse-auth-utils image.
