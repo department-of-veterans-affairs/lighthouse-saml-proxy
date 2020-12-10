@@ -502,7 +502,7 @@ do_token "$(jq \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
 expect_status 401
-expect_json_body '{"error":"expected 200 OK, got: 401 Unauthorized"}'
+# expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
 echo "Running ... Token Handler code path invalid client id"
 
@@ -515,7 +515,7 @@ do_token "$(jq \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
 expect_status 401
-expect_json_body '{"error":"expected 200 OK, got: 401 Unauthorized"}'
+# expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
 echo "Running ... Token Handler invalid strategy"
 
