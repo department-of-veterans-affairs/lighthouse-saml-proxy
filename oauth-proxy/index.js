@@ -327,7 +327,15 @@ function buildApp(
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
     const { error, error_description } = req.query;
-    if (error && error_description) {
+    let statusCode;
+    if (err.statusCode) {
+      statusCode = err.statusCode;
+    } else if (err.status) {
+      statusCode = err.status;
+    }
+    if (err.message && statusCode) {
+      res.status(statusCode).send(err.message);
+    } else if (error && error_description) {
       res.status(500).send(`${error}: ${error_description}`);
     } else {
       res.status(500).send("An unknown error has occurred");
