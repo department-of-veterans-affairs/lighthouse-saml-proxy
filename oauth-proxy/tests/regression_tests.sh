@@ -2,6 +2,20 @@
 # Team Pivot!
 # Simple scipt to test the Oauth Proxy.
 
+# Dependency Check
+
+if ! docker -v COMMAND &> /dev/null
+then
+    echo "please install docker."
+    exit 1
+fi
+
+if ! jq --version COMMAND &> /dev/null
+then
+    echo "Please install jq."
+    exit 1
+fi
+
 # Variables
 
 TOKENS= 
