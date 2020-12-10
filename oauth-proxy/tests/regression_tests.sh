@@ -1,6 +1,6 @@
 #!/bin/bash
 # Team Pivot!
-# Simple scipt to test the Oauth Proxy.
+# Simple script to test the Oauth Proxy.
 
 # Dependency Check
 
