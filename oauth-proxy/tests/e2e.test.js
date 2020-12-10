@@ -481,7 +481,7 @@ describe("OpenID Connect Conformance", () => {
       .catch((err) => {
         expect(err.response.status).toEqual(400);
         expect(err.response.data).toEqual(
-          "Unexpected token g in JSON at position 0"
+          "invalid_request: Invalid or unsupported content-type"
         );
       });
   });
