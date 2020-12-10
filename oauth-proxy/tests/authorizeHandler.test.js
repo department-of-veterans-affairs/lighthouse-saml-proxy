@@ -186,7 +186,13 @@ describe("authorizeHandler", () => {
       res,
       next
     );
-    expect(res.statusCode).toEqual(500);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Unable to get the authorization server."
+    );
+    expect(next).toHaveBeenCalledWith({
+      status: 500,
+    });
   });
 
   it("No state, returns 400", async () => {
