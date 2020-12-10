@@ -178,15 +178,11 @@ describe("minimalError", () => {
       code: "ETIMEDOUT",
       hostname: "deptva-eval.okta.com",
       method: "POST",
-      path: "/oauth2/xxx/v1/token",
-      protocol: "https:",
       url: "https://xxx/oauth2/xxxxxx/v1/token",
       event: "request",
       level: "error",
       message:
         "Failed to retrieve tokens using the OpenID client Timeout awaiting 'request' for 10000ms",
-      stack:
-        "TimeoutError: Timeout awaiting 'request' for 10000ms\n    at ClientRequest.<anonymous> (/home/node/node_modules/got/source/request-as-event-emitter.js:176:14)\n    at Object.onceWrapper (events.js:421:26)\n    at ClientRequest.emit (events.js:326:22)\n    at ClientRequest.EventEmitter.emit (domain.js:483:12)\n    at ClientRequest.origin.emit (/home/node/node_modules/@szmarczak/http-timer/source/index.js:37:11)\n    at Immediate.timeoutHandler (/home/node/node_modules/got/source/utils/timed-out.js:63:11)\n    at processImmediate (internal/timers.js:463:21)",
       time: "2020-12-08T18:54:51.085Z",
     };
     let result = minimalError(testError);
