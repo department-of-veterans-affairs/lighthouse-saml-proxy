@@ -10,6 +10,30 @@ pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
 
+if [[ -z "$TOKEN_FILE" ]];
+then
+  echo "ERROR - TOKEN_FILE is a required parameter."
+  exit 1
+fi
+
+if [[ -z "$EXPIRED_TOKEN_FILE" ]];
+then
+  echo "ERROR - EXPIRED_TOKEN_FILE is a required parameter."
+  exit 1
+fi
+
+if [ -z "$HOST" ];
+then
+  echo "ERROR - HOST is a required parameter."
+  exit 1
+fi
+
+if [ -z "$CODE" ];
+then
+  echo "ERROR - CODE is a required parameter."
+  exit 1
+fi
+
 # Oauth Proxy functions
 
 do_token() {
@@ -91,8 +115,9 @@ track_result() {
 }
 
 # --------
+echo -e "\nToken Tests"
 
-echo "Running ... Token Handler code happy path"
+echo -e "\tRunning ... Token Handler code happy path"
 
 do_token "$(jq \
                 -scn \
@@ -126,7 +151,7 @@ fi
 ./assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
 track_result
 
-echo "Running ... Token Handler expired code"
+echo -e "\tRunning ... Token Handler expired code"
 
 do_token "$(jq \
                 -scn \
@@ -141,7 +166,7 @@ track_result
 ./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
 track_result
 
-echo "Running ... Token Handler invalid code"
+echo -e "\tRunning ... Token Handler invalid code"
 
 do_token "$(jq \
                 -scn \
@@ -156,7 +181,7 @@ track_result
 ./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
 track_result
 
-echo "Running ... Token Handler code path invalid client id"
+echo -e "\tRunning ... Token Handler code path invalid client id"
 
 do_token "$(jq \
                 -scn \
@@ -171,7 +196,7 @@ track_result
 
 # expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
-echo "Running ... Revoke active token happy path"
+echo -e "\tRunning ... Revoke active token happy path"
 
 cat "$TOKEN_FILE" > "$EXPIRED_TOKEN_FILE"
 access_token=$(cat "$TOKEN_FILE" | jq ".access_token" | tr -d '"')
@@ -182,7 +207,7 @@ track_result
 
 # The access token is now expired
 
-echo "Running ... Token Handler refresh happy path"
+echo -e "\tRunning ... Token Handler refresh happy path"
 refresh=$(cat "$TOKEN_FILE" | jq ".refresh_token" | tr -d '"')
 
 do_token "$(jq \
@@ -217,7 +242,7 @@ fi
 ./assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
 track_result
 
-echo "Running ... Token Handler invalid refresh token"
+echo -e "\tRunning ... Token Handler invalid refresh token"
 
 do_token "$(jq \
               -scn \
@@ -232,7 +257,7 @@ track_result
 ./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The refresh token is invalid or expired."}'
 track_result
 
-echo "Running ... Token Handler refresh path invalid client id"
+echo -e "\tRunning ... Token Handler refresh path invalid client id"
   
 do_token "$(jq \
               -scn \
@@ -247,7 +272,7 @@ do_token "$(jq \
 track_result
 # expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
-echo "Running ... Client Credentials happy path"
+echo -e "\tRunning ... Client Credentials happy path"
 
 cc=$(do_client_credentials "launch/patient" "123V456")
 
@@ -260,7 +285,7 @@ track_result
 ./assertions.sh --has-property --json="$cc" --property="expires_in"
 track_result
 
-echo "Running ... Token Handler invalid strategy"
+echo -e "\tRunning ... Token Handler invalid strategy"
 
 do_token "$(jq \
                 -scn \
@@ -278,7 +303,7 @@ track_result
 
 if [[ $pass -lt 1 ]];
 then
-  echo "FAIL - Some token tests did not pass."
+  echo -e "\tFAIL - Some token tests did not pass."
   exit 1
 fi
 

@@ -81,16 +81,13 @@ docker pull vasdvp/lighthouse-auth-utils:latest
 CODE=$(assign_code)
 
 # Start Tests
-echo "Token Tests"
+
 ./token_tests.sh "$HOST" "$CODE" "$TOKEN_FILE" "$EXPIRED_TOKEN"
 track_result
-echo "Intropsect Tests"
 ./introspect_tests.sh "$HOST" "$( cat "$TOKEN_FILE")" "$( cat "$EXPIRED_TOKEN")"
 track_result
-echo "Grants Tests"
 ./okta_grants_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
 track_result
-echo "Other Tests"
 ./other_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
 track_result
 

@@ -29,8 +29,9 @@ track_result() {
 }
 
 # --------
+echo -e "\nMisc. Tests"
 
-echo "Running ... User Info happy path"
+echo -e "\tRunning ... User Info happy path"
   
 access_token=$(echo "$TOKENS" | jq ".access_token" | tr -d '"')
 
@@ -63,7 +64,7 @@ track_result
 ./assertions.sh --has-property --json="$(cat "$curl_body")" --property="updated_at"
 track_result
 
-echo "Running ... Keys happy path"
+echo -e "\tRunning ... Keys happy path"
 
 curl -s \
   -w "%{http_code}" \
@@ -86,7 +87,7 @@ track_result
 track_result
 
 
-echo "Running ... Manage happy path"
+echo -e "\tRunning ... Manage happy path"
 
 curl -s \
   -w "%{http_code}" \
@@ -96,7 +97,7 @@ curl -s \
 ./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=302
 track_result
 
-echo "Running ... Authorize Handler with no state parameter"
+echo -e "\tRunning ... Authorize Handler with no state parameter"
 
 if [[ -z $SCOPE ]];
 then 
@@ -116,7 +117,7 @@ track_result
 
 if [[ $pass -lt 1 ]];
 then
-  echo "FAIL - Some misc. tests did not pass."
+  echo -e "\tFAIL - Some misc. tests did not pass."
   exit 1
 fi
 

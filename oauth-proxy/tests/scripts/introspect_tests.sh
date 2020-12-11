@@ -9,6 +9,24 @@ pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
 
+if [[ -z $(echo "$TOKENS" | jq .access_token) ]];
+then
+  echo "ERROR - TOKENS is a required parameter."
+  exit 1
+fi
+
+if [ -z "$HOST" ];
+then
+  echo "ERROR - HOST is a required parameter."
+  exit 1
+fi
+
+if [ -z "$EXPIRED_ACCESS" ];
+then
+  echo "ERROR - EXPIRED_ACCESS is a required parameter."
+  exit 1
+fi
+
 # Helper Functions
 
 track_result() {
@@ -42,8 +60,9 @@ do_introspect() {
 }
 
 # -------
+echo -e "\nIntropsect Tests"
 
-echo "Running ... Introspect valid access token"
+echo -e "\tRunning ... Introspect valid access token"
 
 access_token=$(echo "$TOKENS" | jq ".access_token" | tr -d '"')
 do_introspect "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
@@ -75,7 +94,7 @@ track_result
 ./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="uid" --expected-value="$USERID"
 track_result
 
-echo "Running ... Introspect valid id token"
+echo -e "\tRunning ... Introspect valid id token"
 
 id_token=$(echo "$TOKENS" | jq ".id_token" | tr -d '"')
 do_introspect "$id_token" "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
@@ -113,7 +132,7 @@ track_result
 ./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="name" --expected-value="$NAME"
 track_result
 
-echo "Running ... Introspect expired access token"
+echo -e "\tRunning ... Introspect expired access token"
 
 do_introspect "$EXPIRED_ACCESS" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
@@ -122,7 +141,7 @@ track_result
 ./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{ "active": false }'
 track_result
 
-echo "Running ... Introspect invalid id token"
+echo -e "\tRunning ... Introspect invalid id token"
 
 do_introspect invalid "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
@@ -133,7 +152,7 @@ track_result
 
 if [[ $pass -lt 1 ]];
 then
-  echo "FAIL - Some introspect tests did not pass."
+  echo -e "\tFAIL - Some introspect tests did not pass."
   exit 1
 fi
 
