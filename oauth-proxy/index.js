@@ -326,7 +326,7 @@ function buildApp(
 
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
-    const { error, error_description } = req.query;
+    const { error_description } = req.query;
     let statusCode = 500;
     if (err.statusCode && isNumber(err.statusCode)) {
       statusCode = err.statusCode;
