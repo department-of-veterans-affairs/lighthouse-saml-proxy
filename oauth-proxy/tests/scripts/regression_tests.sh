@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Team Pivot!
 # Simple script to test the Oauth Proxy.
 
