@@ -51,6 +51,7 @@ phases:
           DEPLOY_TAG=${COMMIT_HASH:0:7}
         else
           DEPLOY_TAG=$(git tag --sort=-creatordate | grep fargate-oauth-proxy | head -1)
+          DEPLOY_TAG=${DEPLOY_TAG#*/}
         fi
       - echo "Deployment target set to ${DEPLOY_TAG}"
       - |

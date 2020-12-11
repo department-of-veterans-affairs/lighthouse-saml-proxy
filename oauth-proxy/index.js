@@ -328,9 +328,14 @@ function buildApp(
     // catchall error handler
     const { error, error_description } = req.query;
     if (error && error_description) {
-      res.status(500).send(`${error}: ${error_description}`);
+      res.status(500).json({
+        error: "server_error",
+        error_description: error_description,
+      });
     } else {
-      res.status(500).send("An unknown error has occurred");
+      res.status(500).json({
+        error: "server_error",
+      });
     }
   });
 
