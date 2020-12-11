@@ -19,7 +19,6 @@ fi
 # Variables
 
 REDIRECT_URI="https://app/after-auth"
-REDIRECT_URI="https://app/after-auth"
 pass=1
 
 TOKEN_FILE="$(mktemp)"
