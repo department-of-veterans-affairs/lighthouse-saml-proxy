@@ -16,7 +16,7 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
-const { isString, isNumber } = require("./utils");
+const { isString } = require("./utils");
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
@@ -328,30 +328,24 @@ function buildApp(
     // catchall error handler
     const { error_description } = req.query;
     let statusCode = 500;
-    if (err.statusCode && isNumber(err.statusCode)) {
+    let error_out = {
+      error: "sever_error",
+    };
+    if (err.statusCode && err.statusCode === 400) {
       statusCode = err.statusCode;
-    } else if (err.status && isNumber(err.status)) {
-      statusCode = err.status;
     }
-    let message;
-    if (isString(err)) {
-      message = err;
-    } else if (err.message && statusCode === 400) {
-      message = {
+    if (statusCode === 400) {
+      error_out = {
         error: "invalid_request",
         error_description: "Invalid or unsupported content-type",
       };
-    } else if (error_description) {
-      message = {
-        error: "server_error",
-        error_description: error_description,
-      };
-    } else {
-      message = {
-        error: "server_error",
-      };
+    } else if (isString(err)) {
+      error_out.error_description = err;
+    } else if (error_description && isString(error_description)) {
+      error_out.error_description = error_description;
     }
-    res.status(statusCode).send(message);
+
+    res.status(statusCode).send(error_out);
   });
 
   function buildMetadataForOpenIdConfiguration(
