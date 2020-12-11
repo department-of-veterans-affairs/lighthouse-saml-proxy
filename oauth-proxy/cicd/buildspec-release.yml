@@ -69,7 +69,7 @@ phases:
       - |
         if [[ ${DEPLOY} == "true" ]]; then
           echo "initiating deploy for ${new_tag}"
-          aws codebuild start-build --project-name oauth-proxy-deploy --environment-variables-override name=RELEASE,value=${new_tag}
+          aws codebuild start-build --project-name oauth-proxy-deploy --environment-variables-override name=RELEASE,value=${new_tag#*/}
         fi
   post_build:
     commands:

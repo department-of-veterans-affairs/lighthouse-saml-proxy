@@ -76,7 +76,7 @@ phases:
             ${CLUSTER} \
             ${SERVICE} \
             --tag ${DEPLOY_TAG} \
-            --timeout 300 || exit 1
+            --timeout 1200 || exit 1
             slackpost.sh -t success "Deployed OAuth Proxy to ${env}."
         done
   post_build:
