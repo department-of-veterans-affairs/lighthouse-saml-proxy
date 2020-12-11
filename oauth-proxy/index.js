@@ -341,13 +341,15 @@ function buildApp(
         error: "invalid_request",
         error_description: "Invalid or unsupported content-type",
       };
-    } else if (error && error_description) {
+    } else if (error_description) {
       message = {
-        error: error,
+        error: "server_error",
         error_description: error_description,
       };
     } else {
-      message = "An unknown error has occurred";
+      message = {
+        error: "server_error",
+      };
     }
     res.status(statusCode).send(message);
   });

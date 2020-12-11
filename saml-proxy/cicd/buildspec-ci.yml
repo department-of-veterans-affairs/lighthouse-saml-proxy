@@ -1,6 +1,6 @@
 ######################################################################
-#  Oauth Proxy CodeBuild CI
-#   This job will build the Oauth Proxy image, run unit tests and push to ECR for deployment.
+#  SAML Proxy CodeBuild CI
+#   This job will build the SAML Proxy image, run unit tests and push to ECR for deployment.
 #
 # Tool Links:
 #  - CodeBuild - https://docs.aws.amazon.com/codebuild/index.html
@@ -19,7 +19,7 @@ env:
   variables:
     # Honor Docker ignore at folder level
     DOCKER_BUILDKIT: 1
-    IMAGE: "oauth-proxy"
+    IMAGE: "saml-proxy"
   parameter-store:
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
     DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
@@ -69,7 +69,7 @@ phases:
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run unit tests
-      - make test IMAGE=${IMAGE} TAG=${COMMIT_HASH}
+      - make test IMAGE=${IMAGE}
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login
@@ -80,5 +80,5 @@ phases:
       - time="${time}\nRelease - $(date +%r) - started"
       - |
         if [[ ${BRANCH} == 'master' ]]; then
-          aws codebuild start-build --project-name oauth-proxy-release --source-version ${CODEBUILD_RESOLVED_SOURCE_VERSION}
+          aws codebuild start-build --project-name saml-proxy-release --source-version ${CODEBUILD_RESOLVED_SOURCE_VERSION}
         fi

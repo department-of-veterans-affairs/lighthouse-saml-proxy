@@ -30,10 +30,9 @@ class ClientCredentialsStrategy {
         this.logger.error({
           message: "Server returned status code " + res.status,
         });
+
         throw {
           statusCode: 500,
-          error: "token_failure",
-          error_description: "Failed to retrieve access_token.",
         };
       }
     } catch (error) {
@@ -59,6 +58,9 @@ class ClientCredentialsStrategy {
           error_description: error.response.data.error_description,
         };
       } else {
+        this.logger.error(
+          "Failed to retrieve access_token from token endpoint."
+        );
         if (error.response) {
           this.logger.error({
             message: "Server returned status code " + error.response.status,
@@ -68,8 +70,6 @@ class ClientCredentialsStrategy {
         }
         throw {
           statusCode: 500,
-          error: "token_failure",
-          error_description: "Failed to retrieve access_token.",
         };
       }
     }

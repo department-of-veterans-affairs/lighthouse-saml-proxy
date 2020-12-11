@@ -21,10 +21,10 @@ class GetPatientInfoFromValidateEndpointStrategy {
       } else {
         this.logger.error({ message: error.message });
       }
+      this.logger.error(
+        "Invalid grant, could not find a valid patient identifier for the provided authorization code."
+      );
       throw {
-        error: "invalid_grant",
-        error_description:
-          "Could not find a valid patient identifier for the provided authorization code.",
         status: 500,
       };
     }
