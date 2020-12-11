@@ -40,13 +40,20 @@ const authorizeHandler = async (
       return next();
     }
   } catch (error) {
+    // This error is unrecoverable because we would be unable to verify
+    // that we are redirecting to a whitelisted client url
     logger.error(
       "Unrecoverable error: could not get the Okta client app",
       error
     );
-    // This error is unrecoverable because we would be unable to verify
-    // that we are redirecting to a whitelisted client url
-    return next(error);
+
+    res.status(400).json({
+      error: "invalid_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    });
+
+    return next();
   }
 
   try {

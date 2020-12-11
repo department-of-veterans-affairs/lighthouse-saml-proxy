@@ -1,0 +1,86 @@
+ ######################################################################
+#  OAuth Proxy CodeBuild Deploy
+#
+# ***  Maintenance Request Needed for Production deployments   ***
+#
+# Maintenance Request Documentation:
+#  - https://github.com/department-of-veterans-affairs/lighthouse-maintenance
+#  - https://community.max.gov/pages/viewpage.action?pageId=2172170301
+#  - https://github.com/department-of-veterans-affairs/lighthouse-devops-support
+#
+# Tool Links:
+#  - CodeBuild - https://docs.aws.amazon.com/codebuild/index.html
+#  - CodeBuild Environmental Variables - https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html
+#  - CodeBuild Source Image - ecs-deployer - https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/ecs-deployer
+#  - AWS CLI 2.0 - https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+#  - ECS Deploy - https://github.com/fabfuel/ecs-deploy
+#
+# All Custom scripts are on the CodeBuild Environment container.
+# https://github.com/department-of-veterans-affairs/lighthouse-codebuild-containers/tree/main/
+#
+# Custom Scripts:
+#  - slackpost.sh
+#
+######################################################################
+version: 0.2
+env:
+  shell: bash
+  variables:
+    # These are the default deploy environments
+    ENVIRONMENTS: "dev staging"
+    # These are the deployable environments
+    DEPLOYABLE_ENVIRONMENTS: "dev staging sandbox prod"
+    # Variables needed for ecs deployment
+    AWS_APP_NAME: "ecs-oauth-proxy"
+  parameter-store:
+    # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
+    SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook_lighthouse"
+phases:
+  pre_build:
+    commands:
+      - printenv
+  build:
+    commands:
+      # Set deploy tag to latest if release, commit hash, or deploy tag is not set.
+      - |
+        if [[ -n ${DEPLOY_TAG} ]]; then
+          echo Deploy Tag set
+        elif [[ ${RELEASE} ]]; then
+          DEPLOY_TAG=${RELEASE}
+        elif [[ ${COMMIT_HASH} ]]; then
+          DEPLOY_TAG=${COMMIT_HASH:0:7}
+        else
+          DEPLOY_TAG=$(git tag --sort=-creatordate | grep fargate-oauth-proxy | head -1)
+        fi
+      - echo "Deployment target set to ${DEPLOY_TAG}"
+      - |
+        for env in ${ENVIRONMENTS}; do
+          if  [[ ! ${DEPLOYABLE_ENVIRONMENTS[@]} =~ ${env} ]]; then
+            echo "${env} is not deployable!"
+            exit 1
+          fi
+          # Production deploys will require a MR number be set. This MR will not be check for validity but will serve as small safety measure for production deploys and reminder to enforce the process.
+          if  [[ (${env} == "prod" || ${env} == "sandbox") && ! ${MR} ]]; then
+            echo "${env} deployments need a maintenance request prior to deployment!"
+            exit 1
+          fi
+          echo Deploying to ${env}
+          # Set Cluster Name
+          CLUSTER="dvp-${env}-${AWS_APP_NAME}-cluster"
+          # Set Service Name
+          SERVICE="dvp-${env}-${AWS_APP_NAME}-service"
+          slackpost.sh -t started "Deploying OAuth Proxy to ${env}."
+          # Actual deploy of new container.
+          ecs deploy --no-deregister \
+            ${CLUSTER} \
+            ${SERVICE} \
+            --tag ${DEPLOY_TAG} \
+            --timeout 300 || exit 1
+            slackpost.sh -t success "Deployed OAuth Proxy to ${env}."
+        done
+  post_build:
+    commands:
+      - |
+        if [[ ${CODEBUILD_BUILD_SUCCEEDING} -eq 0 ]]; then
+          slackpost.sh -t failure "There was an error with the deployment process of OAuth Proxy!"
+        fi
