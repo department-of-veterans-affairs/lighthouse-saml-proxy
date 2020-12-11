@@ -65,7 +65,7 @@ phases:
       - gh release create ${new_tag}
       - echo tag image
       # tag ecr image with release
-      - make tag TAG=${COMMIT_HASH:0:7} NEW_TAG=${new_tag#*/}
+      - make tag IMAGE=${IMAGE} TAG=${COMMIT_HASH:0:7} NEW_TAG=${new_tag#*/}
       - |
         if [[ ${DEPLOY} == "true" ]]; then
           echo "initiating deploy for ${new_tag}"
