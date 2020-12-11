@@ -340,7 +340,10 @@ function buildApp(
         error_description: "Invalid or unsupported content-type",
       };
     } else if (error && error_description) {
-      message = `${error}: ${error_description}`;
+      message = {
+        error: error,
+        error_description: error_description,
+      };
     } else {
       message = "An unknown error has occurred";
     }
