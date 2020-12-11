@@ -64,18 +64,19 @@ phases:
       - |
         make build  \
          TAG=${COMMIT_HASH} \
+         IMAGE=${IMAGE} \
          VERSION=${COMMIT_HASH} \
          BUILD_TOOL=CodeBuild \
-         BUILD_NUMBER=${CODEBUILD_BUILD_NUMBER}
+         BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run unit tests
-      - make test IMAGE=${COMMIT_HASH}
+      - make test IMAGE=${IMAGE}
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login
       # Push image to ECR tagged with commit hash.
       - echo Pushing image to ECR
       - time="${time}\nPush - $(date +%r) - started"
-      - make push TAG=${COMMIT_HASH}
+      - make push IMAGE=${IMAGE} TAG=${COMMIT_HASH}
       - time="${time}\nRelease - $(date +%r) - started"
       - |
         if [[ ${BRANCH} == 'master' ]]; then
