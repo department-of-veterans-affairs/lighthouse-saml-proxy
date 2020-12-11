@@ -3,6 +3,7 @@
 
 HOST=$1
 TOKENS=$2
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
@@ -43,25 +44,25 @@ curl -s \
   "$HOST/userinfo" > "$curl_status"
 
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="name" --expected-value="$NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="name" --expected-value="$NAME"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="locale"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="locale"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="preferred_username" --expected-value="$USER_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="preferred_username" --expected-value="$USER_NAME"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="given_name" --expected-value="$FIRST_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="given_name" --expected-value="$FIRST_NAME"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="middle_name" --expected-value="$MIDDLE_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="middle_name" --expected-value="$MIDDLE_NAME"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="family_name" --expected-value="$LAST_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="family_name" --expected-value="$LAST_NAME"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="zoneinfo"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="zoneinfo"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="updated_at"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="updated_at"
 track_result
 
 echo -e "\tRunning ... Keys happy path"
@@ -71,19 +72,19 @@ curl -s \
   -o "$curl_body" \
   "$HOST/keys" > "$curl_status"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].kty"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].kty"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].alg"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].alg"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].kid"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].kid"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].use"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].use"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].e"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].e"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].n"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="keys[0].n"
 track_result
 
 
@@ -94,7 +95,7 @@ curl -s \
   -o "$curl_body" \
   "$HOST/manage" > "$curl_status"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=302
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=302
 track_result
 
 echo -e "\tRunning ... Authorize Handler with no state parameter"
@@ -109,10 +110,10 @@ curl -s \
   -o "$curl_body" \
   "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=$REDIRECT_URI&aud=default" > "$curl_status"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
 
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "State parameter required"}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "State parameter required"}'
 track_result
 
 if [[ $pass -lt 1 ]];

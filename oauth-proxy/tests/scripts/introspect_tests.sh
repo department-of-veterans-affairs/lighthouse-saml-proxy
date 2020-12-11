@@ -4,6 +4,7 @@
 HOST=$1
 TOKENS=$2
 EXPIRED_ACCESS=$3
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
 curl_status="$(mktemp)"
@@ -67,31 +68,31 @@ echo -e "\tRunning ... Introspect valid access token"
 access_token=$(echo "$TOKENS" | jq ".access_token" | tr -d '"')
 do_introspect "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="active" --expected-value="true"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="active" --expected-value="true"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope" 
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="username" --expected-value="$USER_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="username" --expected-value="$USER_NAME"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="exp" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="exp" 
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="iat" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="iat" 
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub" 
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="aud" --expected-value="$AUDIENCE"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="aud" --expected-value="$AUDIENCE"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="iss" --expected-value="$ISSUER"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="iss" --expected-value="$ISSUER"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="jti" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="jti" 
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="client_id" --expected-value="$CLIENT_ID"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="client_id" --expected-value="$CLIENT_ID"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="uid" --expected-value="$USERID"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="uid" --expected-value="$USERID"
 track_result
 
 echo -e "\tRunning ... Introspect valid id token"
@@ -99,55 +100,55 @@ echo -e "\tRunning ... Introspect valid id token"
 id_token=$(echo "$TOKENS" | jq ".id_token" | tr -d '"')
 do_introspect "$id_token" "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="active" --expected-value="true"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="active" --expected-value="true"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="username" --expected-value="$USER_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="username" --expected-value="$USER_NAME"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="preferred_username" --expected-value="$USER_NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="preferred_username" --expected-value="$USER_NAME"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="exp" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="exp" 
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="iat" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="iat" 
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="sub" 
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="aud" --expected-value="$AUDIENCE"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="aud" --expected-value="$AUDIENCE"
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="iss" --expected-value="$ISSUER"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="iss" --expected-value="$ISSUER"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="jti" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="jti" 
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="at_hash" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="at_hash" 
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="idp" --expected-value="$IDP"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="idp" --expected-value="$IDP"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="auth_time" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="auth_time" 
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="amr" 
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="amr" 
 track_result
-./assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="name" --expected-value="$NAME"
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="name" --expected-value="$NAME"
 track_result
 
 echo -e "\tRunning ... Introspect expired access token"
 
 do_introspect "$EXPIRED_ACCESS" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{ "active": false }'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{ "active": false }'
 track_result
 
 echo -e "\tRunning ... Introspect invalid id token"
 
 do_introspect invalid "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{ "active": false }'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{ "active": false }'
 track_result
 
 if [[ $pass -lt 1 ]];

@@ -2,6 +2,7 @@
 # Team Pivot!
 
 HOST=$1
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
 curl_status="$(mktemp)"
@@ -52,31 +53,31 @@ echo -e "\tRunning ... Delete Okta grant happy path"
 
 do_revoke_grant "$CLIENT_ID" "$USER_EMAIL"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="email" --expected-value="$USER_EMAIL"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="email" --expected-value="$USER_EMAIL"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="responses[0].status" --expected-value="204"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="responses[0].status" --expected-value="204"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="responses[0].message" --expected-value="Okta grants successfully revoked"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="responses[0].message" --expected-value="Okta grants successfully revoked"
 track_result
 
 echo -e "\tRunning ... Revoke Okta grants invalid email"
 
 do_revoke_grant "$CLIENT_ID" "invalid"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result 
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "Invalid email address."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "Invalid email address."}'
 track_result
 
 echo -e "\tRunning ... Revoke Okta grants invalid client"
 
 do_revoke_grant "invalid" "$USER_EMAIL"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "Invalid client_id."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "Invalid client_id."}'
 track_result
 
 if [[ $pass -lt 1 ]];

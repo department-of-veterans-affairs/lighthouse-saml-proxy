@@ -24,6 +24,7 @@ pass=1
 
 TOKEN_FILE="$(mktemp)"
 EXPIRED_TOKEN="$(mktemp)"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Helper Functions
 
@@ -82,13 +83,13 @@ CODE=$(assign_code)
 
 # Start Tests
 
-./token_tests.sh "$HOST" "$CODE" "$TOKEN_FILE" "$EXPIRED_TOKEN"
+"$DIR"/token_tests.sh "$HOST" "$CODE" "$TOKEN_FILE" "$EXPIRED_TOKEN"
 track_result
-./introspect_tests.sh "$HOST" "$( cat "$TOKEN_FILE")" "$( cat "$EXPIRED_TOKEN")"
+"$DIR"/introspect_tests.sh "$HOST" "$( cat "$TOKEN_FILE")" "$( cat "$EXPIRED_TOKEN")"
 track_result
-./okta_grants_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
+"$DIR"/okta_grants_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
 track_result
-./other_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
+"$DIR"/other_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
 track_result
 
 # End of Tests ----

@@ -5,6 +5,7 @@ HOST=$1
 CODE=$2
 TOKEN_FILE=$3
 EXPIRED_TOKEN_FILE=$4
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
 curl_status="$(mktemp)"
@@ -127,28 +128,28 @@ do_token "$(jq \
                 --arg secret "$CLIENT_SECRET" \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="access_token"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="access_token"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="id_token"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="id_token"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="refresh_token"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="refresh_token"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="expires_in"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="expires_in"
 track_result
 
 if [[ "$(cat "$curl_body" | jq .scope)" == *"launch/patient"* ]];
 then
-  ./assertions.sh --has-property --json="$(cat "$curl_body")" --property="patient"
+  "$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="patient"
   track_result
 fi
 
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
 track_result
 
 echo -e "\tRunning ... Token Handler expired code"
@@ -161,9 +162,9 @@ do_token "$(jq \
                 --arg secret "$CLIENT_SECRET" \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
 track_result
 
 echo -e "\tRunning ... Token Handler invalid code"
@@ -176,9 +177,9 @@ do_token "$(jq \
                 --arg secret "$CLIENT_SECRET" \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The authorization code is invalid or has expired."}'
 track_result
 
 echo -e "\tRunning ... Token Handler code path invalid client id"
@@ -191,7 +192,7 @@ do_token "$(jq \
                 --arg secret "$CLIENT_SECRET" \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
 track_result
 
 # expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
@@ -202,7 +203,7 @@ cat "$TOKEN_FILE" > "$EXPIRED_TOKEN_FILE"
 access_token=$(cat "$TOKEN_FILE" | jq ".access_token" | tr -d '"')
 do_revoke_token "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
 
 # The access token is now expired
@@ -218,28 +219,28 @@ do_token "$(jq \
               --arg secret "$CLIENT_SECRET" \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="access_token"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="access_token"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="id_token"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="id_token"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="refresh_token" --expected-value="$refresh"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="refresh_token" --expected-value="$refresh"
 track_result
-./assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
+"$DIR"/assertions.sh --expect-property --json="$(cat "$curl_body")" --property="token_type" --expected-value="Bearer"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="scope"
 track_result
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="expires_in"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="expires_in"
 track_result
 
 if [[ "$(cat "$curl_body" | jq .scope)" == *"launch/patient"* ]];
 then
-  ./assertions.sh --has-property --json="$(cat "$curl_body")" --property="patient"
+  "$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="patient"
   track_result
 fi
 
-./assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
 track_result
 
 echo -e "\tRunning ... Token Handler invalid refresh token"
@@ -252,9 +253,9 @@ do_token "$(jq \
               --arg secret "$CLIENT_SECRET" \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The refresh token is invalid or expired."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_grant", "error_description": "The refresh token is invalid or expired."}'
 track_result
 
 echo -e "\tRunning ... Token Handler refresh path invalid client id"
@@ -268,7 +269,7 @@ do_token "$(jq \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
 track_result
 # expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
@@ -276,13 +277,13 @@ echo -e "\tRunning ... Client Credentials happy path"
 
 cc=$(do_client_credentials "launch/patient" "123V456")
 
-./assertions.sh --has-property --json=$cc --property="access_token"
+"$DIR"/assertions.sh --has-property --json=$cc --property="access_token"
 track_result
-./assertions.sh --expect-property --json="$cc" --property="token_type" --expected-value="Bearer"
+"$DIR"/assertions.sh --expect-property --json="$cc" --property="token_type" --expected-value="Bearer"
 track_result
-./assertions.sh --expect-property --json="$cc" --property="scope" --expected-value="launch/patient"
+"$DIR"/assertions.sh --expect-property --json="$cc" --property="scope" --expected-value="launch/patient"
 track_result
-./assertions.sh --has-property --json="$cc" --property="expires_in"
+"$DIR"/assertions.sh --has-property --json="$cc" --property="expires_in"
 track_result
 
 echo -e "\tRunning ... Token Handler invalid strategy"
@@ -294,9 +295,9 @@ do_token "$(jq \
                 --arg secret "$CLIENT_SECRET" \
                 '{"client_id": $client_id, "grant_type": $grant_type, "client_secret": $secret}')"
 
-./assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-./assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization and refresh_token grant types are supported"}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization and refresh_token grant types are supported"}'
 track_result
 
 # It is not feasible to test Client Credential edge cases yet.
