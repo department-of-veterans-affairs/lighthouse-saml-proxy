@@ -75,7 +75,7 @@ phases:
     commands:
       # post to slack.
       - |
-        if [[ ${codebuild_build_succeeding} -eq 0 ]]; then
+        if [[ ${CODEBUILD_BUILD_SUCCEEDING} -eq 0 ]]; then
           slackpost.sh -t failure "there was an error with the release process for OAuth Proxy!."
         else
           slackpost.sh -t success "OAuth Proxy release ${new_tag} was successful."
