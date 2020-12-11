@@ -19,6 +19,9 @@ const authorizeHandler = async (
   try {
     await checkParameters(state, aud, issuer, logger, oktaClient);
   } catch (err) {
+    if (err.status == 500) {
+      return next(err);
+    }
     res.status(err.status).json({
       error: err.error,
       error_description: err.error_description,
@@ -83,6 +86,7 @@ const authorizeHandler = async (
 
 const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
   if (!state) {
+    logger.error("No valid state parameter was found.");
     throw {
       status: 400,
       error: "invalid_request",
@@ -102,7 +106,8 @@ const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
         serverAudiences = res.audiences;
       })
       .catch(() => {
-        throw { status: 500, error: "internal_error" };
+        logger.error("Unable to get the authorization server.");
+        throw { status: 500 };
       });
 
     if (!serverAudiences.includes(aud)) {

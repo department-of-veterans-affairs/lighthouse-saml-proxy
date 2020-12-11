@@ -172,6 +172,9 @@ describe("tokenHandler clientCredentials", () => {
       await clientCredentialsStrategy.getTokenResponse();
     } catch (error) {
       expect(error.statusCode).toEqual(500);
+      expect(logger.error).toHaveBeenCalledWith(
+        "Failed to retrieve access_token from token endpoint."
+      );
       expect(logger.error).toHaveBeenCalledWith({
         message: "Server returned status code 500",
       });
