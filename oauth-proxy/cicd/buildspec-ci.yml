@@ -69,7 +69,7 @@ phases:
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run unit tests
-      - make test IMAGE=${IMAGE}
+      - make test IMAGE=${IMAGE} TAG=${COMMIT_HASH}
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login
