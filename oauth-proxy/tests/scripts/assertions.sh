@@ -70,7 +70,7 @@ case $i in
     --property=*)
       PROPERTY="${i#*=}"; shift ;;
     --) shift ; break ;;
-    *) echo usage ; exit 1 ;;
+    *) usage ; exit 1 ;;
 esac
 done
 
