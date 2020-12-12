@@ -16,6 +16,31 @@ EXPECTED_STATUS=
 EXPECTED_JSON=
 EXPECTED_VALUE=
 
+usage() {
+cat <<EOF
+Commands
+  --expect-status [--status] [--expected-status]
+      Compares status to expected-status.
+
+  --expect-json [--json] [--expected-json] 
+      Compares json to expected-json.
+
+  --expect-property [--json] [--property] [--expected-value]
+      Compares json property value to expected value.
+
+  --has-property  [--json] [--property]
+      Checks for json property.
+
+  --has-or-expect-property [--json] [--property] [--expected-value]
+      If expected-value is present, compares json property to expected-value. 
+      If expected value is not present check for json property.
+
+Example
+  ./assertions.sh --expect-status=200 --status=200
+EOF
+exit 1
+}
+
 for i in "$@"
 do
 case $i in
@@ -29,6 +54,8 @@ case $i in
       HAS_PROPERTY=1; shift ;;
     --has-or-expect-property)
       HAS_OR_EXPECT_PROPERTY=1; shift ;;
+    --help|-h)
+      usage; exit 1 ;;
 
     --status=*)
       STATUS="${i#*=}"; shift ;;
@@ -43,7 +70,7 @@ case $i in
     --property=*)
       PROPERTY="${i#*=}"; shift ;;
     --) shift ; break ;;
-    *) echo "Internal error!" ; exit 1 ;;
+    *) echo usage ; exit 1 ;;
 esac
 done
 

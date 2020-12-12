@@ -45,7 +45,8 @@ export class VetsAPIClient {
       gender: user.gender || null,
       level_of_assurance: "3",
     };
-
+    console.log(`${this.apiHost}${MVI_PATH}`);
+    console.log(JSON.stringify(body));
     const response = await request.post({
       url: `${this.apiHost}${MVI_PATH}`,
       json: true,
