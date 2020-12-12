@@ -1,12 +1,35 @@
 #!/usr/bin/env bash
 # Team Pivot!
 
-HOST=$1
+HOST=
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
+
+usage() {
+cat <<EOF
+Tests the Oauth Proxy's DELETE grants endpoint.
+
+Example
+  ./okta_grants_tests.sh --host=https://sandbox-api.va.gov/oauth2
+EOF
+exit 1
+}
+
+for i in "$@"
+do
+case $i in
+    
+    --host=*)
+      HOST="${i#*=}"; shift ;;
+    --help|-h)
+      usage ;  exit 1 ;;
+    --) shift ; break ;;
+    *) usage ; exit 1 ;;
+esac
+done
 
 if [ -z "$HOST" ];
 then

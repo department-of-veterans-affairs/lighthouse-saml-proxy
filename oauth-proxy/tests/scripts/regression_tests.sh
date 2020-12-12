@@ -86,7 +86,7 @@ CODE=$(assign_code)
 track_result
 "$DIR"/introspect_tests.sh --host="$HOST" --tokens="$( cat "$TOKEN_FILE")" --expired-access="$( cat "$EXPIRED_TOKEN")"
 track_result
-"$DIR"/okta_grants_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
+"$DIR"/okta_grants_tests.sh --host="$HOST"
 track_result
 "$DIR"/other_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
 track_result
