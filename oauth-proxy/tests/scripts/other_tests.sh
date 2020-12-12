@@ -1,12 +1,38 @@
 #!/usr/bin/env bash
 # Team Pivot!
 
-HOST=$1
-TOKENS=$2
+HOST=
+TOKENS=
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
+
+usage() {
+cat <<EOF
+Tests the variety of minor Oauth Proxy endpoints.
+
+Example
+  ./other_tests.sh --host=https://sandbox-api.va.gov/oauth2 --tokens={ Tokens }
+EOF
+exit 1
+}
+
+for i in "$@"
+do
+case $i in
+    
+    --host=*)
+      HOST="${i#*=}"; shift ;;
+    --tokens=*)
+      TOKENS="${i#*=}"; shift ;;
+    --help|-h)
+      usage ;  exit 1 ;;
+    --) shift ; break ;;
+    *) usage ; exit 1 ;;
+esac
+done
 
 if [[ -z $(echo "$TOKENS" | jq .access_token) ]];
 then

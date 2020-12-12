@@ -1,15 +1,44 @@
 #!/usr/bin/env bash
 # Team Pivot!
 
-HOST=$1
-CODE=$2
-TOKEN_FILE=$3
-EXPIRED_TOKEN_FILE=$4
+HOST=
+CODE=
+TOKEN_FILE=
+EXPIRED_TOKEN_FILE=
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
 curl_status="$(mktemp)"
 curl_body="$(mktemp)"
+
+usage() {
+cat <<EOF
+Tests the Oauth Proxy's Token endpoint.
+
+Example
+  ./token_tests.sh --host=https://sandbox-api.va.gov/oauth2 --token-file={ Token file } --expired-token-file={ expired token file } --code={ CODE }
+EOF
+exit 1
+}
+
+for i in "$@"
+do
+case $i in
+    
+    --host=*)
+      HOST="${i#*=}"; shift ;;
+    --token-file=*)
+      TOKEN_FILE="${i#*=}"; shift ;;
+    --expired-token-file=*)
+      EXPIRED_TOKEN_FILE="${i#*=}"; shift ;;
+    --code=*)
+      CODE="${i#*=}"; shift ;;
+    --help|-h)
+      usage ;  exit 1 ;;
+    --) shift ; break ;;
+    *) usage ; exit 1 ;;
+esac
+done
 
 if [[ -z "$TOKEN_FILE" ]];
 then

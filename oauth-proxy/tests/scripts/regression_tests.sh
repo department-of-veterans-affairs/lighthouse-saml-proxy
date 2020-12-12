@@ -82,13 +82,13 @@ CODE=$(assign_code)
 
 # Start Tests
 
-"$DIR"/token_tests.sh "$HOST" "$CODE" "$TOKEN_FILE" "$EXPIRED_TOKEN"
+"$DIR"/token_tests.sh --host="$HOST" --code="$CODE" --token-file="$TOKEN_FILE" --expired-token-file="$EXPIRED_TOKEN"
 track_result
 "$DIR"/introspect_tests.sh --host="$HOST" --tokens="$( cat "$TOKEN_FILE")" --expired-access="$( cat "$EXPIRED_TOKEN")"
 track_result
 "$DIR"/okta_grants_tests.sh --host="$HOST"
 track_result
-"$DIR"/other_tests.sh "$HOST" "$( cat "$TOKEN_FILE")"
+"$DIR"/other_tests.sh --host="$HOST" --tokens="$( cat "$TOKEN_FILE")"
 track_result
 
 # End of Tests ----
