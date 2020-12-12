@@ -2,6 +2,27 @@
 # Team Pivot!
 # Simple script to test the Oauth Proxy.
 
+usage() {
+cat <<EOF
+Runs e2e Oauth Proxy regression tests.
+
+Example
+  ./regression_tests.sh
+EOF
+exit 1
+}
+
+for i in "$@"
+do
+case $i in
+    
+    --help|-h)
+      usage ;  exit 1 ;;
+    --) shift ; break ;;
+    *) usage ; exit 1 ;;
+esac
+done
+
 # Dependency Check
 
 if ! docker -v COMMAND &> /dev/null
