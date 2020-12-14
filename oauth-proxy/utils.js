@@ -82,7 +82,6 @@ const hashString = (unhashedString, secret) => {
 };
 
 const isString = (obj) => typeof obj === "string" || obj instanceof String;
-const isNumber = (obj) => typeof obj === "number" || obj instanceof Number;
 
 const minimalError = (error) => {
   if (isString(error)) {
@@ -135,6 +134,4 @@ module.exports = {
   hashString,
   parseBearerAuthorization,
   minimalError,
-  isString,
-  isNumber,
 };

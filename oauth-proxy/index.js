@@ -16,7 +16,7 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
-const { isString } = require("./utils");
+
 const openidMetadataWhitelist = [
   "issuer",
   "authorization_endpoint",
@@ -326,28 +326,26 @@ function buildApp(
 
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
-    const { error_description } = req.query;
-    let statusCode = 500;
-    let error_out = {
-      error: "server_error",
-    };
+    const { error, error_description } = req.query;
     if (
       err.statusCode &&
       err.statusCode === 400 &&
       err.type === "entity.parse.failed"
     ) {
-      statusCode = 400;
-      error_out = {
+      res.status(400).json({
         error: "invalid_request",
         error_description: "Invalid or unparsable content-type",
-      };
-    } else if (isString(err)) {
-      error_out.error_description = err;
-    } else if (error_description && isString(error_description)) {
-      error_out.error_description = error_description;
+      });
+    } else if (error && error_description) {
+      res.status(500).json({
+        error: "server_error",
+        error_description: error_description,
+      });
+    } else {
+      res.status(500).json({
+        error: "server_error",
+      });
     }
-
-    res.status(statusCode).send(error_out);
   });
 
   function buildMetadataForOpenIdConfiguration(
