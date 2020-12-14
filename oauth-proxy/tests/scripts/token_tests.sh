@@ -4,7 +4,7 @@
 HOST=
 CODE=
 export TOKEN=
-export EXPIRED_TOKEN=
+export EXPIRED_ACCESS=
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
@@ -13,10 +13,10 @@ curl_body="$(mktemp)"
 
 usage() {
 cat <<EOF
-Tests the Oauth Proxy's Token endpoint.
+Tests the Oauth Proxy's token endpoint.
 
 Example
-  ./token_tests.sh --host=https://sandbox-api.va.gov/oauth2 --token-file={ Token file } --expired-token-file={ expired token file } --code={ CODE }
+  ./token.sh --host=https://sandbox-api.va.gov/oauth2 --code={ CODE }
 EOF
 exit 1
 }
@@ -59,7 +59,7 @@ do_token() {
     -w "%{http_code}" \
     -o "$curl_body" \
     -d "$payload" \
-    "$HOST/token?redirect_uri=$REDIRECT_URI" > "$curl_status"
+    "$HOST/TOKEN?redirect_uri=$REDIRECT_URI" > "$curl_status"
   if [[ "$(cat "$curl_status")" == "200" ]] && [ "$(cat "$curl_body" | jq ".error")" = "null" ];
   then
     TOKEN="$(cat "$curl_body")"
@@ -212,14 +212,14 @@ track_result
 
 echo -e "\tRunning ... Revoke active token happy path"
 
-EXPIRED_TOKEN=TOKEN
 access_token=$(echo "$TOKEN" | jq ".access_token" | tr -d '"')
 do_revoke_token "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
-
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 track_result
 
-# The access token is now expired
+EXPIRED_ACCESS="$access_token"
+
+# The access TOKEN is now expired
 
 echo -e "\tRunning ... Token Handler refresh happy path"
 refresh=$(echo "$TOKEN" | jq ".refresh_token" | tr -d '"')
@@ -256,7 +256,7 @@ fi
 "$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="state"
 track_result
 
-echo -e "\tRunning ... Token Handler invalid refresh token"
+echo -e "\tRunning ... Token Handler invalid refresh Token"
 
 do_token "$(jq \
               -scn \
@@ -317,8 +317,8 @@ track_result
 
 if [[ $pass -lt 1 ]];
 then
-  echo -e "\tFAIL - Some token tests did not pass."
-  exit 1
+  echo -e "\tFAIL - Some Token tests did not pass."
+  return 1
 fi
 
-exit 0
+return 0

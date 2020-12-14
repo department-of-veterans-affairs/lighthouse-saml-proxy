@@ -42,8 +42,6 @@ fi
 REDIRECT_URI="https://app/after-auth"
 pass=1
 
-TOKEN_FILE="$(mktemp)"
-EXPIRED_TOKEN="$(mktemp)"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Helper Functions
@@ -103,13 +101,14 @@ CODE=$(assign_code)
 
 # Start Tests
 
-"$DIR"/token_tests.sh --host="$HOST" --code="$CODE" --token-file="$TOKEN_FILE" --expired-token-file="$EXPIRED_TOKEN"
+. "$DIR"/token_tests.sh --host="$HOST" --code="$CODE"
 track_result
-"$DIR"/introspect_tests.sh --host="$HOST" --tokens="$( cat "$TOKEN_FILE")" --expired-access="$( cat "$EXPIRED_TOKEN")"
+# TOKEN and EXPIRED_ACCESS are assigned in token_tests.sh
+"$DIR"/introspect_tests.sh --host="$HOST" --tokens="$TOKEN" --expired-access="$EXPIRED_ACCESS"
 track_result
 "$DIR"/okta_grants_tests.sh --host="$HOST"
 track_result
-"$DIR"/other_tests.sh --host="$HOST" --tokens="$( cat "$TOKEN_FILE")"
+"$DIR"/other_tests.sh --host="$HOST" --tokens="$TOKEN"
 track_result
 
 # End of Tests ----
