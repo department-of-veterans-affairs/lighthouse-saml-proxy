@@ -3,8 +3,8 @@
 
 HOST=
 CODE=
-TOKEN_FILE=
-EXPIRED_TOKEN_FILE=
+export TOKEN=
+export EXPIRED_TOKEN=
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 pass=1
@@ -27,10 +27,6 @@ case $i in
     
     --host=*)
       HOST="${i#*=}"; shift ;;
-    --token-file=*)
-      TOKEN_FILE="${i#*=}"; shift ;;
-    --expired-token-file=*)
-      EXPIRED_TOKEN_FILE="${i#*=}"; shift ;;
     --code=*)
       CODE="${i#*=}"; shift ;;
     --help|-h)
@@ -39,18 +35,6 @@ case $i in
     *) usage ; exit 1 ;;
 esac
 done
-
-if [[ -z "$TOKEN_FILE" ]];
-then
-  echo "ERROR - TOKEN_FILE is a required parameter."
-  exit 1
-fi
-
-if [[ -z "$EXPIRED_TOKEN_FILE" ]];
-then
-  echo "ERROR - EXPIRED_TOKEN_FILE is a required parameter."
-  exit 1
-fi
 
 if [ -z "$HOST" ];
 then
@@ -78,7 +62,7 @@ do_token() {
     "$HOST/token?redirect_uri=$REDIRECT_URI" > "$curl_status"
   if [[ "$(cat "$curl_status")" == "200" ]] && [ "$(cat "$curl_body" | jq ".error")" = "null" ];
   then
-    cat "$curl_body" > "$TOKEN_FILE"
+    TOKEN="$(cat "$curl_body")"
   fi
 }
 
@@ -228,8 +212,8 @@ track_result
 
 echo -e "\tRunning ... Revoke active token happy path"
 
-cat "$TOKEN_FILE" > "$EXPIRED_TOKEN_FILE"
-access_token=$(cat "$TOKEN_FILE" | jq ".access_token" | tr -d '"')
+EXPIRED_TOKEN=TOKEN
+access_token=$(echo "$TOKEN" | jq ".access_token" | tr -d '"')
 do_revoke_token "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
@@ -238,7 +222,7 @@ track_result
 # The access token is now expired
 
 echo -e "\tRunning ... Token Handler refresh happy path"
-refresh=$(cat "$TOKEN_FILE" | jq ".refresh_token" | tr -d '"')
+refresh=$(echo "$TOKEN" | jq ".refresh_token" | tr -d '"')
 
 do_token "$(jq \
               -scn \
@@ -293,7 +277,7 @@ do_token "$(jq \
               -scn \
               --arg client_id "Invalid" \
               --arg grant_type "refresh_token" \
-              --arg refresh_token "$(cat "$TOKEN_FILE" | jq ".refresh_token" | tr -d '"')" \
+              --arg refresh_token "$(echo "$TOKEN" | jq ".refresh_token" | tr -d '"')" \
               --arg secret "$CLIENT_SECRET" \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
