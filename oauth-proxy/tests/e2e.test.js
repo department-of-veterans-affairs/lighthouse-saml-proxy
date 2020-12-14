@@ -456,6 +456,37 @@ describe("OpenID Connect Conformance", () => {
     });
   });
 
+  it("returns an OIDC conformant token response with status 400 from bad json", async () => {
+    await axios
+      .post(
+        "http://localhost:9090/testServer/token",
+        qs.stringify({
+          grant_type: "authorization_code",
+          client_assertion: "tbd",
+          client_assertion_type:
+            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+          scopes: "offline",
+        }),
+        {
+          headers: {
+            origin: "http://localhost:8080",
+            "Content-type": "application/json",
+          },
+          auth: { username: "clientId123", password: "secretXyz" },
+        }
+      )
+      .then(() => {
+        expect(true).toEqual(false);
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(400);
+        expect(err.response.data.error).toEqual("invalid_request");
+        expect(err.response.data.error_description).toEqual(
+          "Invalid or unsupported content-type"
+        );
+      });
+  });
+
   it("returns an OIDC conformant status 200 on token introspection", async () => {
     await axios
       .post(

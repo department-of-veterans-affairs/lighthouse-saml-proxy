@@ -327,7 +327,16 @@ function buildApp(
     // If we have error and description as query params display them, otherwise go to the
     // catchall error handler
     const { error, error_description } = req.query;
-    if (error && error_description) {
+    if (
+      err.statusCode &&
+      err.statusCode === 400 &&
+      err.type === "entity.parse.failed"
+    ) {
+      res.status(400).json({
+        error: "invalid_request",
+        error_description: "Invalid or unsupported content-type",
+      });
+    } else if (error && error_description) {
       res.status(500).json({
         error: "server_error",
         error_description: error_description,
