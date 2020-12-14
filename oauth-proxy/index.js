@@ -334,7 +334,7 @@ function buildApp(
     ) {
       res.status(400).json({
         error: "invalid_request",
-        error_description: "Invalid or unparsable content-type",
+        error_description: "Invalid or unsupported content-type",
       });
     } else if (error && error_description) {
       res.status(500).json({
