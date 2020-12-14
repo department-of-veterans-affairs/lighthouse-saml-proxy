@@ -258,7 +258,9 @@ function buildApp(
         res,
         next
       )
-      .catch(next);
+      .catch((next) => {
+        logger.error(next);
+      });
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
@@ -331,13 +333,15 @@ function buildApp(
     let error_out = {
       error: "sever_error",
     };
-    if (err.statusCode && err.statusCode === 400) {
-      statusCode = err.statusCode;
-    }
-    if (statusCode === 400) {
+    if (
+      err.statusCode &&
+      err.statusCode === 400 &&
+      err.type === "entity.parse.failed"
+    ) {
+      statusCode = 400;
       error_out = {
         error: "invalid_request",
-        error_description: "Invalid or unsupported content-type",
+        error_description: "Invalid or unparsable content-type",
       };
     } else if (isString(err)) {
       error_out.error_description = err;
