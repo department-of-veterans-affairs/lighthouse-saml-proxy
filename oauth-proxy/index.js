@@ -258,9 +258,7 @@ function buildApp(
         res,
         next
       )
-      .catch((next) => {
-        logger.error(next);
-      });
+      .catch(next);
   });
 
   // @deprecated - To be removed following AuthZ Server reorganization
