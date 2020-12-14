@@ -329,7 +329,7 @@ function buildApp(
     const { error_description } = req.query;
     let statusCode = 500;
     let error_out = {
-      error: "sever_error",
+      error: "server_error",
     };
     if (
       err.statusCode &&
