@@ -7,6 +7,14 @@ cat <<EOF
 Runs e2e Oauth Proxy regression tests.
 
 Example
+  export USER_EMAIL=va.api.user+idme.001@gmail.com
+  export USER_PASSWORD=Password1234!
+  export CLIENT_ID={{ client id }}
+  export CLIENT_SECRET={{ client secret }}
+  export HOST=https://sandbox-api.va.gov/oauth2
+  export CC_CLIENT_ID={{ client id }}
+  export CC_CLIENT_SECRET={{ client secret }}
+
   ./regression_tests.sh
 EOF
 exit 1
@@ -35,6 +43,48 @@ if ! jq --version COMMAND &> /dev/null
 then
     echo "Please install jq."
     exit 1
+fi
+
+if [ -z "$USER_EMAIL" ];
+then
+  echo "ERROR - USER_EMAIL is a required parameter."
+  exit 1
+fi
+
+if [ -z "$USER_PASSWORD" ];
+then
+  echo "ERROR - USER_PASSWORD is a required parameter."
+  exit 1
+fi
+
+if [ -z "$CLIENT_ID" ];
+then
+  echo "ERROR - CLIENT_ID is a required parameter."
+  exit 1
+fi
+
+if [ -z "$CLIENT_SECRET" ];
+then
+  echo "ERROR - CLIENT_SECRET is a required parameter."
+  exit 1
+fi
+
+if [ -z "$HOST" ];
+then
+  echo "ERROR - HOST is a required parameter."
+  exit 1
+fi
+
+if [ -z "$CC_CLIENT_ID" ];
+then
+  echo "ERROR - CC_CLIENT_ID is a required parameter."
+  exit 1
+fi
+
+if [ -z "$CC_CLIENT_SECRET" ];
+then
+  echo "ERROR - CC_CLIENT_SECRET is a required parameter."
+  exit 1
 fi
 
 # Variables
