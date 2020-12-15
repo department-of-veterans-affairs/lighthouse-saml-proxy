@@ -88,7 +88,7 @@ do_introspect() {
 }
 
 # -------
-echo -e "\nIntropsect Tests"
+echo -e "\nIntrospect Tests"
 
 echo -e "\tRunning ... Introspect valid access token"
 
