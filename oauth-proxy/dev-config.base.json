@@ -18,6 +18,10 @@
   "routes": {
     "categories": [
       {
+        "api_category": "",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default"
+      },
+      {
         "api_category": "/claims/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7"
       },
