@@ -103,8 +103,8 @@ expect_json_body() {
   if [[ -z "$JSON" ]] || [ "$(cmp <(echo "$JSON" | jq .) <(echo "$EXPECTED_JSON" | jq .))" ]; then
     echo "----"
     echo "FAIL:"
-    echo "  actual:   $(echo "$JSON" | jq .)"
-    echo "  expected: $(echo "$EXPECTED_JSON" | jq .)"
+    echo "  actual:   $(echo "$JSON" | jq -c .)"
+    echo "  expected: $(echo "$EXPECTED_JSON" | jq -c .)"
     echo "----"
     return 1
   fi
