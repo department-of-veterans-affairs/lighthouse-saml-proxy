@@ -67,7 +67,6 @@ function filterProperty(object, property) {
 
 function buildApp(
   config,
-  issuer,
   oktaClient,
   dynamo,
   dynamoClient,
@@ -346,7 +345,7 @@ function buildApp(
   return app;
 }
 
-function startApp(config, issuer, isolatedIssuers) {
+function startApp(config, isolatedIssuers) {
   const oktaClient = new okta.Client({
     orgUrl: config.okta_url,
     token: config.okta_token,
@@ -382,7 +381,6 @@ function startApp(config, issuer, isolatedIssuers) {
   );
   const app = buildApp(
     config,
-    issuer,
     oktaClient,
     dynamoHandle,
     dynamoClient,
@@ -421,7 +419,6 @@ if (require.main === module) {
         });
       }
 
-      const issuer = await createIssuer(config.upstream_issuer);
       const isolatedIssuers = {};
       if (config.routes && config.routes.categories) {
         for (const service_config of config.routes.categories) {
@@ -430,7 +427,7 @@ if (require.main === module) {
           );
         }
       }
-      startApp(config, issuer, isolatedIssuers);
+      startApp(config, isolatedIssuers);
     } catch (error) {
       logger.error("Could not start the OAuth proxy", error);
       process.exit(1);

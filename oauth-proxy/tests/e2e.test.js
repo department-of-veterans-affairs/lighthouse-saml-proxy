@@ -133,7 +133,6 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
 }
 
 describe("OpenID Connect Conformance", () => {
-  let issuer;
   let oktaClient;
   let dynamoClient;
   let dynamoHandle;
@@ -145,7 +144,6 @@ describe("OpenID Connect Conformance", () => {
   );
 
   beforeAll(async () => {
-    issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
     oktaClient = buildFakeOktaClient({
       client_id: "clientId123",
       client_secret: "secretXyz",
@@ -183,7 +181,6 @@ describe("OpenID Connect Conformance", () => {
 
     const app = buildApp(
       defaultTestingConfig,
-      issuer,
       oktaClient,
       dynamoHandle,
       dynamoClient,
