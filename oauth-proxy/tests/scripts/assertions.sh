@@ -100,16 +100,11 @@ expect_status() {
 # the JSON in file $curl_body
 #
 expect_json_body() {
-  expected_body="$(mktemp)"
-  echo "$EXPECTED_JSON" > "$expected_body"
-  actual_body="$(mktemp)"
-  echo "$JSON" > "$actual_body"
-
-  if [[ -z "$JSON" ]] || [ "$(cmp <(jq -cS . "$actual_body") <(jq -cS . "$expected_body"))" ]; then
+  if [[ -z "$JSON" ]] || [ "$(cmp <(echo "$JSON" | jq .) <(echo "$EXPECTED_JSON" | jq .))" ]; then
     echo "----"
     echo "FAIL:"
-    echo "  actual:   $(jq -cS . "$expected_body")"
-    echo "  expected: $(jq -cS . "$expected_body")"
+    echo "  actual:   $(echo "$JSON" | jq -c .)"
+    echo "  expected: $(echo "$EXPECTED_JSON" | jq -c .)"
     echo "----"
     return 1
   fi
