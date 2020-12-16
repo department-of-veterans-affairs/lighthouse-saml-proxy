@@ -362,6 +362,7 @@ function buildApp(
       config,
       api_category
     );
+    router.options(api_category + "/.well-known/*", corsHandler);
     router.get(
       api_category + "/.well-known/openid-configuration",
       corsHandler,
