@@ -162,22 +162,113 @@ function buildApp(
     preflightContinue: true,
   });
 
+  if (
+    !config.routes.categories.find((category) => category.api_category === "") >
+    0
+  ) {
+    /**
+     * @deprecated - To be removed following AuthZ Server reorganization
+     */
+    const metadataRewrite = buildMetadataRewriteTable(config);
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.options("/.well-known/*", corsHandler);
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.get("/.well-known/openid-configuration", corsHandler, (req, res) => {
+      const baseMetadata = { ...issuer.metadata, ...metadataRewrite };
+      const filteredMetadata = openidMetadataWhitelist.reduce((meta, key) => {
+        meta[key] = baseMetadata[key];
+        return meta;
+      }, {});
+
+      res.json(filteredMetadata);
+    });
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.get(config.routes.app_routes.manage, (req, res) => {
+      res.redirect(config.manage_endpoint);
+    });
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.get(config.routes.app_routes.jwks, (req, res) =>
+      proxyRequestToOkta(req, res, issuer.metadata.jwks_uri, "GET")
+    );
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.get(config.routes.app_routes.userinfo, (req, res) =>
+      proxyRequestToOkta(req, res, issuer.metadata.userinfo_endpoint, "GET")
+    );
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.post(config.routes.app_routes.introspection, (req, res) =>
+      proxyRequestToOkta(
+        req,
+        res,
+        issuer.metadata.introspection_endpoint,
+        "POST",
+        querystring
+      )
+    );
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.post(config.routes.app_routes.revoke, (req, res) => {
+      proxyRequestToOkta(
+        req,
+        res,
+        issuer.metadata.revocation_endpoint,
+        "POST",
+        querystring
+      );
+    });
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.get(config.routes.app_routes.authorize, async (req, res, next) => {
+      await oauthHandlers
+        .authorizeHandler(
+          config,
+          redirect_uri,
+          logger,
+          issuer,
+          dynamo,
+          dynamoClient,
+          oktaClient,
+          req,
+          res,
+          next
+        )
+        .catch(next);
+    });
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.post(config.routes.app_routes.token, async (req, res, next) => {
+      await oauthHandlers
+        .tokenHandler(
+          config,
+          redirect_uri,
+          logger,
+          issuer,
+          dynamo,
+          dynamoClient,
+          validateToken,
+          req,
+          res,
+          next
+        )
+        .catch(next);
+    });
+
+    // @deprecated - To be removed following AuthZ Server reorganization
+    router.delete(config.routes.app_routes.grants, async (req, res, next) => {
+      await oauthHandlers
+        .revokeUserGrantHandler(oktaClient, config, req, res, next)
+        .catch(next);
+    });
+  }
+
   router.get(config.routes.app_routes.redirect, async (req, res, next) => {
     await oauthHandlers
       .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
       .catch(next);
-  });
-
-  const app_routes = config.routes.app_routes;
-  Object.entries(config.routes.categories).forEach(([, isolatedOktaConfig]) => {
-    const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
-    const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-    buildMetadataForOpenIdConfiguration(
-      isolatedOktaConfig.api_category,
-      app_routes,
-      service_issuer,
-      okta_client
-    );
   });
   if (config.enable_smart_launch_service) {
     router.get(
