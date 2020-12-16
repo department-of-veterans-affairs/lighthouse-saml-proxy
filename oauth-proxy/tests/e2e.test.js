@@ -45,6 +45,10 @@ const defaultTestingConfig = {
         api_category: "/veteran-verification-apis/v1",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
       },
+      {
+        api_category: "",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+      },
     ],
     app_routes: {
       authorize: "/authorization",
