@@ -167,6 +167,18 @@ function buildApp(
       .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
       .catch(next);
   });
+
+  const app_routes = config.routes.app_routes;
+  Object.entries(config.routes.categories).forEach(([, isolatedOktaConfig]) => {
+    const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
+    const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
+    buildMetadataForOpenIdConfiguration(
+      isolatedOktaConfig.api_category,
+      app_routes,
+      service_issuer,
+      okta_client
+    );
+  });
   if (config.enable_smart_launch_service) {
     router.get(
       config.routes.app_routes.smart_launch,
