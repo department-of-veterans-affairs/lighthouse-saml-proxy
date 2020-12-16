@@ -169,39 +169,27 @@ function buildApp(
       .catch(next);
   });
 
-  if (config.routes && config.routes.categories) {
-    const app_routes = config.routes.app_routes;
-    Object.entries(config.routes.categories).forEach(
-      ([, isolatedOktaConfig]) => {
-        const okta_client =
-          isolatedOktaClients[isolatedOktaConfig.api_category];
-        const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
-        buildMetadataForOpenIdConfiguration(
-          isolatedOktaConfig.api_category,
-          app_routes,
-          service_issuer,
-          okta_client
-        );
+  const app_routes = config.routes.app_routes;
+  Object.entries(config.routes.categories).forEach(([, isolatedOktaConfig]) => {
+    const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
+    const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
+    buildMetadataForOpenIdConfiguration(
+      isolatedOktaConfig.api_category,
+      app_routes,
+      service_issuer,
+      okta_client
+    );
+  });
+  if (config.enable_smart_launch_service) {
+    router.get(
+      config.routes.app_routes.smart_launch,
+      jwtAuthorizationHandler,
+      async (req, res, next) => {
+        await oauthHandlers
+          .launchRequestHandler(config, logger, dynamo, dynamoClient, res, next)
+          .catch(next);
       }
     );
-    if (config.enable_smart_launch_service) {
-      router.get(
-        config.routes.app_routes.smart_launch,
-        jwtAuthorizationHandler,
-        async (req, res, next) => {
-          await oauthHandlers
-            .launchRequestHandler(
-              config,
-              logger,
-              dynamo,
-              dynamoClient,
-              res,
-              next
-            )
-            .catch(next);
-        }
-      );
-    }
   }
 
   app.use(well_known_base_path, router);
