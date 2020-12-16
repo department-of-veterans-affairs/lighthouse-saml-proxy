@@ -1,7 +1,6 @@
 {
   "host": "http://localhost:7100",
   "well_known_base_path": "/oauth2",
-  "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
   "upstream_issuer_timeout_ms": 15000,
   "dynamo_local": "dynamodb:8000",
   "dynamo_table_name": "OAuthRequests",
