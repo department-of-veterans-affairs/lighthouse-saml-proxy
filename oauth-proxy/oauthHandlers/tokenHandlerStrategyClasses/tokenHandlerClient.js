@@ -26,6 +26,16 @@ class TokenHandlerClient {
       tokens = await this.getTokenResponseStrategy.getTokenResponse();
     } catch (error) {
       rethrowIfRuntimeError(error);
+      if(error.error.includes("401 Unauthorized"))
+      {
+        return {
+          statusCode: 400,
+          responseBody: {
+            error: "invalid_client",
+            error_description: "Client authentication failed.",
+          },
+        };
+      }
       return {
         statusCode: error.statusCode,
         responseBody: {
