@@ -26,8 +26,12 @@ class TokenHandlerClient {
       tokens = await this.getTokenResponseStrategy.getTokenResponse();
     } catch (error) {
       rethrowIfRuntimeError(error);
-      if(error.error.includes("401 Unauthorized"))
-      {
+      if (
+        error.error != undefined &&
+        error.error
+          .toString()
+          .includes("expected 200 OK, got: 401 Unauthorized")
+      ) {
         return {
           statusCode: 400,
           responseBody: {
