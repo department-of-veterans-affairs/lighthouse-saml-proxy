@@ -36,7 +36,7 @@ class TokenHandlerClient {
           statusCode: 400,
           responseBody: {
             error: "invalid_client",
-            error_description: "Client authentication failed.",
+            error_description: "Invalid value for client_id parameter..",
           },
         };
       }
