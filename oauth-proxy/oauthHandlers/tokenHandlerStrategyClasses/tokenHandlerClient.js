@@ -26,17 +26,12 @@ class TokenHandlerClient {
       tokens = await this.getTokenResponseStrategy.getTokenResponse();
     } catch (error) {
       rethrowIfRuntimeError(error);
-      if (
-        error.error != undefined &&
-        error.error
-          .toString()
-          .includes("expected 200 OK, got: 401 Unauthorized")
-      ) {
+      if (error.statusCode != undefined && error.statusCode == 401) {
         return {
-          statusCode: 400,
+          statusCode: 401,
           responseBody: {
             error: "invalid_client",
-            error_description: "Invalid value for client_id parameter..",
+            error_description: "Invalid value for client_id parameter.",
           },
         };
       }

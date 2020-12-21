@@ -398,7 +398,7 @@ describe("tokenHandler code", () => {
         error: "expected 200 OK, got: 401 Unauthorized",
         error_description: "Could not authorize client_id",
         response: {
-          statusCode: 400,
+          statusCode: 401,
         },
       };
     };
@@ -415,6 +415,6 @@ describe("tokenHandler code", () => {
       res,
       next
     );
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(401);
   });
 });
