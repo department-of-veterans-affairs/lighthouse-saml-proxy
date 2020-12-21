@@ -45,6 +45,10 @@ const defaultTestingConfig = {
         api_category: "/veteran-verification-apis/v1",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
       },
+      {
+        api_category: "",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+      },
     ],
     app_routes: {
       authorize: "/authorization",
@@ -129,7 +133,6 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
 }
 
 describe("OpenID Connect Conformance", () => {
-  let issuer;
   let oktaClient;
   let dynamoClient;
   let dynamoHandle;
@@ -141,7 +144,6 @@ describe("OpenID Connect Conformance", () => {
   );
 
   beforeAll(async () => {
-    issuer = await Issuer.discover(upstreamOAuthTestServer.baseUrl());
     oktaClient = buildFakeOktaClient({
       client_id: "clientId123",
       client_secret: "secretXyz",
@@ -179,7 +181,6 @@ describe("OpenID Connect Conformance", () => {
 
     const app = buildApp(
       defaultTestingConfig,
-      issuer,
       oktaClient,
       dynamoHandle,
       dynamoClient,

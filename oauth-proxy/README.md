@@ -9,7 +9,28 @@ This is a slim proxy for transforming and storing values from Okta's OpenID Conn
 ## Usage
 
 - Run `npm i` to install dependencies
-- See `node index.js --help` for usage directions
+
+### Quick Start Docker Compose
+
+`docker-compose up`
+
+### Quick Start Local
+
+Set up Dynamo DB locally
+
+The following dev-config value needs to be set `"dynamo_local": "localhost:8000",`
+
+```
+docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -inMemory
+node dynamo_schema.js --local=true
+```
+
+Start the Oauth Proxy
+```
+npm start
+```
+
+- See `node index.js --help` for more usage directions
 
 ## Proxy Functions
 
