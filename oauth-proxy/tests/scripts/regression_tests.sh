@@ -48,7 +48,7 @@ fi
 if [ -z "$USER_EMAIL" ];
 then
   echo "ERROR - USER_EMAIL is a required parameter."
-  exit 1mktemp
+  exit 1
 fi
 
 if [ -z "$USER_PASSWORD" ];
