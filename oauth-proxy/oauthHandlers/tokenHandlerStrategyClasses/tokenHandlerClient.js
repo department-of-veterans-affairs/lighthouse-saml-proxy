@@ -26,7 +26,7 @@ class TokenHandlerClient {
       tokens = await this.getTokenResponseStrategy.getTokenResponse();
     } catch (error) {
       rethrowIfRuntimeError(error);
-      if (error.statusCode != undefined && error.statusCode == 401) {
+      if (error.statusCode !== undefined && error.statusCode === 401) {
         return {
           statusCode: 401,
           responseBody: {
