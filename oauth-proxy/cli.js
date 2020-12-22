@@ -16,11 +16,6 @@ function processArgs() {
           "host of oauth-proxy in the form of protocol://domain:port",
         required: true,
       },
-      upstream_issuer: {
-        description:
-          "URI of upstream issuer to the proxy. Eventually, this field will go away in favor is the isolated issuers based on API category",
-        required: true,
-      },
       upstream_issuer_timeout_ms: {
         description: "Optional timeout (ms) for upstream requests",
         required: false,

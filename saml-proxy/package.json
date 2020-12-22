@@ -136,6 +136,7 @@
     "typescript": "^3.9.7"
   },
   "resolutions": {
-    "node-forge": ">=0.10.0"
+    "node-forge": ">=0.10.0",
+    "xml-crypto": ">=2.0.0"
   }
 }
