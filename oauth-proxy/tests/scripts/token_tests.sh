@@ -208,7 +208,7 @@ do_token "$(jq \
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
 track_result
 
-# expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
 
 echo -e "\tRunning ... Revoke active token happy path"
 
@@ -284,7 +284,8 @@ do_token "$(jq \
 
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=401
 track_result
-# expect_json_body '{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"invalid_client", "error_description": "Invalid value for client_id parameter."}'
+
 
 echo -e "\tRunning ... Client Credentials happy path"
 
