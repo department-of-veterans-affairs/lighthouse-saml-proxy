@@ -16,6 +16,7 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
+import rTracer from "cls-rtracer";
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -150,6 +151,7 @@ function buildApp(
     );
   }
   app.use(morgan(middlewareLogFormat));
+  app.use(rTracer.expressMiddleware());
   app.use(
     promBundle({
       includeMethod: true,

@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require("winston");
+const { rTracer } = require("cls-rtracer");
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
@@ -36,6 +37,7 @@ const middlewareLogFormat = (tokens, req, res) => {
       "status-code": tokens.status(req, res),
       "content-length": tokens.res(req, res, "content-length"),
       referrer: tokens.referrer(req, res),
+      request_id: rTracer.id(),
     },
     null,
     2
