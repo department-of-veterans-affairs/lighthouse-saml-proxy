@@ -36,14 +36,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/department-of-veterans-affairs/oauth-proxy.git"
+    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy.git"
   },
-  "author": "Ed Paget",
+  "author": "Department of Veterans Affairs",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/department-of-veterans-affairs/oauth-proxy/issues"
+    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy/issues"
   },
-  "homepage": "https://github.com/department-of-veterans-affairs/oauth-proxy#readme",
+  "homepage": "https://github.com/department-of-veterans-affairs/vets-saml-proxy#readme",
   "dependencies": {
     "@okta/okta-sdk-nodejs": "^4.2.0",
     "@sentry/node": "^5.7.1",
