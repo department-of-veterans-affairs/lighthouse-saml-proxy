@@ -137,20 +137,20 @@ dynamo.createTable(tableParams, (err, data) => {
 
 tableParams = {
   AttributeDefinitions: [
-    { AttributeName: "access_token", AttributeType: "S" },
-    { AttributeName: "refresh_token", AttributeType: "S" },
+    { AttributeName: "static_access_token", AttributeType: "S" },
+    { AttributeName: "static_refresh_token", AttributeType: "S" },
   ],
-  KeySchema: [{ AttributeName: "access_token", KeyType: "STRING" }],
+  KeySchema: [{ AttributeName: "static_refresh_token", KeyType: "STRING" }],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
     WriteCapacityUnits: 10,
   },
   GlobalSecondaryIndexes: [
     {
-      IndexName: "refresh_token_index",
+      IndexName: "static_refresh_token_index",
       KeySchema: [
         {
-          AttributeName: "refresh_token",
+          AttributeName: "static_refresh_token",
           KeyType: "STRING",
         },
       ],
