@@ -17,7 +17,6 @@ const {
 } = buildBackgroundServerModule("oauth-proxy test app");
 const { buildApp } = require("../index");
 const { encodeBasicAuthHeader } = require("../utils");
-require("cls-rtracer");
 
 beforeAll(() => {
   upstreamOAuthTestServer.start();
