@@ -120,6 +120,7 @@ $RECYCLE.BIN/
 build/
 /test-report.xml
 /saml-proxy/public/core.css
+/saml-proxy/sp-metadata.xml
 
 # Local config
 /saml-proxy/dev-config.json

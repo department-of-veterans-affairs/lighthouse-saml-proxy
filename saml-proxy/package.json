@@ -3,7 +3,7 @@
   "description": "SAML 2.0 Proxy allows modification/mediation of requests/responses",
   "version": "1.1.0",
   "private": false,
-  "author": "Patrick Vinograd",
+  "author": "Department of Veterans Affairs",
   "keywords": [
     "saml",
     "idp",
@@ -12,10 +12,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/patrickvinograd/saml-proxy"
+    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy.git"
   },
   "bugs": {
-    "url": "https://github.com/patrickvinograd/saml-proxy/issues"
+    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy/issues"
   },
   "main": "./app.js",
   "scripts": {
@@ -127,7 +127,7 @@
     "eslint": "^7.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "jest": "^26.4.0",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.4",
     "prettier": "2.1.1",
     "source-map-support": "^0.5.9",
@@ -136,6 +136,7 @@
     "typescript": "^3.9.7"
   },
   "resolutions": {
-    "node-forge": ">=0.10.0"
+    "node-forge": ">=0.10.0",
+    "xml-crypto": ">=2.0.0"
   }
 }

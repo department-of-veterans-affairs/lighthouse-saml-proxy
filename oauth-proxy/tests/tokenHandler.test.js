@@ -391,4 +391,30 @@ describe("tokenHandler code", () => {
     );
     expect(res.statusCode).toEqual(500);
   });
+
+  it("invalid_client error", async () => {
+    client.grant = () => {
+      throw {
+        error: "expected 200 OK, got: 401 Unauthorized",
+        error_description: "Could not authorize client_id",
+        response: {
+          statusCode: 401,
+        },
+      };
+    };
+
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(401);
+  });
 });
