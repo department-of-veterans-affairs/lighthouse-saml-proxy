@@ -134,3 +134,48 @@ dynamo.createTable(tableParams, (err, data) => {
     );
   }
 });
+
+tableParams = {
+  AttributeDefinitions: [
+    { AttributeName: "access_token", AttributeType: "S" },
+    { AttributeName: "refresh_token", AttributeType: "S" },
+  ],
+  KeySchema: [{ AttributeName: "access_token", KeyType: "STRING" }],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 10,
+    WriteCapacityUnits: 10,
+  },
+  GlobalSecondaryIndexes: [
+    {
+      IndexName: "refresh_token_index",
+      KeySchema: [
+        {
+          AttributeName: "refresh_token",
+          KeyType: "STRING",
+        },
+      ],
+      Projection: {
+        ProjectionType: "ALL",
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 10,
+        WriteCapacityUnits: 10,
+      },
+    },
+  ],
+  TableName: "StaticTokens",
+};
+
+dynamo.createTable(tableParams, (err, data) => {
+  if (err) {
+    console.error(
+      "Unable to create table. Error JSON:",
+      JSON.stringify(err, null, 2)
+    );
+  } else {
+    console.log(
+      "Created table. Table description JSON:",
+      JSON.stringify(data, null, 2)
+    );
+  }
+});
