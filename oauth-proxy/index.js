@@ -16,7 +16,7 @@ const { logger, middlewareLogFormat } = require("./logger");
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
-import rTracer from "cls-rtracer";
+const rTracer = require("cls-rtracer");
 
 const openidMetadataWhitelist = [
   "issuer",

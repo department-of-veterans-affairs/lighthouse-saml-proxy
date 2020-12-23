@@ -1,5 +1,5 @@
 const { createLogger, format, transports } = require("winston");
-const { rTracer } = require("cls-rtracer");
+const rTracer = require("cls-rtracer");
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
