@@ -28,15 +28,17 @@ class PullDocumentByRefreshTokenStrategy {
 
   async getDocumentDynamo(refresh_token) {
     let document = this.getIfStaticToken(refresh_token);
-    try {
-      document = document.access_token ? document : await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "refresh_token",
-        refresh_token,
-        this.config.dynamo_table_name
-      );
-    } catch (error) {
-      this.logger.error("Could not retrieve state from DynamoDB", error);
+    if (!document.access_token) {
+      try {
+        document = await this.dynamoClient.getFromDynamoBySecondary(
+          this.dynamo,
+          "refresh_token",
+          refresh_token,
+          this.config.dynamo_table_name
+        );
+      } catch (error) {
+        this.logger.error("Could not retrieve state from DynamoDB", error);
+      }
     }
     return document;
   }
@@ -47,13 +49,19 @@ class PullDocumentByRefreshTokenStrategy {
     };
     let document;
     try {
-      let payload = await this.dynamoClient.getPayloadFromDynamo(this.dynamo, search_params, this.config.dynamo_static_token_table);
-      document.access_token = payload.static_access_token;
-      document.refresh_token = payload.static_refresh_token;
-      document.id_token = payload.static_id_token;
-      document.token_type = payload.static_token_type;
-      if (payload.static_expires_in) {
-        document.expires_in = payload.static_expires_in;
+      let payload = await this.dynamoClient.getPayloadFromDynamo(
+        this.dynamo,
+        search_params,
+        this.config.dynamo_static_token_table
+      );
+      if (payload.static_access_token) {
+        document.access_token = payload.static_access_token;
+        document.refresh_token = payload.static_refresh_token;
+        document.id_token = payload.static_id_token;
+        document.token_type = payload.static_token_type;
+        if (payload.static_expires_in) {
+          document.expires_in = payload.static_expires_in;
+        }
       }
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
