@@ -43,6 +43,11 @@ function processArgs() {
         description: "name of client credentials table.",
         required: true,
       },
+      dynamo_static_token_table: {
+        description: "name of static token table.",
+        required: true,
+        default: "StaticTokens",
+      },
       hmac_secret: {
         description:
           "hmac secret to hash access tokens being stored in client credentials table.",
