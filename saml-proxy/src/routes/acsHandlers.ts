@@ -12,6 +12,7 @@ import {
   VSORequestMetrics,
   IRequestMetrics,
 } from "../metrics";
+import rTracer from "cls-rtracer";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -29,7 +30,7 @@ const unknownUsersErrorTemplate = (error: any) => {
 export const urlUserErrorTemplate = () => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-  return "internalFailure.hbs";
+  return "sensitiveError.hbs";
 };
 
 // This depends on being called after buildPassportLoginHandler because it uses
@@ -119,7 +120,9 @@ export const loadICN = async (
         action,
         result: "failure",
       });
-      res.render(unknownUsersErrorTemplate(mviError), {});
+      res.render(unknownUsersErrorTemplate(mviError), {
+        request_id: rTracer.id(),
+      });
     }
   }
 };
