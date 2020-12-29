@@ -20,7 +20,7 @@ const unknownUsersErrorTemplate = (error: any) => {
     error.name == "StatusCodeError" &&
     error.statusCode.toString() === "404"
   ) {
-    return "handleFailure.hbs";
+    return "internalFailure.hbs";
   } else {
     return "icnError.hbs";
   }
@@ -29,7 +29,7 @@ const unknownUsersErrorTemplate = (error: any) => {
 export const urlUserErrorTemplate = () => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-  return "handleFailure.hbs";
+  return "internalFailure.hbs";
 };
 
 // This depends on being called after buildPassportLoginHandler because it uses
