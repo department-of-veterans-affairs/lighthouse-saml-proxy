@@ -26,6 +26,15 @@ class TokenHandlerClient {
       tokens = await this.getTokenResponseStrategy.getTokenResponse();
     } catch (error) {
       rethrowIfRuntimeError(error);
+      if (error.statusCode !== undefined && error.statusCode === 401) {
+        return {
+          statusCode: 401,
+          responseBody: {
+            error: "invalid_client",
+            error_description: "Invalid value for client_id parameter.",
+          },
+        };
+      }
       return {
         statusCode: error.statusCode,
         responseBody: {
