@@ -137,10 +137,9 @@ dynamo.createTable(tableParams, (err, data) => {
 
 tableParams = {
   AttributeDefinitions: [
-    { AttributeName: "static_access_token", AttributeType: "S" },
     { AttributeName: "static_refresh_token", AttributeType: "S" },
   ],
-  KeySchema: [{ AttributeName: "static_refresh_token", KeyType: "STRING" }],
+  KeySchema: [{ AttributeName: "static_refresh_token", KeyType: "HASH" }],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
     WriteCapacityUnits: 10,
@@ -151,7 +150,7 @@ tableParams = {
       KeySchema: [
         {
           AttributeName: "static_refresh_token",
-          KeyType: "STRING",
+          KeyType: "HASH",
         },
       ],
       Projection: {
