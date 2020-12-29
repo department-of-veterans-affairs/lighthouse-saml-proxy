@@ -7,7 +7,7 @@
 const AWS = require("aws-sdk");
 
 /**
- * @deprecated, prefer a constructor with the necessary db clients encapsulated.
+ * @deprecated, Prefer a constructor with the necessary db clients encapsulated.
  */
 function createDynamoHandle(awsConfig, local) {
   let dynamoDb;
@@ -31,7 +31,7 @@ function createDynamoHandle(awsConfig, local) {
 }
 
 /**
- * @deprecated, prefer a successor that uses docClient.get
+ * @deprecated, Prefer getPayloadFromDynamo
  */
 function getFromDynamoBySecondary(client, key, value, TableName) {
   const params = {
@@ -60,7 +60,7 @@ function getFromDynamoBySecondary(client, key, value, TableName) {
 }
 
 /**
- * @deprecated, prefer a successor that uses docClient.get
+ * @deprecated, Prefer getPayloadFromDynamo
  */
 function getFromDynamoByState(client, state, TableName) {
   const params = {
@@ -84,7 +84,7 @@ function getFromDynamoByState(client, state, TableName) {
 }
 
 /**
- * @deprecated, prefer a successor that uses docClient.get
+ * @deprecated, Prefer getPayloadFromDynamo
  */
 function getFromDynamoByAccessToken(client, access_token, TableName) {
   const params = {
@@ -194,6 +194,25 @@ function savePayloadToDynamo(dynamoDb, payload, tableName) {
   });
 }
 
+function getPayloadFromDynamo(dynamoDb, searchAttributes, tableName) {
+  var params = {
+    TableName: tableName,
+    Key: {},
+  };
+
+  Object.assign(params.Key, searchAttributes);
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.dbDocClient.get(params, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
@@ -202,4 +221,5 @@ module.exports = {
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
   savePayloadToDynamo,
+  getPayloadFromDynamo,
 };
