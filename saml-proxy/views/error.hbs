@@ -1,11 +1,23 @@
-<div id="container">
-  <h1>{{message}}</h1>
-  <h2>Error ID</h2>
-  <pre>{{request_id}}</pre>
-  <div class="col-md-12 text-right">
-    <form action="/" method="get">
-      <button id="btn-return" class="btn btn-primary input-xlarge" type="submit"><i class="fa fa-home"><span>Restart</span></i></button>
-    </form>
-  </div>
-</div>
+{{#>deptva-formation-error}}
+  <h3 class="usa-alert-heading">
+    Error
+  </h3>
 
+  <p>
+    {{message}}
+  </p>
+
+  <h3 class="usa-alert-heading">
+    Error ID
+  </h3>
+  
+  <pre>{{request_id}}</pre>
+
+  <h3 class="usa-alert-heading">
+    What you can do
+  </h3>
+
+  <p>
+    If you feel you've entered your information correctly, call MyVA311 for help: {{{accessible-phone-number "1-844-698-2311"}}}. If you have hearing loss, call {{{accessible-phone-number "TTY: 711"}}}.
+  </p>
+{{/deptva-formation-error}}
