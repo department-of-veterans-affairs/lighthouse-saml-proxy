@@ -45,42 +45,47 @@ class RefreshTokenStrategy {
     let search_params = {
       static_refresh_token: refresh_token,
     };
-    let document;
+    let tokens;
     try {
       let payload = await dynamoClient.getPayloadFromDynamo(
         this.dynamo,
         search_params,
         this.config.dynamo_static_token_table
       );
-      payload = payload.Item ? payload.Item : {};
-      if (payload.static_access_token) {
-        document = {
-          access_token: payload.static_access_token,
-          refresh_token: payload.static_refresh_token,
-        };
-        if (payload.static_expires_in) {
-          document.expires_in = payload.static_expires_in;
-        }
-        if (payload.static_id_token) {
-          document.id_token = payload.static_id_token;
-        }
-        document.token_type = payload.static_token_type
-          ? payload.static_token_type
-          : "bearer";
-        if (payload.static_redirect_uri) {
-          document.redirect_uri = payload.static_redirect_uri;
-        }
-        if (payload.static_code) {
-          document.code = payload.static_code;
-        }
-        if (payload.static_state) {
-          document.state = payload.statc_state;
+      if (payload.Item) {
+        payload = payload.Item;
+        if (payload.static_access_token) {
+          tokens = {
+            access_token: payload.static_access_token,
+            refresh_token: payload.static_refresh_token,
+          };
+          if (payload.static_expires_in) {
+            tokens.expires_in = payload.static_expires_in;
+          }
+          if (payload.static_icn) {
+            tokens.patient = payload.static_icn;
+          }
+          if (payload.static_id_token) {
+            tokens.id_token = payload.static_id_token;
+          }
+          tokens.token_type = payload.static_token_type
+            ? payload.static_token_type
+            : "bearer";
+          if (payload.static_redirect_uri) {
+            tokens.redirect_uri = payload.static_redirect_uri;
+          }
+          if (payload.static_code) {
+            tokens.code = payload.static_code;
+          }
+          if (payload.static_state) {
+            tokens.state = payload.statc_state;
+          }
         }
       }
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
     }
-    return document;
+    return tokens;
   }
 }
 
