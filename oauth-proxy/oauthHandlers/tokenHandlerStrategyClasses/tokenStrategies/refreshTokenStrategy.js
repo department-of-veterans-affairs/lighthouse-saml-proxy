@@ -23,7 +23,6 @@ class RefreshTokenStrategy {
     if (!tokens || !tokens.access_token) {
       try {
         tokens = await this.client.refresh(this.req.body.refresh_token);
-        stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
       } catch (error) {
         rethrowIfRuntimeError(error);
         this.logger.error(
@@ -38,6 +37,7 @@ class RefreshTokenStrategy {
         };
       }
     }
+    stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
     return tokens;
   }
 
@@ -83,7 +83,11 @@ class RefreshTokenStrategy {
         }
       }
     } catch (error) {
-      this.logger.error("Could not retrieve state from DynamoDB", error);
+      if (error.message && error.message.inclues("non-existent table")) {
+        this.logger.warn("Static tokens table not yet created");
+      } else {
+        this.logger.error("Could not retrieve static token from DynamoDB", error);
+      }
     }
     return tokens;
   }
