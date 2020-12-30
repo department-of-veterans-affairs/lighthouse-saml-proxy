@@ -9,15 +9,17 @@ class PullDocumentByRefreshTokenStrategy {
     this.config = config;
   }
   async pullDocumentFromDynamo() {
-    let hashedRefreshToken = hashString(
-      this.req.body.refresh_token,
-      this.config.hmac_secret
-    );
-    let document = await this.getDocumentDynamo(hashedRefreshToken);
-
+    let document = await this.getIfStaticToken(this.req.body.refresh_token);
+    if (!document || !document.access_token) {
+      let hashedRefreshToken = hashString(
+        this.req.body.refresh_token,
+        this.config.hmac_secret
+      );
+      document = await this.getDocumentDynamo(hashedRefreshToken);
+    }
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (document == null) {
+    if (!document || !document.access_token) {
       this.logger.warn(
         "Hashed refresh_token not found. Searching for unhashed refresh_token."
       );
@@ -27,18 +29,16 @@ class PullDocumentByRefreshTokenStrategy {
   }
 
   async getDocumentDynamo(refresh_token) {
-    let document = this.getIfStaticToken(refresh_token);
-    if (!document.access_token) {
-      try {
-        document = await this.dynamoClient.getFromDynamoBySecondary(
-          this.dynamo,
-          "refresh_token",
-          refresh_token,
-          this.config.dynamo_table_name
-        );
-      } catch (error) {
-        this.logger.error("Could not retrieve state from DynamoDB", error);
-      }
+    let document;
+    try {
+      document = await this.dynamoClient.getFromDynamoBySecondary(
+        this.dynamo,
+        "refresh_token",
+        refresh_token,
+        this.config.dynamo_table_name
+      );
+    } catch (error) {
+      this.logger.error("Could not retrieve state from DynamoDB", error);
     }
     return document;
   }
@@ -54,16 +54,21 @@ class PullDocumentByRefreshTokenStrategy {
         search_params,
         this.config.dynamo_static_token_table
       );
+      payload = payload.Item ? payload.Item : {};
       if (payload.static_access_token) {
-        document.access_token = { S: payload.static_access_token };
-        document.refresh_token = { S: payload.static_refresh_token };
+        document = {
+          access_token: { S: payload.static_access_token },
+          refresh_token: { S: payload.static_refresh_token },
+        };
         if (payload.static_id_token) {
           document.id_token = { S: payload.static_id_token };
         }
         document.token_type = payload.static_token_type
           ? { S: payload.static_token_type }
           : { S: "bearer" };
-        document.redirect_uri = { S: payload.static_redirect_uri };
+        if (payload.static_redirect_uri) {
+          document.redirect_uri = { S: payload.static_redirect_uri };
+        }
         if (payload.static_code) {
           document.code = { S: payload.static_code };
         }
@@ -71,7 +76,7 @@ class PullDocumentByRefreshTokenStrategy {
           document.state = { S: payload.statc_state };
         }
         if (payload.static_expires_in) {
-          document.expires_in = { N: payload.static_expires_in };
+          document.expires_in = { N: payload.static_expires_in.toString() };
         }
       }
     } catch (error) {
