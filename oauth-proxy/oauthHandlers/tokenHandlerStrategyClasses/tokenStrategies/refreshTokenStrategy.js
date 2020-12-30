@@ -12,7 +12,7 @@ class RefreshTokenStrategy {
     this.req = req;
     this.logger = logger;
     this.client = client;
-    this.dynamo = dynamo
+    this.dynamo = dynamo;
     this.config = config;
   }
 
@@ -20,24 +20,24 @@ class RefreshTokenStrategy {
   async getTokenResponse() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens = await this.getIfStaticToken(this.req.body.refresh_token);
-    if (!token || ! token.access_token) {
-    try {
-      tokens = await this.client.refresh(this.req.body.refresh_token);
-      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
-    } catch (error) {
-      rethrowIfRuntimeError(error);
-      this.logger.error(
-        "Could not refresh the client session with the provided refresh token",
-        minimalError(error)
-      );
-      stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
-      throw {
-        error: error.error,
-        error_description: error.error_description,
-        statusCode: statusCodeFromError(error),
-      };
+    if (!tokens || !tokens.access_token) {
+      try {
+        tokens = await this.client.refresh(this.req.body.refresh_token);
+        stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
+      } catch (error) {
+        rethrowIfRuntimeError(error);
+        this.logger.error(
+          "Could not refresh the client session with the provided refresh token",
+          minimalError(error)
+        );
+        stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
+        throw {
+          error: error.error,
+          error_description: error.error_description,
+          statusCode: statusCodeFromError(error),
+        };
+      }
     }
-  }
     return tokens;
   }
 
