@@ -11,7 +11,7 @@ const promBundle = require("express-prom-bundle");
 const Sentry = require("@sentry/node");
 const axios = require("axios");
 const querystring = require("querystring");
-const { logger, middlewareLogFormat } = require("./logger");
+const { middlewareLogFormat, winstonMiddleware, logger } = require("./logger");
 
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
@@ -145,6 +145,7 @@ function buildApp(
     );
   }
   app.use(morgan(middlewareLogFormat));
+  app.use(winstonMiddleware);
   app.use(rTracer.expressMiddleware());
   app.use(
     promBundle({

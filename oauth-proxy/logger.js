@@ -19,13 +19,20 @@ const logFormat = format.combine(
 const logger = createLogger({
   level: "info",
   format: logFormat,
-  defaultMeta: { service: "oauth-proxy" },
+  defaultMeta: {
+    service: "oauth-proxy",
+  },
   transports: [
     new transports.Console({
       silent: process.env.NODE_ENV === "test",
     }),
   ],
 });
+
+const winstonMiddleware = (req, res, next) => {
+  logger.defaultMeta["request_id"] = rTracer.id();
+  next();
+};
 
 const middlewareLogFormat = (tokens, req, res) => {
   return JSON.stringify(
@@ -45,6 +52,7 @@ const middlewareLogFormat = (tokens, req, res) => {
 };
 
 module.exports = {
+  winstonMiddleware,
   logger,
   middlewareLogFormat,
 };
