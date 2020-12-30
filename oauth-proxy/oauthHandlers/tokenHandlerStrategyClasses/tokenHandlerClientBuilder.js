@@ -85,7 +85,6 @@ const getStrategies = (
         logger,
         new issuer.Client(createClientMetadata(redirect_uri, req, config)),
         dynamo,
-        dynamoClient,
         config
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(

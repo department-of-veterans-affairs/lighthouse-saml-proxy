@@ -5,7 +5,7 @@ const {
   minimalError,
 } = require("../../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../../metrics");
-const dynamoClient = require("./dynamo_client");
+const dynamoClient = require("../../../dynamo_client");
 
 class RefreshTokenStrategy {
   constructor(req, logger, client, dynamo, config) {
