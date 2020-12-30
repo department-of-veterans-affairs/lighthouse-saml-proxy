@@ -9,17 +9,15 @@ class PullDocumentByRefreshTokenStrategy {
     this.config = config;
   }
   async pullDocumentFromDynamo() {
-    let document = await this.getIfStaticToken(this.req.body.refresh_token);
-    if (!document || !document.access_token) {
-      let hashedRefreshToken = hashString(
-        this.req.body.refresh_token,
-        this.config.hmac_secret
-      );
-      document = await this.getDocumentDynamo(hashedRefreshToken);
-    }
+    let hashedRefreshToken = hashString(
+      this.req.body.refresh_token,
+      this.config.hmac_secret
+    );
+    let document = await this.getDocumentDynamo(hashedRefreshToken);
+
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (!document || !document.access_token) {
+    if (document == null) {
       this.logger.warn(
         "Hashed refresh_token not found. Searching for unhashed refresh_token."
       );
@@ -37,48 +35,6 @@ class PullDocumentByRefreshTokenStrategy {
         refresh_token,
         this.config.dynamo_table_name
       );
-    } catch (error) {
-      this.logger.error("Could not retrieve state from DynamoDB", error);
-    }
-    return document;
-  }
-
-  async getIfStaticToken(refresh_token) {
-    let search_params = {
-      static_refresh_token: refresh_token,
-    };
-    let document;
-    try {
-      let payload = await this.dynamoClient.getPayloadFromDynamo(
-        this.dynamo,
-        search_params,
-        this.config.dynamo_static_token_table
-      );
-      payload = payload.Item ? payload.Item : {};
-      if (payload.static_access_token) {
-        document = {
-          access_token: { S: payload.static_access_token },
-          refresh_token: { S: payload.static_refresh_token },
-        };
-        if (payload.static_id_token) {
-          document.id_token = { S: payload.static_id_token };
-        }
-        document.token_type = payload.static_token_type
-          ? { S: payload.static_token_type }
-          : { S: "bearer" };
-        if (payload.static_redirect_uri) {
-          document.redirect_uri = { S: payload.static_redirect_uri };
-        }
-        if (payload.static_code) {
-          document.code = { S: payload.static_code };
-        }
-        if (payload.static_state) {
-          document.state = { S: payload.statc_state };
-        }
-        if (payload.static_expires_in) {
-          document.expires_in = { N: payload.static_expires_in.toString() };
-        }
-      }
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
     }

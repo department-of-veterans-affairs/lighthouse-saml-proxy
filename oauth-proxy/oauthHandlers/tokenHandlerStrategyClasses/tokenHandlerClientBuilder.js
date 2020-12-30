@@ -83,7 +83,10 @@ const getStrategies = (
       tokenHandlerStrategy: new RefreshTokenStrategy(
         req,
         logger,
-        new issuer.Client(createClientMetadata(redirect_uri, req, config))
+        new issuer.Client(createClientMetadata(redirect_uri, req, config)),
+        dynamo,
+        dynamoClient,
+        config
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(
         req,
