@@ -55,12 +55,23 @@ class PullDocumentByRefreshTokenStrategy {
         this.config.dynamo_static_token_table
       );
       if (payload.static_access_token) {
-        document.access_token = payload.static_access_token;
-        document.refresh_token = payload.static_refresh_token;
-        document.id_token = payload.static_id_token;
-        document.token_type = payload.static_token_type;
+        document.access_token = { S: payload.static_access_token };
+        document.refresh_token = { S: payload.static_refresh_token };
+        if (payload.static_id_token) {
+          document.id_token = { S: payload.static_id_token };
+        }
+        document.token_type = payload.static_token_type
+          ? { S: payload.static_token_type }
+          : { S: "bearer" };
+        document.redirect_uri = { S: payload.static_redirect_uri };
+        if (payload.static_code) {
+          document.code = { S: payload.static_code };
+        }
+        if (payload.static_state) {
+          document.state = { S: payload.statc_state };
+        }
         if (payload.static_expires_in) {
-          document.expires_in = payload.static_expires_in;
+          document.expires_in = { N: payload.static_expires_in };
         }
       }
     } catch (error) {
