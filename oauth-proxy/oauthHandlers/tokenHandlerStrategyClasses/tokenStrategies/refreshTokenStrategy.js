@@ -86,7 +86,10 @@ class RefreshTokenStrategy {
       if (error.message && error.message.includes("non-existent table")) {
         this.logger.warn("Static tokens table not yet created");
       } else {
-        this.logger.error("Could not retrieve static token from DynamoDB", error);
+        this.logger.error(
+          "Could not retrieve static token from DynamoDB",
+          error
+        );
       }
     }
     return tokens;

@@ -33,15 +33,7 @@ beforeEach(() => {
   config.dynamo_static_token_table = "ut_static_tokens_table";
   dynamo.dbDocClient = {
     get: (search_params, result) => {
-      isCalled = true;
-      if (search_params.search === "me") {
-        result(false, {
-          access_token: "ut_access_token",
-          refresh_token: "ut_refresh_token"
-        });
-      } else {
-        result(false, undefined);
-      }
+      result(false, undefined);
     },
   };
 
