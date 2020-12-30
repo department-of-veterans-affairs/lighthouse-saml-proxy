@@ -75,4 +75,32 @@ describe("dynamo client tests", () => {
       expect(true).toEqual(false);
     }
   });
+
+  it("getPayloadFromDynamo happy", async () => {
+    const mockDynamo = {};
+    let isCalled = false;
+
+    let payloadDoc = {
+      access_token: "ut_access_token",
+      refresh_token: "ut_refresh_token"
+    };
+    mockDynamo.dbDocClient = {
+      get: (search_params, result) => {
+        isCalled = true;
+        result(false, payloadDoc);
+      },
+    };
+
+    try {
+      await dynamoclient.getPayloadFromDynamo(
+        mockDynamo,
+        { search: "me" },
+        "TestTable"
+      );
+      expect(isCalled).toEqual(true);
+    } catch (err) {
+      // should not reach here
+      expect(true).toEqual(false);
+    }
+  });
 });
