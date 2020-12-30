@@ -144,9 +144,9 @@ function buildApp(
       })
     );
   }
+  app.use(rTracer.expressMiddleware());
   app.use(morgan(middlewareLogFormat));
   app.use(winstonMiddleware);
-  app.use(rTracer.expressMiddleware());
   app.use(
     promBundle({
       includeMethod: true,
