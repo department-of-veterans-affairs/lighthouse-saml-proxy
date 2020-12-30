@@ -69,6 +69,8 @@ class TokenHandlerClient {
         tokens,
         decoded
       );
+    }
+    if (patient) {
       return {
         statusCode: 200,
         responseBody: { ...tokenResponseBase, patient, state },
