@@ -20,7 +20,7 @@ class RefreshTokenStrategy {
   async getTokenResponse() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens = await this.getIfStaticToken(this.req.body.refresh_token);
-    if (!tokens || !tokens.access_token) {
+    if (!tokens) {
       try {
         tokens = await this.client.refresh(this.req.body.refresh_token);
       } catch (error) {
