@@ -50,6 +50,7 @@
     "aws-sdk": "^2.372.0",
     "axios": "^0.19.2",
     "body-parser": "^1.18.3",
+    "cls-rtracer": "^2.5.1",
     "cors": "^2.8.5",
     "eslint-plugin-jest": "^24.1.0",
     "express": "^4.16.4",
