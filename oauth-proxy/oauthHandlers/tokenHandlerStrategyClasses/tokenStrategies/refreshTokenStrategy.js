@@ -52,6 +52,7 @@ class RefreshTokenStrategy {
         search_params,
         this.config.dynamo_static_token_table
       );
+
       if (payload.Item) {
         payload = payload.Item;
         if (payload.static_access_token) {
@@ -78,7 +79,7 @@ class RefreshTokenStrategy {
             tokens.code = payload.static_code;
           }
           if (payload.static_state) {
-            tokens.state = payload.statc_state;
+            tokens.state = payload.static_state;
           }
         }
       }
