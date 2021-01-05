@@ -207,7 +207,7 @@ export default function configureExpress(
       res.status(err.status || 500);
       let errMessage =
         res.statusCode < 500 ? err.message : "Error processing SAML request";
-      res.render("sensitiveError", {
+      res.render(res.statusCode == 404 ? "error" : "sensitiveError", {
         message: errMessage,
         request_id: rTracer.id(),
       });
