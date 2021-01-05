@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require("winston");
+const rTracer = require("cls-rtracer");
 
 const logFormat = format.combine(
   format.timestamp({ alias: "time" }),
@@ -18,13 +19,20 @@ const logFormat = format.combine(
 const logger = createLogger({
   level: "info",
   format: logFormat,
-  defaultMeta: { service: "oauth-proxy" },
+  defaultMeta: {
+    service: "oauth-proxy",
+  },
   transports: [
     new transports.Console({
       silent: process.env.NODE_ENV === "test",
     }),
   ],
 });
+
+const winstonMiddleware = (req, res, next) => {
+  logger.defaultMeta["request_id"] = rTracer.id();
+  next();
+};
 
 const middlewareLogFormat = (tokens, req, res) => {
   return JSON.stringify(
@@ -36,6 +44,7 @@ const middlewareLogFormat = (tokens, req, res) => {
       "status-code": tokens.status(req, res),
       "content-length": tokens.res(req, res, "content-length"),
       referrer: tokens.referrer(req, res),
+      request_id: rTracer.id(),
     },
     null,
     2
@@ -43,6 +52,7 @@ const middlewareLogFormat = (tokens, req, res) => {
 };
 
 module.exports = {
+  winstonMiddleware,
   logger,
   middlewareLogFormat,
 };
