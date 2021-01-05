@@ -149,14 +149,13 @@ assign_code() {
 # Pulling latest lighthouse-auth-utils docker image if necessary
 docker pull vasdvp/lighthouse-auth-utils:latest
 
+# Start Tests
+
 "$DIR"/okta_grants_tests.sh --host="$HOST"
 track_result
 
 echo "Fetching code ..."
-
 CODE=$(assign_code)
-
-# Start Tests
 
 . "$DIR"/token_tests.sh --host="$HOST" --code="$CODE"
 track_result
