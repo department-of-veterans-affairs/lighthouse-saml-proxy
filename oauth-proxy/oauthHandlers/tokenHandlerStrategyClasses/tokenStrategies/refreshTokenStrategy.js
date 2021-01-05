@@ -57,29 +57,18 @@ class RefreshTokenStrategy {
         payload = payload.Item;
         if (payload.static_access_token) {
           tokens = {
+            is_static: true,
             access_token: payload.static_access_token,
             refresh_token: payload.static_refresh_token,
+            token_type: "Bearer",
+            scope: payload.static_scopes,
+            expires_in: payload.static_expires_in,
           };
-          if (payload.static_expires_in) {
-            tokens.expires_in = payload.static_expires_in;
-          }
-          if (payload.static_icn) {
-            tokens.patient = payload.static_icn;
-          }
           if (payload.static_id_token) {
             tokens.id_token = payload.static_id_token;
           }
-          tokens.token_type = payload.static_token_type
-            ? payload.static_token_type
-            : "bearer";
-          if (payload.static_redirect_uri) {
-            tokens.redirect_uri = payload.static_redirect_uri;
-          }
-          if (payload.static_code) {
-            tokens.code = payload.static_code;
-          }
-          if (payload.static_state) {
-            tokens.state = payload.static_state;
+          if (payload.static_icn) {
+            tokens.patient = payload.static_icn;
           }
         }
       }
