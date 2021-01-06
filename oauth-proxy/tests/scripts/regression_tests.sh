@@ -126,6 +126,8 @@ assign_code() {
       --user-password="$USER_PASSWORD" \
       --client-id="$CLIENT_ID" \
       --client-secret="$CLIENT_SECRET" \
+      --grant_consent="true" \
+      --scope="openid profile offline_access email address phone launch/patient" \
       --code-only)
 
   local CODE
@@ -147,16 +149,18 @@ assign_code() {
 # Pulling latest lighthouse-auth-utils docker image if necessary
 docker pull vasdvp/lighthouse-auth-utils:latest
 
-CODE=$(assign_code)
-
 # Start Tests
+
+"$DIR"/okta_grants_tests.sh --host="$HOST"
+track_result
+
+echo "Fetching code ..."
+CODE=$(assign_code)
 
 . "$DIR"/token_tests.sh --host="$HOST" --code="$CODE"
 track_result
 # TOKEN and EXPIRED_ACCESS are assigned in token_tests.sh
 "$DIR"/introspect_tests.sh --host="$HOST" --tokens="$TOKEN" --expired-access="$EXPIRED_ACCESS"
-track_result
-"$DIR"/okta_grants_tests.sh --host="$HOST"
 track_result
 "$DIR"/other_tests.sh --host="$HOST" --tokens="$TOKEN"
 track_result
