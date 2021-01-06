@@ -361,8 +361,7 @@ describe("tokenHandler refresh", () => {
       refresh: (resolve) => {
         resolve(
           new TokenSet({
-            access_token:
-              "static-access-token",
+            access_token: "static-access-token",
             refresh_token: "static-refresh-token",
             expires_in: 60,
           })
