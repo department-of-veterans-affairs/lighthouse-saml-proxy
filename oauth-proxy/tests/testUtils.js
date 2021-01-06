@@ -62,6 +62,17 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
+  dynamoClient.getPayloadFromDynamo.mockImplementation(
+    (handle, staticRefreshToken, tableName) => {
+      return new Promise((resolve, reject) => {
+        if (staticRefreshToken === fakeDynamoRecord.static_refresh_token) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such state value on ${tableName}`);
+        }
+      });
+    }
+  );
   return dynamoClient;
 }
 
