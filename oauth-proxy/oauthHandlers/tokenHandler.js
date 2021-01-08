@@ -11,6 +11,7 @@ const tokenHandler = async (
   dynamo,
   dynamoClient,
   validateToken,
+  staticTokens,
   req,
   res,
   next
@@ -27,7 +28,8 @@ const tokenHandler = async (
       req,
       res,
       next,
-      validateToken
+      validateToken,
+      staticTokens
     );
   } catch (error) {
     rethrowIfRuntimeError(error);

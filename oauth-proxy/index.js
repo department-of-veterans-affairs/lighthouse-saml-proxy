@@ -59,6 +59,29 @@ function buildMetadataRewriteTable(config, api_category) {
   };
 }
 
+function buildStaticTokensList(config, dynamo) {
+  let staticTokens = new Map()
+  try {
+    let payload = dynamoClient.scanFromDynamo(
+      dynamo,
+      config.dynamo_static_token_table
+    );
+    payload.Items.forEach(function(staticToken) {
+      staticTokens.set(staticToken.static_refresh_token, staticToken);
+    });
+    return staticTokens;
+  } catch (error) {
+    if (error.message && error.message.includes("non-existent table")) {
+      logger.warn("Static tokens table not yet created");
+    } else {
+      logger.error(
+        "Could not retrieve static token from DynamoDB",
+        error
+      );
+    }
+  }
+}
+
 function filterProperty(object, property) {
   if (property in object) {
     object[property] = "[Filtered]";
@@ -284,6 +307,7 @@ function buildApp(
         .catch(next);
     });
 
+    const staticTokens = new Map();
     router.post(api_category + app_routes.token, async (req, res, next) => {
       await oauthHandlers
         .tokenHandler(
@@ -294,6 +318,7 @@ function buildApp(
           dynamo,
           dynamoClient,
           validateToken,
+          staticTokens,
           req,
           res,
           next
@@ -379,6 +404,7 @@ function startApp(config, isolatedIssuers) {
     config.validate_post_endpoint,
     config.validate_apiKey
   );
+  //const staticTokens = new Map();//buildStaticTokensList(config, dynamoHandle);
   const app = buildApp(
     config,
     oktaClient,

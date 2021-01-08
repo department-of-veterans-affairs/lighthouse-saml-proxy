@@ -8,18 +8,57 @@ const { oktaTokenRefreshGauge, stopTimer } = require("../../../metrics");
 const dynamoClient = require("../../../dynamo_client");
 
 class RefreshTokenStrategy {
-  constructor(req, logger, client, dynamo, config) {
+  constructor(req, logger, client, dynamo, config, staticTokens) {
     this.req = req;
     this.logger = logger;
     this.client = client;
     this.dynamo = dynamo;
     this.config = config;
+    this.staticTokens = staticTokens;
   }
 
   //will throw error if cannot retrieve refresh token
   async getTokenResponse() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
-    let tokens = await this.getIfStaticToken(this.req.body.refresh_token);
+    let tokens;
+    try {
+      //TODO move to separate function at some point
+      //TODO consider adding config to enable disable static tokens entirely
+      if (this.staticTokens.size == 0) {
+        let payload;
+        payload = await dynamoClient.scanFromDynamo(
+          this.dynamo,
+          this.config.dynamo_static_token_table
+        );
+        var self = this;
+        payload.Items.forEach(function(staticToken) {
+          self.staticTokens.set(staticToken.static_refresh_token, staticToken);
+        });
+      }
+    } catch (err) {
+      this.logger.error("Could not load static tokens list", minimalError(error));
+    }
+
+    //TODO move to separate function at some point
+    if (this.staticTokens.has(this.req.body.refresh_token)) {
+      let staticToken = this.staticTokens.get(this.req.body.refresh_token);
+      tokens = {
+        is_static: true,
+        access_token: staticToken.static_access_token,
+        refresh_token: staticToken.static_refresh_token,
+        token_type: "Bearer",
+        scope: staticToken.static_scopes,
+        expires_in: staticToken.static_expires_in,
+      };
+      if (staticToken.static_id_token) {
+        tokens.id_token = staticToken.static_id_token;
+      }
+      if (staticToken.static_icn) {
+        tokens.patient = staticToken.static_icn;
+      }
+      return tokens;
+    }
+
     if (!tokens) {
       try {
         tokens = await this.client.refresh(this.req.body.refresh_token);
@@ -38,50 +77,6 @@ class RefreshTokenStrategy {
       }
     }
     stopTimer(oktaTokenRefreshGauge, oktaTokenRefreshStart);
-    return tokens;
-  }
-
-  async getIfStaticToken(refresh_token) {
-    let search_params = {
-      static_refresh_token: refresh_token,
-    };
-    let tokens;
-    try {
-      let payload = await dynamoClient.getPayloadFromDynamo(
-        this.dynamo,
-        search_params,
-        this.config.dynamo_static_token_table
-      );
-
-      if (payload.Item) {
-        payload = payload.Item;
-        if (payload.static_access_token) {
-          tokens = {
-            is_static: true,
-            access_token: payload.static_access_token,
-            refresh_token: payload.static_refresh_token,
-            token_type: "Bearer",
-            scope: payload.static_scopes,
-            expires_in: payload.static_expires_in,
-          };
-          if (payload.static_id_token) {
-            tokens.id_token = payload.static_id_token;
-          }
-          if (payload.static_icn) {
-            tokens.patient = payload.static_icn;
-          }
-        }
-      }
-    } catch (error) {
-      if (error.message && error.message.includes("non-existent table")) {
-        this.logger.warn("Static tokens table not yet created");
-      } else {
-        this.logger.error(
-          "Could not retrieve static token from DynamoDB",
-          error
-        );
-      }
-    }
     return tokens;
   }
 }

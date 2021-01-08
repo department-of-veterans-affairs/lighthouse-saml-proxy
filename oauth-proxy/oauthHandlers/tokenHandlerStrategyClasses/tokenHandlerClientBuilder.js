@@ -44,7 +44,8 @@ const buildTokenHandlerClient = (
   req,
   res,
   next,
-  validateToken
+  validateToken,
+  staticTokens
 ) => {
   const strategies = getStrategies(
     redirect_uri,
@@ -54,7 +55,8 @@ const buildTokenHandlerClient = (
     dynamoClient,
     config,
     req,
-    validateToken
+    validateToken,
+    staticTokens
   );
   return new TokenHandlerClient(
     strategies.tokenHandlerStrategy,
@@ -75,7 +77,8 @@ const getStrategies = (
   dynamoClient,
   config,
   req,
-  validateToken
+  validateToken,
+  staticTokens
 ) => {
   let strategies;
   if (req.body.grant_type === "refresh_token") {
@@ -85,7 +88,8 @@ const getStrategies = (
         logger,
         new issuer.Client(createClientMetadata(redirect_uri, req, config)),
         dynamo,
-        config
+        config,
+        staticTokens
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(
         req,
