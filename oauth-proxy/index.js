@@ -11,11 +11,12 @@ const promBundle = require("express-prom-bundle");
 const Sentry = require("@sentry/node");
 const axios = require("axios");
 const querystring = require("querystring");
-const { logger, middlewareLogFormat } = require("./logger");
+const { middlewareLogFormat, winstonMiddleware, logger } = require("./logger");
 
 const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
+const rTracer = require("cls-rtracer");
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -143,7 +144,9 @@ function buildApp(
       })
     );
   }
+  app.use(rTracer.expressMiddleware());
   app.use(morgan(middlewareLogFormat));
+  app.use(winstonMiddleware);
   app.use(
     promBundle({
       includeMethod: true,
