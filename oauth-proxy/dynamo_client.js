@@ -30,6 +30,9 @@ function createDynamoHandle(awsConfig, local) {
   return dynamoDb;
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoBySecondary(client, key, value, TableName) {
   const params = {
     IndexName: `oauth_${key}_index`,
@@ -56,6 +59,9 @@ function getFromDynamoBySecondary(client, key, value, TableName) {
   });
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoByState(client, state, TableName) {
   const params = {
     Key: {
@@ -77,6 +83,9 @@ function getFromDynamoByState(client, state, TableName) {
   });
 }
 
+/**
+ * @deprecated, prefer a successor that uses docClient.get
+ */
 function getFromDynamoByAccessToken(client, access_token, TableName) {
   const params = {
     Key: {
