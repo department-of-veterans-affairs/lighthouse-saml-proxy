@@ -19,6 +19,7 @@ let dynamo;
 let dynamoClient;
 let next;
 let validateToken;
+let staticTokens;
 
 beforeEach(() => {
   config = jest.mock();
@@ -28,6 +29,7 @@ beforeEach(() => {
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   validateToken = jest.fn();
+  staticTokens = new Map();
   next = jest.fn();
 
   config.dynamo_static_token_table = "ut_static_tokens_table";
@@ -92,6 +94,7 @@ describe("tokenHandler clientCredentials", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -119,6 +122,7 @@ describe("tokenHandler clientCredentials", () => {
       dynamo,
       dynamoClient,
       null,
+      staticTokens,
       req,
       res,
       next
@@ -168,6 +172,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -197,6 +202,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -225,6 +231,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -253,6 +260,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -276,6 +284,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -303,6 +312,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -331,6 +341,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -377,6 +388,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -430,6 +442,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -451,6 +464,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -477,6 +491,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next

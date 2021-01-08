@@ -62,17 +62,15 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  dynamoClient.getPayloadFromDynamo.mockImplementation(
-    (handle, staticRefreshToken, tableName) => {
-      return new Promise((resolve, reject) => {
-        if (staticRefreshToken === fakeDynamoRecord.static_refresh_token) {
-          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-        } else {
-          reject(`no such state value on ${tableName}`);
-        }
-      });
-    }
-  );
+  dynamoClient.scanFromDynamo.mockImplementation((handle, tableName) => {
+    return new Promise((resolve, reject) => {
+      if (tableName === fakeDynamoRecord.static_token_table) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+      } else {
+        reject(`no such state value on ${tableName}`);
+      }
+    });
+  });
   return dynamoClient;
 }
 
@@ -253,6 +251,7 @@ const createFakeConfig = () => {
     enable_pkce_authorization_flow: true,
     enable_okta_consent_endpoint: true,
     enable_smart_launch_service: true,
+    enable_static_token_service: true,
     routes: {
       categories: [
         {

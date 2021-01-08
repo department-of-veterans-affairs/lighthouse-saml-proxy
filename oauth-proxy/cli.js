@@ -104,6 +104,11 @@ function processArgs() {
         required: false,
         default: false,
       },
+      enable_static_token_service: {
+        description: "Enable static token lookup service?",
+        required: false,
+        default: false,
+      },
       routes: {
         description:
           "An object that describes route configurations for isolated api categories",

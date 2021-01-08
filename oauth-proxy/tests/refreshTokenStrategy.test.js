@@ -9,6 +9,7 @@ let logger;
 let dynamo;
 let client;
 let config;
+let staticTokens = new Map();
 
 beforeEach(() => {
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
@@ -26,18 +27,25 @@ beforeEach(() => {
   });
   config = jest.mock();
   config.dynamo_static_token_table = "ut_static_tokens_table";
+  config.enable_static_token_service = true;
   dynamo = jest.mock();
   dynamo.dbDocClient = {
-    get: (search_params, result) => {
-      if (search_params.Key.static_refresh_token === "static-refresh-token") {
-        result(false, {
-          Item: {
-            static_access_token: "static-access-token",
-            static_refresh_token: "static-refresh-token",
-            static_expires_in: 3600,
-            static_icn: "0123456789",
-            static_scopes: "launch/patient",
-          },
+    scan: (scan_params, result) => {
+      if (scan_params.TableName === "ut_static_tokens_table") {
+        result(null, {
+          Items: [
+            {
+              static_icn: "0123456789",
+              static_refresh_token: "static-refresh-token",
+              static_access_token: "static-access-token",
+              static_scopes:
+                "openid profile patient/Medication.read launch/patient offline_access",
+              static_expires_in: 3600,
+            },
+          ],
+          Count: 1,
+          ScannedCount: 1,
+          ConsumedCapacity: null,
         });
       } else {
         result(false, undefined);
@@ -61,7 +69,8 @@ describe("tokenHandler refreshTokenStrategy", () => {
       token_type: "Bearer",
       expires_in: 3600,
       access_token: "static-access-token",
-      scope: "launch/patient",
+      scope:
+        "openid profile patient/Medication.read launch/patient offline_access",
       patient: "0123456789",
       refresh_token: "static-refresh-token",
     };
@@ -70,7 +79,8 @@ describe("tokenHandler refreshTokenStrategy", () => {
       logger,
       client,
       dynamo,
-      config
+      config,
+      staticTokens
     );
 
     let token = await refreshTokenStrategy.getTokenResponse();
@@ -91,7 +101,8 @@ describe("tokenHandler refreshTokenStrategy", () => {
       logger,
       client,
       dynamo,
-      config
+      config,
+      staticTokens
     );
 
     let token = await refreshTokenStrategy.getTokenResponse();

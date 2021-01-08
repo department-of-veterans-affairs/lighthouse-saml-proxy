@@ -21,42 +21,49 @@ class RefreshTokenStrategy {
   async getTokenResponse() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens;
-    try {
-      //TODO move to separate function at some point
-      //TODO consider adding config to enable disable static tokens entirely
-      if (this.staticTokens.size == 0) {
-        let payload;
-        payload = await dynamoClient.scanFromDynamo(
-          this.dynamo,
-          this.config.dynamo_static_token_table
-        );
-        var self = this;
-        payload.Items.forEach(function(staticToken) {
-          self.staticTokens.set(staticToken.static_refresh_token, staticToken);
-        });
-      }
-    } catch (err) {
-      this.logger.error("Could not load static tokens list", minimalError(error));
-    }
 
     //TODO move to separate function at some point
-    if (this.staticTokens.has(this.req.body.refresh_token)) {
-      let staticToken = this.staticTokens.get(this.req.body.refresh_token);
-      tokens = {
-        is_static: true,
-        access_token: staticToken.static_access_token,
-        refresh_token: staticToken.static_refresh_token,
-        token_type: "Bearer",
-        scope: staticToken.static_scopes,
-        expires_in: staticToken.static_expires_in,
-      };
-      if (staticToken.static_id_token) {
-        tokens.id_token = staticToken.static_id_token;
+    if (this.config.enable_static_token_service) {
+      try {
+        if (this.staticTokens.size == 0) {
+          let payload;
+          payload = await dynamoClient.scanFromDynamo(
+            this.dynamo,
+            this.config.dynamo_static_token_table
+          );
+          var self = this;
+          payload.Items.forEach(function (staticToken) {
+            self.staticTokens.set(
+              staticToken.static_refresh_token,
+              staticToken
+            );
+          });
+        }
+      } catch (err) {
+        this.logger.error(
+          "Could not load static tokens list",
+          minimalError(err)
+        );
       }
-      if (staticToken.static_icn) {
-        tokens.patient = staticToken.static_icn;
+
+      if (this.staticTokens.has(this.req.body.refresh_token)) {
+        let staticToken = this.staticTokens.get(this.req.body.refresh_token);
+        tokens = {
+          is_static: true,
+          access_token: staticToken.static_access_token,
+          refresh_token: staticToken.static_refresh_token,
+          token_type: "Bearer",
+          scope: staticToken.static_scopes,
+          expires_in: staticToken.static_expires_in,
+        };
+        if (staticToken.static_id_token) {
+          tokens.id_token = staticToken.static_id_token;
+        }
+        if (staticToken.static_icn) {
+          tokens.patient = staticToken.static_icn;
+        }
+        return tokens;
       }
-      return tokens;
     }
 
     if (!tokens) {

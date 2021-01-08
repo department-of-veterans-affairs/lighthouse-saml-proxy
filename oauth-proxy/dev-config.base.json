@@ -15,6 +15,7 @@
   "enable_pkce_authorization_flow": true,
   "enable_okta_consent_endpoint": true,
   "enable_smart_launch_service": true,
+  "enable_static_token_service": true,
   "routes": {
     "categories": [
       {

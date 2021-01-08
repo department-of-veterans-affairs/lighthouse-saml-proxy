@@ -182,15 +182,18 @@ dynamo.createTable(tableParams, (err, data) => {
 
 function createStaticTokenEntry() {
   let itemParams = {
-      TableName: "StaticTokens",
-      Item: {
-          "static_access_token": {"S": "123456789"},
-          "static_refresh_token": {"S": "987654321"},
-          "static_scopes": {"S": "openid profile patient/Medication.read launch/patient offline_access"},
-          "static_expires_in":{"N": "3600"},
-          "static_icn": {"S": "555"},
-      }
-    };
+    TableName: "StaticTokens",
+    Item: {
+      static_access_token: { S: "123456789" },
+      static_refresh_token: { S: "987654321" },
+      static_scopes: {
+        S:
+          "openid profile patient/Medication.read launch/patient offline_access",
+      },
+      static_expires_in: { N: 3600 },
+      static_icn: { S: "555" },
+    },
+  };
 
   dynamo.putItem(itemParams, (err, data) => {
     if (err) {
@@ -200,7 +203,7 @@ function createStaticTokenEntry() {
       );
     } else {
       console.log("Created static token entry.");
-      );
+      console.log(data);
     }
   });
-};
+}
