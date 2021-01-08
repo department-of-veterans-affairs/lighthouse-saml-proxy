@@ -384,7 +384,6 @@ function startApp(config, isolatedIssuers) {
     config.validate_post_endpoint,
     config.validate_apiKey
   );
-  //const staticTokens = new Map();//buildStaticTokensList(config, dynamoHandle);
   const app = buildApp(
     config,
     oktaClient,

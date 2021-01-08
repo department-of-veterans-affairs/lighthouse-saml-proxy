@@ -22,7 +22,6 @@ class RefreshTokenStrategy {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens;
 
-    //TODO move to separate function at some point
     if (this.config.enable_static_token_service) {
       try {
         if (this.staticTokens.size == 0) {
