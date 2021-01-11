@@ -190,7 +190,7 @@ function createStaticTokenEntry() {
         S:
           "openid profile patient/Medication.read launch/patient offline_access",
       },
-      static_expires_in: { N: 3600 },
+      static_expires_in: { N: "3600" },
       static_icn: { S: "555" },
     },
   };
