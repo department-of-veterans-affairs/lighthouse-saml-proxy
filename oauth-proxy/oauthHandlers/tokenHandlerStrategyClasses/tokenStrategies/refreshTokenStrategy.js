@@ -14,7 +14,7 @@ class RefreshTokenStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getTokenResponse() {
+  async getToken() {
     let oktaTokenRefreshStart = process.hrtime.bigint();
     let tokens;
     try {

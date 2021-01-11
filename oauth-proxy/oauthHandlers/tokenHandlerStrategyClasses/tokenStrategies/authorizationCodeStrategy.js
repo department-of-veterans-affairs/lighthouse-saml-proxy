@@ -13,7 +13,7 @@ class AuthorizationCodeStrategy {
   }
 
   //will throw error if cannot retrieve refresh token
-  async getTokenResponse() {
+  async getToken() {
     let token;
     try {
       token = await this.client.grant({
