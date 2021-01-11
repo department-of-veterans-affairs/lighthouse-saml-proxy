@@ -12,6 +12,7 @@ import {
   VSORequestMetrics,
   IRequestMetrics,
 } from "../metrics";
+import rTracer from "cls-rtracer";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -20,7 +21,7 @@ const unknownUsersErrorTemplate = (error: any) => {
     error.name == "StatusCodeError" &&
     error.statusCode.toString() === "404"
   ) {
-    return "handleFailure.hbs";
+    return "internalFailure.hbs";
   } else {
     return "icnError.hbs";
   }
@@ -29,7 +30,7 @@ const unknownUsersErrorTemplate = (error: any) => {
 export const urlUserErrorTemplate = () => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-  return "handleFailure.hbs";
+  return "sensitiveError.hbs";
 };
 
 // This depends on being called after buildPassportLoginHandler because it uses
@@ -119,7 +120,9 @@ export const loadICN = async (
         action,
         result: "failure",
       });
-      res.render(unknownUsersErrorTemplate(mviError), {});
+      res.render(unknownUsersErrorTemplate(mviError), {
+        request_id: rTracer.id(),
+      });
     }
   }
 };
@@ -174,11 +177,7 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
       const sessionIndex = req?.user?.authnContext?.sessionIndex;
       if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
-        const err = {
-          message: "Bad request.",
-          status: 400,
-        };
-        return next(err);
+        return res.render("sensitiveError.hbs", { request_id: rTracer.id() });
       }
       let sessionIndexCached = null;
       sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
@@ -193,11 +192,7 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
             sessionIndex +
             " was previously cached."
         );
-        const err = {
-          message: "Bad request.",
-          status: 400,
-        };
-        return next(err);
+        return res.render("sensitiveError.hbs", { request_id: rTracer.id() });
       }
       // Set the session index to expire after 6hrs, or 21600 seconds.
       await cache.set(sessionIndex, "", "EX", 21600);

@@ -11,6 +11,7 @@ import {
   urlUserErrorTemplate,
 } from "./acsHandlers";
 import logger from "../logger";
+import rTracer from "cls-rtracer";
 
 export const getHashCode = (str) => {
   var hash = 0;
@@ -155,5 +156,5 @@ export const acsFactory = (app, acsUrl, cache, cacheEnabled) => {
 
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
-  res.render(urlUserErrorTemplate(req, {}));
+  res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };

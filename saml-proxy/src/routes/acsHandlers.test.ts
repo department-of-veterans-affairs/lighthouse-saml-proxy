@@ -244,6 +244,13 @@ describe("requestWithMetrics", () => {
 });
 
 describe("validateIdpResponse", () => {
+  let mockResponse;
+
+  beforeEach(() => {
+    mockResponse = {
+      render: jest.fn(),
+    };
+  });
   it("should cache session index for a given saml response", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
@@ -259,12 +266,12 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, {}, nextFn);
+    await validateFn(req, mockResponse, nextFn);
     expect(nextFn).toHaveBeenCalled();
     expect(cache.has(testSessionIndex));
   });
 
-  it("should throw an error on repeated idp saml response", async () => {
+  it("should return sensitiveError on repeated idp saml response", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
@@ -279,15 +286,16 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, {}, nextFn).catch((err) => {
+    await validateFn(req, mockResponse, nextFn).catch((err) => {
       fail("Test failure due to unexpected error " + err);
     });
-    await validateFn(req, {}, nextFn).catch((err) => {
+    await validateFn(req, mockResponse, nextFn).catch((err) => {
       fail("Test failure due to unexpected error " + err);
     });
 
-    expect(nextFn).toHaveBeenCalledTimes(2);
-    expect(nextFn.mock.calls[1].toString() == "Error: Bad request");
+    expect(nextFn).toHaveBeenCalledTimes(1);
+    expect(mockResponse.render).toHaveBeenCalledTimes(1);
+    expect(mockResponse.render.mock.calls[0][0]).toBe("sensitiveError.hbs");
   });
 
   it("should throw an error when processing a saml response with no session index", async () => {
@@ -302,12 +310,13 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, {}, nextFn).catch((err) => {
+    await validateFn(req, mockResponse, nextFn).catch((err) => {
       fail("Test failure due to unexpected error " + err);
     });
 
-    expect(nextFn).toHaveBeenCalledTimes(1);
-    expect(nextFn.mock.calls[0].toString() == "Error: Bad request");
+    expect(nextFn).toHaveBeenCalledTimes(0);
+    expect(mockResponse.render).toHaveBeenCalledTimes(1);
+    expect(mockResponse.render.mock.calls[0][0]).toBe("sensitiveError.hbs");
   });
 
   it("should not cache anything when cache is not enabled", async () => {
@@ -325,7 +334,7 @@ describe("validateIdpResponse", () => {
     };
 
     const validateFn = handlers.validateIdpResponse(cache, false);
-    await validateFn(req, {}, nextFn);
+    await validateFn(req, mockResponse, nextFn);
     expect(nextFn).toHaveBeenCalled();
     expect(!cache.has(testSessionIndex));
   });
