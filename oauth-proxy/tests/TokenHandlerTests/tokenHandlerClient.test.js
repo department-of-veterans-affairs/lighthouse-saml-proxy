@@ -1,6 +1,3 @@
-const { IoT1ClickDevicesService } = require("aws-sdk");
-const { describe } = require("yargs");
-
 require("jest");
 
 describe( "handleToken tests", () => {
