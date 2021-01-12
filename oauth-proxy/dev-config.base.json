@@ -5,6 +5,7 @@
   "dynamo_local": "dynamodb:8000",
   "dynamo_table_name": "OAuthRequests",
   "dynamo_client_credentials_table": "ClientCredentials",
+  "dynamo_static_token_table": "StaticTokens",
   "hmac_secret": "secret",
   "okta_url": "https://deptva-eval.okta.com",
   "validate_post_endpoint": "https://sandbox-api.va.gov/internal/auth/v1/validation",
@@ -14,6 +15,7 @@
   "enable_pkce_authorization_flow": true,
   "enable_okta_consent_endpoint": true,
   "enable_smart_launch_service": true,
+  "enable_static_token_service": true,
   "routes": {
     "categories": [
       {

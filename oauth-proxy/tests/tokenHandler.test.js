@@ -19,6 +19,7 @@ let dynamo;
 let dynamoClient;
 let next;
 let validateToken;
+let staticTokens;
 
 beforeEach(() => {
   config = jest.mock();
@@ -28,7 +29,29 @@ beforeEach(() => {
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   validateToken = jest.fn();
+  staticTokens = new Map();
   next = jest.fn();
+
+  config.dynamo_static_token_table = "ut_static_tokens_table";
+  dynamo.dbDocClient = {
+    get: (search_params, result) => {
+      if (
+        search_params.Key.static_refresh_token ===
+        "the_fake_static_refresh_token"
+      ) {
+        result(false, {
+          Item: {
+            static_access_token: "the_fake_static_access_token",
+            static_refresh_token: "the_fake_static_refresh_token",
+            static_expires_in: 1500,
+            static_icn: "the_fake_static_icn",
+          },
+        });
+      } else {
+        result(false, undefined);
+      }
+    },
+  };
 
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
@@ -71,6 +94,7 @@ describe("tokenHandler clientCredentials", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -98,6 +122,7 @@ describe("tokenHandler clientCredentials", () => {
       dynamo,
       dynamoClient,
       null,
+      staticTokens,
       req,
       res,
       next
@@ -147,6 +172,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -176,6 +202,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -204,6 +231,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -232,6 +260,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -255,6 +284,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -282,6 +312,7 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -310,12 +341,59 @@ describe("tokenHandler refresh", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
     );
     expect(validateToken).not.toHaveBeenCalled();
     expect(res.statusCode).toEqual(401);
+  });
+  it("handles the static token refresh flow", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "refresh_token",
+        refresh_token: "static-refresh-token",
+        client_id: "client123",
+        client_secret: "secret789",
+      },
+    });
+    dynamoClient = buildFakeDynamoClient({
+      state: "abc123",
+      code: "xyz789",
+      refresh_token: "static-refresh-token",
+      redirect_uri: "http://localhost/thisDoesNotMatter",
+    });
+    validateToken = () => {
+      return { va_identifiers: { icn: "0000000000000" } };
+    };
+    let res = new MockExpressResponse();
+    let client = buildOpenIDClient({
+      refresh: (resolve) => {
+        resolve(
+          new TokenSet({
+            access_token: "static-access-token",
+            refresh_token: "static-refresh-token",
+            expires_in: 60,
+          })
+        );
+      },
+    });
+    issuer = new FakeIssuer(client);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      staticTokens,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(200);
   });
 });
 
@@ -364,6 +442,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -385,6 +464,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next
@@ -411,6 +491,7 @@ describe("tokenHandler code", () => {
       dynamo,
       dynamoClient,
       validateToken,
+      staticTokens,
       req,
       res,
       next

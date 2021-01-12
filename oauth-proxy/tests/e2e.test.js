@@ -39,6 +39,7 @@ const defaultTestingConfig = {
   hmac_secret: "testsecret",
   dynamo_client_credentials_table: "client_creds_table",
   enable_smart_launch_service: true,
+  enable_static_token_service: true,
   routes: {
     categories: [
       {

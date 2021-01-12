@@ -287,6 +287,7 @@ function buildApp(
         .catch(next);
     });
 
+    const staticTokens = new Map();
     router.post(api_category + app_routes.token, async (req, res, next) => {
       await oauthHandlers
         .tokenHandler(
@@ -297,6 +298,7 @@ function buildApp(
           dynamo,
           dynamoClient,
           validateToken,
+          staticTokens,
           req,
           res,
           next
