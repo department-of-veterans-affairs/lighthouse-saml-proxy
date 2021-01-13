@@ -1,17 +1,294 @@
+const {
+  buildTokenHandlerClient,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenHandlerClientBuilder");
+const {
+  RefreshTokenStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
+const {
+  AuthorizationCodeStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/authorizationCodeStrategy");
+const {
+  ClientCredentialsStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
+const {
+  UnsupportedGrantStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/unsupportedGrantStrategy");
+const {
+  PullDocumentByRefreshTokenStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
+const {
+  PullDocumentByCodeStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByCodeStrategy");
+const {
+  PullDocumentByLaunchStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByLaunchStrategy");
+const {
+  SaveDocumentStateStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
+const {
+  SaveDocumentLaunchStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentLaunchStrategy");
+const {
+  GetPatientInfoFromValidateEndpointStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
+const {
+  GetPatientInfoFromLaunchStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
+const {
+  FakeIssuer,
+  buildFakeDynamoClient,
+  buildFakeLogger,
+  createFakeConfig,
+} = require("../testUtils");
+const MockExpressRequest = require("mock-express-request");
+const MockExpressResponse = require("mock-express-response");
+const { encodeBasicAuthHeader } = require("../../utils");
+
 require("jest");
 
 describe("buildTokenHandlerClient Tests", () => {
-  it("Refresh Client Basic Auth", () => {});
+  let redirect_uri = "https://redirect.com";
+  let issuer = new FakeIssuer();
+  let logger = buildFakeLogger();
+  let dynamo = {};
+  let dynamoClient = buildFakeDynamoClient({});
+  let config = createFakeConfig();
+  let req;
+  let res = new MockExpressResponse();
+  let next = jest.fn();
+  let validateToken = {};
+  let staticTokens = {};
 
-  it("Refresh Client Body Auth", () => {});
+  it("Refresh Client Basic Auth", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "refresh_token",
+      },
+      headers: {
+        authorization: encodeBasicAuthHeader("user", "pass"),
+      },
+    });
 
-  it("Code Client PKCE Auth", () => {});
+    let response = buildTokenHandlerClient(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req,
+      res,
+      next,
+      validateToken,
+      staticTokens
+    );
 
-  it("ClientCredentials Client", () => {});
+    expect(response.getTokenResponseStrategy).toBeInstanceOf(
+      RefreshTokenStrategy
+    );
+    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
+      PullDocumentByRefreshTokenStrategy
+    );
+    expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
+      SaveDocumentStateStrategy
+    );
+    expect(response.getPatientInfoStrategy).toBeInstanceOf(
+      GetPatientInfoFromValidateEndpointStrategy
+    );
+  });
 
-  it("Unsupported Grant Client", () => {});
+  it("Refresh Client Body Auth", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "refresh_token",
+        client_id: "client id",
+        client_secret: "client secret",
+      },
+    });
+    let response = buildTokenHandlerClient(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req,
+      res,
+      next,
+      validateToken,
+      staticTokens
+    );
 
-  it("Code Client Invalid Auth", () => {});
+    expect(response.getTokenResponseStrategy).toBeInstanceOf(
+      RefreshTokenStrategy
+    );
+    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
+      PullDocumentByRefreshTokenStrategy
+    );
+    expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
+      SaveDocumentStateStrategy
+    );
+    expect(response.getPatientInfoStrategy).toBeInstanceOf(
+      GetPatientInfoFromValidateEndpointStrategy
+    );
+  });
 
-  it("ClientCredentials Client Invalid Assertion Type", () => {});
+  it("Code Client PKCE Auth", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "authorization_code",
+        client_id: "client id",
+      },
+    });
+    let response = buildTokenHandlerClient(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req,
+      res,
+      next,
+      validateToken,
+      staticTokens
+    );
+
+    expect(response.getTokenResponseStrategy).toBeInstanceOf(
+      AuthorizationCodeStrategy
+    );
+    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
+      PullDocumentByCodeStrategy
+    );
+    expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
+      SaveDocumentStateStrategy
+    );
+    expect(response.getPatientInfoStrategy).toBeInstanceOf(
+      GetPatientInfoFromValidateEndpointStrategy
+    );
+  });
+
+  it("ClientCredentials Client", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+      },
+    });
+    let response = buildTokenHandlerClient(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req,
+      res,
+      next,
+      validateToken,
+      staticTokens
+    );
+
+    expect(response.getTokenResponseStrategy).toBeInstanceOf(
+      ClientCredentialsStrategy
+    );
+    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
+      PullDocumentByLaunchStrategy
+    );
+    expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
+      SaveDocumentLaunchStrategy
+    );
+    expect(response.getPatientInfoStrategy).toBeInstanceOf(
+      GetPatientInfoFromLaunchStrategy
+    );
+  });
+
+  it("Unsupported Grant Client", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "unsupported",
+      },
+    });
+    let response = buildTokenHandlerClient(
+      redirect_uri,
+      issuer,
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      req,
+      res,
+      next,
+      validateToken,
+      staticTokens
+    );
+
+    expect(response.getTokenResponseStrategy).toBeInstanceOf(
+      UnsupportedGrantStrategy
+    );
+  });
+
+  it("Code Client Invalid Auth", () => {
+    req.body.grant_type = "authorization_code";
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "authorization_code",
+      },
+    });
+    try {
+      buildTokenHandlerClient(
+        redirect_uri,
+        issuer,
+        logger,
+        dynamo,
+        dynamoClient,
+        config,
+        req,
+        res,
+        next,
+        validateToken,
+        staticTokens
+      );
+    } catch (err) {
+      expect(err.status).toBe(401);
+      expect(err.error).toBe("invalid_client");
+      expect(err.error_description).toBe("Client authentication failed");
+      return;
+    }
+    expect(true).toBe(false);
+  });
+
+  it("ClientCredentials Client Invalid Assertion Type", () => {
+    req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion_type: "invalid",
+      },
+    });
+
+    try {
+      buildTokenHandlerClient(
+        redirect_uri,
+        issuer,
+        logger,
+        dynamo,
+        dynamoClient,
+        config,
+        req,
+        res,
+        next,
+        validateToken,
+        staticTokens
+      );
+    } catch (err) {
+      expect(err.status).toBe(400);
+      expect(err.error).toBe("invalid_request");
+      expect(err.error_description).toBe(
+        "Client assertion type must be jwt-bearer."
+      );
+      return;
+    }
+    expect(true).toBe(false);
+  });
 });
