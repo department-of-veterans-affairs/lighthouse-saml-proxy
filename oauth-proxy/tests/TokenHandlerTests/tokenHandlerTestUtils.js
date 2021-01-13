@@ -1,3 +1,8 @@
+const access_token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjoiZW1haWwucmVhZCIsImlhdCI6MTUxNjIzOTAyMn0.iiq38iOU_UJSl3emfEc8fSelVl7dWBaZ-Yd5wurVhc4";
+const access_token_patient =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjoibGF1bmNoL3BhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.5RLmIUn-kZqZVb4IqxNUpWCXPYtDrBraShDHTIndlgU";
+
 const buildGetTokenResponseStrategy = (response, error = false) => {
   const getTokenResponseStrategy = { getTokenResponse: jest.fn() };
   getTokenResponseStrategy.getTokenResponse.mockImplementation(() => {
@@ -32,7 +37,7 @@ const buildSaveDocumentStrategy = () => {
   return saveDocumentStrategy;
 };
 
-const buildGetPatientInfoStrategy = (patient, error = false) => {
+const buildGetPatientInfoStrategy = (patient, error) => {
   const getPatientInfoStrategy = { createPatientInfo: jest.fn() };
   getPatientInfoStrategy.createPatientInfo.mockImplementation(() => {
     return new Promise((resolve, reject) => {
@@ -46,9 +51,19 @@ const buildGetPatientInfoStrategy = (patient, error = false) => {
   return getPatientInfoStrategy;
 };
 
+const buildToken = (is_static, patient) => {
+  let token = {
+    is_static: is_static,
+    access_token: patient ? access_token_patient : access_token,
+  };
+
+  return token;
+};
+
 module.exports = {
   buildGetTokenResponseStrategy,
   buildGetDocumentStrategy,
   buildSaveDocumentStrategy,
   buildGetPatientInfoStrategy,
+  buildToken,
 };
