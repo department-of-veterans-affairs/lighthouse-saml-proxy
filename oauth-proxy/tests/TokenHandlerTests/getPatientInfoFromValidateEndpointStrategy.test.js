@@ -1,5 +1,3 @@
-const { isRuntimeError } = require("../../utils")
-
 require("jest")
 
 describe("createPatientInfo Tests", () => {
@@ -8,6 +6,6 @@ describe("createPatientInfo Tests", () => {
   })
 
   it("Validation Error", async () => {
-    
+
   })
 })
