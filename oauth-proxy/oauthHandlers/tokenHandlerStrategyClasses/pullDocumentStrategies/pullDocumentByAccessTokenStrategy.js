@@ -15,11 +15,17 @@ class PullDocumentByAccessTokenStrategy {
       this.config.hmac_secret
     );
     try {
-      document = await this.dynamoClient.getFromDynamoByAccessToken(
+      let search_params = {
+        access_token: hashedToken,
+      };
+      let payload = await dynamoClient.getPayloadFromDynamo(
         this.dynamo,
-        hashedToken,
+        search_params,
         this.config.dynamo_client_credentials_table
       );
+      if (payload.Item) {
+        document = payload.Item;
+      }
     } catch (err) {
       rethrowIfRuntimeError(err);
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);
