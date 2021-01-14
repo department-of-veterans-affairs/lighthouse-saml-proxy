@@ -30,7 +30,7 @@ function convertObjectToDynamoAttributeValues(obj) {
   }, {});
 }
 
-function buildFakeDynamoClient(fakeDynamoRecord) {
+function buildFakeDynamoClient(fakeDynamoRecord, saveError) {
   const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
   dynamoClient.saveToDynamo.mockImplementation((state) => {
     return new Promise((resolve) => {
@@ -38,6 +38,15 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
       resolve({ pk: state });
+    });
+  });
+  dynamoClient.savePayloadToDynamo.mockImplementation((launch) => {
+    return new Promise((resolve, reject) => {
+      if(saveError) {
+        reject(true)
+      }else {
+        resolve(true)
+      }
     });
   });
   dynamoClient.getFromDynamoBySecondary.mockImplementation(
