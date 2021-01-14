@@ -4,16 +4,16 @@ const { translateTokenSet } = require("../tokenResponse");
 
 class TokenHandlerClient {
   constructor(
-    getTokenResponseStrategy,
-    pullDocumentFromDynamoStrategy,
+    getTokenStrategy,
+    getDocumentFromDynamoStrategy,
     saveDocumentToDynamoStrategy,
     getPatientInfoStrategy,
     req,
     res,
     next
   ) {
-    this.getTokenResponseStrategy = getTokenResponseStrategy;
-    this.pullDocumentFromDynamoStrategy = pullDocumentFromDynamoStrategy;
+    this.getTokenStrategy = getTokenStrategy;
+    this.getDocumentStrategy = getDocumentFromDynamoStrategy;
     this.saveDocumentToDynamoStrategy = saveDocumentToDynamoStrategy;
     this.getPatientInfoStrategy = getPatientInfoStrategy;
     this.req = req;
@@ -23,7 +23,7 @@ class TokenHandlerClient {
   async handleToken() {
     let tokens;
     try {
-      tokens = await this.getTokenResponseStrategy.getTokenResponse();
+      tokens = await this.getTokenStrategy.getToken();
     } catch (error) {
       rethrowIfRuntimeError(error);
       if (error.statusCode !== undefined && error.statusCode === 401) {
@@ -52,7 +52,8 @@ class TokenHandlerClient {
       };
     }
 
-    let document = await this.pullDocumentFromDynamoStrategy.pullDocumentFromDynamo();
+    let document = await this.getDocumentStrategy.getDocument();
+
     let state;
     if (document && tokens) {
       await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(

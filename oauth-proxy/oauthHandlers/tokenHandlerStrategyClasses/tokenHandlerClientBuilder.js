@@ -13,14 +13,14 @@ const {
 } = require("./tokenStrategies/unsupportedGrantStrategy");
 const { TokenHandlerClient } = require("./tokenHandlerClient");
 const {
-  PullDocumentByCodeStrategy,
-} = require("./pullDocumentStrategies/pullDocumentByCodeStrategy");
+  GetDocumentByCodeStrategy,
+} = require("./documentStrategies/getDocumentByCodeStrategy");
 const {
-  PullDocumentByRefreshTokenStrategy,
-} = require("./pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
+  GetDocumentByRefreshTokenStrategy,
+} = require("./documentStrategies/getDocumentByRefreshTokenStrategy");
 const {
-  PullDocumentByLaunchStrategy,
-} = require("./pullDocumentStrategies/pullDocumentByLaunchStrategy");
+  GetDocumentByLaunchStrategy,
+} = require("./documentStrategies/getDocumentByLaunchStrategy");
 const {
   SaveDocumentStateStrategy,
 } = require("./saveDocumentStrategies/saveDocumentStateStrategy");
@@ -59,8 +59,8 @@ const buildTokenHandlerClient = (
     staticTokens
   );
   return new TokenHandlerClient(
-    strategies.tokenHandlerStrategy,
-    strategies.pullDocumentFromDynamoStrategy,
+    strategies.getTokenStrategy,
+    strategies.getDocumentFromDynamoStrategy,
     strategies.saveDocumentToDynamoStrategy,
     strategies.getPatientInfoStrategy,
     req,
@@ -83,7 +83,7 @@ const getStrategies = (
   let strategies;
   if (req.body.grant_type === "refresh_token") {
     strategies = {
-      tokenHandlerStrategy: new RefreshTokenStrategy(
+      getTokenStrategy: new RefreshTokenStrategy(
         req,
         logger,
         new issuer.Client(createClientMetadata(redirect_uri, req, config)),
@@ -91,7 +91,7 @@ const getStrategies = (
         config,
         staticTokens
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentByRefreshTokenStrategy(
+      getDocumentFromDynamoStrategy: new GetDocumentByRefreshTokenStrategy(
         req,
         logger,
         dynamo,
@@ -112,13 +112,13 @@ const getStrategies = (
     };
   } else if (req.body.grant_type === "authorization_code") {
     strategies = {
-      tokenHandlerStrategy: new AuthorizationCodeStrategy(
+      getTokenStrategy: new AuthorizationCodeStrategy(
         req,
         logger,
         redirect_uri,
         new issuer.Client(createClientMetadata(redirect_uri, req, config))
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentByCodeStrategy(
+      getDocumentFromDynamoStrategy: new GetDocumentByCodeStrategy(
         req,
         logger,
         dynamo,
@@ -149,14 +149,14 @@ const getStrategies = (
       };
     }
     strategies = {
-      tokenHandlerStrategy: new ClientCredentialsStrategy(
+      getTokenStrategy: new ClientCredentialsStrategy(
         req,
         logger,
         dynamo,
         dynamoClient,
         issuer.token_endpoint
       ),
-      pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
+      getDocumentFromDynamoStrategy: new GetDocumentByLaunchStrategy(req),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
         logger,
         dynamo,
@@ -167,7 +167,7 @@ const getStrategies = (
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
-    strategies = { tokenHandlerStrategy: new UnsupportedGrantStrategy() };
+    strategies = { getTokenStrategy: new UnsupportedGrantStrategy() };
   }
   return strategies;
 };

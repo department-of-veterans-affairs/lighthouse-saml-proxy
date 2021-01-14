@@ -1,8 +1,8 @@
 require("jest");
 
 const {
-  PullDocumentByCodeStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByCodeStrategy");
+  GetDocumentByCodeStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/documentStrategies/getDocumentByCodeStrategy");
 
 const {
   buildFakeDynamoClient,
@@ -28,7 +28,7 @@ let config;
 let dynamo;
 let logger;
 let req;
-describe("pullDocumentByCodeStrategy tests", () => {
+describe("getDocumentByCodeStrategy tests", () => {
   beforeEach(() => {
     config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
@@ -49,14 +49,14 @@ describe("pullDocumentByCodeStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
 
-    let strategy = new PullDocumentByCodeStrategy(
+    let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
       dynamo,
       dynamoClient,
       config
     );
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
     expect(document).toEqual({
       state: { S: STATE },
       code: { S: CODE_HASH_PAIR[0] },
@@ -73,14 +73,14 @@ describe("pullDocumentByCodeStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
 
-    let strategy = new PullDocumentByCodeStrategy(
+    let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
       dynamo,
       dynamoClient,
       config
     );
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
     expect(document).toEqual({
       state: { S: STATE },
       code: { S: CODE_HASH_PAIR[1] },
@@ -91,7 +91,7 @@ describe("pullDocumentByCodeStrategy tests", () => {
 
   it("Could not retrieve Token", async () => {
     dynamoClient = buildFakeDynamoClient({});
-    let strategy = new PullDocumentByCodeStrategy(
+    let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
       dynamo,
@@ -99,7 +99,7 @@ describe("pullDocumentByCodeStrategy tests", () => {
       config
     );
 
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
   });
 });

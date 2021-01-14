@@ -1,8 +1,8 @@
 require("jest");
 
 const {
-  PullDocumentByRefreshTokenStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
+  GetDocumentByRefreshTokenStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/documentStrategies/getDocumentByRefreshTokenStrategy");
 
 const {
   buildFakeDynamoClient,
@@ -29,7 +29,7 @@ let dynamo;
 let logger;
 let req;
 
-describe("pullDocumentByRefreshTokenStrategy tests", () => {
+describe("getDocumentByRefreshTokenStrategy tests", () => {
   beforeEach(() => {
     config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
@@ -50,14 +50,14 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
 
-    let strategy = new PullDocumentByRefreshTokenStrategy(
+    let strategy = new GetDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
       dynamoClient,
       config
     );
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
 
     expect(document).toEqual({
       state: { S: STATE },
@@ -75,14 +75,14 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
 
-    let strategy = new PullDocumentByRefreshTokenStrategy(
+    let strategy = new GetDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
       dynamoClient,
       config
     );
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
 
     expect(document).toEqual({
       state: { S: STATE },
@@ -94,7 +94,7 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
 
   it("Could not retrieve Token", async () => {
     dynamoClient = buildFakeDynamoClient();
-    let strategy = new PullDocumentByRefreshTokenStrategy(
+    let strategy = new GetDocumentByRefreshTokenStrategy(
       req,
       logger,
       dynamo,
@@ -102,7 +102,7 @@ describe("pullDocumentByRefreshTokenStrategy tests", () => {
       config
     );
 
-    let document = await strategy.pullDocumentFromDynamo();
+    let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
   });
 });

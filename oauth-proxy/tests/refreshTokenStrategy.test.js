@@ -83,7 +83,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
       staticTokens
     );
 
-    let token = await refreshTokenStrategy.getTokenResponse();
+    let token = await refreshTokenStrategy.getToken();
     expect(token).toEqual(data);
   });
 
@@ -105,7 +105,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
       staticTokens
     );
 
-    let token = await refreshTokenStrategy.getTokenResponse();
+    let token = await refreshTokenStrategy.getToken();
     expect(token.access_token).toEqual("real-access-token");
     expect(token.refresh_token).toEqual("real-refresh-token");
     expect(token.expires_in).toEqual(60);
