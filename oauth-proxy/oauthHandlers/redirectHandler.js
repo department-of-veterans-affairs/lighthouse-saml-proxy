@@ -39,15 +39,20 @@ const redirectHandler = async (
   }
 
   try {
-    let document = await dynamoClient.getFromDynamoByState(
+    let search_params = {
+      state: state,
+    };
+    let document = await dynamoClient.getPayloadFromDynamo(
       dynamo,
-      state,
+      search_params,
       config.dynamo_table_name
     );
-
-    const params = new URLSearchParams(req.query);
-    loginEnd.inc();
-    res.redirect(`${document.redirect_uri.S}?${params.toString()}`);
+    if (document && document.Item) {
+      document = document.Item;
+      const params = new URLSearchParams(req.query);
+      loginEnd.inc();
+      res.redirect(`${document.redirect_uri}?${params.toString()}`);
+    }
   } catch (error) {
     logger.error("Failed to redirect to the OAuth client application", error);
     return next(error); // This error is unrecoverable because we can't look up the original redirect.
