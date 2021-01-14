@@ -1,4 +1,5 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
+const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByAccessTokenStrategy {
   constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
@@ -21,7 +22,7 @@ class PullDocumentByAccessTokenStrategy {
       let payload = await dynamoClient.getPayloadFromDynamo(
         this.dynamo,
         search_params,
-        this.config.dynamo_client_credentials_table
+        this.config.dynamo_table_name
       );
       if (payload.Item) {
         document = payload.Item;

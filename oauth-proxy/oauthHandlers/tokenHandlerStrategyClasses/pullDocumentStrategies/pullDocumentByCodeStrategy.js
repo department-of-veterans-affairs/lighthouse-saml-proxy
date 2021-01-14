@@ -1,4 +1,5 @@
 const { rethrowIfRuntimeError, hashString } = require("../../../utils");
+const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByCodeStrategy {
   constructor(req, logger, dynamo, dynamoClient, config) {
@@ -23,13 +24,23 @@ class PullDocumentByCodeStrategy {
 
   async getDocumentDynamo(code) {
     let document;
+
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
+      let payload = await dynamoClient.queryFromDynamo(
         this.dynamo,
-        "code",
-        code,
-        this.config.dynamo_table_name
+        "#code = :code",
+        {
+          "#code" : "code",
+        },
+        {
+          ":code" : code,
+        },
+        this.config.dynamo_table_name,
+        "oauth_code_index",
       );
+      if (payload.Items && payload.Items[0]) {
+        document = payload.Items[0];
+      }
     } catch (err) {
       rethrowIfRuntimeError(err);
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);
