@@ -60,10 +60,25 @@ const buildToken = (is_static, patient) => {
   return token;
 };
 
+const buildValidateToken = (response, error) => {
+  const mockValidate = jest.fn();
+  mockValidate.mockImplementation(() => {
+    return new Promise((resolve, reject) => {
+      if (!error) {
+        resolve(response);
+      } else {
+        reject(response);
+      }
+    });
+  });
+  return mockValidate;
+};
+
 module.exports = {
   buildGetTokenResponseStrategy,
   buildGetDocumentStrategy,
   buildSaveDocumentStrategy,
   buildGetPatientInfoStrategy,
   buildToken,
+  buildValidateToken,
 };
