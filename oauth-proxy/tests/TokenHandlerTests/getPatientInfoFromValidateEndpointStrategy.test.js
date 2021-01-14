@@ -3,12 +3,8 @@ require("jest");
 const {
   GetPatientInfoFromValidateEndpointStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromValidateEndpointStrategy");
-const {
-  buildFakeLogger,
-} = require("../testUtils");
-const {
-  buildValidateToken
-} = require("./tokenHandlerTestUtils");
+const { buildFakeLogger } = require("../testUtils");
+const { buildValidateToken } = require("./tokenHandlerTestUtils");
 describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
   let logger;
   let mockValidate;
@@ -17,19 +13,22 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
     logger = buildFakeLogger();
   });
   it("Happy Path", async () => {
-    mockValidate = buildValidateToken({va_identifiers: {icn: "patient"}}, false);
+    mockValidate = buildValidateToken(
+      { va_identifiers: { icn: "patient" } },
+      false
+    );
     let strategy = new GetPatientInfoFromValidateEndpointStrategy(
       mockValidate,
       logger
     );
     let response = await strategy.createPatientInfo(
-        { access_token: "token" },
-        { aud: "aud" }
-      );
-    expect(response).toBe("patient")
-  })
+      { access_token: "token" },
+      { aud: "aud" }
+    );
+    expect(response).toBe("patient");
+  });
   it("Type Error", async () => {
-    mockValidate = buildValidateToken({}, true)
+    mockValidate = buildValidateToken({}, true);
     let strategy = new GetPatientInfoFromValidateEndpointStrategy(
       mockValidate,
       logger
