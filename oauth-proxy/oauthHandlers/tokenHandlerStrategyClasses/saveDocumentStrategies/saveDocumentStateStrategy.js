@@ -13,7 +13,7 @@ class SaveDocumentStateStrategy {
       if (document.state && tokens.refresh_token) {
         await this.dynamoClient.saveToDynamo(
           this.dynamo,
-          document.state.S,
+          document.state,
           "refresh_token",
           hashString(tokens.refresh_token, this.config.hmac_secret),
           this.config.dynamo_table_name
