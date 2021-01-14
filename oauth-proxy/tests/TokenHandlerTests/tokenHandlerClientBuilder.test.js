@@ -14,14 +14,14 @@ const {
   UnsupportedGrantStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/unsupportedGrantStrategy");
 const {
-  PullDocumentByRefreshTokenStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByRefreshTokenStrategy");
+  GetDocumentByRefreshTokenStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/documentStrategies/getDocumentByRefreshTokenStrategy");
 const {
-  PullDocumentByCodeStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByCodeStrategy");
+  GetDocumentByCodeStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/documentStrategies/getDocumentByCodeStrategy");
 const {
-  PullDocumentByLaunchStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/pullDocumentStrategies/pullDocumentByLaunchStrategy");
+  GetDocumentByLaunchStrategy,
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/documentStrategies/getDocumentByLaunchStrategy");
 const {
   SaveDocumentStateStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
@@ -83,11 +83,9 @@ describe("buildTokenHandlerClient Tests", () => {
       staticTokens
     );
 
-    expect(response.getTokenResponseStrategy).toBeInstanceOf(
-      RefreshTokenStrategy
-    );
-    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
-      PullDocumentByRefreshTokenStrategy
+    expect(response.getTokenStrategy).toBeInstanceOf(RefreshTokenStrategy);
+    expect(response.getDocumentStrategy).toBeInstanceOf(
+      GetDocumentByRefreshTokenStrategy
     );
     expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
       SaveDocumentStateStrategy
@@ -119,11 +117,9 @@ describe("buildTokenHandlerClient Tests", () => {
       staticTokens
     );
 
-    expect(response.getTokenResponseStrategy).toBeInstanceOf(
-      RefreshTokenStrategy
-    );
-    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
-      PullDocumentByRefreshTokenStrategy
+    expect(response.getTokenStrategy).toBeInstanceOf(RefreshTokenStrategy);
+    expect(response.getDocumentStrategy).toBeInstanceOf(
+      GetDocumentByRefreshTokenStrategy
     );
     expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
       SaveDocumentStateStrategy
@@ -154,11 +150,9 @@ describe("buildTokenHandlerClient Tests", () => {
       staticTokens
     );
 
-    expect(response.getTokenResponseStrategy).toBeInstanceOf(
-      AuthorizationCodeStrategy
-    );
-    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
-      PullDocumentByCodeStrategy
+    expect(response.getTokenStrategy).toBeInstanceOf(AuthorizationCodeStrategy);
+    expect(response.getDocumentStrategy).toBeInstanceOf(
+      GetDocumentByCodeStrategy
     );
     expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
       SaveDocumentStateStrategy
@@ -190,11 +184,9 @@ describe("buildTokenHandlerClient Tests", () => {
       staticTokens
     );
 
-    expect(response.getTokenResponseStrategy).toBeInstanceOf(
-      ClientCredentialsStrategy
-    );
-    expect(response.pullDocumentFromDynamoStrategy).toBeInstanceOf(
-      PullDocumentByLaunchStrategy
+    expect(response.getTokenStrategy).toBeInstanceOf(ClientCredentialsStrategy);
+    expect(response.getDocumentStrategy).toBeInstanceOf(
+      GetDocumentByLaunchStrategy
     );
     expect(response.saveDocumentToDynamoStrategy).toBeInstanceOf(
       SaveDocumentLaunchStrategy
@@ -224,9 +216,7 @@ describe("buildTokenHandlerClient Tests", () => {
       staticTokens
     );
 
-    expect(response.getTokenResponseStrategy).toBeInstanceOf(
-      UnsupportedGrantStrategy
-    );
+    expect(response.getTokenStrategy).toBeInstanceOf(UnsupportedGrantStrategy);
   });
 
   it("Code Client Invalid Auth", () => {
