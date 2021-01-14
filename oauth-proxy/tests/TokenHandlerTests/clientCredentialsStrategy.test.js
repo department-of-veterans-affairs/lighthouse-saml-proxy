@@ -2,13 +2,13 @@ require("jest");
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
-const { buildFakeDynamoClient } = require("./testUtils");
+const { buildFakeDynamoClient } = require("../testUtils");
 const {
   ClientCredentialsStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
 const {
   GetPatientInfoFromLaunchStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
 let logger;
 let dynamo;
 let dynamoClient;
