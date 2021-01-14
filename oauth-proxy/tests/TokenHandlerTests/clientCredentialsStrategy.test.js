@@ -2,7 +2,7 @@ require("jest");
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
-const { buildFakeDynamoClient } = require("../testUtils");
+const { buildFakeDynamoClient, buildFakeLogger } = require("../testUtils");
 const {
   ClientCredentialsStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
@@ -16,7 +16,7 @@ let token_endpoint = "http://localhost:9090/testServer/token";
 let mock = new MockAdapter(axios);
 
 beforeEach(() => {
-  logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+  logger = buildFakeLogger;
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   jest.mock("axios", () => ({ post: jest.fn(), create: jest.fn() }));
@@ -179,25 +179,5 @@ describe("tokenHandler clientCredentials", () => {
         message: "Server returned status code 500",
       });
     }
-  });
-
-  it("handles client_credentials launch", async () => {
-    let req = new MockExpressRequest({
-      body: {
-        grant_type: "client_credentials",
-        client_assertion: "tbd",
-        client_assertion_type:
-          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-        scopes: "launch/patient",
-        launch: "123V456",
-      },
-    });
-
-    let clientCredentialsStrategy = new GetPatientInfoFromLaunchStrategy(req);
-    let expectedPatient = await clientCredentialsStrategy.createPatientInfo(
-      null,
-      null
-    );
-    expect(expectedPatient).toEqual("123V456");
   });
 });
