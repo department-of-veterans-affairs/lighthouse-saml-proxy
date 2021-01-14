@@ -5,7 +5,6 @@ const {
   buildOpenIDClient,
   buildFakeLogger,
   createFakeConfig,
-  convertObjectToDynamoAttributeValues,
 } = require("../testUtils");
 const {
   RefreshTokenStrategy,
@@ -31,14 +30,6 @@ beforeEach(() => {
   });
   config = createFakeConfig();
   dynamo = jest.mock();
-  staticEntry = {
-    static_icn: "0123456789",
-    static_refresh_token: "static-refresh-token",
-    static_access_token: "static-access-token",
-    static_scopes:
-      "openid profile patient/Medication.read launch/patient offline_access",
-    static_expires_in: 3600,
-  };
   dynamo.dbDocClient = {
     scan: (scan_params, result) => {
       if (scan_params.TableName === "ut_static_tokens_table") {
