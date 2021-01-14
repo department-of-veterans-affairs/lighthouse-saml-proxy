@@ -4,7 +4,7 @@ const {
 
 require("jest");
 
-describe("getToken tests", () => {
+describe("getToken tests", async () => {
   it("Happy Path", () => {
     let error = {
       statusCode: 400,
@@ -14,7 +14,7 @@ describe("getToken tests", () => {
     };
 
     try {
-      new UnsupportedGrantStrategy().getToken();
+      await new UnsupportedGrantStrategy().getToken();
     } catch (err) {
       expect(err).toEqual(error);
       return;
