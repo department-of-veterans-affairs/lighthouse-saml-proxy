@@ -16,7 +16,7 @@ let token_endpoint = "http://localhost:9090/testServer/token";
 let mock = new MockAdapter(axios);
 
 beforeEach(() => {
-  logger = buildFakeLogger;
+  logger = buildFakeLogger();
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   jest.mock("axios", () => ({ post: jest.fn(), create: jest.fn() }));
