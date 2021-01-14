@@ -229,6 +229,30 @@ function getPayloadFromDynamo(dynamoDb, searchAttributes, tableName) {
   });
 }
 
+function queryFromDynamo(dynamoDb, conditionExpression, attributeNames, attributeValues, tableName, indexName) {
+  var params = {
+    TableName : tableName,
+    KeyConditionExpression: conditionExpression,
+    ExpressionAttributeNames:{},
+    ExpressionAttributeValues: {},
+  };
+  if (indexName) {
+    params.IndexName = indexName;
+  }
+  Object.assign(params.ExpressionAttributeNames, attributeNames);
+  Object.assign(params.ExpressionAttributeValues, attributeValues);
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.dbDocClient.query(params, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
@@ -239,4 +263,5 @@ module.exports = {
   savePayloadToDynamo,
   scanFromDynamo,
   getPayloadFromDynamo,
+  queryFromDynamo,
 };
