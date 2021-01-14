@@ -1,11 +1,11 @@
 const { hashString } = require("../../../utils");
+const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByRefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient, config) {
+  constructor(req, logger, dynamo, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.config = config;
   }
   async pullDocumentFromDynamo() {
@@ -29,12 +29,21 @@ class PullDocumentByRefreshTokenStrategy {
   async getDocumentDynamo(refresh_token) {
     let document;
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
+      let payload = await dynamoClient.queryFromDynamo(
         this.dynamo,
-        "refresh_token",
-        refresh_token,
-        this.config.dynamo_table_name
+        "#refresh_token = :efresh_token",
+        {
+          "#refresh_token" : "refresh_token",
+        },
+        {
+          ":refresh_token" : refresh_token,
+        },
+        this.config.dynamo_table_name,
+        "oauth_refresh_token_index",
       );
+      if (payload.Items && payload.Items[0]) {
+        document = payload.Items[0];
+      }
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
     }

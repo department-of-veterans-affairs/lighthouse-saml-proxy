@@ -17,7 +17,6 @@ const launchRequestHandler = async (
   const pullDocumentStrategy = new PullDocumentByAccessTokenStrategy(
     logger,
     dynamo,
-    dynamoClient,
     config,
     hashString
   );
@@ -27,7 +26,7 @@ const launchRequestHandler = async (
   );
 
   if (documentResponse && documentResponse.launch) {
-    res.json({ launch: documentResponse.launch.S });
+    res.json({ launch: documentResponse.launch });
   } else {
     return res.sendStatus(401);
   }

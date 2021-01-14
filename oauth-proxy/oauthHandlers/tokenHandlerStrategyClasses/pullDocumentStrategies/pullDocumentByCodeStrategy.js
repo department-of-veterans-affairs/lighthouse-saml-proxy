@@ -2,11 +2,10 @@ const { rethrowIfRuntimeError, hashString } = require("../../../utils");
 const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient, config) {
+  constructor(req, logger, dynamo, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.config = config;
   }
   async pullDocumentFromDynamo() {

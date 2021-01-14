@@ -5,7 +5,6 @@ class PullDocumentByAccessTokenStrategy {
   constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
     this.logger = logger;
     this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.config = config;
     this.hashingFunction = hashingFunction;
   }
@@ -22,7 +21,7 @@ class PullDocumentByAccessTokenStrategy {
       let payload = await dynamoClient.getPayloadFromDynamo(
         this.dynamo,
         search_params,
-        this.config.dynamo_table_name
+        this.config.dynamo_client_credentials_table
       );
       if (payload.Item) {
         document = payload.Item;

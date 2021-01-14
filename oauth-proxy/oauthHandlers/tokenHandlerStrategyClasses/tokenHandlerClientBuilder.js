@@ -95,7 +95,6 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient,
         config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
@@ -122,7 +121,6 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient,
         config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
