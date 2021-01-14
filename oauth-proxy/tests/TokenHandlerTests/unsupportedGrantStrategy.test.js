@@ -4,8 +4,8 @@ const {
 
 require("jest");
 
-describe("getToken tests", async () => {
-  it("Happy Path", () => {
+describe("getToken tests", () => {
+  it("Happy Path", async () => {
     let error = {
       statusCode: 400,
       error: "unsupported_grant_type",
