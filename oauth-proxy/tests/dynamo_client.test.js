@@ -138,4 +138,65 @@ describe("dynamo client tests", () => {
       expect(err.message).toEqual("non-existent table");
     }
   });
+
+  it("getPayloadFromDynamo happy", async () => {
+    const mockDynamo = {};
+    let isCalled = false;
+
+    let payloadDoc = {
+      Item: {
+        access_token: "ut_access_token",
+        refresh_token: "ut_refresh_token",
+      },
+    };
+    mockDynamo.dbDocClient = {
+      get: (search_params, result) => {
+        isCalled = true;
+        if (search_params.Key.search == "me") {
+          result(false, payloadDoc);
+        } else {
+          result(false, {});
+        }
+      },
+    };
+
+    try {
+      let result = await dynamoclient.getPayloadFromDynamo(
+        mockDynamo,
+        { search: "me" },
+        "TestTable"
+      );
+      expect(isCalled).toEqual(true);
+      expect(result.Item.access_token).toEqual("ut_access_token");
+      expect(result.Item.refresh_token).toEqual("ut_refresh_token");
+    } catch (err) {
+      // should not reach here
+      expect(true).toEqual(false);
+    }
+  });
+
+  it("getPayloadFromDynamo error", async () => {
+    const mockDynamo = {};
+    let isCalled = false;
+
+    mockDynamo.dbDocClient = {
+      get: (search_params, result) => {
+        isCalled = true;
+        result({ message: "non-existent table" }, false);
+      },
+    };
+
+    try {
+      await dynamoclient.getPayloadFromDynamo(
+        mockDynamo,
+        { search: "me" },
+        "TestTable"
+      );
+      // should not reach here
+      expect(false).toEqual(true);
+    } catch (err) {
+      expect(isCalled).toEqual(true);
+      expect(err.message).toEqual("non-existent table");
+    }
+  });
 });

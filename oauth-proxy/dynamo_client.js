@@ -210,6 +210,25 @@ function scanFromDynamo(dynamoDb, tableName) {
   });
 }
 
+function getPayloadFromDynamo(dynamoDb, searchAttributes, tableName) {
+  var params = {
+    TableName: tableName,
+    Key: {},
+  };
+
+  Object.assign(params.Key, searchAttributes);
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.dbDocClient.get(params, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
@@ -219,4 +238,5 @@ module.exports = {
   getFromDynamoBySecondary,
   savePayloadToDynamo,
   scanFromDynamo,
+  getPayloadFromDynamo,
 };
