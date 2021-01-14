@@ -44,7 +44,16 @@ class TokenHandlerClient {
       };
     }
 
+    if (tokens.is_static) {
+      delete tokens.is_static;
+      return {
+        statusCode: 200,
+        responseBody: tokens,
+      };
+    }
+
     let document = await this.getDocumentStrategy.getDocument();
+
     let state;
     if (document && tokens) {
       await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(

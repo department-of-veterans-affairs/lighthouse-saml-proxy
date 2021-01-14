@@ -194,6 +194,22 @@ function savePayloadToDynamo(dynamoDb, payload, tableName) {
   });
 }
 
+function scanFromDynamo(dynamoDb, tableName) {
+  var params = {
+    TableName: tableName,
+  };
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.dbDocClient.scan(params, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
@@ -202,4 +218,5 @@ module.exports = {
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
   savePayloadToDynamo,
+  scanFromDynamo,
 };

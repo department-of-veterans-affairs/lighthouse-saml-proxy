@@ -134,3 +134,76 @@ dynamo.createTable(tableParams, (err, data) => {
     );
   }
 });
+
+tableParams = {
+  AttributeDefinitions: [
+    { AttributeName: "static_refresh_token", AttributeType: "S" },
+  ],
+  KeySchema: [{ AttributeName: "static_refresh_token", KeyType: "HASH" }],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 10,
+    WriteCapacityUnits: 10,
+  },
+  GlobalSecondaryIndexes: [
+    {
+      IndexName: "static_refresh_token_index",
+      KeySchema: [
+        {
+          AttributeName: "static_refresh_token",
+          KeyType: "HASH",
+        },
+      ],
+      Projection: {
+        ProjectionType: "ALL",
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 10,
+        WriteCapacityUnits: 10,
+      },
+    },
+  ],
+  TableName: "StaticTokens",
+};
+
+dynamo.createTable(tableParams, (err, data) => {
+  if (err) {
+    console.error(
+      "Unable to create table. Error JSON:",
+      JSON.stringify(err, null, 2)
+    );
+  } else {
+    console.log(
+      "Created table. Table description JSON:",
+      JSON.stringify(data, null, 2)
+    );
+    createStaticTokenEntry();
+  }
+});
+
+function createStaticTokenEntry() {
+  let itemParams = {
+    TableName: "StaticTokens",
+    Item: {
+      static_access_token: { S: "123456789" },
+      static_refresh_token: { S: "987654321" },
+      static_scopes: {
+        S:
+          "openid profile patient/Medication.read launch/patient offline_access",
+      },
+      static_expires_in: { N: "3600" },
+      static_icn: { S: "555" },
+    },
+  };
+
+  dynamo.putItem(itemParams, (err, data) => {
+    if (err) {
+      console.error(
+        "Unable to create static token entry. Error JSON:",
+        JSON.stringify(err, null, 2)
+      );
+    } else {
+      console.log("Created static token entry.");
+      console.log(data);
+    }
+  });
+}

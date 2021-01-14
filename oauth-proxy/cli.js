@@ -43,6 +43,11 @@ function processArgs() {
         description: "name of client credentials table.",
         required: true,
       },
+      dynamo_static_token_table: {
+        description: "name of static token table.",
+        required: true,
+        default: "StaticTokens",
+      },
       hmac_secret: {
         description:
           "hmac secret to hash access tokens being stored in client credentials table.",
@@ -96,6 +101,11 @@ function processArgs() {
       },
       enable_smart_launch_service: {
         description: "Enable SMART launch lookup service?",
+        required: false,
+        default: false,
+      },
+      enable_static_token_service: {
+        description: "Enable static token lookup service?",
         required: false,
         default: false,
       },
