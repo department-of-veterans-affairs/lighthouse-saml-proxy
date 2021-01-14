@@ -3,9 +3,9 @@ const access_token =
 const access_token_patient =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjoibGF1bmNoL3BhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.5RLmIUn-kZqZVb4IqxNUpWCXPYtDrBraShDHTIndlgU";
 
-const buildGetTokenResponseStrategy = (response, error = false) => {
-  const getTokenResponseStrategy = { getTokenResponse: jest.fn() };
-  getTokenResponseStrategy.getTokenResponse.mockImplementation(() => {
+const buildGetTokenStrategy = (response, error = false) => {
+  const getTokenStrategy = { getToken: jest.fn() };
+  getTokenStrategy.getToken.mockImplementation(() => {
     return new Promise((resolve, reject) => {
       if (!error) {
         resolve(response);
@@ -14,12 +14,12 @@ const buildGetTokenResponseStrategy = (response, error = false) => {
       }
     });
   });
-  return getTokenResponseStrategy;
+  return getTokenStrategy;
 };
 
 const buildGetDocumentStrategy = (document) => {
-  const getDocumentStrategy = { pullDocumentFromDynamo: jest.fn() };
-  getDocumentStrategy.pullDocumentFromDynamo.mockImplementation(() => {
+  const getDocumentStrategy = { getDocument: jest.fn() };
+  getDocumentStrategy.getDocument.mockImplementation(() => {
     return new Promise((resolve) => {
       resolve(document);
     });
@@ -75,7 +75,7 @@ const buildValidateToken = (response, error) => {
 };
 
 module.exports = {
-  buildGetTokenResponseStrategy,
+  buildGetTokenStrategy,
   buildGetDocumentStrategy,
   buildSaveDocumentStrategy,
   buildGetPatientInfoStrategy,

@@ -4,11 +4,11 @@ const {
   TokenHandlerClient,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenHandlerClient");
 const {
-  buildGetTokenResponseStrategy,
   buildGetDocumentStrategy,
   buildSaveDocumentStrategy,
   buildGetPatientInfoStrategy,
   buildToken,
+  buildGetTokenStrategy,
 } = require("./tokenHandlerTestUtils");
 const MockExpressRequest = require("mock-express-request");
 const MockExpressResponse = require("mock-express-response");
@@ -24,7 +24,7 @@ describe("handleToken tests", () => {
 
   it("Happy Path Static", async () => {
     let token = buildToken(true, false);
-    getTokenResponseStrategy = buildGetTokenResponseStrategy(token, false);
+    getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy({});
@@ -48,7 +48,7 @@ describe("handleToken tests", () => {
 
   it("Happy Path no launch/patient", async () => {
     let token = buildToken(false, false);
-    getTokenResponseStrategy = buildGetTokenResponseStrategy(token);
+    getTokenResponseStrategy = buildGetTokenStrategy(token);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy({});
@@ -72,7 +72,7 @@ describe("handleToken tests", () => {
 
   it("Happy Path with launch/patient", async () => {
     let token = buildToken(false, true);
-    getTokenResponseStrategy = buildGetTokenResponseStrategy(token, false);
+    getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy("patient");
@@ -99,7 +99,7 @@ describe("handleToken tests", () => {
     let err = {
       statusCode: 401,
     };
-    getTokenResponseStrategy = buildGetTokenResponseStrategy(err, true);
+    getTokenResponseStrategy = buildGetTokenStrategy(err, true);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy({});
@@ -130,7 +130,7 @@ describe("handleToken tests", () => {
       error: "error",
       error_description: "error_description",
     };
-    getTokenResponseStrategy = buildGetTokenResponseStrategy(err, true);
+    getTokenResponseStrategy = buildGetTokenStrategy(err, true);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy({});
