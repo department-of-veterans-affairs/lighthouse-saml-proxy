@@ -112,9 +112,10 @@ class FakeIssuer {
 function buildFakeOktaClient(
   fakeRecord,
   getAuthorizationServerInfoMock,
-  userCollection
+  userCollection,
+  grant
 ) {
-  const oClient = { getApplication: jest.fn(), listUsers: jest.fn() };
+  const oClient = { getApplication: jest.fn(), listUsers: jest.fn(), grant: jest.fn() };
   oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
@@ -128,6 +129,13 @@ function buildFakeOktaClient(
   oClient.listUsers = () => {
     return userCollection;
   };
+  oClient.grant.mockImplementation(() => {
+    if(grant){
+      return grant
+    }else{
+      throw {error: "error", error_description: "error_description"}
+    }
+  })
   return oClient;
 }
 

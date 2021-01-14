@@ -8,7 +8,7 @@ const {
   createFakeConfig,
   createFakeHashingFunction,
   jwtEncodeClaims,
-  convertObjectToDynamoAttributeValues
+  convertObjectToDynamoAttributeValues,
 } = require("../testUtils");
 
 require("jest");
@@ -29,11 +29,15 @@ describe("saveDocumentToDynamo tests", () => {
     dynamoClient = buildFakeDynamoClient(document);
 
     const strategy = new SaveDocumentLaunchStrategy(
-      logger, dynamo, dynamoClient, config, hashingFunction
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      hashingFunction
     );
     await strategy.saveDocumentToDynamo(document, null);
 
-    expect(logger.error.mock.calls.length).toBe(1)
+    expect(logger.error.mock.calls).toHaveLength(1);
   });
 
   it("happy path", async () => {
@@ -47,12 +51,18 @@ describe("saveDocumentToDynamo tests", () => {
     dynamoClient = buildFakeDynamoClient(document);
 
     const strategy = new SaveDocumentLaunchStrategy(
-      logger, dynamo, dynamoClient, config, hashingFunction
+      logger,
+      dynamo,
+      dynamoClient,
+      config,
+      hashingFunction
     );
     const expire_on = new Date().getTime() + 300 * 1000;
-    let encoded_token = jwtEncodeClaims(token,expire_on);
-    await strategy.saveDocumentToDynamo(document, {access_token: encoded_token});
+    let encoded_token = jwtEncodeClaims(token, expire_on);
+    await strategy.saveDocumentToDynamo(document, {
+      access_token: encoded_token,
+    });
 
-    expect(logger.error.mock.calls.length).toBe(0)
+    expect(logger.error.mock.calls).toHaveLength(0);
   });
 });
