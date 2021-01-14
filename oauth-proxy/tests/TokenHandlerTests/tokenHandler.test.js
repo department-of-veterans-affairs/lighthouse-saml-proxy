@@ -2,14 +2,14 @@ require("jest");
 const MockExpressRequest = require("mock-express-request");
 const MockExpressResponse = require("mock-express-response");
 const { TokenSet } = require("openid-client");
-const { tokenHandler } = require("../oauthHandlers");
-const { encodeBasicAuthHeader } = require("../utils");
+const { tokenHandler } = require("../../oauthHandlers");
+const { encodeBasicAuthHeader } = require("../../utils");
 const {
   FakeIssuer,
   buildFakeDynamoClient,
   buildOpenIDClient,
   buildExpiredRefreshTokenClient,
-} = require("./testUtils");
+} = require("../testUtils");
 
 let config;
 let redirect_uri;
