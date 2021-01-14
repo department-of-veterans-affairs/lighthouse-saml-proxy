@@ -1,10 +1,15 @@
 require("jest");
 const MockExpressRequest = require("mock-express-request");
 const { TokenSet } = require("openid-client");
-const { buildOpenIDClient } = require("./testUtils");
+const {
+  buildOpenIDClient,
+  buildFakeLogger,
+  createFakeConfig,
+  convertObjectToDynamoAttributeValues,
+} = require("../testUtils");
 const {
   RefreshTokenStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
 let logger;
 let dynamo;
 let client;
@@ -12,8 +17,7 @@ let config;
 let staticTokens = new Map();
 
 beforeEach(() => {
-  logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
+  logger = buildFakeLogger();
   client = buildOpenIDClient({
     refresh: (resolve) => {
       resolve(
@@ -25,10 +29,16 @@ beforeEach(() => {
       );
     },
   });
-  config = jest.mock();
-  config.dynamo_static_token_table = "ut_static_tokens_table";
-  config.enable_static_token_service = true;
+  config = createFakeConfig();
   dynamo = jest.mock();
+  staticEntry = {
+    static_icn: "0123456789",
+    static_refresh_token: "static-refresh-token",
+    static_access_token: "static-access-token",
+    static_scopes:
+      "openid profile patient/Medication.read launch/patient offline_access",
+    static_expires_in: 3600,
+  };
   dynamo.dbDocClient = {
     scan: (scan_params, result) => {
       if (scan_params.TableName === "ut_static_tokens_table") {
@@ -56,14 +66,6 @@ beforeEach(() => {
 
 describe("tokenHandler refreshTokenStrategy", () => {
   it("handles the static refreshTokenStrategy flow", async () => {
-    let req = new MockExpressRequest({
-      body: {
-        grant_type: "refresh_token",
-        refresh_token: "static-refresh-token",
-        state: "abc123",
-      },
-    });
-
     const data = {
       is_static: true,
       token_type: "Bearer",
@@ -74,6 +76,15 @@ describe("tokenHandler refreshTokenStrategy", () => {
       patient: "0123456789",
       refresh_token: "static-refresh-token",
     };
+
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "refresh_token",
+        refresh_token: data.refresh_token,
+        state: "abc123",
+      },
+    });
+
     let refreshTokenStrategy = new RefreshTokenStrategy(
       req,
       logger,
