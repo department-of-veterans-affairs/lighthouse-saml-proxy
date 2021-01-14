@@ -62,6 +62,17 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
+  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
+    (dynamo, hashedToken, dynamo_client_credentials_table) => {
+      return new Promise((resolve, reject) => {
+        if (hashedToken === fakeDynamoRecord.access_token) {
+          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        } else {
+          reject(`no such state value on ${dynamo_client_credentials_table}`);
+        }
+      });
+    }
+  );
   dynamoClient.scanFromDynamo.mockImplementation((handle, tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
@@ -292,6 +303,16 @@ const jwtEncodeClaims = (claims, expires_on) => {
   return encodedClaims.compact();
 };
 
+const createFakeHashingFunction = () => {
+  hash = jest.fn();
+  
+  hash.mockImplementation((value) => {
+    return value;
+  });
+
+  return hash;
+};
+
 module.exports = {
   buildDynamoAttributeValue,
   convertObjectToDynamoAttributeValues,
@@ -304,4 +325,5 @@ module.exports = {
   buildFakeLogger,
   createFakeConfig,
   jwtEncodeClaims,
+  createFakeHashingFunction
 };
