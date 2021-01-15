@@ -37,7 +37,7 @@ class ClientCredentialsStrategy {
       }
     } catch (error) {
       rethrowIfRuntimeError(error);
-      if ( error.response != undefined && error.response.status == 400) {
+      if (error.response != undefined && error.response.status == 400) {
         if (error.response.data.errorCode) {
           throw {
             statusCode: 400,
