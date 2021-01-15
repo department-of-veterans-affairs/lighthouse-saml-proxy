@@ -55,81 +55,81 @@ class DynamoClient {
     });
   }
 
-getPayloadFromDynamo(searchAttributes, tableName) {
-  var params = {
-    TableName: tableName,
-    Key: {},
-  };
+  getPayloadFromDynamo(searchAttributes, tableName) {
+    var params = {
+      TableName: tableName,
+      Key: {},
+    };
 
-  Object.assign(params.Key, searchAttributes);
+    Object.assign(params.Key, searchAttributes);
 
-  return new Promise((resolve, reject) => {
-    this.dbDocClient.get(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
+    return new Promise((resolve, reject) => {
+      this.dbDocClient.get(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
     });
-  });
-}
-
-queryFromDynamo(
-  conditionExpression,
-  attributeNames,
-  attributeValues,
-  tableName,
-  indexName
-) {
-  var params = {
-    TableName: tableName,
-    KeyConditionExpression: conditionExpression,
-    ExpressionAttributeNames: {},
-    ExpressionAttributeValues: {},
-  };
-  if (indexName) {
-    params.IndexName = indexName;
   }
-  Object.assign(params.ExpressionAttributeNames, attributeNames);
-  Object.assign(params.ExpressionAttributeValues, attributeValues);
 
-  return new Promise((resolve, reject) => {
-    this.dbDocClient.query(params, (err, data) =>{
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
+  queryFromDynamo(
+    conditionExpression,
+    attributeNames,
+    attributeValues,
+    tableName,
+    indexName
+  ) {
+    var params = {
+      TableName: tableName,
+      KeyConditionExpression: conditionExpression,
+      ExpressionAttributeNames: {},
+      ExpressionAttributeValues: {},
+    };
+    if (indexName) {
+      params.IndexName = indexName;
+    }
+    Object.assign(params.ExpressionAttributeNames, attributeNames);
+    Object.assign(params.ExpressionAttributeValues, attributeValues);
 
-updateToDynamo(recordKey, payload, tableName) {
-  var params = {
-    TableName: tableName,
-    Key: {},
-    ReturnValues: "UPDATED_NEW",
-  };
-  Object.assign(params.Key, recordKey);
-  params.UpdateExpression = "set ";
-  params.ExpressionAttributeValues = {};
-  Object.entries(payload).forEach((entry) => {
-    const [key, value] = entry;
-    console.log(key, value);
-    params.UpdateExpression += key + " = :" + key + ",";
-    params.ExpressionAttributeValues[":" + key] = value;
-  });
-  params.UpdateExpression = params.UpdateExpression.slice(0, -1);
-  return new Promise((resolve, reject) => {
-    this.dbDocClient.update(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
+    return new Promise((resolve, reject) => {
+      this.dbDocClient.query(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
     });
-  });
-}
+  }
+
+  updateToDynamo(recordKey, payload, tableName) {
+    var params = {
+      TableName: tableName,
+      Key: {},
+      ReturnValues: "UPDATED_NEW",
+    };
+    Object.assign(params.Key, recordKey);
+    params.UpdateExpression = "set ";
+    params.ExpressionAttributeValues = {};
+    Object.entries(payload).forEach((entry) => {
+      const [key, value] = entry;
+      console.log(key, value);
+      params.UpdateExpression += key + " = :" + key + ",";
+      params.ExpressionAttributeValues[":" + key] = value;
+    });
+    params.UpdateExpression = params.UpdateExpression.slice(0, -1);
+    return new Promise((resolve, reject) => {
+      this.dbDocClient.update(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
 }
 module.exports = {
   DynamoClient,
