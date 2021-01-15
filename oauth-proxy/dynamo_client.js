@@ -74,11 +74,7 @@ class DynamoClient {
     });
   }
 
-  queryFromDynamo(
-    queryParams,
-    tableName,
-    indexName
-  ) {
+  queryFromDynamo(queryParams, tableName, indexName) {
     var params = {
       TableName: tableName,
       ExpressionAttributeNames: {},
