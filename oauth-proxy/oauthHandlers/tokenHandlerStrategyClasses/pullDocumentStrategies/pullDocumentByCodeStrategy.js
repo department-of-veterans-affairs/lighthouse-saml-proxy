@@ -29,13 +29,13 @@ class PullDocumentByCodeStrategy {
         this.dynamo,
         "#code = :code",
         {
-          "#code" : "code",
+          "#code": "code",
         },
         {
-          ":code" : code,
+          ":code": code,
         },
         this.config.dynamo_table_name,
-        "oauth_code_index",
+        "oauth_code_index"
       );
       if (payload.Items && payload.Items[0]) {
         document = payload.Items[0];

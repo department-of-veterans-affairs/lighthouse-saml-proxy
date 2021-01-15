@@ -229,11 +229,18 @@ function getPayloadFromDynamo(dynamoDb, searchAttributes, tableName) {
   });
 }
 
-function queryFromDynamo(dynamoDb, conditionExpression, attributeNames, attributeValues, tableName, indexName) {
+function queryFromDynamo(
+  dynamoDb,
+  conditionExpression,
+  attributeNames,
+  attributeValues,
+  tableName,
+  indexName
+) {
   var params = {
-    TableName : tableName,
+    TableName: tableName,
     KeyConditionExpression: conditionExpression,
-    ExpressionAttributeNames:{},
+    ExpressionAttributeNames: {},
     ExpressionAttributeValues: {},
   };
   if (indexName) {
@@ -253,6 +260,34 @@ function queryFromDynamo(dynamoDb, conditionExpression, attributeNames, attribut
   });
 }
 
+function updateToDynamo(dynamoDb, recordKey, payload, tableName) {
+  var params = {
+    TableName: tableName,
+    Key: {},
+    ReturnValues: "UPDATED_NEW",
+  };
+  Object.assign(params.Key, recordKey);
+  params.UpdateExpression = "set ";
+  params.ExpressionAttributeValues = {};
+  Object.entries(payload).forEach((entry) => {
+    const [key, value] = entry;
+    console.log(key, value);
+    params.UpdateExpression += key + " = :" + key;
+    +",";
+    params.ExpressionAttributeValues[":" + key] = value;
+  });
+
+  return new Promise((resolve, reject) => {
+    dynamoDb.dbDocClient.update(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   createDynamoHandle,
   saveToDynamo,
@@ -261,6 +296,7 @@ module.exports = {
   saveToDynamoAccessToken,
   getFromDynamoBySecondary,
   savePayloadToDynamo,
+  updateToDynamo,
   scanFromDynamo,
   getPayloadFromDynamo,
   queryFromDynamo,

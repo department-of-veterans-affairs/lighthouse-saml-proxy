@@ -23,11 +23,10 @@ const redirectHandler = async (
 
   if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
-      await dynamoClient.saveToDynamo(
+      await dynamoClient.updateToDynamo(
         dynamo,
-        state,
-        "code",
-        hashString(req.query.code, config.hmac_secret),
+        { state: state },
+        { code: hashString(req.query.code, config.hmac_secret) },
         config.dynamo_table_name
       );
     } catch (error) {

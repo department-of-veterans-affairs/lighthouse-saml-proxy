@@ -33,13 +33,13 @@ class PullDocumentByRefreshTokenStrategy {
         this.dynamo,
         "#refresh_token = :refresh_token",
         {
-          "#refresh_token" : "refresh_token",
+          "#refresh_token": "refresh_token",
         },
         {
-          ":refresh_token" : refresh_token,
+          ":refresh_token": refresh_token,
         },
         this.config.dynamo_table_name,
-        "oauth_refresh_token_index",
+        "oauth_refresh_token_index"
       );
       if (payload.Items && payload.Items[0]) {
         document = payload.Items[0];
