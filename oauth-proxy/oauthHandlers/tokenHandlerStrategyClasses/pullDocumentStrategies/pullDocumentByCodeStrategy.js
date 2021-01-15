@@ -25,7 +25,6 @@ class PullDocumentByCodeStrategy {
 
     try {
       let payload = await this.dynamo.queryFromDynamo(
-        this.dynamo,
         "#code = :code",
         {
           "#code": "code",

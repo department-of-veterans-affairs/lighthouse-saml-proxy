@@ -26,7 +26,6 @@ class RefreshTokenStrategy {
         if (this.staticTokens.size == 0) {
           let payload;
           payload = await this.dynamo.scanFromDynamo(
-            this.dynamo,
             this.config.dynamo_static_token_table
           );
           var self = this;

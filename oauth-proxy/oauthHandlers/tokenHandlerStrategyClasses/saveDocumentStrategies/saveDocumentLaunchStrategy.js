@@ -23,7 +23,6 @@ class SaveDocumentLaunchStrategy {
         };
 
         await this.dynamo.savePayloadToDynamo(
-          this.dynamo,
           payload,
           this.config.dynamo_client_credentials_table
         );

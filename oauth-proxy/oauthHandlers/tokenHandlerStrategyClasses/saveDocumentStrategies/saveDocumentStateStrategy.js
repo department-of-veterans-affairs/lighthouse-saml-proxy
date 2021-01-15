@@ -11,7 +11,6 @@ class SaveDocumentStateStrategy {
     try {
       if (document.state && tokens.refresh_token) {
         await this.dynamo.updateToDynamo(
-          this.dynamo,
           { state: document.state },
           {
             refresh_token: hashString(

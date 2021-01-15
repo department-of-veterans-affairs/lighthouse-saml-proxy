@@ -16,7 +16,6 @@ const redirectHandler = async (logger, dynamo, config, req, res, next) => {
   if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
       await dynamo.updateToDynamo(
-        dynamo,
         { state: state },
         { code: hashString(req.query.code, config.hmac_secret) },
         config.dynamo_table_name

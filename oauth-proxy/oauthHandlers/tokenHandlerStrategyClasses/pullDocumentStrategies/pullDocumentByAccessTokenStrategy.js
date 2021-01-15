@@ -18,7 +18,6 @@ class PullDocumentByAccessTokenStrategy {
         access_token: hashedToken,
       };
       let payload = await this.dynamo.getPayloadFromDynamo(
-        this.dynamo,
         search_params,
         this.config.dynamo_client_credentials_table
       );
