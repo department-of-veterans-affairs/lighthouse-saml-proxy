@@ -9,7 +9,7 @@ class ClientCredentialsStrategy {
     this.token_endpoint = token_endpoint;
   }
 
-  async getTokenResponse() {
+  async getToken() {
     let token;
     let res;
 

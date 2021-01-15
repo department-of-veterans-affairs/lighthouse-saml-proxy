@@ -1,13 +1,13 @@
 const { rethrowIfRuntimeError, hashString } = require("../../../utils");
 
-class PullDocumentByCodeStrategy {
+class GetDocumentByCodeStrategy {
   constructor(req, logger, dynamo, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.config = config;
   }
-  async pullDocumentFromDynamo() {
+  async getDocument() {
     let hashedCode = hashString(this.req.body.code, this.config.hmac_secret);
     let document = await this.getDocumentDynamo(hashedCode);
 
@@ -42,4 +42,4 @@ class PullDocumentByCodeStrategy {
   }
 }
 
-module.exports = { PullDocumentByCodeStrategy };
+module.exports = { GetDocumentByCodeStrategy };

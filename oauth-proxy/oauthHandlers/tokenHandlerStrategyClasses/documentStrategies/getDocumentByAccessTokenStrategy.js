@@ -1,13 +1,13 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 
-class PullDocumentByAccessTokenStrategy {
+class GetDocumentByAccessTokenStrategy {
   constructor(logger, dynamo, config, hashingFunction) {
     this.logger = logger;
     this.dynamo = dynamo;
     this.config = config;
     this.hashingFunction = hashingFunction;
   }
-  async pullDocumentFromDynamo(access_token) {
+  async getDocument(access_token) {
     let document;
     let hashedToken = this.hashingFunction(
       access_token,
@@ -33,4 +33,4 @@ class PullDocumentByAccessTokenStrategy {
   }
 }
 
-module.exports = { PullDocumentByAccessTokenStrategy };
+module.exports = { GetDocumentByAccessTokenStrategy };

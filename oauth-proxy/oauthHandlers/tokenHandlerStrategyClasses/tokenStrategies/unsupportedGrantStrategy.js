@@ -1,7 +1,7 @@
 class UnsupportedGrantStrategy {
   constructor() {}
 
-  async getTokenResponse() {
+  async getToken() {
     throw {
       statusCode: 400,
       error: "unsupported_grant_type",

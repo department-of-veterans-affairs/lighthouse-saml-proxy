@@ -59,7 +59,7 @@ describe("tokenHandler clientCredentials", () => {
       token_endpoint
     );
 
-    let token = await clientCredentialsStrategy.getTokenResponse();
+    let token = await clientCredentialsStrategy.getToken();
     expect(token).toEqual(data);
   });
 
@@ -92,7 +92,7 @@ describe("tokenHandler clientCredentials", () => {
     );
 
     try {
-      await clientCredentialsStrategy.getTokenResponse();
+      await clientCredentialsStrategy.getToken();
     } catch (error) {
       expect(error.statusCode).toEqual(400);
       expect(error.error).toEqual("invalid_client");
@@ -131,7 +131,7 @@ describe("tokenHandler clientCredentials", () => {
     );
 
     try {
-      await clientCredentialsStrategy.getTokenResponse();
+      await clientCredentialsStrategy.getToken();
     } catch (error) {
       expect(error.statusCode).toEqual(401);
       expect(error.error).toEqual("invalid_client");
@@ -169,7 +169,7 @@ describe("tokenHandler clientCredentials", () => {
     );
 
     try {
-      await clientCredentialsStrategy.getTokenResponse();
+      await clientCredentialsStrategy.getToken();
     } catch (error) {
       expect(error.statusCode).toEqual(500);
       expect(logger.error).toHaveBeenCalledWith(

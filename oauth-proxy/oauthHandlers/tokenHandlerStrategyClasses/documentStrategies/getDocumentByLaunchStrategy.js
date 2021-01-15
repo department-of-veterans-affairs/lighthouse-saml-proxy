@@ -1,8 +1,8 @@
-class PullDocumentByLaunchStrategy {
+class GetDocumentByLaunchStrategy {
   constructor(req) {
     this.req = req;
   }
-  async pullDocumentFromDynamo() {
+  async getDocument() {
     let launch = this.req.body.launch;
     if (launch === undefined || launch === "") {
       return null;
@@ -18,4 +18,4 @@ class PullDocumentByLaunchStrategy {
   }
 }
 
-module.exports = { PullDocumentByLaunchStrategy };
+module.exports = { GetDocumentByLaunchStrategy };

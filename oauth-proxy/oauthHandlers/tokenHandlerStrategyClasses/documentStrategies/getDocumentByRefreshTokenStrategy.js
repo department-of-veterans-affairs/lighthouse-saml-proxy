@@ -1,13 +1,13 @@
 const { hashString } = require("../../../utils");
 
-class PullDocumentByRefreshTokenStrategy {
+class GetDocumentByRefreshTokenStrategy {
   constructor(req, logger, dynamo, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
     this.config = config;
   }
-  async pullDocumentFromDynamo() {
+  async getDocument() {
     let hashedRefreshToken = hashString(
       this.req.body.refresh_token,
       this.config.hmac_secret
@@ -45,4 +45,4 @@ class PullDocumentByRefreshTokenStrategy {
   }
 }
 
-module.exports = { PullDocumentByRefreshTokenStrategy };
+module.exports = { GetDocumentByRefreshTokenStrategy };
