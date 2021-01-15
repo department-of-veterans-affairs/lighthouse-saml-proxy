@@ -1,6 +1,5 @@
 require("jest");
 const MockExpressRequest = require("mock-express-request");
-const MockExpressResponse = require("mock-express-response");
 const { tokenHandler } = require("../../oauthHandlers");
 const {
   FakeIssuer,
@@ -116,6 +115,34 @@ describe("tokenHandler tests", () => {
     expect(res.json).toHaveBeenLastCalledWith({
       error: "error",
       error_description: "error_description",
+    });
+  });
+
+  it("handleToken error", async () => {
+    const handleToken = jest.fn();
+    handleToken.mockImplementation(() => {
+      throw { statusCode: 500, responseBody: "error" };
+    });
+    buildTokenHandlerClient.mockImplementation(() => {
+      return { handleToken: handleToken };
+    });
+
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      validateToken,
+      staticTokens,
+      req,
+      res,
+      next
+    );
+    expect(next).toHaveBeenLastCalledWith({
+      statusCode: 500,
+      responseBody: "error",
     });
   });
 });

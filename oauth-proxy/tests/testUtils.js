@@ -40,7 +40,7 @@ function buildFakeDynamoClient(fakeDynamoRecord, saveError) {
       resolve({ pk: state });
     });
   });
-  dynamoClient.savePayloadToDynamo.mockImplementation((launch) => {
+  dynamoClient.savePayloadToDynamo.mockImplementation(() => {
     return new Promise((resolve, reject) => {
       if (saveError) {
         reject(true);
@@ -326,7 +326,7 @@ const jwtEncodeClaims = (claims, expires_on) => {
 };
 
 const createFakeHashingFunction = () => {
-  hash = jest.fn();
+  let hash = jest.fn();
 
   hash.mockImplementation((value) => {
     return value;
