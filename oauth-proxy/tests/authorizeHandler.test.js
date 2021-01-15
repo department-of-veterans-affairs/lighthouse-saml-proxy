@@ -129,7 +129,7 @@ describe("authorizeHandler", () => {
     expect(res.redirect).toHaveBeenCalled();
   });
 
-  it("Verify that no client_redirect results in 400", async () => {
+  it("Verify that no redirect_uri results in 400", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
     res = new MockExpressResponse();
