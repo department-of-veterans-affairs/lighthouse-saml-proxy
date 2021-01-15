@@ -60,11 +60,9 @@ const authorizeHandler = async (
   }
 
   try {
-    await dynamoClient.saveToDynamo(
+    await dynamoClient.savePayloadToDynamo(
       dynamo,
-      state,
-      "redirect_uri",
-      client_redirect,
+      { state: state, redirect_uri: client_redirect },
       config.dynamo_table_name
     );
   } catch (error) {
