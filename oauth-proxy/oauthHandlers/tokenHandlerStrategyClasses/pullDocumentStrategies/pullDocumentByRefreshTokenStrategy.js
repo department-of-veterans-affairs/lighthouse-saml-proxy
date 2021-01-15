@@ -29,12 +29,8 @@ class PullDocumentByRefreshTokenStrategy {
     let document;
     try {
       let payload = await this.dynamo.queryFromDynamo(
-        "#refresh_token = :refresh_token",
         {
-          "#refresh_token": "refresh_token",
-        },
-        {
-          ":refresh_token": refresh_token,
+          refresh_token: refresh_token,
         },
         this.config.dynamo_table_name,
         "oauth_refresh_token_index"

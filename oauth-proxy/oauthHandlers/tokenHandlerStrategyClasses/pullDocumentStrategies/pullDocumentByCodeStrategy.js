@@ -25,12 +25,8 @@ class PullDocumentByCodeStrategy {
 
     try {
       let payload = await this.dynamo.queryFromDynamo(
-        "#code = :code",
         {
-          "#code": "code",
-        },
-        {
-          ":code": code,
+          code: code,
         },
         this.config.dynamo_table_name,
         "oauth_code_index"

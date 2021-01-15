@@ -75,24 +75,26 @@ class DynamoClient {
   }
 
   queryFromDynamo(
-    conditionExpression,
-    attributeNames,
-    attributeValues,
+    queryParams,
     tableName,
     indexName
   ) {
     var params = {
       TableName: tableName,
-      KeyConditionExpression: conditionExpression,
       ExpressionAttributeNames: {},
       ExpressionAttributeValues: {},
     };
     if (indexName) {
       params.IndexName = indexName;
     }
-    Object.assign(params.ExpressionAttributeNames, attributeNames);
-    Object.assign(params.ExpressionAttributeValues, attributeValues);
-
+    params.KeyConditionExpression = "";
+    Object.entries(queryParams).forEach((entry) => {
+      const [key, value] = entry;
+      params.KeyConditionExpression += "#" + key + " = :" + key + " AND ";
+      params.ExpressionAttributeNames["#" + key] = key;
+      params.ExpressionAttributeValues[":" + key] = value;
+    });
+    params.KeyConditionExpression = params.KeyConditionExpression.slice(0, -5);
     return new Promise((resolve, reject) => {
       this.dbDocClient.query(params, (err, data) => {
         if (err) {
@@ -115,7 +117,6 @@ class DynamoClient {
     params.ExpressionAttributeValues = {};
     Object.entries(payload).forEach((entry) => {
       const [key, value] = entry;
-      console.log(key, value);
       params.UpdateExpression += key + " = :" + key + ",";
       params.ExpressionAttributeValues[":" + key] = value;
     });
