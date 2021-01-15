@@ -272,11 +272,10 @@ function updateToDynamo(dynamoDb, recordKey, payload, tableName) {
   Object.entries(payload).forEach((entry) => {
     const [key, value] = entry;
     console.log(key, value);
-    params.UpdateExpression += key + " = :" + key;
-    +",";
+    params.UpdateExpression += key + " = :" + key + ",";
     params.ExpressionAttributeValues[":" + key] = value;
   });
-
+  params.UpdateExpression = params.UpdateExpression.slice(0, -1);
   return new Promise((resolve, reject) => {
     dynamoDb.dbDocClient.update(params, (err, data) => {
       if (err) {
