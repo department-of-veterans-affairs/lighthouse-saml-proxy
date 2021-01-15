@@ -13,9 +13,17 @@ const authorizeHandler = async (
   res,
   next
 ) => {
-  loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
+  if (client_redirect === "") {
+    res.status(400).json({
+      error: "invalid_client",
+      error_description:
+        "There was no redirect URI specified by the application.",
+    });
+    return next();
+  }
 
+  loginBegin.inc();
   try {
     await checkParameters(state, aud, issuer, logger, oktaClient);
   } catch (err) {
