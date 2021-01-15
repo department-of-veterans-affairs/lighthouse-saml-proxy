@@ -28,14 +28,19 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
     expect(response).toBe("patient");
   });
   it("Type Error", async () => {
-    mockValidate = buildValidateToken({}, true);
+    let error = { response: { status: 500 } };
+    mockValidate = buildValidateToken(error, true);
     let strategy = new GetPatientInfoFromValidateEndpointStrategy(
       mockValidate,
       logger
     );
     try {
-      await strategy.createPatientInfo(null, null);
+      await strategy.createPatientInfo({ access_token: "token" },
+      { aud: "aud" });
     } catch (err) {
+      expect(logger.error).toHaveBeenCalledWith({
+        message: "Server returned status code " + error.response.status,
+      });
       expect(true).toBe(true);
       return;
     }
