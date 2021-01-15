@@ -130,7 +130,7 @@ if [[ -z $SCOPE ]];
 then 
   SCOPE="openid%20profile%20disability_rating.read%20service_history.read%20veteran_status.read%20offline_access"
 fi
-
+REDIRECT_URI="http"
 curl -s \
   -w "%{http_code}" \
   -o "$curl_body" \

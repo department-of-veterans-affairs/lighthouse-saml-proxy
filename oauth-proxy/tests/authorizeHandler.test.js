@@ -129,6 +129,34 @@ describe("authorizeHandler", () => {
     expect(res.redirect).toHaveBeenCalled();
   });
 
+  it("Verify that no client_redirect results in 400", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = new MockExpressResponse();
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+    expect(next).toHaveBeenCalled();
+  });
+
   it("Aud parameter does not match API response, redirect -> until we implement", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
