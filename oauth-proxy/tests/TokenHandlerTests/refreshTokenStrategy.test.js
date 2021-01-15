@@ -141,7 +141,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           state: "abc123",
         },
       });
-  
+
       let refreshTokenStrategy = new RefreshTokenStrategy(
         req,
         logger,
@@ -150,11 +150,11 @@ describe("tokenHandler refreshTokenStrategy", () => {
         config,
         staticTokens
       );
-  
+
       let token = await refreshTokenStrategy.getToken();
       expect(token).toEqual(data);
     });
-  
+
     it("happy path static token size > 0", async () => {
       staticTokens.set("static-refresh-token", {
         static_icn: "0123456789",
@@ -172,7 +172,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           state: "abc123",
         },
       });
-  
+
       let refreshTokenStrategy = new RefreshTokenStrategy(
         req,
         logger,
@@ -181,11 +181,11 @@ describe("tokenHandler refreshTokenStrategy", () => {
         config,
         staticTokens
       );
-  
+
       let token = await refreshTokenStrategy.getToken();
       expect(token).toEqual(data);
     });
-  
+
     it("happy path no id icn", async () => {
       delete data.patient;
       setScan({
@@ -196,7 +196,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         static_expires_in: 3600,
         static_id_token: "static-id-token",
       });
-  
+
       let req = new MockExpressRequest({
         body: {
           grant_type: "refresh_token",
@@ -204,7 +204,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           state: "abc123",
         },
       });
-  
+
       let refreshTokenStrategy = new RefreshTokenStrategy(
         req,
         logger,
@@ -213,7 +213,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         config,
         staticTokens
       );
-  
+
       let token = await refreshTokenStrategy.getToken();
       expect(token).toEqual(data);
     });
@@ -227,7 +227,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           "openid profile patient/Medication.read launch/patient offline_access",
         static_expires_in: 3600,
       });
-  
+
       let req = new MockExpressRequest({
         body: {
           grant_type: "refresh_token",
@@ -235,7 +235,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           state: "abc123",
         },
       });
-  
+
       let refreshTokenStrategy = new RefreshTokenStrategy(
         req,
         logger,
@@ -244,11 +244,11 @@ describe("tokenHandler refreshTokenStrategy", () => {
         config,
         staticTokens
       );
-  
+
       let token = await refreshTokenStrategy.getToken();
       expect(token).toEqual(data);
     });
-  
+
     it("happy path no id token no icn", async () => {
       delete data.patient;
       delete data.id_token;
@@ -259,7 +259,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           "openid profile patient/Medication.read launch/patient offline_access",
         static_expires_in: 3600,
       });
-  
+
       let req = new MockExpressRequest({
         body: {
           grant_type: "refresh_token",
@@ -267,7 +267,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
           state: "abc123",
         },
       });
-  
+
       let refreshTokenStrategy = new RefreshTokenStrategy(
         req,
         logger,
@@ -276,12 +276,12 @@ describe("tokenHandler refreshTokenStrategy", () => {
         config,
         staticTokens
       );
-  
+
       let token = await refreshTokenStrategy.getToken();
       expect(token).toEqual(data);
     });
-  })
-  
+  });
+
   describe("Real refresh static token dynamo error", () => {
     beforeEach(() => {
       dynamo = jest.mock();
