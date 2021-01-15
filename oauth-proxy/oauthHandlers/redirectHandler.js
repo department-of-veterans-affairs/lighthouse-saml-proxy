@@ -33,7 +33,6 @@ const redirectHandler = async (logger, dynamo, config, req, res, next) => {
       state: state,
     };
     let document = await dynamo.getPayloadFromDynamo(
-      dynamo,
       search_params,
       config.dynamo_table_name
     );
