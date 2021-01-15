@@ -6,6 +6,7 @@ const {
   buildFakeLogger,
   createFakeConfig,
 } = require("../testUtils");
+const { minimalError } = require("../../utils");
 const {
   RefreshTokenStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
@@ -13,9 +14,10 @@ let logger;
 let dynamo;
 let client;
 let config;
-let staticTokens = new Map();
+let staticTokens;
 
 beforeEach(() => {
+  staticTokens = new Map();
   logger = buildFakeLogger();
   client = buildOpenIDClient({
     refresh: (resolve) => {
@@ -90,6 +92,31 @@ describe("tokenHandler refreshTokenStrategy", () => {
   });
 
   it("handles the real refreshTokenStrategy flow", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "refresh_token",
+        refresh_token: "real-refresh-token",
+        state: "abc123",
+      },
+    });
+
+    let refreshTokenStrategy = new RefreshTokenStrategy(
+      req,
+      logger,
+      client,
+      dynamo,
+      config,
+      staticTokens
+    );
+
+    let token = await refreshTokenStrategy.getToken();
+    expect(token.access_token).toEqual("real-access-token");
+    expect(token.refresh_token).toEqual("real-refresh-token");
+    expect(token.expires_in).toEqual(60);
+  });
+
+  it("static token service off", async () => {
+    config.enable_static_token_service = false;
     let req = new MockExpressRequest({
       body: {
         grant_type: "refresh_token",

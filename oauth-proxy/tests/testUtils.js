@@ -42,10 +42,10 @@ function buildFakeDynamoClient(fakeDynamoRecord, saveError) {
   });
   dynamoClient.savePayloadToDynamo.mockImplementation((launch) => {
     return new Promise((resolve, reject) => {
-      if(saveError) {
-        reject(true)
-      }else {
-        resolve(true)
+      if (saveError) {
+        reject(true);
+      } else {
+        resolve(true);
       }
     });
   });
@@ -115,7 +115,11 @@ function buildFakeOktaClient(
   userCollection,
   grant
 ) {
-  const oClient = { getApplication: jest.fn(), listUsers: jest.fn(), grant: jest.fn() };
+  const oClient = {
+    getApplication: jest.fn(),
+    listUsers: jest.fn(),
+    grant: jest.fn(),
+  };
   oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
@@ -130,12 +134,12 @@ function buildFakeOktaClient(
     return userCollection;
   };
   oClient.grant.mockImplementation(() => {
-    if(grant){
-      return grant
-    }else{
-      throw {error: "error", error_description: "error_description"}
+    if (grant) {
+      return grant;
+    } else {
+      throw { error: "error", error_description: "error_description" };
     }
-  })
+  });
   return oClient;
 }
 
@@ -323,7 +327,7 @@ const jwtEncodeClaims = (claims, expires_on) => {
 
 const createFakeHashingFunction = () => {
   hash = jest.fn();
-  
+
   hash.mockImplementation((value) => {
     return value;
   });
@@ -343,5 +347,5 @@ module.exports = {
   buildFakeLogger,
   createFakeConfig,
   jwtEncodeClaims,
-  createFakeHashingFunction
+  createFakeHashingFunction,
 };
