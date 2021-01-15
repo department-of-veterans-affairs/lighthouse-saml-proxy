@@ -35,8 +35,10 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       logger
     );
     try {
-      await strategy.createPatientInfo({ access_token: "token" },
-      { aud: "aud" });
+      await strategy.createPatientInfo(
+        { access_token: "token" },
+        { aud: "aud" }
+      );
     } catch (err) {
       expect(logger.error).toHaveBeenCalledWith({
         message: "Server returned status code " + error.response.status,
