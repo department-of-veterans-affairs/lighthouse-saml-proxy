@@ -6,9 +6,6 @@ const { buildFakeDynamoClient, buildFakeLogger } = require("../testUtils");
 const {
   ClientCredentialsStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
-const {
-  GetPatientInfoFromLaunchStrategy,
-} = require("../../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
 let logger;
 let dynamo;
 let dynamoClient;
