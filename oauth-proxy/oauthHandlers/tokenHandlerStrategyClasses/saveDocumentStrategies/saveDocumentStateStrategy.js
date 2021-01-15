@@ -1,17 +1,16 @@
 const { hashString } = require("../../../utils");
 
 class SaveDocumentStateStrategy {
-  constructor(req, logger, dynamo, dynamoClient, config) {
+  constructor(req, logger, dynamo, config) {
     this.req = req;
     this.logger = logger;
     this.dynamo = dynamo;
-    this.dynamoClient = dynamoClient;
     this.config = config;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.state && tokens.refresh_token) {
-        await this.dynamoClient.updateToDynamo(
+        await this.dynamo.updateToDynamo(
           this.dynamo,
           { state: document.state },
           {

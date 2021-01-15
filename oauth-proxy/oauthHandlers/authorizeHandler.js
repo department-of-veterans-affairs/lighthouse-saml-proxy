@@ -7,7 +7,6 @@ const authorizeHandler = async (
   logger,
   issuer,
   dynamo,
-  dynamoClient,
   oktaClient,
   req,
   res,
@@ -60,7 +59,7 @@ const authorizeHandler = async (
   }
 
   try {
-    await dynamoClient.savePayloadToDynamo(
+    await dynamo.savePayloadToDynamo(
       dynamo,
       { state: state, redirect_uri: client_redirect },
       config.dynamo_table_name

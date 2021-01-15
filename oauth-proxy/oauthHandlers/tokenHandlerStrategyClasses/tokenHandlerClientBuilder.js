@@ -39,7 +39,6 @@ const buildTokenHandlerClient = (
   issuer,
   logger,
   dynamo,
-  dynamoClient,
   config,
   req,
   res,
@@ -52,7 +51,6 @@ const buildTokenHandlerClient = (
     issuer,
     logger,
     dynamo,
-    dynamoClient,
     config,
     req,
     validateToken,
@@ -74,7 +72,6 @@ const getStrategies = (
   issuer,
   logger,
   dynamo,
-  dynamoClient,
   config,
   req,
   validateToken,
@@ -101,7 +98,6 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient,
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
@@ -127,7 +123,6 @@ const getStrategies = (
         req,
         logger,
         dynamo,
-        dynamoClient,
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
@@ -150,15 +145,12 @@ const getStrategies = (
       tokenHandlerStrategy: new ClientCredentialsStrategy(
         req,
         logger,
-        dynamo,
-        dynamoClient,
         issuer.token_endpoint
       ),
       pullDocumentFromDynamoStrategy: new PullDocumentByLaunchStrategy(req),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
         logger,
         dynamo,
-        dynamoClient,
         config,
         hashString
       ),

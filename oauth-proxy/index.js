@@ -3,9 +3,7 @@ const cors = require("cors");
 const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
-const {
-  DynamoClient,
-} = require("./dynamo_client");
+const { DynamoClient } = require("./dynamo_client");
 
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");

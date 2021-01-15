@@ -6,14 +6,7 @@ const {
 /*
  * Handler for looking up SMART launch context by access_token.
  */
-const launchRequestHandler = async (
-  config,
-  logger,
-  dynamo,
-  dynamoClient,
-  res,
-  next
-) => {
+const launchRequestHandler = async (config, logger, dynamo, res, next) => {
   const pullDocumentStrategy = new PullDocumentByAccessTokenStrategy(
     logger,
     dynamo,
