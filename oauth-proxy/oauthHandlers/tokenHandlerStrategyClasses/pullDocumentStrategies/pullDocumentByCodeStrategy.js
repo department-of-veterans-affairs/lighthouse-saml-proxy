@@ -1,5 +1,4 @@
 const { rethrowIfRuntimeError, hashString } = require("../../../utils");
-const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByCodeStrategy {
   constructor(req, logger, dynamo, config) {
@@ -25,7 +24,7 @@ class PullDocumentByCodeStrategy {
     let document;
 
     try {
-      let payload = await dynamoClient.queryFromDynamo(
+      let payload = await this.dynamo.queryFromDynamo(
         this.dynamo,
         "#code = :code",
         {

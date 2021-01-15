@@ -3,7 +3,10 @@ const cors = require("cors");
 const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
-const dynamoClient = require("./dynamo_client");
+const {
+  DynamoClient,
+} = require("./dynamo_client");
+
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
 const morgan = require("morgan");
@@ -70,7 +73,6 @@ function buildApp(
   config,
   oktaClient,
   dynamo,
-  dynamoClient,
   validateToken,
   isolatedIssuers,
   isolatedOktaClients
@@ -167,7 +169,7 @@ function buildApp(
 
   router.get(config.routes.app_routes.redirect, async (req, res, next) => {
     await oauthHandlers
-      .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
+      .redirectHandler(logger, dynamo, config, req, res, next)
       .catch(next);
   });
 
@@ -188,7 +190,7 @@ function buildApp(
       jwtAuthorizationHandler,
       async (req, res, next) => {
         await oauthHandlers
-          .launchRequestHandler(config, logger, dynamo, dynamoClient, res, next)
+          .launchRequestHandler(config, logger, dynamo, res, next)
           .catch(next);
       }
     );
@@ -278,7 +280,6 @@ function buildApp(
           logger,
           service_issuer,
           dynamo,
-          dynamoClient,
           okta_client,
           req,
           res,
@@ -296,7 +297,6 @@ function buildApp(
           logger,
           service_issuer,
           dynamo,
-          dynamoClient,
           validateToken,
           staticTokens,
           req,
@@ -370,7 +370,7 @@ function startApp(config, isolatedIssuers) {
     );
   }
 
-  const dynamoHandle = dynamoClient.createDynamoHandle(
+  const dynamoHandle = new DynamoClient(
     Object.assign(
       {},
       { region: config.aws_region },
@@ -388,7 +388,6 @@ function startApp(config, isolatedIssuers) {
     config,
     oktaClient,
     dynamoHandle,
-    dynamoClient,
     validateToken,
     isolatedIssuers,
     isolatedOktaClients

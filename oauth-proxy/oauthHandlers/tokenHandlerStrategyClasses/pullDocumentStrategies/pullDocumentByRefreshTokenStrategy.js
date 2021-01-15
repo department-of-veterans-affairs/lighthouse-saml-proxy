@@ -1,5 +1,4 @@
 const { hashString } = require("../../../utils");
-const dynamoClient = require("../../../dynamo_client");
 
 class PullDocumentByRefreshTokenStrategy {
   constructor(req, logger, dynamo, config) {
@@ -29,7 +28,7 @@ class PullDocumentByRefreshTokenStrategy {
   async getDocumentDynamo(refresh_token) {
     let document;
     try {
-      let payload = await dynamoClient.queryFromDynamo(
+      let payload = await this.dynamo.queryFromDynamo(
         this.dynamo,
         "#refresh_token = :refresh_token",
         {

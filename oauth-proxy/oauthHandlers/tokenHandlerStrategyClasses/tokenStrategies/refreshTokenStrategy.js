@@ -5,7 +5,6 @@ const {
   minimalError,
 } = require("../../../utils");
 const { oktaTokenRefreshGauge, stopTimer } = require("../../../metrics");
-const dynamoClient = require("../../../dynamo_client");
 
 class RefreshTokenStrategy {
   constructor(req, logger, client, dynamo, config, staticTokens) {
@@ -26,7 +25,7 @@ class RefreshTokenStrategy {
       try {
         if (this.staticTokens.size == 0) {
           let payload;
-          payload = await dynamoClient.scanFromDynamo(
+          payload = await this.dynamo.scanFromDynamo(
             this.dynamo,
             this.config.dynamo_static_token_table
           );
