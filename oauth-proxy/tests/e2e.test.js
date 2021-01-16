@@ -81,8 +81,8 @@ function buildFakeOktaClient(fakeRecord) {
 }
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
-  const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-  dynamoClient.saveToDynamo.mockImplementation((state) => {
+  const fakeDynamo = jest.genMockFromModule("../dynamo_client.js");
+  fakeDynamo.updateToDynamo.mockImplementation((state) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
@@ -90,8 +90,8 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ pk: state });
     });
   });
-  dynamoClient.getFromDynamoBySecondary.mockImplementation(
-    (handle, attr, value, tableName) => {
+  fakeDynamo.queryFromDynamo.mockImplementation(
+    ({attr: value}, tableName) => {
       return new Promise((resolve, reject) => {
         if (fakeDynamoRecord[attr] === value) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -101,8 +101,8 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  dynamoClient.getFromDynamoByState.mockImplementation(
-    (handle, state, tableName) => {
+  fakeDynamo.getPayloadFromDynamo.mockImplementation(
+    ({state: state}, tableName) => {
       return new Promise((resolve, reject) => {
         if (state === fakeDynamoRecord.state) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -112,8 +112,8 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
-    (handle, access_token, tableName) => {
+  fakeDynamo.getPayloadFromDynamo.mockImplementation(
+    ({access_token: access_token, tableName) => {
       const fakeLaunchRecord = {
         launch: "123V456",
       };
@@ -130,13 +130,12 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       });
     }
   );
-  return dynamoClient;
+  return fakeDynamo;
 }
 
 describe("OpenID Connect Conformance", () => {
   let oktaClient;
-  let dynamoClient;
-  let dynamoHandle;
+  let fakeDynamo;
   const testServerBaseUrlPattern = new RegExp(
     `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`
   );
@@ -164,7 +163,7 @@ describe("OpenID Connect Conformance", () => {
         isolatedOktaClients[service_config.api_category] = oktaClient;
       }
     }
-    dynamoClient = buildFakeDynamoClient({
+    fakeDynamo = buildFakeDynamoClient({
       state: "abc123",
       code: "xyz789",
       refresh_token: "jkl456",
@@ -183,8 +182,7 @@ describe("OpenID Connect Conformance", () => {
     const app = buildApp(
       defaultTestingConfig,
       oktaClient,
-      dynamoHandle,
-      dynamoClient,
+      fakeDynamo,
       fakeTokenValidator,
       isolatedIssuers,
       isolatedOktaClients
