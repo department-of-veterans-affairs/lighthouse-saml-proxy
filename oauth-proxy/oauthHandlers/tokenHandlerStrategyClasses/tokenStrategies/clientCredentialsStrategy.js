@@ -3,7 +3,7 @@ const qs = require("qs");
 const { rethrowIfRuntimeError } = require("../../../utils");
 
 class ClientCredentialsStrategy {
-  constructor(req, logger, dynamo, token_endpoint) {
+  constructor(req, logger, token_endpoint) {
     this.req = req;
     this.logger = logger;
     this.token_endpoint = token_endpoint;
