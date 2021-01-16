@@ -36,7 +36,6 @@ beforeEach(() => {
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
   dynamo = jest.mock();
-  dynamoClient = jest.mock();
   next = jest.fn();
   req = new MockExpressRequest();
   res = new MockExpressResponse();
@@ -91,7 +90,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -120,7 +118,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -150,7 +147,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -180,7 +176,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -202,7 +197,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -228,7 +222,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -245,7 +238,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,
@@ -267,7 +259,6 @@ describe("authorizeHandler", () => {
       logger,
       issuer,
       dynamo,
-      dynamoClient,
       oktaClient,
       req,
       res,

@@ -31,38 +31,39 @@ function convertObjectToDynamoAttributeValues(obj) {
 }
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
-  const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-  dynamoClient.saveToDynamo.mockImplementation((state) => {
+  const dynamoClient = {};
+
+  dynamoClient.savePayloadToDynamo((payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
-      resolve({ pk: state });
+      resolve({ pk: payload.state });
     });
   });
-  dynamoClient.getFromDynamoBySecondary.mockImplementation(
-    (handle, attr, value, tableName) => {
+  dynamoClient.queryFromDynamo(
+    ({attr: value}, tableName) => {
       return new Promise((resolve, reject) => {
         if (fakeDynamoRecord[attr] === value) {
-          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+          resolve(fakeDynamoRecord);
         } else {
           reject(`no such ${attr} value on ${tableName}`);
         }
       });
     }
   );
-  dynamoClient.getFromDynamoByState.mockImplementation(
-    (handle, state, tableName) => {
+  dynamoClient.getPayloadFromDynamo(
+    ({attr: value}, tableName) => {
       return new Promise((resolve, reject) => {
-        if (state === fakeDynamoRecord.state) {
-          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        if (attr === "state" && value === fakeDynamoRecord.state) {
+          resolve(fakeDynamoRecord);
         } else {
           reject(`no such state value on ${tableName}`);
         }
       });
     }
   );
-  dynamoClient.scanFromDynamo.mockImplementation((handle, tableName) => {
+  dynamoClient.scanFromDynamo((handle, tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
