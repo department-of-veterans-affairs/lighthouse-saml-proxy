@@ -33,7 +33,7 @@ function convertObjectToDynamoAttributeValues(obj) {
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
-  dynamoClient.savePayloadToDynamo((payload) => {
+  dynamoClient.savePayloadToDynamo = ((payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
