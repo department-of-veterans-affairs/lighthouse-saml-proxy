@@ -51,11 +51,11 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
   };
   dynamoClient.queryFromDynamo = (queryParam, tableName) => {
     return new Promise((resolve, reject) => {
-      if (fakeDynamoRecord[Object.keys(queryParam)[0]] === Object.values(queryParam)[0]) {
+      if (fakeDynamoRecord && fakeDynamoRecord[Object.keys(queryParam)[0]] && fakeDynamoRecord[Object.keys(queryParam)[0]] === Object.values(queryParam)[0]) {
         const out = { Items: [fakeDynamoRecord]};
         resolve(out);
       } else {
-        reject(`no such ${attr} value on ${tableName}`);
+        reject(`no such ${queryParam} value on ${tableName}`);
       }
     });
   };

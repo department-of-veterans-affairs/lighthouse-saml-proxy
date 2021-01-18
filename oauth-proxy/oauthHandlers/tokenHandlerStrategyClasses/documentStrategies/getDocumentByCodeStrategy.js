@@ -13,7 +13,7 @@ class GetDocumentByCodeStrategy {
 
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (document == null) {
+    if (!document) {
       this.logger.warn("Hashed code not found. Searching for unhashed code.");
       document = await this.getDocumentDynamo(this.req.body.code);
     }
