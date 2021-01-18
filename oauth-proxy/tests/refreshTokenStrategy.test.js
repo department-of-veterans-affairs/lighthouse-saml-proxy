@@ -28,8 +28,8 @@ beforeEach(() => {
   config = jest.mock();
   config.dynamo_static_token_table = "ut_static_tokens_table";
   config.enable_static_token_service = true;
-  dynamo = jest.mock();
-  dynamo.dbDocClient = {
+
+  dynamo = {
     scan: (scan_params, result) => {
       if (scan_params.TableName === "ut_static_tokens_table") {
         result(null, {
