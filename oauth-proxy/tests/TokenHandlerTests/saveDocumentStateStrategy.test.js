@@ -25,7 +25,6 @@ const ACCESS_TOKEN = "the_fake_access_token";
 
 let dynamoClient;
 let config;
-let dynamo;
 let logger;
 let req;
 let document;
@@ -35,7 +34,6 @@ describe("saveDocumentStateStrategy tests", () => {
   beforeEach(() => {
     config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
-    dynamo = jest.mock();
     logger = buildFakeLogger();
     req = new MockExpressRequest({
       body: {
@@ -64,7 +62,6 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );
@@ -80,7 +77,6 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );

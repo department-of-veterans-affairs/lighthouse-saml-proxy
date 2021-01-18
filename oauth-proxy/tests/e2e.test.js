@@ -81,7 +81,7 @@ function buildFakeOktaClient(fakeRecord) {
 }
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
-  const fakeDynamo = jest.genMockFromModule("../dynamo_client.js");
+  const fakeDynamo = {}};
   fakeDynamo.updateToDynamo.mockImplementation((state) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
@@ -113,7 +113,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     }
   );
   fakeDynamo.getPayloadFromDynamo.mockImplementation(
-    ({access_token: access_token, tableName) => {
+    ({access_token: access_token, tableName}) => {
       const fakeLaunchRecord = {
         launch: "123V456",
       };

@@ -33,37 +33,33 @@ function convertObjectToDynamoAttributeValues(obj) {
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
-  dynamoClient.savePayloadToDynamo = ((payload) => {
+  dynamoClient.savePayloadToDynamo = (payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
       resolve({ pk: payload.state });
     });
+  };
+  dynamoClient.queryFromDynamo = ({ attr: value }, tableName) => {
+    return new Promise((resolve, reject) => {
+      if (fakeDynamoRecord[attr] === value) {
+        resolve(fakeDynamoRecord);
+      } else {
+        reject(`no such ${attr} value on ${tableName}`);
+      }
+    });
+  };
+  dynamoClient.getPayloadFromDynamo = (({ attr: value }, tableName) => {
+    return new Promise((resolve, reject) => {
+      if (attr === "state" && value === fakeDynamoRecord.state) {
+        resolve(fakeDynamoRecord);
+      } else {
+        reject(`no such state value on ${tableName}`);
+      }
+    });
   });
-  dynamoClient.queryFromDynamo(
-    ({attr: value}, tableName) => {
-      return new Promise((resolve, reject) => {
-        if (fakeDynamoRecord[attr] === value) {
-          resolve(fakeDynamoRecord);
-        } else {
-          reject(`no such ${attr} value on ${tableName}`);
-        }
-      });
-    }
-  );
-  dynamoClient.getPayloadFromDynamo(
-    ({attr: value}, tableName) => {
-      return new Promise((resolve, reject) => {
-        if (attr === "state" && value === fakeDynamoRecord.state) {
-          resolve(fakeDynamoRecord);
-        } else {
-          reject(`no such state value on ${tableName}`);
-        }
-      });
-    }
-  );
-  dynamoClient.scanFromDynamo((handle, tableName) => {
+  dynamoClient.scanFromDynamo = ((handle, tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));

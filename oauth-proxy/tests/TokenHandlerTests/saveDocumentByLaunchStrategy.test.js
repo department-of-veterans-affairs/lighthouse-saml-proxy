@@ -69,9 +69,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     expect(savePayloadToDynamoCalledWith.payload.access_token).toBe(
       mockHashingFunction()
     );
-    expect(savePayloadToDynamoCalledWith.payload.launch).toBe(
-      "42"
-    );
+    expect(savePayloadToDynamoCalledWith.payload.launch).toBe("42");
     expect(savePayloadToDynamoCalledWith.TableName).toBe(
       config.dynamo_client_credentials_table
     );
