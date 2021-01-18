@@ -41,6 +41,14 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ pk: payload.state });
     });
   };
+  dynamoClient.updateToDynamo = (rowkey, payload) => {
+    return new Promise((resolve) => {
+      // It's unclear whether this should resolve with a full records or just
+      // the identity field but thus far it has been irrelevant to the
+      // functional testing of the oauth-proxy.
+      resolve({ pk: payload.state });
+    });
+  };
   dynamoClient.queryFromDynamo = ({ attr: value }, tableName) => {
     return new Promise((resolve, reject) => {
       if (fakeDynamoRecord[attr] === value) {
