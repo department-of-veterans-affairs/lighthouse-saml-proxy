@@ -48,9 +48,9 @@ beforeEach(() => {
           ConsumedCapacity: null,
         };
       } else {
-        throw({message: "no static token here"});
+        throw { message: "no static token here" };
       }
-    }
+    },
   };
 });
 

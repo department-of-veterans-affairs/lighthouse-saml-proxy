@@ -51,24 +51,33 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
   };
   dynamoClient.queryFromDynamo = (queryParam, tableName) => {
     return new Promise((resolve, reject) => {
-      if (fakeDynamoRecord && fakeDynamoRecord[Object.keys(queryParam)[0]] && fakeDynamoRecord[Object.keys(queryParam)[0]] === Object.values(queryParam)[0]) {
-        const out = { Items: [fakeDynamoRecord]};
+      if (
+        fakeDynamoRecord &&
+        fakeDynamoRecord[Object.keys(queryParam)[0]] &&
+        fakeDynamoRecord[Object.keys(queryParam)[0]] ===
+          Object.values(queryParam)[0]
+      ) {
+        const out = { Items: [fakeDynamoRecord] };
         resolve(out);
       } else {
         reject(`no such ${queryParam} value on ${tableName}`);
       }
     });
   };
-  dynamoClient.getPayloadFromDynamo = (({ attr: value }, tableName) => {
+  dynamoClient.getPayloadFromDynamo = (searchAttributes, tableName) => {
     return new Promise((resolve, reject) => {
-      if (attr === "state" && value === fakeDynamoRecord.state) {
+      if (
+        Object.keys(searchAttributes)[0] &&
+        Object.keys(searchAttributes)[0] === "state" &&
+        Object.values(searchAttributes)[0] === fakeDynamoRecord.state
+      ) {
         resolve(fakeDynamoRecord);
       } else {
         reject(`no such state value on ${tableName}`);
       }
     });
-  });
-  dynamoClient.scanFromDynamo = ((tableName) => {
+  };
+  dynamoClient.scanFromDynamo = (tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -76,7 +85,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         reject(`no such state value on ${tableName}`);
       }
     });
-  });
+  };
   return dynamoClient;
 }
 

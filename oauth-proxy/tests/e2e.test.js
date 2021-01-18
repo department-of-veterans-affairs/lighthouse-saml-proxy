@@ -91,7 +91,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     });
   });
   fakeDynamo.queryFromDynamo.mockImplementation(
-    ({attr: value}, tableName) => {
+    ({ attr: value }, tableName) => {
       return new Promise((resolve, reject) => {
         if (fakeDynamoRecord[attr] === value) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -102,7 +102,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     }
   );
   fakeDynamo.getPayloadFromDynamo.mockImplementation(
-    ({state: state}, tableName) => {
+    ({ state: state }, tableName) => {
       return new Promise((resolve, reject) => {
         if (state === fakeDynamoRecord.state) {
           resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -113,7 +113,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
     }
   );
   fakeDynamo.getPayloadFromDynamo.mockImplementation(
-    ({access_token: access_token, tableName}) => {
+    ({ access_token: access_token, tableName }) => {
       const fakeLaunchRecord = {
         launch: "123V456",
       };

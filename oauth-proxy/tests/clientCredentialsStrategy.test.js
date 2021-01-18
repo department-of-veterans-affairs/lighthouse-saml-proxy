@@ -2,7 +2,6 @@ require("jest");
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
-const { buildFakeDynamoClient } = require("./testUtils");
 const {
   ClientCredentialsStrategy,
 } = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
@@ -10,23 +9,12 @@ const {
   GetPatientInfoFromLaunchStrategy,
 } = require("../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
 let logger;
-let dynamo;
-let dynamoClient;
 let token_endpoint = "http://localhost:9090/testServer/token";
 let mock = new MockAdapter(axios);
 
 beforeEach(() => {
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
-  dynamoClient = jest.mock();
   jest.mock("axios", () => ({ post: jest.fn(), create: jest.fn() }));
-
-  dynamoClient = buildFakeDynamoClient({
-    state: "abc123",
-    code: "the_fake_authorization_code",
-    refresh_token: "",
-    redirect_uri: "http://localhost/thisDoesNotMatter",
-  });
 });
 
 describe("tokenHandler clientCredentials", () => {

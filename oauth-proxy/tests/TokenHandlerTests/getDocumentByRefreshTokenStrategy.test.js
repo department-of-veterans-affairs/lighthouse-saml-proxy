@@ -41,7 +41,7 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
   });
 
   it("Happy Path - Unhashed Token", async () => {
-    dynamoClient = buildFakeDynamoClient({      
+    dynamoClient = buildFakeDynamoClient({
       state: STATE,
       code: CODE_HASH_PAIR[0],
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
@@ -57,10 +57,10 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
     let document = await strategy.getDocument();
 
     expect(document).toEqual({
-      state: STATE ,
+      state: STATE,
       code: CODE_HASH_PAIR[0],
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI ,
+      redirect_uri: REDIRECT_URI,
     });
   });
 
@@ -81,10 +81,10 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
     let document = await strategy.getDocument();
 
     expect(document).toEqual({
-      state: STATE ,
+      state: STATE,
       code: CODE_HASH_PAIR[1],
       refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI ,
+      redirect_uri: REDIRECT_URI,
     });
   });
 
