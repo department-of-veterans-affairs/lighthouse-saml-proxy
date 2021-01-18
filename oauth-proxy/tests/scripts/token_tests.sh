@@ -311,7 +311,7 @@ do_token "$(jq \
 
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization and refresh_token grant types are supported"}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization, refresh_token, and client_credential grant types are supported"}'
 track_result
 
 # It is not feasible to test Client Credential edge cases yet.
