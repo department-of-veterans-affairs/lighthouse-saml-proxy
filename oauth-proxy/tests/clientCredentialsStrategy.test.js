@@ -54,8 +54,6 @@ describe("tokenHandler clientCredentials", () => {
     let clientCredentialsStrategy = new ClientCredentialsStrategy(
       req,
       logger,
-      dynamo,
-      dynamoClient,
       token_endpoint
     );
 
@@ -86,8 +84,6 @@ describe("tokenHandler clientCredentials", () => {
     let clientCredentialsStrategy = new ClientCredentialsStrategy(
       req,
       logger,
-      dynamo,
-      dynamoClient,
       token_endpoint
     );
 
@@ -125,8 +121,6 @@ describe("tokenHandler clientCredentials", () => {
     let clientCredentialsStrategy = new ClientCredentialsStrategy(
       req,
       logger,
-      dynamo,
-      dynamoClient,
       token_endpoint
     );
 
@@ -163,8 +157,6 @@ describe("tokenHandler clientCredentials", () => {
     let clientCredentialsStrategy = new ClientCredentialsStrategy(
       req,
       logger,
-      dynamo,
-      dynamoClient,
       token_endpoint
     );
 

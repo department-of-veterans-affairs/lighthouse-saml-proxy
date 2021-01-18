@@ -59,7 +59,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       }
     });
   });
-  dynamoClient.scanFromDynamo = ((handle, tableName) => {
+  dynamoClient.scanFromDynamo = ((tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));

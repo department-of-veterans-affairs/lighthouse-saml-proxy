@@ -81,7 +81,7 @@ function buildFakeOktaClient(fakeRecord) {
 }
 
 function buildFakeDynamoClient(fakeDynamoRecord) {
-  const fakeDynamo = {}};
+  const fakeDynamo = jest.genMockFromModule("../dynamo_client.js");
   fakeDynamo.updateToDynamo.mockImplementation((state) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
