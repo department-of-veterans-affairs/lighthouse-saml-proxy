@@ -49,10 +49,11 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ pk: payload.state });
     });
   };
-  dynamoClient.queryFromDynamo = ({ attr: value }, tableName) => {
+  dynamoClient.queryFromDynamo = (queryParam, tableName) => {
     return new Promise((resolve, reject) => {
-      if (fakeDynamoRecord[attr] === value) {
-        resolve(fakeDynamoRecord);
+      if (fakeDynamoRecord[Object.keys(queryParam)[0]] === Object.values(queryParam)[0]) {
+        const out = { Items: [fakeDynamoRecord]};
+        resolve(out);
       } else {
         reject(`no such ${attr} value on ${tableName}`);
       }
