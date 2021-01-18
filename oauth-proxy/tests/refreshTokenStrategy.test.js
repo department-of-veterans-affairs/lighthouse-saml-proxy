@@ -30,9 +30,9 @@ beforeEach(() => {
   config.enable_static_token_service = true;
 
   dynamo = {
-    scan: (scan_params, result) => {
-      if (scan_params.TableName === "ut_static_tokens_table") {
-        result(null, {
+    scanFromDynamo: (table_name) => {
+      if (table_name === "ut_static_tokens_table") {
+        return {
           Items: [
             {
               static_icn: "0123456789",
@@ -46,11 +46,11 @@ beforeEach(() => {
           Count: 1,
           ScannedCount: 1,
           ConsumedCapacity: null,
-        });
+        };
       } else {
-        result(false, undefined);
+        throw({message: "no static token here"});
       }
-    },
+    }
   };
 });
 
