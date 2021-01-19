@@ -240,13 +240,13 @@ describe("buildTokenHandlerClient Tests", () => {
         validateToken,
         staticTokens
       );
+      fail("Invalid auth error should have been thrown.")
     } catch (err) {
       expect(err.status).toBe(401);
       expect(err.error).toBe("invalid_client");
       expect(err.error_description).toBe("Client authentication failed");
       return;
     }
-    expect(true).toBe(false);
   });
 
   it("ClientCredentials Client Invalid Assertion Type", () => {
@@ -271,6 +271,7 @@ describe("buildTokenHandlerClient Tests", () => {
         validateToken,
         staticTokens
       );
+      fail("Invalid assertion type error should have been thrown.")
     } catch (err) {
       expect(err.status).toBe(400);
       expect(err.error).toBe("invalid_request");
@@ -279,6 +280,5 @@ describe("buildTokenHandlerClient Tests", () => {
       );
       return;
     }
-    expect(true).toBe(false);
   });
 });

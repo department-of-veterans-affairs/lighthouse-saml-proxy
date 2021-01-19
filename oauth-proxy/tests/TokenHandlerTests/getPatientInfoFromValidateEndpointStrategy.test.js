@@ -39,14 +39,13 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
         { access_token: "token" },
         { aud: "aud" }
       );
+      fail("Type error should have been thrown.")
     } catch (err) {
       expect(logger.error).toHaveBeenCalledWith({
         message: "Server returned status code " + error.response.status,
       });
-      expect(true).toBe(true);
       return;
     }
-    expect(true).toBe(false);
   });
 
   it("Validate error", async () => {
@@ -60,14 +59,13 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
         { access_token: "token" },
         { aud: "aud" }
       );
+      fail("Validate error should have been thrown.")
     } catch (err) {
-      expect(true).toBe(true);
       expect(err.status).toBe(500);
       expect(logger.error).toHaveBeenCalledWith(
         "Invalid grant, could not find a valid patient identifier for the provided authorization code."
       );
       return;
     }
-    expect(true).toBe(false);
   });
 });
