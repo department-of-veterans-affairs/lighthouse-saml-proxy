@@ -23,7 +23,6 @@ let config;
 let redirect_uri;
 let issuer;
 let logger;
-let dynamo;
 let dynamoClient;
 let next;
 let oktaClient;
@@ -35,7 +34,6 @@ beforeEach(() => {
   redirect_uri = jest.mock();
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
   next = jest.fn();
   req = new MockExpressRequest();
   res = new MockExpressResponse();
@@ -89,7 +87,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -117,7 +115,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -146,7 +144,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -175,7 +173,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -196,7 +194,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -221,7 +219,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -237,7 +235,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
@@ -258,7 +256,7 @@ describe("authorizeHandler", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
+      dynamoClient,
       oktaClient,
       req,
       res,
