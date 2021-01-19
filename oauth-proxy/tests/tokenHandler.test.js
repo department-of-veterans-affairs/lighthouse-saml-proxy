@@ -15,7 +15,6 @@ let config;
 let redirect_uri;
 let issuer;
 let logger;
-let dynamo;
 let dynamoClient;
 let next;
 let validateToken;
@@ -26,32 +25,31 @@ beforeEach(() => {
   redirect_uri = jest.mock();
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
   dynamoClient = jest.mock();
   validateToken = jest.fn();
   staticTokens = new Map();
   next = jest.fn();
 
   config.dynamo_static_token_table = "ut_static_tokens_table";
-  dynamo.dbDocClient = {
-    get: (search_params, result) => {
-      if (
-        search_params.Key.static_refresh_token ===
-        "the_fake_static_refresh_token"
-      ) {
-        result(false, {
-          Item: {
-            static_access_token: "the_fake_static_access_token",
-            static_refresh_token: "the_fake_static_refresh_token",
-            static_expires_in: 1500,
-            static_icn: "the_fake_static_icn",
-          },
-        });
-      } else {
-        result(false, undefined);
-      }
-    },
-  };
+  // dynamoClient = {
+  //   get: (search_params, result) => {
+  //     if (
+  //       search_params.Key.static_refresh_token ===
+  //       "the_fake_static_refresh_token"
+  //     ) {
+  //       result(false, {
+  //         Item: {
+  //           static_access_token: "the_fake_static_access_token",
+  //           static_refresh_token: "the_fake_static_refresh_token",
+  //           static_expires_in: 1500,
+  //           static_icn: "the_fake_static_icn",
+  //         },
+  //       });
+  //     } else {
+  //       result(false, undefined);
+  //     }
+  //   },
+  // };
 
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
@@ -91,7 +89,6 @@ describe("tokenHandler clientCredentials", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -119,7 +116,6 @@ describe("tokenHandler clientCredentials", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       null,
       staticTokens,
@@ -169,7 +165,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -199,7 +194,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -228,7 +222,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -257,7 +250,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -281,7 +273,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -309,7 +300,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -338,7 +328,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -385,7 +374,6 @@ describe("tokenHandler refresh", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -439,7 +427,6 @@ describe("tokenHandler code", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -461,7 +448,6 @@ describe("tokenHandler code", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -488,7 +474,6 @@ describe("tokenHandler code", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,

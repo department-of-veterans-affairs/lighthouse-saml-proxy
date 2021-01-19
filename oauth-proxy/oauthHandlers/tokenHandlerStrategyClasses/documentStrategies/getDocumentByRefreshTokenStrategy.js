@@ -16,7 +16,7 @@ class GetDocumentByRefreshTokenStrategy {
 
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (document == null) {
+    if (!document) {
       this.logger.warn(
         "Hashed refresh_token not found. Searching for unhashed refresh_token."
       );

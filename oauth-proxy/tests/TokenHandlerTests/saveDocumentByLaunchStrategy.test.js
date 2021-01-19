@@ -9,7 +9,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
   it("empty launch", async () => {
     let testSaveToDynamoAccessTokenCalled = false;
 
-    const mockDynamoClient = {
+    const mockDynamo = {
       saveToDynamoAccessToken: () => {
         testSaveToDynamoAccessTokenCalled = true;
         return new Promise((resolve) => {
@@ -22,8 +22,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       null,
-      null,
-      mockDynamoClient,
+      mockDynamo,
       null,
       null
     );
@@ -35,14 +34,12 @@ describe("saveDocumentByLaunchStrategy tests", () => {
   it("happy path", async () => {
     const savePayloadToDynamoCalledWith = {};
 
-    const mockDynamo = {};
     const mockHashingFunction = () => {
       return "hash";
     };
     const mockLogger = { error: () => {} };
-    const mockDynamoClient = {
-      savePayloadToDynamo: (dynamohandle, payload, TableName) => {
-        savePayloadToDynamoCalledWith.dynamohandle = dynamohandle;
+    const mockDynamo = {
+      savePayloadToDynamo: (payload, TableName) => {
         savePayloadToDynamoCalledWith.payload = payload;
         savePayloadToDynamoCalledWith.TableName = TableName;
         return new Promise((resolve) => {
@@ -55,7 +52,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       dynamo_client_credentials_table: "dynamo_client_credentials_table",
       hmac_secret: "hmac_secret",
     };
-    const document = { launch: { S: "42" } };
+    const document = { launch: "42" };
     const claims = { aud: "https://ut/v1/token", iss: "ut_iss", sub: "ut_sub" };
     const expire_on = new Date().getTime() + 300 * 1000;
     const tokens = { access_token: jwtEncodeClaims(claims, expire_on) };
@@ -63,20 +60,16 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
       mockDynamo,
-      mockDynamoClient,
       config,
       mockHashingFunction
     );
     await strategy.saveDocumentToDynamo(document, tokens);
 
     // Expect saveToDynamoAccessToken to have been called with the correct values
-    expect(savePayloadToDynamoCalledWith.dynamohandle).toBe(mockDynamo);
     expect(savePayloadToDynamoCalledWith.payload.access_token).toBe(
       mockHashingFunction()
     );
-    expect(savePayloadToDynamoCalledWith.payload.launch).toBe(
-      document.launch.S
-    );
+    expect(savePayloadToDynamoCalledWith.payload.launch).toBe("42");
     expect(savePayloadToDynamoCalledWith.TableName).toBe(
       config.dynamo_client_credentials_table
     );
@@ -95,7 +88,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     const mockHashingFunction = () => {
       return "hash";
     };
-    const mockDynamoClient = {
+    const mockDynamo = {
       savePayloadToDynamo: () => {
         throw expectedError;
       },
@@ -111,8 +104,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
-      null,
-      mockDynamoClient,
+      mockDynamo,
       config,
       mockHashingFunction
     );

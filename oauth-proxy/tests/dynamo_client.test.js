@@ -2,23 +2,26 @@
 
 require("jest");
 
-const dynamoclient = require("../dynamo_client");
+jest.mock("aws-sdk");
+
+const { DynamoClient } = require("../dynamo_client");
 
 describe("dynamo client tests", () => {
+  const dynamoclient = new DynamoClient(
+    Object.assign({}, { region: "config.aws_region" }, null, null),
+    "http://localhost:8000"
+  );
+
   it("savePayloadToDynamo happy", async () => {
-    const mockDynamo = {};
     let isCalled = false;
 
-    mockDynamo.dbDocClient = {
-      put: (payloadDoc, result) => {
-        isCalled = true;
-        result(false, payloadDoc);
-      },
-    };
+    dynamoclient.dbDocClient.put.mockImplementation((payloadDoc, result) => {
+      isCalled = true;
+      result(null, payloadDoc);
+    });
 
     try {
       await dynamoclient.savePayloadToDynamo(
-        mockDynamo,
         { pay: "load" },
         "ClientCredentials"
       );
@@ -30,16 +33,12 @@ describe("dynamo client tests", () => {
   });
 
   it("savePayloadToDynamo error", async () => {
-    const mockDynamo = {};
-    mockDynamo.dbDocClient = {
-      put: (payloadDoc, result) => {
-        result({ message: "Missing key" }, undefined);
-      },
-    };
+    dynamoclient.dbDocClient.put.mockImplementation((payloadDoc, result) => {
+      result({ message: "Missing key" }, null);
+    });
 
     try {
       await dynamoclient.savePayloadToDynamo(
-        mockDynamo,
         { pay: "load" },
         "ClientCredentials"
       );
@@ -50,23 +49,18 @@ describe("dynamo client tests", () => {
     }
   });
 
-  it("saveToDynamoAccessToken happy", async () => {
-    // const mockDynamo = {};
+  it("updateToDynamo happy", async () => {
     let isCalled = false;
 
-    const mockDynamo = {
-      updateItem: (params, result) => {
-        isCalled = true;
-        result(false, params);
-      },
-    };
+    dynamoclient.dbDocClient.update.mockImplementation((params, result) => {
+      isCalled = true;
+      result(false, params);
+    });
 
     try {
-      await dynamoclient.saveToDynamoAccessToken(
-        mockDynamo,
-        "ut_access_token",
-        "ut_key",
-        "ut_value",
+      await dynamoclient.updateToDynamo(
+        { key: "ut_access_token" },
+        { ut_key: "ut_value" },
         "ut_table"
       );
       expect(isCalled).toEqual(true);
@@ -77,7 +71,6 @@ describe("dynamo client tests", () => {
   });
 
   it("scanFromDynamo happy", async () => {
-    const mockDynamo = {};
     let isCalled = false;
 
     let payloadDoc = {
@@ -96,19 +89,17 @@ describe("dynamo client tests", () => {
       ConsumedCapacity: null,
     };
 
-    mockDynamo.dbDocClient = {
-      scan: (scan_params, result) => {
-        isCalled = true;
-        if (scan_params.TableName == "TestTable") {
-          result(false, payloadDoc);
-        } else {
-          result(false, {});
-        }
-      },
-    };
+    dynamoclient.dbDocClient.scan.mockImplementation((scan_params, result) => {
+      isCalled = true;
+      if (scan_params.TableName == "TestTable") {
+        result(false, payloadDoc);
+      } else {
+        result(false, {});
+      }
+    });
 
     try {
-      let result = await dynamoclient.scanFromDynamo(mockDynamo, "TestTable");
+      let result = await dynamoclient.scanFromDynamo("TestTable");
       expect(isCalled).toEqual(true);
       expect(result.Items[0].static_access_token).toEqual("ut_access_token");
       expect(result.Items[0].static_refresh_token).toEqual("ut_refresh_token");
@@ -119,18 +110,15 @@ describe("dynamo client tests", () => {
   });
 
   it("scanFromDynamo error", async () => {
-    const mockDynamo = {};
     let isCalled = false;
 
-    mockDynamo.dbDocClient = {
-      scan: (scan_params, result) => {
-        isCalled = true;
-        result({ message: "non-existent table" }, false);
-      },
-    };
+    dynamoclient.dbDocClient.scan.mockImplementation((scan_params, result) => {
+      isCalled = true;
+      result({ message: "non-existent table" }, false);
+    });
 
     try {
-      await dynamoclient.scanFromDynamo(mockDynamo, "TestTable");
+      await dynamoclient.scanFromDynamo("TestTable");
       // should not reach here
       expect(false).toEqual(true);
     } catch (err) {
@@ -140,7 +128,6 @@ describe("dynamo client tests", () => {
   });
 
   it("getPayloadFromDynamo happy", async () => {
-    const mockDynamo = {};
     let isCalled = false;
 
     let payloadDoc = {
@@ -149,20 +136,18 @@ describe("dynamo client tests", () => {
         refresh_token: "ut_refresh_token",
       },
     };
-    mockDynamo.dbDocClient = {
-      get: (search_params, result) => {
-        isCalled = true;
-        if (search_params.Key.search == "me") {
-          result(false, payloadDoc);
-        } else {
-          result(false, {});
-        }
-      },
-    };
+
+    dynamoclient.dbDocClient.get.mockImplementation((search_params, result) => {
+      isCalled = true;
+      if (search_params.Key.search == "me") {
+        result(false, payloadDoc);
+      } else {
+        result(false, {});
+      }
+    });
 
     try {
       let result = await dynamoclient.getPayloadFromDynamo(
-        mockDynamo,
         { search: "me" },
         "TestTable"
       );
@@ -176,22 +161,14 @@ describe("dynamo client tests", () => {
   });
 
   it("getPayloadFromDynamo error", async () => {
-    const mockDynamo = {};
     let isCalled = false;
-
-    mockDynamo.dbDocClient = {
-      get: (search_params, result) => {
-        isCalled = true;
-        result({ message: "non-existent table" }, false);
-      },
-    };
+    dynamoclient.dbDocClient.get.mockImplementation((search_params, result) => {
+      isCalled = true;
+      result({ message: "non-existent table" }, false);
+    });
 
     try {
-      await dynamoclient.getPayloadFromDynamo(
-        mockDynamo,
-        { search: "me" },
-        "TestTable"
-      );
+      await dynamoclient.getPayloadFromDynamo({ search: "me" }, "TestTable");
       // should not reach here
       expect(false).toEqual(true);
     } catch (err) {
