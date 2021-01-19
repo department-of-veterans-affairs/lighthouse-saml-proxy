@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
-const { DynamoClient } = require("./dynamo_client");
+const { DynamoClient } = require("./dynamoClient_client");
 
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
@@ -70,7 +70,7 @@ function filterProperty(object, property) {
 function buildApp(
   config,
   oktaClient,
-  dynamo,
+  dynamoClient,
   validateToken,
   isolatedIssuers,
   isolatedOktaClients
@@ -167,7 +167,7 @@ function buildApp(
 
   router.get(config.routes.app_routes.redirect, async (req, res, next) => {
     await oauthHandlers
-      .redirectHandler(logger, dynamo, config, req, res, next)
+      .redirectHandler(logger, dynamoClient, config, req, res, next)
       .catch(next);
   });
 
@@ -188,7 +188,7 @@ function buildApp(
       jwtAuthorizationHandler,
       async (req, res, next) => {
         await oauthHandlers
-          .launchRequestHandler(config, logger, dynamo, res, next)
+          .launchRequestHandler(config, logger, dynamoClient, res, next)
           .catch(next);
       }
     );
@@ -277,7 +277,7 @@ function buildApp(
           redirect_uri,
           logger,
           service_issuer,
-          dynamo,
+          dynamoClient,
           okta_client,
           req,
           res,
@@ -294,7 +294,7 @@ function buildApp(
           redirect_uri,
           logger,
           service_issuer,
-          dynamo,
+          dynamoClient,
           validateToken,
           staticTokens,
           req,
@@ -368,14 +368,14 @@ function startApp(config, isolatedIssuers) {
     );
   }
 
-  const dynamoHandle = new DynamoClient(
+  const dynamoClient = new DynamoClient(
     Object.assign(
       {},
       { region: config.aws_region },
       config.aws_id === null ? null : { accessKeyId: config.aws_id },
       config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
     ),
-    config.dynamo_local
+    config.dynamoClient_local
   );
 
   const validateToken = configureTokenValidator(
@@ -385,7 +385,7 @@ function startApp(config, isolatedIssuers) {
   const app = buildApp(
     config,
     oktaClient,
-    dynamoHandle,
+    dynamoClient,
     validateToken,
     isolatedIssuers,
     isolatedOktaClients
