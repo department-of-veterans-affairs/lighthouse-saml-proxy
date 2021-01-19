@@ -71,6 +71,27 @@ describe("dynamo client tests", () => {
     }
   });
 
+  it("updateToDynamo error", async () => {
+    let isCalled = false;
+
+    dynamoclient.dbDocClient.update.mockImplementation((params, result) => {
+      isCalled = true;
+      result({message: "not updated"}, false);
+    });
+
+    try {
+      await dynamoclient.updateToDynamo(
+        { key: "ut_access_token" },
+        { ut_key: "ut_value" },
+        "ut_table"
+      );
+      // should not reach here
+      expect(true).toEqual(false);
+    } catch (err) {
+      expect(isCalled).toEqual(true);
+    }
+  });
+
   it("scanFromDynamo happy", async () => {
     let isCalled = false;
 
