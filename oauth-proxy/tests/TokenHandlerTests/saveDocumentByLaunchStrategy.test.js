@@ -9,7 +9,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
   it("empty launch", async () => {
     let testSaveToDynamoAccessTokenCalled = false;
 
-    const mockDynamo = {
+    const mockDynamoClient = {
       saveToDynamoAccessToken: () => {
         testSaveToDynamoAccessTokenCalled = true;
         return new Promise((resolve) => {
@@ -22,7 +22,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       null,
-      mockDynamo,
+      mockDynamoClient,
       null,
       null
     );
@@ -38,7 +38,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
       return "hash";
     };
     const mockLogger = { error: () => {} };
-    const mockDynamo = {
+    const mockDynamoClient = {
       savePayloadToDynamo: (payload, TableName) => {
         savePayloadToDynamoCalledWith.payload = payload;
         savePayloadToDynamoCalledWith.TableName = TableName;
@@ -59,7 +59,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
-      mockDynamo,
+      mockDynamoClient,
       config,
       mockHashingFunction
     );
@@ -88,7 +88,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
     const mockHashingFunction = () => {
       return "hash";
     };
-    const mockDynamo = {
+    const mockDynamoClient = {
       savePayloadToDynamo: () => {
         throw expectedError;
       },
@@ -104,7 +104,7 @@ describe("saveDocumentByLaunchStrategy tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       mockLogger,
-      mockDynamo,
+      mockDynamoClient,
       config,
       mockHashingFunction
     );

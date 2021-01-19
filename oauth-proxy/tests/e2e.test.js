@@ -80,9 +80,9 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
-function buildFakeDynamoClient(fakeDynamoRecord) {
-  const fakeDynamo = {};
-  fakeDynamo.updateToDynamo = (tok) => {
+function buildFakeDynamoClientClient(fakeDynamoClientRecord) {
+  const fakeDynamoClient = {};
+  fakeDynamoClient.updateToDynamo = (tok) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
@@ -90,20 +90,20 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ pk: tok.state });
     });
   };
-  fakeDynamo.queryFromDynamo = (queryParams, tableName) => {
+  fakeDynamoClient.queryFromDynamo = (queryParams, tableName) => {
     return new Promise((resolve, reject) => {
       if (
-        fakeDynamoRecord &&
-        fakeDynamoRecord[Object.keys(queryParams)[0]] ===
+        fakeDynamoClientRecord &&
+        fakeDynamoClientRecord[Object.keys(queryParams)[0]] ===
           Object.values(queryParams)[0]
       ) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoClientRecord));
       } else {
         reject(`no such ${queryParams} value on ${tableName}`);
       }
     });
   };
-  fakeDynamo.getPayloadFromDynamo = (search_params, tableName) => {
+  fakeDynamoClient.getPayloadFromDynamo = (search_params, tableName) => {
     const hashed_smart_launch_token =
       "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a";
     const fakeLaunchRecord = {
@@ -116,16 +116,18 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         searchKey === "access_token" &&
         search_params[searchKey] === hashed_smart_launch_token
       ) {
-        fakeDynamoRecord.access_token = hashed_smart_launch_token;
+        fakeDynamoClientRecord.access_token = hashed_smart_launch_token;
         resolve({ Item: fakeLaunchRecord });
-      } else if (search_params[searchKey] === fakeDynamoRecord[searchKey]) {
-        resolve({ Item: fakeDynamoRecord });
+      } else if (
+        search_params[searchKey] === fakeDynamoClientRecord[searchKey]
+      ) {
+        resolve({ Item: fakeDynamoClientRecord });
       } else {
         reject(`no such state value on ${tableName}`);
       }
     });
   };
-  fakeDynamo.savePayloadToDynamo = (payload) => {
+  fakeDynamoClient.savePayloadToDynamo = (payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
@@ -133,12 +135,12 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ payload });
     });
   };
-  return fakeDynamo;
+  return fakeDynamoClient;
 }
 
 describe("OpenID Connect Conformance", () => {
   let oktaClient;
-  let fakeDynamo;
+  let fakeDynamoClient;
   const testServerBaseUrlPattern = new RegExp(
     `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`
   );
@@ -166,7 +168,7 @@ describe("OpenID Connect Conformance", () => {
         isolatedOktaClients[service_config.api_category] = oktaClient;
       }
     }
-    fakeDynamo = buildFakeDynamoClient({
+    fakeDynamoClient = buildFakeDynamoClientClient({
       state: "abc123",
       code: "xyz789",
       refresh_token: "jkl456",
@@ -184,7 +186,7 @@ describe("OpenID Connect Conformance", () => {
     const app = buildApp(
       defaultTestingConfig,
       oktaClient,
-      fakeDynamo,
+      fakeDynamoClient,
       fakeTokenValidator,
       isolatedIssuers,
       isolatedOktaClients
