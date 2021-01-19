@@ -240,7 +240,7 @@ describe("buildTokenHandlerClient Tests", () => {
         validateToken,
         staticTokens
       );
-      fail("Invalid auth error should have been thrown.")
+      fail("Invalid auth error should have been thrown.");
     } catch (err) {
       expect(err.status).toBe(401);
       expect(err.error).toBe("invalid_client");
@@ -271,7 +271,7 @@ describe("buildTokenHandlerClient Tests", () => {
         validateToken,
         staticTokens
       );
-      fail("Invalid assertion type error should have been thrown.")
+      fail("Invalid assertion type error should have been thrown.");
     } catch (err) {
       expect(err.status).toBe(400);
       expect(err.error).toBe("invalid_request");

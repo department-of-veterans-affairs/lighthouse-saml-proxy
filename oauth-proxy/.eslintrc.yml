@@ -4,6 +4,7 @@ env:
   commonjs: true
   es2020: true
   jest/globals: true
+  jasmine: true
 extends:
   - "eslint:recommended"
   - "plugin:prettier/recommended"
