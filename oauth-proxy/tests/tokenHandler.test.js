@@ -31,25 +31,6 @@ beforeEach(() => {
   next = jest.fn();
 
   config.dynamo_static_token_table = "ut_static_tokens_table";
-  // dynamoClient = {
-  //   get: (search_params, result) => {
-  //     if (
-  //       search_params.Key.static_refresh_token ===
-  //       "the_fake_static_refresh_token"
-  //     ) {
-  //       result(false, {
-  //         Item: {
-  //           static_access_token: "the_fake_static_access_token",
-  //           static_refresh_token: "the_fake_static_refresh_token",
-  //           static_expires_in: 1500,
-  //           static_icn: "the_fake_static_icn",
-  //         },
-  //       });
-  //     } else {
-  //       result(false, undefined);
-  //     }
-  //   },
-  // };
 
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
