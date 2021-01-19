@@ -2,7 +2,7 @@ const { URLSearchParams } = require("url");
 const { loginEnd } = require("../metrics");
 const { hashString } = require("../utils");
 
-const redirectHandler = async (logger, dynamo, config, req, res, next) => {
+const redirectHandler = async (logger, dynamoClient, config, req, res, next) => {
   const { state } = req.query;
 
   if (state == null) {
@@ -15,7 +15,7 @@ const redirectHandler = async (logger, dynamo, config, req, res, next) => {
 
   if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
-      await dynamo.updateToDynamo(
+      await dynamoClient.updateToDynamo(
         { state: state },
         { code: hashString(req.query.code, config.hmac_secret) },
         config.dynamo_table_name

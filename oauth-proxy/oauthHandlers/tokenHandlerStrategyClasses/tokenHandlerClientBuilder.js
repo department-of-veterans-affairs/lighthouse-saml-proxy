@@ -38,7 +38,7 @@ const buildTokenHandlerClient = (
   redirect_uri,
   issuer,
   logger,
-  dynamo,
+  dynamoClient,
   config,
   req,
   res,
@@ -50,7 +50,7 @@ const buildTokenHandlerClient = (
     redirect_uri,
     issuer,
     logger,
-    dynamo,
+    dynamoClient,
     config,
     req,
     validateToken,
@@ -71,7 +71,7 @@ const getStrategies = (
   redirect_uri,
   issuer,
   logger,
-  dynamo,
+  dynamoClient,
   config,
   req,
   validateToken,
@@ -84,20 +84,20 @@ const getStrategies = (
         req,
         logger,
         new issuer.Client(createClientMetadata(redirect_uri, req, config)),
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       ),
       getDocumentFromDynamoStrategy: new GetDocumentByRefreshTokenStrategy(
         req,
         logger,
-        dynamo,
+        dynamoClient,
         config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
         req,
         logger,
-        dynamo,
+        dynamoClient,
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
@@ -116,13 +116,13 @@ const getStrategies = (
       getDocumentFromDynamoStrategy: new GetDocumentByCodeStrategy(
         req,
         logger,
-        dynamo,
+        dynamoClient,
         config
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
         req,
         logger,
-        dynamo,
+        dynamoClient,
         config
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
@@ -150,7 +150,7 @@ const getStrategies = (
       getDocumentFromDynamoStrategy: new GetDocumentByLaunchStrategy(req),
       saveDocumentToDynamoStrategy: new SaveDocumentLaunchStrategy(
         logger,
-        dynamo,
+        dynamoClient,
         config,
         hashString
       ),
