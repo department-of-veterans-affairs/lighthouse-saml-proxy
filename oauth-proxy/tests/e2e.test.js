@@ -80,7 +80,7 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
-function buildFakeDynamoClientClient(fakeDynamoClientRecord) {
+function buildFakeDynamoClient(fakeDynamoClientRecord) {
   const fakeDynamoClient = {};
   fakeDynamoClient.updateToDynamo = (tok) => {
     return new Promise((resolve) => {
@@ -168,7 +168,7 @@ describe("OpenID Connect Conformance", () => {
         isolatedOktaClients[service_config.api_category] = oktaClient;
       }
     }
-    fakeDynamoClient = buildFakeDynamoClientClient({
+    fakeDynamoClient = buildFakeDynamoClient({
       state: "abc123",
       code: "xyz789",
       refresh_token: "jkl456",
