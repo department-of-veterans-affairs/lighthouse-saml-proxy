@@ -15,10 +15,10 @@ describe("getToken tests", () => {
 
     try {
       await new UnsupportedGrantStrategy().getToken();
+      fail("Unsupported grant type error should have been thrown")
     } catch (err) {
       expect(err).toEqual(error);
       return;
     }
-    expect(true).toBe(false);
   });
 });
