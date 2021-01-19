@@ -39,6 +39,6 @@ describe("getDocumentByLaunchStrategy tests", () => {
     const strategy = new GetDocumentByLaunchStrategy(req);
 
     const document = await strategy.getDocument();
-    expect(document.launch.S).toBe("42");
+    expect(document.launch).toBe("42");
   });
 });
