@@ -65,7 +65,7 @@ describe("getToken tests", () => {
         redirect_uri,
         client
       ).getToken();
-      fail("Auth client error should be thrown")
+      fail("Auth client error should be thrown");
     } catch (err) {
       expect(err.error).toBe("error");
       expect(err.error_description).toBe("error_description");

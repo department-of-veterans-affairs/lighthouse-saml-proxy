@@ -39,7 +39,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
         { access_token: "token" },
         { aud: "aud" }
       );
-      fail("Type error should have been thrown.")
+      fail("Type error should have been thrown.");
     } catch (err) {
       expect(logger.error).toHaveBeenCalledWith({
         message: "Server returned status code " + error.response.status,
@@ -59,7 +59,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
         { access_token: "token" },
         { aud: "aud" }
       );
-      fail("Validate error should have been thrown.")
+      fail("Validate error should have been thrown.");
     } catch (err) {
       expect(err.status).toBe(500);
       expect(logger.error).toHaveBeenCalledWith(

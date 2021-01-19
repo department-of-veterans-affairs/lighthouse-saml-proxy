@@ -122,7 +122,7 @@ const realRefreshTests = async () => {
 
     try {
       await refreshTokenStrategy.getToken();
-      fail("Client error should have been thrown.")
+      fail("Client error should have been thrown.");
     } catch (err) {
       expect(err.error).toBe("client error");
       expect(err.error_description).toBe("this is a client error");
