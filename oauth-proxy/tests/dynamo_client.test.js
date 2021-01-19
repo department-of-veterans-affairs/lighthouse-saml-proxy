@@ -76,7 +76,7 @@ describe("dynamo client tests", () => {
 
     dynamoclient.dbDocClient.update.mockImplementation((params, result) => {
       isCalled = true;
-      result({message: "not updated"}, false);
+      result({ message: "not updated" }, false);
     });
 
     try {
