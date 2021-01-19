@@ -117,7 +117,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         search_params[searchKey] === hashed_smart_launch_token
       ) {
         fakeDynamoRecord.access_token = hashed_smart_launch_token;
-        resolve(fakeLaunchRecord);
+        resolve({ Item: fakeLaunchRecord });
       } else if (search_params[searchKey] === fakeDynamoRecord[searchKey]) {
         resolve({ Item: fakeDynamoRecord });
       } else {
@@ -772,47 +772,47 @@ describe("OpenID Connect Conformance", () => {
       });
   });
 
-  // it("launch context not found for an access token from a client creds flow", async () => {
-  //   await axios
-  //     .get("http://localhost:9090/testServer/smart/launch", {
-  //       headers: {
-  //         authorization:
-  //           "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbmUgRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.cMErWtEf7DxCXJl8C9q0L7ttkm-Ex54UWHsOCMGbtUc",
-  //       },
-  //     })
-  //     .then(() => {
-  //       expect(true).toEqual(false); // Don't expect to be here
-  //     })
-  //     .catch((err) => {
-  //       expect(err.response.status).toEqual(401);
-  //     });
-  // });
+  it("launch context not found for an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkphbmUgRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.cMErWtEf7DxCXJl8C9q0L7ttkm-Ex54UWHsOCMGbtUc",
+        },
+      })
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(401);
+      });
+  });
 
-  // it("missing authorization on a request for launch context given an access token from a client creds flow", async () => {
-  //   await axios
-  //     .get("http://localhost:9090/testServer/smart/launch")
-  //     .then(() => {
-  //       expect(true).toEqual(false); // Don't expect to be here
-  //     })
-  //     .catch((err) => {
-  //       expect(err.response.status).toEqual(401);
-  //       expect(err.response.statusText).toEqual("Unauthorized");
-  //     });
-  // });
+  it("missing authorization on a request for launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch")
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(401);
+        expect(err.response.statusText).toEqual("Unauthorized");
+      });
+  });
 
-  // it("bad jwt on a request for launch context given an access token from a client creds flow", async () => {
-  //   await axios
-  //     .get("http://localhost:9090/testServer/smart/launch", {
-  //       headers: {
-  //         authorization: "Bearer xxx.xx.x.x.x-x.x.x",
-  //       },
-  //     })
-  //     .then(() => {
-  //       expect(true).toEqual(false); // Don't expect to be here
-  //     })
-  //     .catch((err) => {
-  //       expect(err.response.status).toEqual(401);
-  //       expect(err.response.statusText).toEqual("Unauthorized");
-  //     });
-  // });
+  it("bad jwt on a request for launch context given an access token from a client creds flow", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/smart/launch", {
+        headers: {
+          authorization: "Bearer xxx.xx.x.x.x-x.x.x",
+        },
+      })
+      .then(() => {
+        expect(true).toEqual(false); // Don't expect to be here
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(401);
+        expect(err.response.statusText).toEqual("Unauthorized");
+      });
+  });
 });
