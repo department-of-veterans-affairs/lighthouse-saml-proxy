@@ -6,14 +6,14 @@ const {
   RefreshTokenStrategy,
 } = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
 let logger;
-let dynamo;
+let dynamoClient;
 let client;
 let config;
 let staticTokens = new Map();
 
 beforeEach(() => {
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
+  dynamoClient = jest.mock();
   client = buildOpenIDClient({
     refresh: (resolve) => {
       resolve(
@@ -29,7 +29,7 @@ beforeEach(() => {
   config.dynamo_static_token_table = "ut_static_tokens_table";
   config.enable_static_token_service = true;
 
-  dynamo = {
+  dynamoClient = {
     scanFromDynamo: (table_name) => {
       if (table_name === "ut_static_tokens_table") {
         return {
@@ -78,7 +78,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
       req,
       logger,
       client,
-      dynamo,
+      dynamoClient,
       config,
       staticTokens
     );
@@ -100,7 +100,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
       req,
       logger,
       client,
-      dynamo,
+      dynamoClient,
       config,
       staticTokens
     );

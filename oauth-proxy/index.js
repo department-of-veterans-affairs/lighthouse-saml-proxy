@@ -3,7 +3,7 @@ const cors = require("cors");
 const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
-const { DynamoClient } = require("./dynamoClient_client");
+const { DynamoClient } = require("./dynamo_client");
 
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
@@ -375,7 +375,7 @@ function startApp(config, isolatedIssuers) {
       config.aws_id === null ? null : { accessKeyId: config.aws_id },
       config.aws_secret === null ? null : { secretAccessKey: config.aws_secret }
     ),
-    config.dynamoClient_local
+    config.dynamo_local
   );
 
   const validateToken = configureTokenValidator(
