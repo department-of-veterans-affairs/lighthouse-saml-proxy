@@ -1,6 +1,7 @@
 "use strict";
 
 require("jest");
+var _ = require("lodash");
 
 jest.mock("aws-sdk");
 
@@ -137,9 +138,9 @@ describe("dynamo client tests", () => {
       },
     };
 
-    dynamoclient.dbDocClient.get.mockImplementation((search_params, result) => {
+    dynamoclient.dbDocClient.get.mockImplementation((query_params, result) => {
       isCalled = true;
-      if (search_params.Key.search == "me") {
+      if (query_params.Key.search == "me") {
         result(false, payloadDoc);
       } else {
         result(false, {});
@@ -162,7 +163,7 @@ describe("dynamo client tests", () => {
 
   it("getPayloadFromDynamo error", async () => {
     let isCalled = false;
-    dynamoclient.dbDocClient.get.mockImplementation((search_params, result) => {
+    dynamoclient.dbDocClient.get.mockImplementation((query_params, result) => {
       isCalled = true;
       result({ message: "non-existent table" }, false);
     });
@@ -174,6 +175,76 @@ describe("dynamo client tests", () => {
     } catch (err) {
       expect(isCalled).toEqual(true);
       expect(err.message).toEqual("non-existent table");
+    }
+  });
+  it("queryFromDynamo happy", async () => {
+    let isCalled = false;
+
+    let payloadDoc = {
+      Items: [
+        {
+          access_token: "ut_access_token",
+          refresh_token: "ut_refresh_token",
+        },
+      ],
+    };
+
+    dynamoclient.dbDocClient.query.mockImplementation(
+      (query_params, result) => {
+        isCalled = true;
+        if (
+          _.isEqual(query_params.ExpressionAttributeNames, {
+            "#qparam1": "qparam1",
+            "#qparam2": "qparam2",
+          }) &&
+          _.isEqual(query_params.ExpressionAttributeValues, {
+            ":qparam1": "val1",
+            ":qparam2": "val2",
+          }) &&
+          query_params.IndexName === "ut_index"
+        ) {
+          result(false, payloadDoc);
+        } else {
+          result(false, {});
+        }
+      }
+    );
+
+    try {
+      let result = await dynamoclient.queryFromDynamo(
+        { qparam1: "val1", qparam2: "val2" },
+        "TestTable",
+        "ut_index"
+      );
+      expect(isCalled).toEqual(true);
+      expect(result.Items[0].access_token).toEqual("ut_access_token");
+      expect(result.Items[0].refresh_token).toEqual("ut_refresh_token");
+    } catch (err) {
+      // should not reach here
+      expect(true).toEqual(false);
+    }
+  });
+
+  it("queryFromDynamo no record", async () => {
+    let isCalled = false;
+
+    dynamoclient.dbDocClient.query.mockImplementation(
+      (query_params, result) => {
+        isCalled = true;
+        result({ message: "No record found" }, false);
+      }
+    );
+
+    try {
+      await dynamoclient.queryFromDynamo(
+        { qparam1: "val1", qparam2: "val2" },
+        "TestTable",
+        "ut_index"
+      );
+      // should not reach here
+      expect(true).toEqual(false);
+    } catch (err) {
+      expect(isCalled).toEqual(true);
     }
   });
 });
