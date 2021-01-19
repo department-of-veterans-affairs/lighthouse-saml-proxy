@@ -1,10 +1,10 @@
 const { rethrowIfRuntimeError, hashString } = require("../../../utils");
 
 class GetDocumentByCodeStrategy {
-  constructor(req, logger, dynamo, config) {
+  constructor(req, logger, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
+    this.dynamoClient = dynamoClient;
     this.config = config;
   }
   async getDocument() {
@@ -24,7 +24,7 @@ class GetDocumentByCodeStrategy {
     let document;
 
     try {
-      let payload = await this.dynamo.queryFromDynamo(
+      let payload = await this.dynamoClient.queryFromDynamo(
         {
           code: code,
         },
