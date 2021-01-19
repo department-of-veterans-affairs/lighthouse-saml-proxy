@@ -4,14 +4,12 @@ class GetDocumentByLaunchStrategy {
   }
   async getDocument() {
     let launch = this.req.body.launch;
-    if (launch === undefined || launch === "") {
+    if (!launch || launch === "") {
       return null;
     }
 
     let document = {
-      launch: {
-        S: launch,
-      },
+      launch: launch,
     };
 
     return document;
