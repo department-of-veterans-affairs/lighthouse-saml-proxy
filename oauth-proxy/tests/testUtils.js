@@ -71,7 +71,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         Object.keys(searchAttributes)[0] === "state" &&
         Object.values(searchAttributes)[0] === fakeDynamoRecord.state
       ) {
-        resolve(fakeDynamoRecord);
+        resolve({ Item: fakeDynamoRecord });
       } else {
         reject(`no such state value on ${tableName}`);
       }
