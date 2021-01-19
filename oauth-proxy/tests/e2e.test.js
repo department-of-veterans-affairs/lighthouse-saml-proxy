@@ -105,32 +105,33 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
   };
   fakeDynamo.getPayloadFromDynamo = (search_params, tableName) => {
     return new Promise((resolve, reject) => {
-      if (search_params.state === fakeDynamoRecord.state) {
-        resolve({Item:fakeDynamoRecord});
+      let searchKey = Object.keys(search_params)[0];
+      if (search_params[searchKey] === fakeDynamoRecord[searchKey]) {
+        resolve({ Item: fakeDynamoRecord });
       } else {
         reject(`no such state value on ${tableName}`);
       }
     });
   };
-  fakeDynamo.getPayloadFromDynamo = (
-    search_params,
-    tableName,
-  ) => {
-    const fakeLaunchRecord = {
-      launch: "123V456",
-    };
-    return new Promise((resolve, reject) => {
-      if (
-        tableName === "client_creds_table" &&
-        search_params.access_token ===
-          "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a"
-      ) {
-        resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
-      } else {
-        reject(`no such access_token value on ${tableName}`);
-      }
-    });
-  };
+  // fakeDynamo.getPayloadFromDynamo = (
+  //   search_params,
+  //   tableName,
+  // ) => {
+  //   const fakeLaunchRecord = {
+  //     launch: "123V456",
+  //   };
+  //   return new Promise((resolve, reject) => {
+  //     if (
+  //       tableName === "client_creds_table" &&
+  //       search_params.access_token ===
+  //         "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a"
+  //     ) {
+  //       resolve({Item:fakeDynamoRecord});
+  //     } else {
+  //       reject(`no such access_token value on ${tableName}`);
+  //     }
+  //   });
+  // };
   fakeDynamo.savePayloadToDynamo = (payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
