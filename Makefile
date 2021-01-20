@@ -59,6 +59,8 @@ test:
 	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
 	docker run --rm --entrypoint='' \
 		-w "/home/node" \
+		-v "${PWD}/reports/:/home/node/reports/" \
+		-e JEST_JUNIT_OUTPUT_DIR="/home/node/reports/" \
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		npm run test:ci
 
