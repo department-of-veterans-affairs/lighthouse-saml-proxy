@@ -1,6 +1,9 @@
 "use strict";
 const AWS = require("aws-sdk");
 
+/**
+ * Acts as an adapter to the direct Dynamo DB APIs
+ */
 class DynamoClient {
   constructor(awsConfig, local) {
     if (local) {
@@ -20,6 +23,13 @@ class DynamoClient {
     }
   }
 
+  /**
+   * Saves the contents of payload to a record in dynamo. This will replace an existing record.
+   * Use this for inserting new records or to replacement existing records.
+   *
+   * @param {*} payload The payload to save, which must include a field that corresponds to the primary key of the record.
+   * @param {*} tableName The name of the table to save to.
+   */
   savePayloadToDynamo(payload, tableName) {
     const params = {
       TableName: tableName,
@@ -39,6 +49,11 @@ class DynamoClient {
     });
   }
 
+  /**
+   * Scans and returns all the records from a given dynamo db table.
+   *
+   * @param {*} tableName The name of the table to scan from.
+   */
   scanFromDynamo(tableName) {
     const params = {
       TableName: tableName,

@@ -48,10 +48,13 @@ const redirectHandler = async (
       loginEnd.inc();
       res.redirect(`${document.redirect_uri}?${params.toString()}`);
     } else {
-      logger.error("Failed to get the redirect for the OAuth client application");
+      logger.error(
+        "Failed to get the redirect for the OAuth client application"
+      );
       res.status(400).json({
         error: "invalid_request",
-        error_description: "Unable to look up the original redirect for the given state",
+        error_description:
+          "Unable to look up the original redirect for the given state",
       });
     }
   } catch (error) {
@@ -59,7 +62,8 @@ const redirectHandler = async (
     // This error is unrecoverable because we can't look up the original redirect.
     res.status(400).json({
       error: "invalid_request",
-      error_description: "Unable to look up the original redirect for the given state",
+      error_description:
+        "Unable to look up the original redirect for the given state",
     });
   }
   // Only would reach here upon an error

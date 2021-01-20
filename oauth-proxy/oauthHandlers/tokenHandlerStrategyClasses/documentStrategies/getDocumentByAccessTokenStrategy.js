@@ -14,11 +14,10 @@ class GetDocumentByAccessTokenStrategy {
       this.config.hmac_secret
     );
     try {
-      let search_params = {
-        access_token: hashedToken,
-      };
       let payload = await this.dynamoClient.getPayloadFromDynamo(
-        search_params,
+        {
+          access_token: hashedToken,
+        },
         this.config.dynamo_client_credentials_table
       );
       if (payload.Item) {
