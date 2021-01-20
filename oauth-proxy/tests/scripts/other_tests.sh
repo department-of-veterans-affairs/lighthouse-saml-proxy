@@ -155,6 +155,19 @@ track_result
 "$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
 track_result
 
+echo -e "\tRunning ... Authorize Handler with undefined redirect_uri"
+
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&aud=default" > "$curl_status"
+
+  "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+track_result
+
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
+track_result
+
 if [[ $pass -lt 1 ]];
 then
   echo -e "\tFAIL - Some misc. tests did not pass."

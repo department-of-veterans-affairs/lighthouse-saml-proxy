@@ -14,7 +14,7 @@ const authorizeHandler = async (
   next
 ) => {
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
-  if (client_redirect === "") {
+  if (client_redirect === undefined || client_redirect === "") {
     res.status(400).json({
       error: "invalid_client",
       error_description:
