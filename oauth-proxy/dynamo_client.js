@@ -72,7 +72,7 @@ class DynamoClient {
 
   /**
    * Returns the record identified by keyAttributes. Note this only works using primary keys, not secondary keys or indexes.
-   * 
+   *
    * @param {*} keyAttributes Object with primary keys and values for the table
    * @param {*} tableName The table to get the recordd from
    */
@@ -98,7 +98,7 @@ class DynamoClient {
   /**
    * Queries for and returns a list of records that match queryParams.
    * Use this for searches that are based on secondary keys or indexes.
-   * 
+   *
    * @param {*} queryParams And object with fields and values to query from.
    * @param {*} tableName The name of the table to query against.
    * @param {*} indexName The name of the index that corresponsds to the queryParams
@@ -133,7 +133,7 @@ class DynamoClient {
 
   /**
    * Updates and augments existing records in Dyanamo DB. Use this to do updates or fields additions to an existing records.
-   * 
+   *
    * @param {*} recordKey An object with the fields and values that correspond to the key for the table
    * @param {*} payload The payload to update with
    * @param {*} tableName The name of the table to update to
