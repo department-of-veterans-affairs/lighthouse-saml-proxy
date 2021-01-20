@@ -35,7 +35,7 @@ describe("getDocument Tests", () => {
     expect(document.launch.S).toBe("launch");
   });
 
-  it("Dynamo Error", async () => {
+  it("Dynamo Client Throws Error Fetching Document By Access Token.", async () => {
     dynamoClient = buildFakeDynamoClient({
       access_token: "access_token",
       launch: "launch",
