@@ -5,7 +5,7 @@ const User = require("@okta/okta-sdk-nodejs/src/models/User");
 
 const getAuthorizationServerInfoMock = jest.fn();
 
-const userCollection = new Collection("", "", new ModelFactory(User));
+const userCollection = new Collection(null, "", new ModelFactory(User));
 const MockExpressRequest = require("mock-express-request");
 const {
   AuthorizationCodeStrategy,
