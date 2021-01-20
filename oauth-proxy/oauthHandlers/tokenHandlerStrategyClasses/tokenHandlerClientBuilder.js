@@ -167,6 +167,14 @@ const getStrategies = (
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
+    if (req.body.grant_type === undefined || req.body.grant_type === "") {
+      throw {
+        statusCode: 400,
+        error: "empty_grant_type",
+        error_description:
+          "A grant type is required. Supported grant types are authorization, refresh_token, and client_credential.",
+      };
+    }
     strategies = { getTokenStrategy: new UnsupportedGrantStrategy() };
   }
   return strategies;
