@@ -4,7 +4,7 @@ class GetDocumentByLaunchStrategy {
   }
   async getDocument() {
     let launch = this.req.body.launch;
-    if (!launch || launch === "") {
+    if (launch === undefined || launch === "") {
       return null;
     }
 
