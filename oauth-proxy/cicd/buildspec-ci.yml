@@ -37,7 +37,7 @@ phases:
       # Set Start time
       - time="Start - $(date +%r)"
       - mkdir -p reports
-      - chown 777 /reports
+      - chmod 777 /reports
       # Generate short ref
       - COMMIT_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
       # Get usable branch name
