@@ -29,7 +29,7 @@ describe("dynamo client tests", () => {
       expect(isCalled).toEqual(true);
     } catch (err) {
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     }
   });
 
@@ -44,7 +44,7 @@ describe("dynamo client tests", () => {
         "ClientCredentials"
       );
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     } catch (err) {
       expect(err.message).toEqual("Missing key");
     }
@@ -67,7 +67,7 @@ describe("dynamo client tests", () => {
       expect(isCalled).toEqual(true);
     } catch (err) {
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     }
   });
 
@@ -86,7 +86,7 @@ describe("dynamo client tests", () => {
         "ut_table"
       );
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     } catch (err) {
       expect(isCalled).toEqual(true);
     }
@@ -127,7 +127,7 @@ describe("dynamo client tests", () => {
       expect(result.Items[0].static_refresh_token).toEqual("ut_refresh_token");
     } catch (err) {
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     }
   });
 
@@ -178,7 +178,7 @@ describe("dynamo client tests", () => {
       expect(result.Item.refresh_token).toEqual("ut_refresh_token");
     } catch (err) {
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     }
   });
 
@@ -242,7 +242,7 @@ describe("dynamo client tests", () => {
       expect(result.Items[0].refresh_token).toEqual("ut_refresh_token");
     } catch (err) {
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     }
   });
 
@@ -263,7 +263,7 @@ describe("dynamo client tests", () => {
         "ut_index"
       );
       // should not reach here
-      fail("Should not reach here");
+      expect(false).toEqual(true);
     } catch (err) {
       expect(isCalled).toEqual(true);
     }
