@@ -36,11 +36,10 @@ const redirectHandler = async (
   }
 
   try {
-    let search_params = {
-      state: state,
-    };
     let document = await dynamoClient.getPayloadFromDynamo(
-      search_params,
+      {
+        state: state,
+      },
       config.dynamo_table_name
     );
     if (document && document.Item) {
@@ -49,13 +48,22 @@ const redirectHandler = async (
       loginEnd.inc();
       res.redirect(`${document.redirect_uri}?${params.toString()}`);
     } else {
-      logger.error("Failed to get the redirect for the OAuth client application", error);
-      return next(error);  // This error is unrecoverable because we can't look up the original redirect.  
+      logger.error("Failed to get the redirect for the OAuth client application");
+      res.status(400).json({
+        error: "invalid_request",
+        error_description: "Unable to look up the original redirect for the given state",
+      });
     }
   } catch (error) {
     logger.error("Failed to redirect to the OAuth client application", error);
-    return next(error); // This error is unrecoverable because we can't look up the original redirect.
+    // This error is unrecoverable because we can't look up the original redirect.
+    res.status(400).json({
+      error: "invalid_request",
+      error_description: "Unable to look up the original redirect for the given state",
+    });
   }
+  // Only would reach here upon an error
+  return next();
 };
 
 module.exports = redirectHandler;

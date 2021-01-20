@@ -60,4 +60,26 @@ describe("redirectHandler", () => {
     await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
+
+  it("Query using state fails, returns 400", async () => {
+    dynamoClient.getPayloadFromDynamo = (searchAttributes, tableName) => {
+      return new Promise((resolve, reject) => {
+        reject(`no such state value on ${tableName}`);
+      });
+    };
+    req.query = { state: "xxxxx" };
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it("Query using state fails with bad return from dynamo, returns 400", async () => {
+    dynamoClient.getPayloadFromDynamo = () => {
+      return new Promise((resolve) => {
+        resolve(null);
+      });
+    };
+    req.query = { state: "xxxxx" };
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
 });
