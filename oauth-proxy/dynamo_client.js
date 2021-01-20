@@ -114,16 +114,15 @@ class DynamoClient {
     }
     params.KeyConditionExpression = "";
     const andCondtion = " AND ";
+    const condtionItems = [];
     Object.entries(queryParams).forEach((entry) => {
       const [key, value] = entry;
-      params.KeyConditionExpression += "#" + key + " = :" + key + andCondtion;
+      condtionItems.push("#" + key + " = :" + key);
       params.ExpressionAttributeNames["#" + key] = key;
       params.ExpressionAttributeValues[":" + key] = value;
     });
+    params.KeyConditionExpression = condtionItems.join(andCondtion);
 
-    // truncate the dangling 'and' condion from the expression
-    params.KeyConditionExpression = params.KeyConditionExpression.slice(0, -andCondtion.length);
-    
     return new Promise((resolve, reject) => {
       this.dbDocClient.query(params, (err, data) => {
         if (err) {
