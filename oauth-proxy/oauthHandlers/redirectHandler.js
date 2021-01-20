@@ -48,6 +48,9 @@ const redirectHandler = async (
       const params = new URLSearchParams(req.query);
       loginEnd.inc();
       res.redirect(`${document.redirect_uri}?${params.toString()}`);
+    } else {
+      logger.error("Failed to get the redirect for the OAuth client application", error);
+      return next(error);  // This error is unrecoverable because we can't look up the original redirect.  
     }
   } catch (error) {
     logger.error("Failed to redirect to the OAuth client application", error);
