@@ -27,8 +27,8 @@ class DynamoClient {
    * Saves the contents of payload to a record in dynamo. This will replace an existing record.
    * Use this for inserting new records or to replacement existing records.
    *
-   * @param {*} payload The payload to save, which must include a field that corresponds to the primary key of the record.
-   * @param {*} tableName The name of the table to save to.
+   * @param {*} payload The payload to save, which must include a field that corresponds to the primary key of the record
+   * @param {*} tableName The name of the table to save to
    */
   savePayloadToDynamo(payload, tableName) {
     const params = {
@@ -52,7 +52,7 @@ class DynamoClient {
   /**
    * Scans and returns all the records from a given dynamo db table.
    *
-   * @param {*} tableName The name of the table to scan from.
+   * @param {*} tableName The name of the table to scan from
    */
   scanFromDynamo(tableName) {
     const params = {
@@ -70,13 +70,19 @@ class DynamoClient {
     });
   }
 
-  getPayloadFromDynamo(searchAttributes, tableName) {
+  /**
+   * Returns the record identified by keyAttributes. Note this only works using primary keys, not secondary keys or indexes.
+   * 
+   * @param {*} keyAttributes Object with primary keys and values for the table
+   * @param {*} tableName The table to get the recordd from
+   */
+  getPayloadFromDynamo(keyAttributes, tableName) {
     const params = {
       TableName: tableName,
       Key: {},
     };
 
-    Object.assign(params.Key, searchAttributes);
+    Object.assign(params.Key, keyAttributes);
 
     return new Promise((resolve, reject) => {
       this.dbDocClient.get(params, (err, data) => {
@@ -89,6 +95,14 @@ class DynamoClient {
     });
   }
 
+  /**
+   * Queries for and returns a list of records that match queryParams.
+   * Use this for searches that are based on secondary keys or indexes.
+   * 
+   * @param {*} queryParams And object with fields and values to query from.
+   * @param {*} tableName The name of the table to query against.
+   * @param {*} indexName The name of the index that corresponsds to the queryParams
+   */
   queryFromDynamo(queryParams, tableName, indexName) {
     const params = {
       TableName: tableName,
@@ -117,6 +131,13 @@ class DynamoClient {
     });
   }
 
+  /**
+   * Updates and augments existing records in Dyanamo DB. Use this to do updates or fields additions to an existing records.
+   * 
+   * @param {*} recordKey An object with the fields and values that correspond to the key for the table
+   * @param {*} payload The payload to update with
+   * @param {*} tableName The name of the table to update to
+   */
   updateToDynamo(recordKey, payload, tableName) {
     const params = {
       TableName: tableName,
