@@ -44,7 +44,7 @@ describe("getToken tests", () => {
     expect(response).toBe(token);
   });
 
-  it("Auth Client Error", async () => {
+  it("Authorization Server Client Throws Error Fetching Grant.", async () => {
     client = buildFakeOktaClient(
       {
         client_id: "clientId123",
