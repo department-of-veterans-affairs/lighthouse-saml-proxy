@@ -169,10 +169,10 @@ const getStrategies = (
   } else {
     if (req.body.grant_type === undefined || req.body.grant_type === "") {
       throw {
-        statusCode: 400,
-        error: "empty_grant_type",
+        status: 400,
+        error: "invalid_request",
         error_description:
-          "A grant type is required. Supported grant types are authorization, refresh_token, and client_credential.",
+          "A grant type is required. Supported grant types are authorization_code, refresh_token, and client_credentials.",
       };
     }
     strategies = { getTokenStrategy: new UnsupportedGrantStrategy() };

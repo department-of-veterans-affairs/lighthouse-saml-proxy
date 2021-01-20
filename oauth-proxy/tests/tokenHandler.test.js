@@ -129,6 +129,65 @@ describe("tokenHandler clientCredentials", () => {
     );
     expect(res.statusCode).toEqual(400);
   });
+
+  it("handles invalid request with no grant_type", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    let res = new MockExpressResponse();
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      null,
+      staticTokens,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it("handles invalid request with invalid grant_type", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "invalid",
+        client_assertion: "tbd",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    let res = new MockExpressResponse();
+    issuer = new FakeIssuer(dynamoClient);
+    await tokenHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamo,
+      dynamoClient,
+      null,
+      staticTokens,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
 });
 
 describe("tokenHandler refresh", () => {
