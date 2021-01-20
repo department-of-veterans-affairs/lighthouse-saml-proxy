@@ -210,8 +210,10 @@ describe("dynamo client tests", () => {
       ],
     };
 
+    let result_query_expression;
     dynamoclient.dbDocClient.query.mockImplementation(
       (query_params, result) => {
+        result_query_expression = query_params.KeyConditionExpression;
         isCalled = true;
         if (
           _.isEqual(query_params.ExpressionAttributeNames, {
@@ -240,6 +242,7 @@ describe("dynamo client tests", () => {
       expect(isCalled).toEqual(true);
       expect(result.Items[0].access_token).toEqual("ut_access_token");
       expect(result.Items[0].refresh_token).toEqual("ut_refresh_token");
+      expect(result_query_expression).toEqual("#qparam1 = :qparam1 AND #qparam2 = :qparam2");
     } catch (err) {
       // should not reach here
       fail("Should not reach here");
