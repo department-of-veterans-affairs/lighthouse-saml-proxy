@@ -21,7 +21,7 @@ class DynamoClient {
   }
 
   savePayloadToDynamo(payload, tableName) {
-    var params = {
+    const params = {
       TableName: tableName,
       Item: {},
     };
@@ -40,7 +40,7 @@ class DynamoClient {
   }
 
   scanFromDynamo(tableName) {
-    var params = {
+    const params = {
       TableName: tableName,
     };
 
@@ -56,7 +56,7 @@ class DynamoClient {
   }
 
   getPayloadFromDynamo(searchAttributes, tableName) {
-    var params = {
+    const params = {
       TableName: tableName,
       Key: {},
     };
@@ -75,7 +75,7 @@ class DynamoClient {
   }
 
   queryFromDynamo(queryParams, tableName, indexName) {
-    var params = {
+    const params = {
       TableName: tableName,
       ExpressionAttributeNames: {},
       ExpressionAttributeValues: {},
@@ -103,7 +103,7 @@ class DynamoClient {
   }
 
   updateToDynamo(recordKey, payload, tableName) {
-    var params = {
+    const params = {
       TableName: tableName,
       Key: {},
       ReturnValues: "UPDATED_NEW",
