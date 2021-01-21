@@ -30,6 +30,12 @@ Start the Oauth Proxy
 npm start
 ```
 
+Generate jsdocs for Oauth Proxy
+```
+npm run-script jsdoc
+```
+
+
 - See `node index.js --help` for more usage directions
 
 ## Proxy Functions
