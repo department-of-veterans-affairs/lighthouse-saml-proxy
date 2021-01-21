@@ -135,7 +135,7 @@ class DynamoClient {
   }
 
   /**
-   * Updates and augments existing records in Dyanamo DB. Use this to do updates or fields additions to an existing records.
+   * Updates and augments existing records in Dyanamo DB. Use this to do updates or fields additions to an existing record.
    *
    * @param {*} recordKey An object with the fields and values that correspond to the key for the table
    * @param {*} payload The payload to update with
