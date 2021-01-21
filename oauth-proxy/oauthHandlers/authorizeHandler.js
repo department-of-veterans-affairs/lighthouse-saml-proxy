@@ -13,9 +13,9 @@ const authorizeHandler = async (
   res,
   next
 ) => {
+  loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
-  loginBegin.inc();
   try {
     await checkParameters(
       state,
