@@ -17,7 +17,14 @@ const authorizeHandler = async (
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
   try {
-    await checkParameters(state, aud, issuer, logger, oktaClient);
+    await checkParameters(
+      state,
+      aud,
+      issuer,
+      logger,
+      oktaClient,
+      client_redirect
+    );
   } catch (err) {
     if (err.status == 500) {
       return next(err);
@@ -84,7 +91,23 @@ const authorizeHandler = async (
   );
 };
 
-const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
+const checkParameters = async (
+  state,
+  aud,
+  issuer,
+  logger,
+  oktaClient,
+  client_redirect
+) => {
+  if (!client_redirect) {
+    logger.error("No valid redirect_uri was found.");
+    throw {
+      status: 400,
+      error: "invalid_client",
+      error_description:
+        "There was no redirect URI specified by the application.",
+    };
+  }
   if (!state) {
     logger.error("No valid state parameter was found.");
     throw {
