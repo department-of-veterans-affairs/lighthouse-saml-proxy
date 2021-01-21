@@ -311,7 +311,7 @@ do_token "$(jq \
 
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"invalid_request","error_description":"Only authorization_code, refresh_token, and client_credentials grant types are supported"}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization_code, refresh_token, and client_credentials grant types are supported"}'
 track_result
 
 echo -e "\tRunning ... Token Handler missing grant_type"
