@@ -311,7 +311,21 @@ do_token "$(jq \
 
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
-"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization and refresh_token grant types are supported"}'
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"unsupported_grant_type","error_description":"Only authorization_code, refresh_token, and client_credentials grant types are supported"}'
+track_result
+
+echo -e "\tRunning ... Token Handler missing grant_type"
+
+do_token "$(jq \
+                -scn \
+                --arg client_id "$CLIENT_ID" \
+                --arg grant_type "" \
+                --arg secret "$CLIENT_SECRET" \
+                '{"client_id": $client_id, "grant_type": $grant_type, "client_secret": $secret}')"
+
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+track_result
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error":"invalid_request","error_description":"A grant type is required. Supported grant types are authorization_code, refresh_token, and client_credentials."}'
 track_result
 
 # It is not feasible to test Client Credential edge cases yet.
