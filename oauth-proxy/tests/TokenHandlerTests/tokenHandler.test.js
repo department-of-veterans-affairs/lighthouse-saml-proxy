@@ -20,7 +20,6 @@ let config;
 let redirect_uri;
 let issuer;
 let logger;
-let dynamo;
 let dynamoClient;
 let next;
 let validateToken;

@@ -41,42 +41,46 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       resolve({ pk: payload.state });
     });
   });
-  dynamoClient.updateToDynamo = jest.fn().mockImplementation((rowkey, payload) => {
-    return new Promise((resolve) => {
-      // It's unclear whether this should resolve with a full records or just
-      // the identity field but thus far it has been irrelevant to the
-      // functional testing of the oauth-proxy.
-      resolve({ Item:payload });
+  dynamoClient.updateToDynamo = jest
+    .fn()
+    .mockImplementation((rowkey, payload) => {
+      return new Promise((resolve) => {
+        // It's unclear whether this should resolve with a full records or just
+        // the identity field but thus far it has been irrelevant to the
+        // functional testing of the oauth-proxy.
+        resolve({ Item: payload });
+      });
     });
-  });
-  dynamoClient.queryFromDynamo = jest.fn().mockImplementation((queryParam, tableName) => {
-    return new Promise((resolve, reject) => {
-      if (
-        fakeDynamoRecord &&
-        fakeDynamoRecord[Object.keys(queryParam)[0]] &&
-        fakeDynamoRecord[Object.keys(queryParam)[0]] ===
-          Object.values(queryParam)[0]
-      ) {
-        const out = { Items: [fakeDynamoRecord] };
-        resolve(out);
-      } else {
-        reject(`no such ${queryParam} value on ${tableName}`);
-      }
+  dynamoClient.queryFromDynamo = jest
+    .fn()
+    .mockImplementation((queryParam, tableName) => {
+      return new Promise((resolve, reject) => {
+        if (
+          fakeDynamoRecord &&
+          fakeDynamoRecord[Object.keys(queryParam)[0]] &&
+          fakeDynamoRecord[Object.keys(queryParam)[0]] ===
+            Object.values(queryParam)[0]
+        ) {
+          const out = { Items: [fakeDynamoRecord] };
+          resolve(out);
+        } else {
+          reject(`no such ${queryParam} value on ${tableName}`);
+        }
+      });
     });
-  });
-  dynamoClient.getPayloadFromDynamo = jest.fn().mockImplementation((searchAttributes, tableName) => {
-    return new Promise((resolve, reject) => {
-      const searchkey = Object.keys(searchAttributes)[0];
-      const searchVal = Object.values(searchAttributes)[0];
-      if (
-        fakeDynamoRecord[searchkey] === searchVal
-      ) {
-        resolve({ Item: fakeDynamoRecord });
-      } else {
-        reject(`no such state value on ${tableName}`);
-      }
+  dynamoClient.getPayloadFromDynamo = jest
+    .fn()
+    .mockImplementation((searchAttributes, tableName) => {
+      return new Promise((resolve, reject) => {
+        const searchkey = Object.keys(searchAttributes)[0];
+        const searchVal = Object.values(searchAttributes)[0];
+        if (fakeDynamoRecord[searchkey] === searchVal) {
+          resolve({ Item: fakeDynamoRecord });
+        } else {
+          reject(`no such state value on ${tableName}`);
+        }
+      });
     });
-  });
   dynamoClient.scanFromDynamo = jest.fn().mockImplementation((tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {

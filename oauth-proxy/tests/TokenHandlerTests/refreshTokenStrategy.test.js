@@ -17,19 +17,19 @@ let staticTokens;
 let data;
 
 const setScan = (items) => {
-  dynamoClient.scanFromDynamo =  (table_name) => {
-      if (table_name === "ut_static_tokens_table") {
-        return {
-          Items: [items],
-          Count: 1,
-          ScannedCount: 1,
-          ConsumedCapacity: null,
-        };
-      } else {
-         throw { message: "no static token here" };
-      }
-    };
+  dynamoClient.scanFromDynamo = (table_name) => {
+    if (table_name === "ut_static_tokens_table") {
+      return {
+        Items: [items],
+        Count: 1,
+        ScannedCount: 1,
+        ConsumedCapacity: null,
+      };
+    } else {
+      throw { message: "no static token here" };
+    }
   };
+};
 
 beforeEach(() => {
   data = {
