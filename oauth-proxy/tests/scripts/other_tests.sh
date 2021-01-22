@@ -142,6 +142,32 @@ track_result
 "$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_request", "error_description": "State parameter required"}'
 track_result
 
+echo -e "\tRunning ... Authorize Handler with no redirect_uri"
+
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=&aud=default" > "$curl_status"
+
+  "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+track_result
+
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
+track_result
+
+echo -e "\tRunning ... Authorize Handler with undefined redirect_uri"
+
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&aud=default" > "$curl_status"
+
+  "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+track_result
+
+"$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
+track_result
+
 echo -e "\tRunning ... Redirect Handler without a redirect_url that can be looked up"
 curl -s \
   -w "%{http_code}" \
