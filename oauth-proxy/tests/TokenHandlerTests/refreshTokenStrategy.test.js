@@ -17,8 +17,7 @@ let staticTokens;
 let data;
 
 const setScan = (items) => {
-  dynamo.dbDocClient = {
-    scan: (scan_params, result) => {
+  dynamo.scan = (scan_params, result) => {
       if (scan_params.TableName === "ut_static_tokens_table") {
         result(null, {
           Items: [items],
@@ -29,9 +28,8 @@ const setScan = (items) => {
       } else {
         result(false, undefined);
       }
-    },
+    };
   };
-};
 
 beforeEach(() => {
   data = {
