@@ -32,7 +32,6 @@ beforeEach(() => {
   config = createFakeConfig();
   redirect_uri = jest.mock();
   logger = buildFakeLogger();
-  dynamo = jest.mock();
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
     code: "the_fake_authorization_code",
@@ -77,7 +76,6 @@ describe("tokenHandler tests", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -103,7 +101,6 @@ describe("tokenHandler tests", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
@@ -132,7 +129,6 @@ describe("tokenHandler tests", () => {
       redirect_uri,
       logger,
       issuer,
-      dynamo,
       dynamoClient,
       validateToken,
       staticTokens,
