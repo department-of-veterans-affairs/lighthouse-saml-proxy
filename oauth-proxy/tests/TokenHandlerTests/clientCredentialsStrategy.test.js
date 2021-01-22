@@ -2,13 +2,10 @@ require("jest");
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
-const { buildFakeDynamoClient } = require("./testUtils");
+const { buildFakeDynamoClient, buildFakeLogger } = require("../testUtils");
 const {
   ClientCredentialsStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
-const {
-  GetPatientInfoFromLaunchStrategy,
-} = require("../oauthHandlers/tokenHandlerStrategyClasses/getPatientInfoStrategies/getPatientInfoFromLaunchStrategy");
+} = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");
 let logger;
 let dynamo;
 let dynamoClient;
@@ -16,7 +13,7 @@ let token_endpoint = "http://localhost:9090/testServer/token";
 let mock = new MockAdapter(axios);
 
 beforeEach(() => {
-  logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+  logger = buildFakeLogger();
   dynamo = jest.mock();
   dynamoClient = jest.mock();
   jest.mock("axios", () => ({ post: jest.fn(), create: jest.fn() }));
@@ -63,6 +60,36 @@ describe("tokenHandler clientCredentials", () => {
     expect(token).toEqual(data);
   });
 
+  it("handles the client_credentials flow axios returns non 200", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "valid-assertion",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+    mock.onPost(token_endpoint).reply(() => {
+      return [202, {}];
+    });
+
+    let clientCredentialsStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      token_endpoint
+    );
+
+    try {
+      await clientCredentialsStrategy.getToken();
+    } catch (err) {
+      expect(err.statusCode).toBe(500);
+    }
+  });
+
   it("handles invalid client_credentials request invalid_client", async () => {
     let req = new MockExpressRequest({
       body: {
@@ -102,6 +129,43 @@ describe("tokenHandler clientCredentials", () => {
     }
   });
 
+  it("handles invalid client_credentials request invalid_client no error code", async () => {
+    let req = new MockExpressRequest({
+      body: {
+        grant_type: "client_credentials",
+        client_assertion: "invalid-client-assertion",
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        scopes: "launch/patient",
+        launch: "123V456",
+      },
+    });
+
+    const errResp = {
+      status: 400,
+      errorSummary: "Invalid value for 'client_id' parameter.",
+      error: "No Error Code",
+      error_description: "No Error Code Description",
+      response: { error: "invalid_clients" },
+    };
+    mock.onPost(token_endpoint).reply(400, errResp);
+
+    let clientCredentialsStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      token_endpoint
+    );
+
+    try {
+      await clientCredentialsStrategy.getToken();
+    } catch (error) {
+      expect(error.statusCode).toEqual(400);
+      expect(error.error).toEqual("No Error Code");
+      expect(error.error_description).toEqual("No Error Code Description");
+    }
+  });
   it("handles invalid client_credentials request expired assertion", async () => {
     let req = new MockExpressRequest({
       body: {
@@ -181,11 +245,11 @@ describe("tokenHandler clientCredentials", () => {
     }
   });
 
-  it("handles client_credentials launch", async () => {
+  it("handles invalid client_credentials request unknown error no error response", async () => {
     let req = new MockExpressRequest({
       body: {
         grant_type: "client_credentials",
-        client_assertion: "tbd",
+        client_assertion: "unknown-failed-assertion",
         client_assertion_type:
           "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
         scopes: "launch/patient",
@@ -193,11 +257,28 @@ describe("tokenHandler clientCredentials", () => {
       },
     });
 
-    let clientCredentialsStrategy = new GetPatientInfoFromLaunchStrategy(req);
-    let expectedPatient = await clientCredentialsStrategy.createPatientInfo(
-      null,
-      null
+    mock.onPost(token_endpoint).reply(() => {
+      throw { response: null, message: "This is an error message." };
+    });
+
+    let clientCredentialsStrategy = new ClientCredentialsStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      token_endpoint
     );
-    expect(expectedPatient).toEqual("123V456");
+
+    try {
+      await clientCredentialsStrategy.getToken();
+    } catch (error) {
+      expect(error.statusCode).toEqual(500);
+      expect(logger.error).toHaveBeenCalledWith(
+        "Failed to retrieve access_token from token endpoint."
+      );
+      expect(logger.error).toHaveBeenCalledWith({
+        message: "This is an error message.",
+      });
+    }
   });
 });

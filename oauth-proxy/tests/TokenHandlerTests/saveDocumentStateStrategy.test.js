@@ -72,6 +72,25 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  it("No Document State", () => {
+    document.state = null;
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamo,
+      dynamoClient,
+      config
+    );
+    strategy.saveDocumentToDynamo(document, tokens);
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(dynamoClient.saveToDynamo).not.toHaveBeenCalled();
+  });
   it("Could not save documents", () => {
     dynamoClient = jest.fn();
     dynamoClient.mockImplementation(() => {
