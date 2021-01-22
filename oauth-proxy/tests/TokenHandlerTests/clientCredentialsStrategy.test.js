@@ -2,6 +2,7 @@ require("jest");
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
 const MockExpressRequest = require("mock-express-request");
+const { buildFakeDynamoClient, buildFakeLogger } = require("../testUtils");
 const {
   ClientCredentialsStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/clientCredentialsStrategy");

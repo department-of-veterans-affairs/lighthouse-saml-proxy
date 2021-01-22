@@ -12,7 +12,6 @@ const {
 
 describe("getDocument Tests", () => {
   let logger = buildFakeLogger();
-  let dynamo = jest.fn();
   let dynamoClient;
   let config = createFakeConfig();
   let hashingFunction = createFakeHashingFunction();
@@ -25,14 +24,13 @@ describe("getDocument Tests", () => {
 
     let document = await new GetDocumentByAccessTokenStrategy(
       logger,
-      dynamo,
       dynamoClient,
       config,
       hashingFunction
     ).getDocument("access_token");
 
-    expect(document.access_token.S).toBe("access_token");
-    expect(document.launch.S).toBe("launch");
+    expect(document.access_token).toBe("access_token");
+    expect(document.launch).toBe("launch");
   });
 
   it("Dynamo Client Throws Error Fetching Document By Access Token.", async () => {
@@ -43,7 +41,6 @@ describe("getDocument Tests", () => {
 
     let document = await new GetDocumentByAccessTokenStrategy(
       logger,
-      dynamo,
       dynamoClient,
       config,
       hashingFunction

@@ -15,7 +15,6 @@ require("jest");
 
 describe("saveDocumentToDynamo tests", () => {
   let logger = buildFakeLogger();
-  let dynamo = jest.fn();
   let dynamoClient;
   let config = createFakeConfig();
   let hashingFunction = createFakeHashingFunction();
@@ -30,7 +29,6 @@ describe("saveDocumentToDynamo tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       logger,
-      dynamo,
       dynamoClient,
       config,
       hashingFunction
@@ -51,7 +49,6 @@ describe("saveDocumentToDynamo tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       logger,
-      dynamo,
       dynamoClient,
       config,
       hashingFunction
@@ -77,7 +74,6 @@ describe("saveDocumentToDynamo tests", () => {
 
     const strategy = new SaveDocumentLaunchStrategy(
       logger,
-      dynamo,
       dynamoClient,
       config,
       hashingFunction

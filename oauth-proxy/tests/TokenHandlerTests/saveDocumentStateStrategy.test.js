@@ -80,7 +80,6 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );

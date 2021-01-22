@@ -33,23 +33,23 @@ function convertObjectToDynamoAttributeValues(obj) {
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
-  dynamoClient.savePayloadToDynamo = (payload) => {
+  dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation((payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
       resolve({ pk: payload.state });
     });
-  };
-  dynamoClient.updateToDynamo = (rowkey, payload) => {
+  });
+  dynamoClient.updateToDynamo = jest.fn().mockImplementation((rowkey, payload) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
       resolve({ pk: payload.state });
     });
-  };
-  dynamoClient.queryFromDynamo = (queryParam, tableName) => {
+  });
+  dynamoClient.queryFromDynamo = jest.fn().mockImplementation((queryParam, tableName) => {
     return new Promise((resolve, reject) => {
       if (
         fakeDynamoRecord &&
@@ -63,21 +63,21 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         reject(`no such ${queryParam} value on ${tableName}`);
       }
     });
-  };
-  dynamoClient.getPayloadFromDynamo = (searchAttributes, tableName) => {
+  });
+  dynamoClient.getPayloadFromDynamo = jest.fn().mockImplementation((searchAttributes, tableName) => {
     return new Promise((resolve, reject) => {
+      const searchkey = Object.keys(searchAttributes)[0];
+      const searchVal = Object.values(searchAttributes)[0];
       if (
-        Object.keys(searchAttributes)[0] &&
-        Object.keys(searchAttributes)[0] === "state" &&
-        Object.values(searchAttributes)[0] === fakeDynamoRecord.state
+        fakeDynamoRecord[searchkey] === searchVal
       ) {
         resolve({ Item: fakeDynamoRecord });
       } else {
         reject(`no such state value on ${tableName}`);
       }
     });
-  };
-  dynamoClient.scanFromDynamo = (tableName) => {
+  });
+  dynamoClient.scanFromDynamo = jest.fn().mockImplementation((tableName) => {
     return new Promise((resolve, reject) => {
       if (tableName === fakeDynamoRecord.static_token_table) {
         resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
@@ -85,7 +85,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
         reject(`no such state value on ${tableName}`);
       }
     });
-  };
+  });
   return dynamoClient;
 }
 
@@ -331,7 +331,6 @@ const createFakeHashingFunction = () => {
 };
 
 module.exports = {
-  buildDynamoAttributeValue,
   convertObjectToDynamoAttributeValues,
   buildFakeOktaClient,
   buildFakeDynamoClient,
