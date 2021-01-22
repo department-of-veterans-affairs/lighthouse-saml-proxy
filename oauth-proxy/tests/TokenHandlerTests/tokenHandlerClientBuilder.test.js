@@ -50,7 +50,6 @@ describe("buildTokenHandlerClient Tests", () => {
   let redirect_uri = "https://redirect.com";
   let issuer = new FakeIssuer();
   let logger = buildFakeLogger();
-  let dynamo = {};
   let dynamoClient = buildFakeDynamoClient({});
   let config = createFakeConfig();
   let req;
@@ -73,7 +72,6 @@ describe("buildTokenHandlerClient Tests", () => {
       redirect_uri,
       issuer,
       logger,
-      dynamo,
       dynamoClient,
       config,
       req,
@@ -107,7 +105,6 @@ describe("buildTokenHandlerClient Tests", () => {
       redirect_uri,
       issuer,
       logger,
-      dynamo,
       dynamoClient,
       config,
       req,
@@ -140,7 +137,6 @@ describe("buildTokenHandlerClient Tests", () => {
       redirect_uri,
       issuer,
       logger,
-      dynamo,
       dynamoClient,
       config,
       req,
@@ -174,7 +170,6 @@ describe("buildTokenHandlerClient Tests", () => {
       redirect_uri,
       issuer,
       logger,
-      dynamo,
       dynamoClient,
       config,
       req,
@@ -211,7 +206,6 @@ describe("buildTokenHandlerClient Tests", () => {
         redirect_uri,
         issuer,
         logger,
-        dynamo,
         dynamoClient,
         config,
         req,
@@ -236,7 +230,6 @@ describe("buildTokenHandlerClient Tests", () => {
       redirect_uri,
       issuer,
       logger,
-      dynamo,
       dynamoClient,
       config,
       req,
@@ -261,7 +254,6 @@ describe("buildTokenHandlerClient Tests", () => {
         redirect_uri,
         issuer,
         logger,
-        dynamo,
         dynamoClient,
         config,
         req,
@@ -292,7 +284,6 @@ describe("buildTokenHandlerClient Tests", () => {
         redirect_uri,
         issuer,
         logger,
-        dynamo,
         dynamoClient,
         config,
         req,
