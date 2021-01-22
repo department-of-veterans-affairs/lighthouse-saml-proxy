@@ -220,8 +220,8 @@ describe("buildTokenHandlerClient Tests", () => {
         validateToken,
         staticTokens
       );
-      fail("Requests with no grants should not return a client.")
-    }catch(err) {
+      fail("Requests with no grants should not return a client.");
+    } catch (err) {
       expect(err).toEqual(error);
     }
   });
