@@ -10,7 +10,7 @@ describe("getToken tests", () => {
       statusCode: 400,
       error: "unsupported_grant_type",
       error_description:
-        "Only authorization and refresh_token grant types are supported",
+        "Only authorization_code, refresh_token, and client_credentials grant types are supported",
     };
 
     try {

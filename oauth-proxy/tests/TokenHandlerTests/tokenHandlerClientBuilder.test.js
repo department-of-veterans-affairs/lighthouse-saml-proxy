@@ -196,6 +196,36 @@ describe("buildTokenHandlerClient Tests", () => {
     );
   });
 
+  it("Request with No Grant. Throws Error.", () => {
+    req = new MockExpressRequest({
+      body: {},
+    });
+    let error = {
+      status: 400,
+      error: "invalid_request",
+      error_description:
+        "A grant type is required. Supported grant types are authorization_code, refresh_token, and client_credentials.",
+    };
+    try {
+      buildTokenHandlerClient(
+        redirect_uri,
+        issuer,
+        logger,
+        dynamo,
+        dynamoClient,
+        config,
+        req,
+        res,
+        next,
+        validateToken,
+        staticTokens
+      );
+      fail("Requests with no grants should not return a client.")
+    }catch(err) {
+      expect(err).toEqual(error);
+    }
+  });
+
   it("Unsupported Grant Client", () => {
     req = new MockExpressRequest({
       body: {
