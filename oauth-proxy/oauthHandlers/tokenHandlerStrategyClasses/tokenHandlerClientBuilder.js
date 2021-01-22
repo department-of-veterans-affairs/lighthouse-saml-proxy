@@ -167,7 +167,7 @@ const getStrategies = (
       getPatientInfoStrategy: new GetPatientInfoFromLaunchStrategy(req),
     };
   } else {
-    if (req.body.grant_type === undefined || req.body.grant_type === "") {
+    if (!req.body.grant_type) {
       throw {
         status: 400,
         error: "invalid_request",
