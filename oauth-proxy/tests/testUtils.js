@@ -107,9 +107,14 @@ class FakeIssuer {
 function buildFakeOktaClient(
   fakeRecord,
   getAuthorizationServerInfoMock,
-  userCollection
+  userCollection,
+  grant
 ) {
-  const oClient = { getApplication: jest.fn(), listUsers: jest.fn() };
+  const oClient = {
+    getApplication: jest.fn(),
+    listUsers: jest.fn(),
+    grant: jest.fn(),
+  };
   oClient.getApplication.mockImplementation((client_id) => {
     return new Promise((resolve, reject) => {
       if (client_id === fakeRecord.client_id) {
@@ -123,6 +128,13 @@ function buildFakeOktaClient(
   oClient.listUsers = () => {
     return userCollection;
   };
+  oClient.grant.mockImplementation(() => {
+    if (grant) {
+      return grant;
+    } else {
+      throw { error: "error", error_description: "error_description" };
+    }
+  });
   return oClient;
 }
 
@@ -267,6 +279,7 @@ const createFakeConfig = () => {
     enable_okta_consent_endpoint: true,
     enable_smart_launch_service: true,
     enable_static_token_service: true,
+    dynamo_static_token_table: "ut_static_tokens_table",
     routes: {
       categories: [
         {
@@ -307,6 +320,16 @@ const jwtEncodeClaims = (claims, expires_on) => {
   return encodedClaims.compact();
 };
 
+const createFakeHashingFunction = () => {
+  let hash = jest.fn();
+
+  hash.mockImplementation((value) => {
+    return value;
+  });
+
+  return hash;
+};
+
 module.exports = {
   buildDynamoAttributeValue,
   convertObjectToDynamoAttributeValues,
@@ -319,4 +342,5 @@ module.exports = {
   buildFakeLogger,
   createFakeConfig,
   jwtEncodeClaims,
+  createFakeHashingFunction,
 };

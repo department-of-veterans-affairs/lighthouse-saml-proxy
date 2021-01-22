@@ -35,7 +35,7 @@ class ClientCredentialsStrategy {
       }
     } catch (error) {
       rethrowIfRuntimeError(error);
-      if (error.response.status == 400) {
+      if (error.response && error.response.status == 400) {
         if (error.response.data.errorCode) {
           throw {
             statusCode: 400,
@@ -49,7 +49,7 @@ class ClientCredentialsStrategy {
             error_description: error.response.data.error_description,
           };
         }
-      } else if (error.response.status == 401) {
+      } else if (error.response && error.response.status == 401) {
         throw {
           statusCode: 401,
           error: error.response.data.error,
