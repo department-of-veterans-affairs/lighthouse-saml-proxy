@@ -46,7 +46,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
-      resolve({ pk: payload.state });
+      resolve({ Item:payload });
     });
   });
   dynamoClient.queryFromDynamo = jest.fn().mockImplementation((queryParam, tableName) => {

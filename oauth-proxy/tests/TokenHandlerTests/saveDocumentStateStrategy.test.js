@@ -85,7 +85,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
-    expect(dynamoClient.saveToDynamo).not.toHaveBeenCalled();
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
   it("Could not save documents", () => {
     dynamoClient = jest.fn();
