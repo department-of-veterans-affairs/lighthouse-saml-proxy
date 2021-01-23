@@ -42,7 +42,7 @@ const redirectHandler = async (
       },
       config.dynamo_table_name
     );
-    if (document?.Item?.redirect_uri) {
+    if (document && document.Item && document.Item.redirect_uri) {
       document = document.Item;
       const params = new URLSearchParams(req.query);
       loginEnd.inc();
