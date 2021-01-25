@@ -150,12 +150,13 @@ class DynamoClient {
     Object.assign(params.Key, recordKey);
     params.UpdateExpression = "set ";
     params.ExpressionAttributeValues = {};
+    const updateExpressionKeys = [];
     Object.entries(payload).forEach((entry) => {
       const [key, value] = entry;
-      params.UpdateExpression += key + " = :" + key + ",";
+      updateExpressionKeys.push(key + " = :" + key);
       params.ExpressionAttributeValues[":" + key] = value;
     });
-    params.UpdateExpression = params.UpdateExpression.slice(0, -1);
+    params.UpdateExpression += updateExpressionKeys.join(",");
     return new Promise((resolve, reject) => {
       this.dbDocClient.update(params, (err, data) => {
         if (err) {

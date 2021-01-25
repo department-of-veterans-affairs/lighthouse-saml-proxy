@@ -53,8 +53,7 @@ const redirectHandler = async (
       );
       res.status(400).json({
         error: "invalid_request",
-        error_description:
-          "Unable to look up the original redirect for the given state",
+        error_description: "Invalid state",
       });
     }
   } catch (error) {
@@ -62,8 +61,7 @@ const redirectHandler = async (
     // This error is unrecoverable because we can't look up the original redirect.
     res.status(400).json({
       error: "invalid_request",
-      error_description:
-        "Unable to look up the original redirect for the given state",
+      error_description: "Invalid state",
     });
   }
   // Only would reach here upon an error
