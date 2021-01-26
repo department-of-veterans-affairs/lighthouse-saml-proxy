@@ -69,15 +69,20 @@ describe("OpenID Connect Conformance", () => {
   let fakeDynamoClient;
 
   beforeAll(async () => {
-    oktaClient = buildFakeOktaClient({
-      client_id: "clientId123",
-      client_secret: "secretXyz",
-      settings: {
-        oauthClient: {
-          redirect_uris: ["http://localhost:8080/oauth/redirect"],
+    oktaClient = buildFakeOktaClient(
+      {
+        client_id: "clientId123",
+        client_secret: "secretXyz",
+        settings: {
+          oauthClient: {
+            redirect_uris: ["http://localhost:8080/oauth/redirect"],
+          },
         },
       },
-    }, null, null, null);
+      null,
+      null,
+      null
+    );
     const isolatedIssuers = {};
     const isolatedOktaClients = {};
     if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
@@ -96,7 +101,7 @@ describe("OpenID Connect Conformance", () => {
     });
 
     const fakeTokenValidator = () => {
-      throw { };
+      throw {};
     };
 
     const app = buildApp(
@@ -131,9 +136,9 @@ describe("OpenID Connect Conformance", () => {
           auth: { username: "clientId123", password: "secretXyz" },
         }
       );
-      fail("token request should have thrown an error")
+      fail("token request should have thrown an error");
     } catch (err) {
-      expect(err.response.status).toEqual(503)
+      expect(err.response.status).toEqual(503);
     }
   });
 });

@@ -6,7 +6,10 @@ const qs = require("qs");
 const { Issuer } = require("openid-client");
 const { randomBytes } = require("crypto");
 
-const { convertObjectToDynamoAttributeValues, buildFakeOktaClient } = require("./testUtils");
+const {
+  convertObjectToDynamoAttributeValues,
+  buildFakeOktaClient,
+} = require("./testUtils");
 const {
   buildBackgroundServerModule,
 } = require("../../common/backgroundServer");
@@ -135,15 +138,20 @@ describe("OpenID Connect Conformance", () => {
   );
 
   beforeAll(async () => {
-    oktaClient = buildFakeOktaClient({
-      client_id: "clientId123",
-      client_secret: "secretXyz",
-      settings: {
-        oauthClient: {
-          redirect_uris: ["http://localhost:8080/oauth/redirect"],
+    oktaClient = buildFakeOktaClient(
+      {
+        client_id: "clientId123",
+        client_secret: "secretXyz",
+        settings: {
+          oauthClient: {
+            redirect_uris: ["http://localhost:8080/oauth/redirect"],
+          },
         },
       },
-    }, null, null, null);
+      null,
+      null,
+      null
+    );
     const isolatedIssuers = {};
     const isolatedOktaClients = {};
     if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {

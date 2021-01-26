@@ -227,6 +227,13 @@ function buildApp(
         error: "invalid_request",
         error_description: "Invalid or unsupported content-type",
       });
+    } else if (err.statusCode && err.statusCode === 503) {
+      res
+        .status(503)
+        .json({
+          error: "server_error",
+        })
+        .headers("Retry-After", "300");
     } else if (error && error_description) {
       res.status(500).json({
         error: "server_error",
