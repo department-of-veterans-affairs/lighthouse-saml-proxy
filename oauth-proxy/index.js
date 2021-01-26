@@ -228,12 +228,11 @@ function buildApp(
         error_description: "Invalid or unsupported content-type",
       });
     } else if (err.statusCode && err.statusCode === 503) {
-      res
+      res.set("Retry-After", "300")
         .status(503)
         .json({
-          error: "server_error",
-        })
-        .headers("Retry-After", "300");
+          error: "Service_Unavailable",
+        });
     } else if (error && error_description) {
       res.status(500).json({
         error: "server_error",
