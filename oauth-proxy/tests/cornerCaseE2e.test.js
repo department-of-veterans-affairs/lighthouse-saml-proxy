@@ -138,6 +138,7 @@ describe("OpenID Connect Conformance", () => {
       );
       fail("token request should have thrown an error");
     } catch (err) {
+      expect(err.response.headers["retry-after"]).toEqual("300");
       expect(err.response.status).toEqual(503);
     }
   });
