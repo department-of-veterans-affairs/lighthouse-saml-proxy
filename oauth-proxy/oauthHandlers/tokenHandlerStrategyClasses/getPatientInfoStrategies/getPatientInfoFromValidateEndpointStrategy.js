@@ -25,7 +25,7 @@ class GetPatientInfoFromValidateEndpointStrategy {
         "Invalid grant, could not find a valid patient identifier for the provided authorization code."
       );
       throw {
-        status: 500,
+        status: 503,
       };
     }
     return patient;
