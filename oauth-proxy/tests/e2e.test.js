@@ -80,63 +80,67 @@ function buildFakeOktaClient(fakeRecord) {
   return oktaClient;
 }
 
-function buildFakeDynamoClient(fakeDynamoRecord) {
-  const dynamoClient = jest.genMockFromModule("../dynamo_client.js");
-  dynamoClient.saveToDynamo.mockImplementation((state) => {
+function buildFakeDynamoClient(fakeDynamoClientRecord) {
+  const fakeDynamoClient = {};
+  fakeDynamoClient.updateToDynamo = (tok) => {
     return new Promise((resolve) => {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
-      resolve({ pk: state });
+      resolve({ pk: tok.state });
     });
-  });
-  dynamoClient.getFromDynamoBySecondary.mockImplementation(
-    (handle, attr, value, tableName) => {
-      return new Promise((resolve, reject) => {
-        if (fakeDynamoRecord[attr] === value) {
-          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-        } else {
-          reject(`no such ${attr} value on ${tableName}`);
-        }
-      });
-    }
-  );
-  dynamoClient.getFromDynamoByState.mockImplementation(
-    (handle, state, tableName) => {
-      return new Promise((resolve, reject) => {
-        if (state === fakeDynamoRecord.state) {
-          resolve(convertObjectToDynamoAttributeValues(fakeDynamoRecord));
-        } else {
-          reject(`no such state value on ${tableName}`);
-        }
-      });
-    }
-  );
-  dynamoClient.getFromDynamoByAccessToken.mockImplementation(
-    (handle, access_token, tableName) => {
-      const fakeLaunchRecord = {
-        launch: "123V456",
-      };
-      return new Promise((resolve, reject) => {
-        if (
-          tableName === "client_creds_table" &&
-          access_token ===
-            "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a"
-        ) {
-          resolve(convertObjectToDynamoAttributeValues(fakeLaunchRecord));
-        } else {
-          reject(`no such access_token value on ${tableName}`);
-        }
-      });
-    }
-  );
-  return dynamoClient;
+  };
+  fakeDynamoClient.queryFromDynamo = (queryParams, tableName) => {
+    return new Promise((resolve, reject) => {
+      if (
+        fakeDynamoClientRecord &&
+        fakeDynamoClientRecord[Object.keys(queryParams)[0]] ===
+          Object.values(queryParams)[0]
+      ) {
+        resolve(convertObjectToDynamoAttributeValues(fakeDynamoClientRecord));
+      } else {
+        reject(`no such ${queryParams} value on ${tableName}`);
+      }
+    });
+  };
+  fakeDynamoClient.getPayloadFromDynamo = (search_params, tableName) => {
+    const hashed_smart_launch_token =
+      "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a";
+    const fakeLaunchRecord = {
+      launch: "123V456",
+    };
+    return new Promise((resolve, reject) => {
+      let searchKey = Object.keys(search_params)[0];
+      if (
+        tableName === "client_creds_table" &&
+        searchKey === "access_token" &&
+        search_params[searchKey] === hashed_smart_launch_token
+      ) {
+        fakeDynamoClientRecord.access_token = hashed_smart_launch_token;
+        resolve({ Item: fakeLaunchRecord });
+      } else if (
+        search_params[searchKey] === fakeDynamoClientRecord[searchKey]
+      ) {
+        resolve({ Item: fakeDynamoClientRecord });
+      } else {
+        reject(`no such state value on ${tableName}`);
+      }
+    });
+  };
+  fakeDynamoClient.savePayloadToDynamo = (payload) => {
+    return new Promise((resolve) => {
+      // It's unclear whether this should resolve with a full records or just
+      // the identity field but thus far it has been irrelevant to the
+      // functional testing of the oauth-proxy.
+      resolve({ payload });
+    });
+  };
+  return fakeDynamoClient;
 }
 
 describe("OpenID Connect Conformance", () => {
   let oktaClient;
-  let dynamoClient;
-  let dynamoHandle;
+  let fakeDynamoClient;
   const testServerBaseUrlPattern = new RegExp(
     `^${defaultTestingConfig.host}${defaultTestingConfig.well_known_base_path}.*`
   );
@@ -164,13 +168,12 @@ describe("OpenID Connect Conformance", () => {
         isolatedOktaClients[service_config.api_category] = oktaClient;
       }
     }
-    dynamoClient = buildFakeDynamoClient({
+    fakeDynamoClient = buildFakeDynamoClient({
       state: "abc123",
       code: "xyz789",
       refresh_token: "jkl456",
       redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
     });
-    dynamoHandle = jest.mock();
 
     const fakeTokenValidator = () => {
       return {
@@ -183,8 +186,7 @@ describe("OpenID Connect Conformance", () => {
     const app = buildApp(
       defaultTestingConfig,
       oktaClient,
-      dynamoHandle,
-      dynamoClient,
+      fakeDynamoClient,
       fakeTokenValidator,
       isolatedIssuers,
       isolatedOktaClients
@@ -747,7 +749,8 @@ describe("OpenID Connect Conformance", () => {
         expect(resp.status).toEqual(200);
         expect(resp.data.launch).toEqual("123V456");
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err);
         expect(true).toEqual(false); // Don't expect to be here
       });
   });

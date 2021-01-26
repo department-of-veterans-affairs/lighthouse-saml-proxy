@@ -1,8 +1,7 @@
 const jwtDecode = require("jwt-decode");
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
+  constructor(logger, dynamoClient, config, hashingFunction) {
     this.logger = logger;
-    this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
     this.hashingFunction = hashingFunction;
@@ -10,7 +9,7 @@ class SaveDocumentLaunchStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.launch) {
-        let launch = document.launch.S;
+        let launch = document.launch;
         let accessToken = this.hashingFunction(
           tokens.access_token,
           this.config.hmac_secret
@@ -24,7 +23,6 @@ class SaveDocumentLaunchStrategy {
         };
 
         await this.dynamoClient.savePayloadToDynamo(
-          this.dynamo,
           payload,
           this.config.dynamo_client_credentials_table
         );

@@ -1,10 +1,9 @@
 const { rethrowIfRuntimeError, hashString } = require("../../../utils");
 
 class GetDocumentByCodeStrategy {
-  constructor(req, logger, dynamo, dynamoClient, config) {
+  constructor(req, logger, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
   }
@@ -14,7 +13,7 @@ class GetDocumentByCodeStrategy {
 
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (document == null) {
+    if (!document) {
       this.logger.warn("Hashed code not found. Searching for unhashed code.");
       document = await this.getDocumentDynamo(this.req.body.code);
     }
@@ -23,13 +22,18 @@ class GetDocumentByCodeStrategy {
 
   async getDocumentDynamo(code) {
     let document;
+
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "code",
-        code,
-        this.config.dynamo_table_name
+      let payload = await this.dynamoClient.queryFromDynamo(
+        {
+          code: code,
+        },
+        this.config.dynamo_table_name,
+        "oauth_code_index"
       );
+      if (payload.Items && payload.Items[0]) {
+        document = payload.Items[0];
+      }
     } catch (err) {
       rethrowIfRuntimeError(err);
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);

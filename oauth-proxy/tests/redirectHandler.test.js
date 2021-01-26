@@ -13,7 +13,6 @@ const userCollection = new Collection("", "", new ModelFactory(User));
 userCollection.currentItems = [{ id: 1 }];
 
 let logger;
-let dynamo;
 let dynamoClient;
 let next;
 let req;
@@ -22,7 +21,6 @@ let config;
 
 beforeEach(() => {
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
-  dynamo = jest.mock();
   dynamoClient = jest.mock();
   next = jest.fn();
   req = new MockExpressRequest();
@@ -48,18 +46,40 @@ describe("redirectHandler", () => {
       state: "abc123",
     };
 
-    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.redirect).toHaveBeenCalled();
   });
 
   it("No state, returns 400", async () => {
-    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 
   it("State is empty, returns 400", async () => {
     req.query = { state: null };
-    await redirectHandler(logger, dynamo, dynamoClient, config, req, res, next);
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it("Query using state fails, returns 400", async () => {
+    dynamoClient.getPayloadFromDynamo = (searchAttributes, tableName) => {
+      return new Promise((resolve, reject) => {
+        reject(`no such state value on ${tableName}`);
+      });
+    };
+    req.query = { state: "xxxxx" };
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it("Query using state fails with bad return from dynamo, returns 400", async () => {
+    dynamoClient.getPayloadFromDynamo = () => {
+      return new Promise((resolve) => {
+        resolve(null);
+      });
+    };
+    req.query = { state: "xxxxx" };
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
 });

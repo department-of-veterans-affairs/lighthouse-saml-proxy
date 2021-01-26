@@ -4,7 +4,6 @@ const { hashString } = require("../utils");
 
 const redirectHandler = async (
   logger,
-  dynamo,
   dynamoClient,
   config,
   req,
@@ -23,11 +22,9 @@ const redirectHandler = async (
 
   if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
     try {
-      await dynamoClient.saveToDynamo(
-        dynamo,
-        state,
-        "code",
-        hashString(req.query.code, config.hmac_secret),
+      await dynamoClient.updateToDynamo(
+        { state: state },
+        { code: hashString(req.query.code, config.hmac_secret) },
         config.dynamo_table_name
       );
     } catch (error) {
@@ -39,19 +36,36 @@ const redirectHandler = async (
   }
 
   try {
-    let document = await dynamoClient.getFromDynamoByState(
-      dynamo,
-      state,
+    let document = await dynamoClient.getPayloadFromDynamo(
+      {
+        state: state,
+      },
       config.dynamo_table_name
     );
-
-    const params = new URLSearchParams(req.query);
-    loginEnd.inc();
-    res.redirect(`${document.redirect_uri.S}?${params.toString()}`);
+    if (document && document.Item && document.Item.redirect_uri) {
+      document = document.Item;
+      const params = new URLSearchParams(req.query);
+      loginEnd.inc();
+      res.redirect(`${document.redirect_uri}?${params.toString()}`);
+    } else {
+      logger.error(
+        "Failed to get the redirect for the OAuth client application"
+      );
+      res.status(400).json({
+        error: "invalid_request",
+        error_description: "Invalid state",
+      });
+    }
   } catch (error) {
     logger.error("Failed to redirect to the OAuth client application", error);
-    return next(error); // This error is unrecoverable because we can't look up the original redirect.
+    // This error is unrecoverable because we can't look up the original redirect.
+    res.status(400).json({
+      error: "invalid_request",
+      error_description: "Invalid state",
+    });
   }
+  // Only would reach here upon an error
+  return next();
 };
 
 module.exports = redirectHandler;

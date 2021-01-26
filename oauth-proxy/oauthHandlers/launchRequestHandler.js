@@ -9,14 +9,12 @@ const {
 const launchRequestHandler = async (
   config,
   logger,
-  dynamo,
   dynamoClient,
   res,
   next
 ) => {
   const getDocumentStrategy = new GetDocumentByAccessTokenStrategy(
     logger,
-    dynamo,
     dynamoClient,
     config,
     hashString
@@ -25,7 +23,7 @@ const launchRequestHandler = async (
   let documentResponse = await getDocumentStrategy.getDocument(res.locals.jwt);
 
   if (documentResponse && documentResponse.launch) {
-    res.json({ launch: documentResponse.launch.S });
+    res.json({ launch: documentResponse.launch });
   } else {
     return res.sendStatus(401);
   }

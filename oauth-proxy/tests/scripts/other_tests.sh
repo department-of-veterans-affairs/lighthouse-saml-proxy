@@ -168,6 +168,15 @@ track_result
 "$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
 track_result
 
+echo -e "\tRunning ... Redirect Handler without a redirect_url that can be looked up"
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/redirect?code=xxxsomecode&state=xxxxxxstatewithnoredirect" > "$curl_status"
+
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
+track_result
+
 if [[ $pass -lt 1 ]];
 then
   echo -e "\tFAIL - Some misc. tests did not pass."

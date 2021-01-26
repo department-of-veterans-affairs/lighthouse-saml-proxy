@@ -1,9 +1,8 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 
 class GetDocumentByAccessTokenStrategy {
-  constructor(logger, dynamo, dynamoClient, config, hashingFunction) {
+  constructor(logger, dynamoClient, config, hashingFunction) {
     this.logger = logger;
-    this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
     this.hashingFunction = hashingFunction;
@@ -15,11 +14,15 @@ class GetDocumentByAccessTokenStrategy {
       this.config.hmac_secret
     );
     try {
-      document = await this.dynamoClient.getFromDynamoByAccessToken(
-        this.dynamo,
-        hashedToken,
+      let payload = await this.dynamoClient.getPayloadFromDynamo(
+        {
+          access_token: hashedToken,
+        },
         this.config.dynamo_client_credentials_table
       );
+      if (payload.Item) {
+        document = payload.Item;
+      }
     } catch (err) {
       rethrowIfRuntimeError(err);
       this.logger.error("Failed to retrieve document from Dynamo DB.", err);

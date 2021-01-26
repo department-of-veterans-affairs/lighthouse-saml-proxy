@@ -1,10 +1,9 @@
 const { hashString } = require("../../../utils");
 
 class GetDocumentByRefreshTokenStrategy {
-  constructor(req, logger, dynamo, dynamoClient, config) {
+  constructor(req, logger, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
-    this.dynamo = dynamo;
     this.dynamoClient = dynamoClient;
     this.config = config;
   }
@@ -17,7 +16,7 @@ class GetDocumentByRefreshTokenStrategy {
 
     // Backwards compatibility.
     // Remove after 42 Days of PR merge (DATE - 11/30/2020).
-    if (document == null) {
+    if (!document) {
       this.logger.warn(
         "Hashed refresh_token not found. Searching for unhashed refresh_token."
       );
@@ -29,12 +28,16 @@ class GetDocumentByRefreshTokenStrategy {
   async getDocumentDynamo(refresh_token) {
     let document;
     try {
-      document = await this.dynamoClient.getFromDynamoBySecondary(
-        this.dynamo,
-        "refresh_token",
-        refresh_token,
-        this.config.dynamo_table_name
+      let payload = await this.dynamoClient.queryFromDynamo(
+        {
+          refresh_token: refresh_token,
+        },
+        this.config.dynamo_table_name,
+        "oauth_refresh_token_index"
       );
+      if (payload.Items && payload.Items[0]) {
+        document = payload.Items[0];
+      }
     } catch (error) {
       this.logger.error("Could not retrieve state from DynamoDB", error);
     }

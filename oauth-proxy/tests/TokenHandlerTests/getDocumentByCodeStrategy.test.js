@@ -25,14 +25,12 @@ const REDIRECT_URI = "http://localhost/thisDoesNotMatter";
 
 let dynamoClient;
 let config;
-let dynamo;
 let logger;
 let req;
 describe("getDocumentByCodeStrategy tests", () => {
   beforeEach(() => {
     config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
-    dynamo = jest.mock();
     logger = buildFakeLogger();
     req = new MockExpressRequest({
       body: {
@@ -52,16 +50,15 @@ describe("getDocumentByCodeStrategy tests", () => {
     let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );
     let document = await strategy.getDocument();
     expect(document).toEqual({
-      state: { S: STATE },
-      code: { S: CODE_HASH_PAIR[0] },
-      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[0] },
-      redirect_uri: { S: REDIRECT_URI },
+      state: STATE,
+      code: CODE_HASH_PAIR[0],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
     });
   });
 
@@ -76,16 +73,15 @@ describe("getDocumentByCodeStrategy tests", () => {
     let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );
     let document = await strategy.getDocument();
     expect(document).toEqual({
-      state: { S: STATE },
-      code: { S: CODE_HASH_PAIR[1] },
-      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[1] },
-      redirect_uri: { S: REDIRECT_URI },
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
     });
   });
 
@@ -94,7 +90,6 @@ describe("getDocumentByCodeStrategy tests", () => {
     let strategy = new GetDocumentByCodeStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );

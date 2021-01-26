@@ -3,7 +3,8 @@ const cors = require("cors");
 const { Issuer, custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
-const dynamoClient = require("./dynamo_client");
+const { DynamoClient } = require("./dynamo_client");
+
 const { processArgs } = require("./cli");
 const okta = require("@okta/okta-sdk-nodejs");
 const morgan = require("morgan");
@@ -69,7 +70,6 @@ function filterProperty(object, property) {
 function buildApp(
   config,
   oktaClient,
-  dynamo,
   dynamoClient,
   validateToken,
   isolatedIssuers,
@@ -167,7 +167,7 @@ function buildApp(
 
   router.get(config.routes.app_routes.redirect, async (req, res, next) => {
     await oauthHandlers
-      .redirectHandler(logger, dynamo, dynamoClient, config, req, res, next)
+      .redirectHandler(logger, dynamoClient, config, req, res, next)
       .catch(next);
   });
 
@@ -188,7 +188,7 @@ function buildApp(
       jwtAuthorizationHandler,
       async (req, res, next) => {
         await oauthHandlers
-          .launchRequestHandler(config, logger, dynamo, dynamoClient, res, next)
+          .launchRequestHandler(config, logger, dynamoClient, res, next)
           .catch(next);
       }
     );
@@ -277,7 +277,6 @@ function buildApp(
           redirect_uri,
           logger,
           service_issuer,
-          dynamo,
           dynamoClient,
           okta_client,
           req,
@@ -295,7 +294,6 @@ function buildApp(
           redirect_uri,
           logger,
           service_issuer,
-          dynamo,
           dynamoClient,
           validateToken,
           staticTokens,
@@ -370,7 +368,7 @@ function startApp(config, isolatedIssuers) {
     );
   }
 
-  const dynamoHandle = dynamoClient.createDynamoHandle(
+  const dynamoClient = new DynamoClient(
     Object.assign(
       {},
       { region: config.aws_region },
@@ -387,7 +385,6 @@ function startApp(config, isolatedIssuers) {
   const app = buildApp(
     config,
     oktaClient,
-    dynamoHandle,
     dynamoClient,
     validateToken,
     isolatedIssuers,

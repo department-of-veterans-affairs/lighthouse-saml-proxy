@@ -60,7 +60,7 @@ class TokenHandlerClient {
         document,
         tokens
       );
-      state = (document.state && document.state.S) || null;
+      state = document.state || null;
     }
     state = state || null;
 

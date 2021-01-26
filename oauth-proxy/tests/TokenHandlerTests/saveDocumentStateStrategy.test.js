@@ -25,7 +25,6 @@ const ACCESS_TOKEN = "the_fake_access_token";
 
 let dynamoClient;
 let config;
-let dynamo;
 let logger;
 let req;
 let document;
@@ -35,7 +34,6 @@ describe("saveDocumentStateStrategy tests", () => {
   beforeEach(() => {
     config = createFakeConfig();
     config.hmac_secret = HMAC_SECRET;
-    dynamo = jest.mock();
     logger = buildFakeLogger();
     req = new MockExpressRequest({
       body: {
@@ -43,10 +41,10 @@ describe("saveDocumentStateStrategy tests", () => {
       },
     });
     document = {
-      state: { S: STATE },
-      code: { S: CODE_HASH_PAIR[0] },
-      refresh_token: { S: REFRESH_TOKEN_HASH_PAIR[0] },
-      redirect_uri: { S: REDIRECT_URI },
+      state: STATE,
+      code: CODE_HASH_PAIR[0],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
     };
     tokens = {
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
@@ -64,7 +62,6 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );
@@ -83,13 +80,12 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
-    expect(dynamoClient.saveToDynamo).not.toHaveBeenCalled();
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
   it("Could not save documents", () => {
     dynamoClient = jest.fn();
@@ -99,7 +95,6 @@ describe("saveDocumentStateStrategy tests", () => {
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
-      dynamo,
       dynamoClient,
       config
     );

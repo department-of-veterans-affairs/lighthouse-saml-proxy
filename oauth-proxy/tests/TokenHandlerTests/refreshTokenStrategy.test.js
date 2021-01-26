@@ -10,26 +10,24 @@ const {
   RefreshTokenStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/tokenStrategies/refreshTokenStrategy");
 let logger;
-let dynamo;
+let dynamoClient;
 let client;
 let config;
 let staticTokens;
 let data;
 
 const setScan = (items) => {
-  dynamo.dbDocClient = {
-    scan: (scan_params, result) => {
-      if (scan_params.TableName === "ut_static_tokens_table") {
-        result(null, {
-          Items: [items],
-          Count: 1,
-          ScannedCount: 1,
-          ConsumedCapacity: null,
-        });
-      } else {
-        result(false, undefined);
-      }
-    },
+  dynamoClient.scanFromDynamo = (table_name) => {
+    if (table_name === "ut_static_tokens_table") {
+      return {
+        Items: [items],
+        Count: 1,
+        ScannedCount: 1,
+        ConsumedCapacity: null,
+      };
+    } else {
+      throw { message: "no static token here" };
+    }
   };
 };
 
@@ -59,7 +57,7 @@ beforeEach(() => {
       );
     },
   });
-  dynamo = jest.mock();
+  dynamoClient = jest.mock();
   setScan({
     static_icn: "0123456789",
     static_refresh_token: "static-refresh-token",
@@ -84,7 +82,7 @@ const realRefreshTests = async () => {
       req,
       logger,
       client,
-      dynamo,
+      dynamoClient,
       config,
       staticTokens
     );
@@ -115,7 +113,7 @@ const realRefreshTests = async () => {
       req,
       logger,
       client,
-      dynamo,
+      dynamoClient,
       config,
       staticTokens
     );
@@ -146,7 +144,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         req,
         logger,
         client,
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       );
@@ -177,7 +175,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         req,
         logger,
         client,
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       );
@@ -209,7 +207,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         req,
         logger,
         client,
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       );
@@ -240,7 +238,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         req,
         logger,
         client,
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       );
@@ -272,7 +270,7 @@ describe("tokenHandler refreshTokenStrategy", () => {
         req,
         logger,
         client,
-        dynamo,
+        dynamoClient,
         config,
         staticTokens
       );
@@ -282,10 +280,10 @@ describe("tokenHandler refreshTokenStrategy", () => {
     });
   });
 
-  describe("Real refresh static token dynamo error", () => {
+  describe("Real refresh static token dynamoClient error", () => {
     beforeEach(() => {
-      dynamo = jest.mock();
-      dynamo.dbDocClient = {
+      dynamoClient = jest.mock();
+      dynamoClient.dbDocClient = {
         scan: () => {
           throw { message: "this is an error message" };
         },

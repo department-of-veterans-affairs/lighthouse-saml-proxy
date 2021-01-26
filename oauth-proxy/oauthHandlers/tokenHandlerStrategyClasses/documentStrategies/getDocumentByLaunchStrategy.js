@@ -9,9 +9,7 @@ class GetDocumentByLaunchStrategy {
     }
 
     let document = {
-      launch: {
-        S: launch,
-      },
+      launch: launch,
     };
 
     return document;
