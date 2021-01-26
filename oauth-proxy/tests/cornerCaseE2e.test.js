@@ -5,7 +5,7 @@ const axios = require("axios");
 const qs = require("qs");
 const { Issuer } = require("openid-client");
 
-const { convertObjectToDynamoAttributeValues } = require("./testUtils");
+const { buildFakeDynamoClient, buildFakeOktaClient } = require("./testUtils");
 const {
   buildBackgroundServerModule,
 } = require("../../common/backgroundServer");
@@ -27,7 +27,6 @@ afterAll(() => {
 
 const TEST_SERVER_PORT = 9090;
 const FAKE_CLIENT_APP_REDIRECT_URL = "http://localhost:8080/oauth/redirect";
-const FAKE_CLIENT_APP_URL_PATTERN = /http:[/][/]localhost:8080.*/;
 const defaultTestingConfig = {
   host: `http://localhost:${TEST_SERVER_PORT}`,
   well_known_base_path: "/testServer",
@@ -65,78 +64,6 @@ const defaultTestingConfig = {
   },
 };
 
-function buildFakeOktaClient(fakeRecord) {
-  const oktaClient = { getApplication: jest.fn() };
-  oktaClient.getApplication.mockImplementation((client_id) => {
-    return new Promise((resolve, reject) => {
-      if (client_id === fakeRecord.client_id) {
-        resolve(fakeRecord);
-      } else {
-        reject(`no such client application '${client_id}'`);
-      }
-    });
-  });
-  return oktaClient;
-}
-
-function buildFakeDynamoClient(fakeDynamoClientRecord) {
-  const fakeDynamoClient = {};
-  fakeDynamoClient.updateToDynamo = (tok) => {
-    return new Promise((resolve) => {
-      // It's unclear whether this should resolve with a full records or just
-      // the identity field but thus far it has been irrelevant to the
-      // functional testing of the oauth-proxy.
-      resolve({ pk: tok.state });
-    });
-  };
-  fakeDynamoClient.queryFromDynamo = (queryParams, tableName) => {
-    return new Promise((resolve, reject) => {
-      if (
-        fakeDynamoClientRecord &&
-        fakeDynamoClientRecord[Object.keys(queryParams)[0]] ===
-          Object.values(queryParams)[0]
-      ) {
-        resolve(convertObjectToDynamoAttributeValues(fakeDynamoClientRecord));
-      } else {
-        reject(`no such ${queryParams} value on ${tableName}`);
-      }
-    });
-  };
-  fakeDynamoClient.getPayloadFromDynamo = (search_params, tableName) => {
-    const hashed_smart_launch_token =
-      "ab29a92e1db44913c896efeed12108faa0b47a944b56cd7cd07d121aefa3769a";
-    const fakeLaunchRecord = {
-      launch: "123V456",
-    };
-    return new Promise((resolve, reject) => {
-      let searchKey = Object.keys(search_params)[0];
-      if (
-        tableName === "client_creds_table" &&
-        searchKey === "access_token" &&
-        search_params[searchKey] === hashed_smart_launch_token
-      ) {
-        fakeDynamoClientRecord.access_token = hashed_smart_launch_token;
-        resolve({ Item: fakeLaunchRecord });
-      } else if (
-        search_params[searchKey] === fakeDynamoClientRecord[searchKey]
-      ) {
-        resolve({ Item: fakeDynamoClientRecord });
-      } else {
-        reject(`no such state value on ${tableName}`);
-      }
-    });
-  };
-  fakeDynamoClient.savePayloadToDynamo = (payload) => {
-    return new Promise((resolve) => {
-      // It's unclear whether this should resolve with a full records or just
-      // the identity field but thus far it has been irrelevant to the
-      // functional testing of the oauth-proxy.
-      resolve({ payload });
-    });
-  };
-  return fakeDynamoClient;
-}
-
 describe("OpenID Connect Conformance", () => {
   let oktaClient;
   let fakeDynamoClient;
@@ -150,7 +77,7 @@ describe("OpenID Connect Conformance", () => {
           redirect_uris: ["http://localhost:8080/oauth/redirect"],
         },
       },
-    });
+    }, null, null, null);
     const isolatedIssuers = {};
     const isolatedOktaClients = {};
     if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
