@@ -61,7 +61,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       );
       fail("Validate error should have been thrown.");
     } catch (err) {
-      expect(err.status).toBe(500);
+      expect(err.statusCode).toBe(503);
       expect(logger.error).toHaveBeenCalledWith(
         "Invalid grant, could not find a valid patient identifier for the provided authorization code."
       );

@@ -6,7 +6,10 @@ const qs = require("qs");
 const { Issuer } = require("openid-client");
 const { randomBytes } = require("crypto");
 
-const { convertObjectToDynamoAttributeValues } = require("./testUtils");
+const {
+  convertObjectToDynamoAttributeValues,
+  buildFakeOktaClient,
+} = require("./testUtils");
 const {
   buildBackgroundServerModule,
 } = require("../../common/backgroundServer");
@@ -65,20 +68,6 @@ const defaultTestingConfig = {
     },
   },
 };
-
-function buildFakeOktaClient(fakeRecord) {
-  const oktaClient = { getApplication: jest.fn() };
-  oktaClient.getApplication.mockImplementation((client_id) => {
-    return new Promise((resolve, reject) => {
-      if (client_id === fakeRecord.client_id) {
-        resolve(fakeRecord);
-      } else {
-        reject(`no such client application '${client_id}'`);
-      }
-    });
-  });
-  return oktaClient;
-}
 
 function buildFakeDynamoClient(fakeDynamoClientRecord) {
   const fakeDynamoClient = {};
@@ -149,15 +138,20 @@ describe("OpenID Connect Conformance", () => {
   );
 
   beforeAll(async () => {
-    oktaClient = buildFakeOktaClient({
-      client_id: "clientId123",
-      client_secret: "secretXyz",
-      settings: {
-        oauthClient: {
-          redirect_uris: ["http://localhost:8080/oauth/redirect"],
+    oktaClient = buildFakeOktaClient(
+      {
+        client_id: "clientId123",
+        client_secret: "secretXyz",
+        settings: {
+          oauthClient: {
+            redirect_uris: ["http://localhost:8080/oauth/redirect"],
+          },
         },
       },
-    });
+      null,
+      null,
+      null
+    );
     const isolatedIssuers = {};
     const isolatedOktaClients = {};
     if (defaultTestingConfig.routes && defaultTestingConfig.routes.categories) {
