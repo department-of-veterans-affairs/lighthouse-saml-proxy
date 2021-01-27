@@ -229,7 +229,7 @@ function buildApp(
       });
     } else if (err.statusCode && err.statusCode === 503) {
       res.set("Retry-After", "300").status(503).json({
-        error: "Service_Unavailable",
+        error: "temporarily_unavailable",
       });
     } else if (error && error_description) {
       res.status(500).json({
