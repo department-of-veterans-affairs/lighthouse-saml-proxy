@@ -100,7 +100,7 @@
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.0",
-    "passport-wsfed-saml2": "git+https://github.com/department-of-veterans-affairs/lighthouse-passport-wsfed-saml2.git",
+    "passport-wsfed-saml2": "git+https://github.com/auth0/passport-wsfed-saml2.git",
     "prom-client": "^11.5.2",
     "redis": "^3.0.2",
     "request": "^2.88.0",
