@@ -24,7 +24,7 @@ describe("dynamo client tests", () => {
     try {
       await dynamoclient.savePayloadToDynamo(
         { pay: "load" },
-        "ClientCredentials"
+        "LaunchContext"
       );
       expect(isCalled).toEqual(true);
     } catch (err) {
@@ -41,7 +41,7 @@ describe("dynamo client tests", () => {
     try {
       await dynamoclient.savePayloadToDynamo(
         { pay: "load" },
-        "ClientCredentials"
+        "LaunchContext"
       );
       // should not reach here
       fail("Should not reach here");

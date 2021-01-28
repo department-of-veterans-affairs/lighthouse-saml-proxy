@@ -39,8 +39,8 @@ function processArgs() {
         description: "flag to use local DynamoDB instance",
         required: false,
       },
-      dynamo_client_credentials_table: {
-        description: "name of client credentials table.",
+      dynamo_launch_context_table: {
+        description: "name of launch context table.",
         required: true,
       },
       dynamo_static_token_table: {
