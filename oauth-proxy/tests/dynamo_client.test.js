@@ -22,10 +22,7 @@ describe("dynamo client tests", () => {
     });
 
     try {
-      await dynamoclient.savePayloadToDynamo(
-        { pay: "load" },
-        "ClientCredentials"
-      );
+      await dynamoclient.savePayloadToDynamo({ pay: "load" }, "LaunchContext");
       expect(isCalled).toEqual(true);
     } catch (err) {
       // should not reach here
@@ -39,10 +36,7 @@ describe("dynamo client tests", () => {
     });
 
     try {
-      await dynamoclient.savePayloadToDynamo(
-        { pay: "load" },
-        "ClientCredentials"
-      );
+      await dynamoclient.savePayloadToDynamo({ pay: "load" }, "LaunchContext");
       // should not reach here
       fail("Should not reach here");
     } catch (err) {

@@ -40,7 +40,7 @@ const defaultTestingConfig = {
   validate_apiKey: "fakeApiKey",
   manage_endpoint: "http://localhost:9091/account",
   hmac_secret: "testsecret",
-  dynamo_client_credentials_table: "client_creds_table",
+  dynamo_launch_context_table: "launch_context_table",
   enable_smart_launch_service: true,
   enable_static_token_service: true,
   routes: {
@@ -101,7 +101,7 @@ function buildFakeDynamoClient(fakeDynamoClientRecord) {
     return new Promise((resolve, reject) => {
       let searchKey = Object.keys(search_params)[0];
       if (
-        tableName === "client_creds_table" &&
+        tableName === "launch_context_table" &&
         searchKey === "access_token" &&
         search_params[searchKey] === hashed_smart_launch_token
       ) {

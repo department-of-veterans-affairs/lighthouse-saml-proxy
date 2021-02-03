@@ -18,7 +18,7 @@ class GetDocumentByAccessTokenStrategy {
         {
           access_token: hashedToken,
         },
-        this.config.dynamo_client_credentials_table
+        this.config.dynamo_launch_context_table
       );
       if (payload.Item) {
         document = payload.Item;

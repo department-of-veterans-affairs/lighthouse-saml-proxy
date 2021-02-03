@@ -118,7 +118,7 @@ tableParams = {
       },
     },
   ],
-  TableName: "ClientCredentials",
+  TableName: "LaunchContext",
 };
 
 dynamo.createTable(tableParams, (err, data) => {

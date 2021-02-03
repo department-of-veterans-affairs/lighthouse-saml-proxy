@@ -271,7 +271,7 @@ const createFakeConfig = () => {
     upstream_issuer_timeout_ms: 15000,
     dynamo_local: "dynamodb:8000",
     dynamo_table_name: "OAuthRequests",
-    dynamo_client_credentials_table: "ClientCredentials",
+    dynamo_launch_context_table: "LaunchContext",
     hmac_secret: "secret",
     okta_url: "https://deptva-eval.okta.com",
     validate_post_endpoint:
