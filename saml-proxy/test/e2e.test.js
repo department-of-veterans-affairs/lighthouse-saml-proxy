@@ -17,7 +17,7 @@ const {
 } = buildBackgroundServerModule("saml-proxy test app");
 
 const loaRedirect =
-  "Found. Redirecting to /samlproxy/sp/verify?authnContext=http%3A%2F%2Fidmanagement.gov%2Fns%2Fassurance%2Floa%2F3";
+  "Found. Redirecting to /samlproxy/sp/verify?authnContext=http%3A%2F%2Fidmanagement.gov%2Fns%2Fassurance%2Floa%2F3&RelayState=state";
 const userNotFoundText =
   "We need to verify your identity before giving you access to your information";
 
