@@ -43,7 +43,12 @@ const claimsWithNoEDIPI = {
   uuid: "totally-uniq",
   level_of_assurance: "3",
 };
-
+const claimsBasicAccount = {
+  icn: "asdfasdf",
+  email: "ed@example.gov",
+  uuid: "totally-uniq",
+  level_of_assurance: "0",
+};
 describe("scrubUserClaims", () => {
   it("should return a user claims object with only permitted keys for dslogon logins", () => {
     // ICN will have been looked up before this function runs
@@ -337,5 +342,81 @@ describe("validateIdpResponse", () => {
     await validateFn(req, mockResponse, nextFn);
     expect(nextFn).toHaveBeenCalled();
     expect(!cache.has(testSessionIndex));
+  });
+});
+
+describe("testLevelOfAssuranceOrRedirect", () => {
+  let mockResponse;
+  beforeEach(() => {
+    mockResponse = {
+      render: jest.fn(),
+    };
+  });
+
+  it("testLevelOfAssuranceOrRedirect, sufficient loa", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+    handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn);
+    expect(nextFn).toHaveBeenCalled();
+  });
+
+  it("testLevelOfAssuranceOrRedirect, insufficient loa", async () => {
+    const nextFn = jest.fn();
+    let redirectUrl;
+    mockResponse.redirect = jest.fn((url) => {
+      redirectUrl = url;
+    });
+    const testSessionIndex = "test";
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsBasicAccount },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+      body: {
+        RelayState: "relateState",
+      },
+    };
+    handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn);
+    expect(nextFn).not.toHaveBeenCalled();
+    expect(redirectUrl).toBe(
+      "/samlproxy/sp/verify?authnContext=http%3A%2F%2Fidmanagement.gov%2Fns%2Fassurance%2Floa%2F3&RelayState=relateState"
+    );
+  });
+
+  it("testLevelOfAssuranceOrRedirect, insufficient loa and missing relay state", async () => {
+    const nextFn = jest.fn();
+    let redirectUrl;
+    mockResponse.redirect = jest.fn((url) => {
+      redirectUrl = url;
+    });
+    const testSessionIndex = "test";
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: { ...claimsBasicAccount },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+    try {
+      handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn)
+    } catch (err) {
+      expect(err.status).toBe(400);
+      expect(err.message).toBe("Error: Empty relay state during loa test. Invalid request.");
+    }
+    expect(nextFn).not.toHaveBeenCalled();
   });
 });
