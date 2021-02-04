@@ -158,14 +158,15 @@ export const testLevelOfAssuranceOrRedirect = (
     req.user.claims &&
     !sufficientLevelOfAssurance(req.user.claims)
   ) {
-    const redirect_url = url.format({
-      pathname: SP_VERIFY,
-      query: {
-        authnContext: "http://idmanagement.gov/ns/assurance/loa/3",
-        RelayState: req.query.RelayState || req.body.RelayState,
-      },
-    });
-    res.redirect(redirect_url);
+    res.redirect(
+      url.format({
+        pathname: SP_VERIFY,
+        query: {
+          authnContext: "http://idmanagement.gov/ns/assurance/loa/3",
+          RelayState: req.query.RelayState || req.body.RelayState,
+        },
+      })
+    );
   } else {
     next();
   }
