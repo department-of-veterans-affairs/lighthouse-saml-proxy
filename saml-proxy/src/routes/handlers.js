@@ -44,7 +44,7 @@ export const samlLogin = function (template) {
           : "Empty relay state. Invalid request.";
       logger.error(logMessage);
       throw {
-        message: "Error: Empty relay state. Invalid request.",
+        message: "Error: " + logMessage,
         status: 400,
       };
     }

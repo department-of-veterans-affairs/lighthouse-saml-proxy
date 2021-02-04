@@ -68,6 +68,20 @@ describe("samlLogin", () => {
       "Error: Empty relay state. Invalid request."
     );
   });
+  it("Redirect request to the verify request with a null relay state should throw an error", async () => {
+    let thrownError;
+    mockRequest.authnRequest = {
+      relayState: null,
+    };
+    try {
+      samlLogin("verify")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError.message).toEqual(
+      "Error: Empty relay state during verify. Invalid request."
+    );
+  });
   it("Login requests with an empty relay state should throw an error", async () => {
     let thrownError;
     mockRequest.authnRequest = {
