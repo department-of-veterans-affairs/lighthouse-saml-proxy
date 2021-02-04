@@ -325,4 +325,35 @@ describe("authorizeHandler", () => {
     );
     expect(res.statusCode).toEqual(400);
   });
+
+  it("Verify that launch is saved for SMART enabled IDP", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch/patient",
+      idp: "smart-idp-123",
+      launch: "123V456",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
 });
