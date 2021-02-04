@@ -79,6 +79,12 @@ function processArgs() {
         description:
           "Okta IDP identifier to be added as a query param (idp) if not specified by user in authorize request",
       },
+      smart_launch_idps: {
+        description:
+          "An comma separated list of idp keys that allow storing of launch context",
+        required: true,
+        default: "",
+      },
       sentry_dsn: {
         description: "URL of the sentry project to send errors",
         required: false,
