@@ -398,7 +398,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
   it("testLevelOfAssuranceOrRedirect, insufficient loa and missing relay state", async () => {
     const nextFn = jest.fn();
     mockResponse.redirect = jest.fn((url) => {
-      fail("Redirect should bot have been called to '" + url + "'");
+      fail("Redirect should not have been called to '" + url + "'");
     });
     const testSessionIndex = "test";
     const req = {
