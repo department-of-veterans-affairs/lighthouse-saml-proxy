@@ -397,9 +397,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
 
   it("testLevelOfAssuranceOrRedirect, insufficient loa and missing relay state", async () => {
     const nextFn = jest.fn();
-    let redirectUrl;
     mockResponse.redirect = jest.fn((url) => {
-      redirectUrl = url;
+      fail("Redirect should bot have been called to '" + url + "'");
     });
     const testSessionIndex = "test";
     const req = {
@@ -412,10 +411,12 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       },
     };
     try {
-      handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn)
+      handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn);
     } catch (err) {
       expect(err.status).toBe(400);
-      expect(err.message).toBe("Error: Empty relay state during loa test. Invalid request.");
+      expect(err.message).toBe(
+        "Error: Empty relay state during loa test. Invalid request."
+      );
     }
     expect(nextFn).not.toHaveBeenCalled();
   });
