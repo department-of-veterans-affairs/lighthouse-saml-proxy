@@ -80,7 +80,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access",
     };
 
     await authorizeHandler(
@@ -108,7 +107,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access",
       aud: "aud",
     };
 
@@ -135,7 +133,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "",
-      scope: "openid profile offline_access",
       aud: "aud",
     };
 
@@ -162,7 +159,6 @@ describe("authorizeHandler", () => {
     req.query = {
       state: "fake_state",
       client_id: "clientId123",
-      scope: "openid profile offline_access",
       aud: "aud",
     };
 
@@ -189,7 +185,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access",
       aud: "notAPIValue",
     };
 
@@ -223,7 +218,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access",
       aud: "notAPIValue",
     };
 
@@ -270,7 +264,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "invalid",
       redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access",
       aud: "aud",
     };
 
@@ -309,7 +302,6 @@ describe("authorizeHandler", () => {
       state: "fake_state",
       client_id: "clientId123",
       redirect_uri: "https://www.google.com",
-      scope: "openid profile offline_access",
     };
 
     await authorizeHandler(
