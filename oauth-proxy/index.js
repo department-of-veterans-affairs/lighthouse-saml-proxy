@@ -18,6 +18,7 @@ const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 const rTracer = require("cls-rtracer");
+const { SlugHelper } = require("./slug_helper")
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -90,6 +91,7 @@ function buildApp(
       },
     });
   }
+  const slugHelper = new SlugHelper(config);
 
   const setProxyResponse = (response, targetResponse) => {
     if (response.headers !== undefined) {
@@ -282,6 +284,7 @@ function buildApp(
           service_issuer,
           dynamoClient,
           okta_client,
+          slugHelper,
           req,
           res,
           next
