@@ -10,12 +10,11 @@ class SlugHelper {
   }
 
   map(slug) {
-    const matchedSlug = this.idps.find(item => {
+    const matchedSlug = this.idps.find((item) => {
       return item.slug === slug;
     });
     return matchedSlug ? matchedSlug.id : slug;
   }
-
 }
 module.exports = {
   SlugHelper,
