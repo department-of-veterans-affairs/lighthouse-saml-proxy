@@ -410,14 +410,18 @@ describe("testLevelOfAssuranceOrRedirect", () => {
         },
       },
     };
+    let errStatus;
+    let errMessage;
     try {
       handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn);
     } catch (err) {
-      expect(err.status).toBe(400);
-      expect(err.message).toBe(
-        "Error: Empty relay state during loa test. Invalid request."
-      );
+      errStatus = err.status;
+      errMessage = err.message;
     }
     expect(nextFn).not.toHaveBeenCalled();
+    expect(errStatus).toBe(400);
+    expect(errMessage).toBe(
+      "Error: Empty relay state during loa test. Invalid request."
+    );
   });
 });
