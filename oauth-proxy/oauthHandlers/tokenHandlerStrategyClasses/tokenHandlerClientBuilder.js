@@ -98,7 +98,8 @@ const getStrategies = (
         req,
         logger,
         dynamoClient,
-        config
+        config,
+        hashString
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,
@@ -123,7 +124,8 @@ const getStrategies = (
         req,
         logger,
         dynamoClient,
-        config
+        config,
+        hashString
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,

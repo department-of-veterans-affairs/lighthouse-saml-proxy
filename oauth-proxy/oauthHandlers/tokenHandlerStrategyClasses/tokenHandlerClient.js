@@ -55,12 +55,14 @@ class TokenHandlerClient {
     let document = await this.getDocumentStrategy.getDocument();
 
     let state;
+    let launch;
     if (document && tokens) {
       await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(
         document,
         tokens
       );
       state = document.state || null;
+      launch = document.launch || null;
     }
     state = state || null;
 
@@ -68,10 +70,15 @@ class TokenHandlerClient {
     const tokenResponseBase = translateTokenSet(tokens);
     let decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
-      let patient = await this.getPatientInfoStrategy.createPatientInfo(
-        tokens,
-        decoded
-      );
+      let patient;
+      if (launch) {
+        patient = launch;
+      } else {
+        patient = await this.getPatientInfoStrategy.createPatientInfo(
+          tokens,
+          decoded
+        );
+      }
       return {
         statusCode: 200,
         responseBody: { ...tokenResponseBase, patient, state },
