@@ -158,11 +158,18 @@ export const testLevelOfAssuranceOrRedirect = (
     req.user.claims &&
     !sufficientLevelOfAssurance(req.user.claims)
   ) {
+    if (!req.query?.RelayState && !req.body?.RelayState) {
+      throw {
+        message: "Error: Empty relay state during loa test. Invalid request.",
+        status: 400,
+      };
+    }
     res.redirect(
       url.format({
         pathname: SP_VERIFY,
         query: {
           authnContext: "http://idmanagement.gov/ns/assurance/loa/3",
+          RelayState: req.query?.RelayState || req.body?.RelayState,
         },
       })
     );

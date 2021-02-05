@@ -38,9 +38,13 @@ export const samlLogin = function (template) {
       req.authnRequest?.relayState == null ||
       req.authnRequest?.relayState == ""
     ) {
-      logger.error("Empty relay state. Invalid request.");
+      let logMessage =
+        template === "verify"
+          ? "Empty relay state during verify. Invalid request."
+          : "Empty relay state. Invalid request.";
+      logger.error(logMessage);
       throw {
-        message: "Error: Empty relay state. Invalid request.",
+        message: "Error: " + logMessage,
         status: 400,
       };
     }
