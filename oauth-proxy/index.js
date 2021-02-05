@@ -69,7 +69,6 @@ function filterProperty(object, property) {
 
 function buildApp(
   config,
-  oktaClient,
   dynamoClient,
   validateToken,
   isolatedIssuers,
@@ -388,7 +387,6 @@ function startApp(config, isolatedIssuers) {
   );
   const app = buildApp(
     config,
-    oktaClient,
     dynamoClient,
     validateToken,
     isolatedIssuers,
