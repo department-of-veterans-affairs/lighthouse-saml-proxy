@@ -2,12 +2,11 @@ const { hashString } = require("../../../utils");
 const jwtDecode = require("jwt-decode");
 
 class SaveDocumentStateStrategy {
-  constructor(req, logger, dynamoClient, config, hashingFunction) {
+  constructor(req, logger, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
-    this.hashingFunction = hashingFunction;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
@@ -33,7 +32,7 @@ class SaveDocumentStateStrategy {
     try {
       if (document.launch && tokens.access_token) {
         let launch = document.launch;
-        let accessToken = this.hashingFunction(
+        let accessToken = hashString(
           tokens.access_token,
           this.config.hmac_secret
         );
@@ -52,7 +51,7 @@ class SaveDocumentStateStrategy {
       }
     } catch (error) {
       this.logger.error(
-        "Could not update the refresh token in DynamoDB",
+        "Could not save the launch context in DynamoDB",
         error
       );
     }
