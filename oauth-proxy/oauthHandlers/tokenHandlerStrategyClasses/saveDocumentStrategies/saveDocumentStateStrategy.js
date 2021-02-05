@@ -50,10 +50,7 @@ class SaveDocumentStateStrategy {
         );
       }
     } catch (error) {
-      this.logger.error(
-        "Could not save the launch context in DynamoDB",
-        error
-      );
+      this.logger.error("Could not save the launch context in DynamoDB", error);
     }
   }
 }
