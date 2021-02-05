@@ -57,6 +57,24 @@
       "jwks": "/keys",
       "grants": "/grants",
       "smart_launch": "/smart/launch"
-    }
+    },
+    "idps": [
+      {
+        "slug": "lighthouse",
+        "id": "0ua720axxxxxxx"
+      },
+      {
+        "slug": "ssoi",
+        "id": "0uahh383xxxxxx"
+      },
+      {
+        "slug": "ssoe",
+        "id": "0uah999ueuhh23",
+        "attribute3": "potentially expandable attributes",
+        "attribute4": "potentially expandable attributes",
+        "attribute5": "potentially expandable attributes",
+        "attribute6": "potentially expandable attributes"
+      }
+    ]
   }
 }
