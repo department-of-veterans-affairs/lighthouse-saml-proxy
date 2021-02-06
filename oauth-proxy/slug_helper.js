@@ -10,6 +10,11 @@ class SlugHelper {
     }
   }
 
+  /**
+   * Rewrites the slug to a target url based on configuration settings.
+   *
+   * @param {*} slug The slug to rewrite.
+   */
   rewrite(slug) {
     if (!this.idps) {
       return slug;
@@ -20,6 +25,7 @@ class SlugHelper {
     return matchedSlug ? matchedSlug.id : slug;
   }
 }
+
 module.exports = {
   SlugHelper,
 };

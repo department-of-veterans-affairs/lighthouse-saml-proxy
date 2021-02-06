@@ -16,7 +16,7 @@ const {
 } = require("./testUtils");
 const getAuthorizationServerInfoMock = jest.fn();
 const mockSlugHelper = {
-  rewrite: jest.fn()
+  rewrite: jest.fn(),
 };
 mockSlugHelper.rewrite.mockImplementation((slug) => {
   return slug;
@@ -209,7 +209,6 @@ describe("authorizeHandler", () => {
       dynamoClient,
       oktaClient,
       mockSlugHelper,
-      authorizeHandler,
       req,
       res,
       next
