@@ -5,11 +5,15 @@
  */
 class SlugHelper {
   constructor(config) {
-    this.idps = config.idps;
-    this.routes = config.routes;
+    if (config) {
+      this.idps = config.idps;
+    }
   }
 
-  map(slug) {
+  rewrite(slug) {
+    if (!this.idps) {
+      return slug;
+    }
     const matchedSlug = this.idps.find((item) => {
       return item.slug === slug;
     });

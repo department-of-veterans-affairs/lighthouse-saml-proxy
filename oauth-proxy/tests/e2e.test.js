@@ -179,6 +179,7 @@ describe("OpenID Connect Conformance", () => {
 
     const app = buildApp(
       defaultTestingConfig,
+      oktaClient,
       fakeDynamoClient,
       fakeTokenValidator,
       isolatedIssuers,
