@@ -70,7 +70,6 @@ function filterProperty(object, property) {
 
 function buildApp(
   config,
-  oktaClient,
   dynamoClient,
   validateToken,
   isolatedIssuers,
@@ -356,12 +355,6 @@ function buildApp(
 }
 
 function startApp(config, isolatedIssuers) {
-  const oktaClient = new okta.Client({
-    orgUrl: config.okta_url,
-    token: config.okta_token,
-    requestExecutor: new okta.DefaultRequestExecutor(),
-  });
-
   const isolatedOktaClients = {};
   if (config.routes && config.routes.categories) {
     Object.entries(config.routes.categories).forEach(
@@ -391,7 +384,6 @@ function startApp(config, isolatedIssuers) {
   );
   const app = buildApp(
     config,
-    oktaClient,
     dynamoClient,
     validateToken,
     isolatedIssuers,
