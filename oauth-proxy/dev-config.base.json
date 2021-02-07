@@ -57,29 +57,20 @@
       "jwks": "/keys",
       "grants": "/grants",
       "smart_launch": "/smart/launch"
+    }
+  },
+  "idps": [
+    {
+      "slug": "localhost",
+      "id": "<FIX ME>"
     },
-    "idps": [
-      {
-        "slug": "localhost",
-        "id": "0oaxxxlocalhostxxxxx"
-      },
-      {
-        "slug": "lighthouse",
-        "id": "0ua720axlighthousexxxxxxx"
-      },
-      {
-        "slug": "ssoi",
-        "id": "0uahh383xssoixxxxxx",
-        "manage": "some_manage_endpoint"
-      },
-      {
-        "slug": "ssoe",
-        "id": "0uahxxssoexxxxxxx",
-        "attribute3": "potentially expandable attributes",
-        "attribute4": "potentially expandable attributes",
-        "attribute5": "potentially expandable attributes",
-        "attribute6": "potentially expandable attributes"
-      }
-    ]
-  }
+    {
+      "slug": "lighthouse",
+      "id": "<FIX ME>"
+    },
+    {
+      "slug": "ssoi",
+      "id": "<FIX ME>"
+    }
+  ]
 }
