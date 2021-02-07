@@ -190,7 +190,7 @@ function processArgs() {
           required: true,
         },
         id: {
-          description: "The identity provide ID",
+          description: "The identity provider ID",
           required: true,
         },
       },
