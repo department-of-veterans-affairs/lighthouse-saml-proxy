@@ -1,7 +1,7 @@
 const access_token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjoiZW1haWwucmVhZCIsImlhdCI6MTUxNjIzOTAyMn0.iiq38iOU_UJSl3emfEc8fSelVl7dWBaZ-Yd5wurVhc4";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImVtYWlsLnJlYWQiXSwiaWF0IjoxNTE2MjM5MDIyfQ.lybRIPdhq6UslRqKRtiEuyqnCUY6OoDFeXRaogoPROk";
 const access_token_patient =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjoibGF1bmNoL3BhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.5RLmIUn-kZqZVb4IqxNUpWCXPYtDrBraShDHTIndlgU";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sImlhdCI6MTUxNjIzOTAyMn0.2PU4pZHbSRhOgpmG9jfCgY0YEoq5hmq9LH_56e6VfzA";
 
 const buildGetTokenStrategy = (response, error = false) => {
   const getTokenStrategy = { getToken: jest.fn() };
