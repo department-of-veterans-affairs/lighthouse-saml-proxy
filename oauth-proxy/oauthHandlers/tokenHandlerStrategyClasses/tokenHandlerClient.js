@@ -62,7 +62,7 @@ class TokenHandlerClient {
         tokens
       );
       state = document.state || null;
-      launch = document.launch || null;
+      launch = document.launch;
     }
     state = state || null;
 
@@ -71,7 +71,7 @@ class TokenHandlerClient {
     let decoded = jwtDecode(tokens.access_token);
     if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
       let patient;
-      if (launch) {
+      if (launch !== undefined) {
         patient = launch;
       } else {
         patient = await this.getPatientInfoStrategy.createPatientInfo(

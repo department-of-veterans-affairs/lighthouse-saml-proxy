@@ -81,7 +81,7 @@ function processArgs() {
       },
       smart_launch_idps: {
         description:
-          "An comma separated list of idp keys that allow storing of launch context",
+          "A comma separated list of idp keys that allow storing of launch context",
         required: true,
         default: "",
       },
