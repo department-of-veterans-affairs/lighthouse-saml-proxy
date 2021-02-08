@@ -1,4 +1,4 @@
-const { hashString, rethrowIfRuntimeError } = require("../../../utils");
+const { hashString } = require("../../../utils");
 const jwtDecode = require("jwt-decode");
 
 class SaveDocumentStateStrategy {
@@ -51,7 +51,7 @@ class SaveDocumentStateStrategy {
       }
     } catch (error) {
       this.logger.error("Could not save the launch context in DynamoDB", error);
-      rethrowIfRuntimeError(error);
+      throw { status: 500, errorMessage: "Could not save the launch context." };
     }
   }
 }
