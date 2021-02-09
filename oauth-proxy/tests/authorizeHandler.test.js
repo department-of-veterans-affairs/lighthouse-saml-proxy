@@ -361,7 +361,7 @@ describe("authorizeHandler", () => {
       redirect_uri: "http://localhost:8080/oauth/redirect",
       scope: "openid profile offline_access launch",
       launch:
-        "eyJhbGciOiJIUzI1NiJ9.eyJwYXRpZW50IjoiMTIzNFY1Njc4In0.z-lvprpXx_3EncDYLBUFwRSw6j-gId6snhjcSrva6hU",
+        "ewogICJwYXRpZW50IjogIjEyMzRWNTY3OCIsCiAgImVuY291bnRlciI6ICI5ODc2LTU0MzItMTAwMCIKfQ==",
       aud: "aud",
     };
 

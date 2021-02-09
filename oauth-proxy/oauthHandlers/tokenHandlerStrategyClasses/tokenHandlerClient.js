@@ -77,7 +77,9 @@ class TokenHandlerClient {
         responseBody["patient"] = patient;
       } else if (decoded.scp.indexOf("launch") > -1 && launch) {
         try {
-          let decodedLaunch = jwtDecode(launch);
+          let decodedLaunch = JSON.parse(
+            Buffer.from(launch, "base64").toString("ascii")
+          );
           for (var key in decodedLaunch) {
             responseBody[key] = decodedLaunch[key];
           }

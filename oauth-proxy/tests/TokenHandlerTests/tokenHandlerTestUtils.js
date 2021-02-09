@@ -55,7 +55,11 @@ const buildGetPatientInfoStrategy = (patient, error) => {
 const buildToken = (is_static, patient, standaloneLaunch) => {
   let token = {
     is_static: is_static,
-    access_token: patient ? (standaloneLaunch ? access_token_patient : access_token_launch) : access_token,
+    access_token: patient
+      ? standaloneLaunch
+        ? access_token_patient
+        : access_token_launch
+      : access_token,
   };
 
   return token;

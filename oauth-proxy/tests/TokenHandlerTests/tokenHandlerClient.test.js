@@ -98,7 +98,9 @@ describe("handleToken tests", () => {
   it("Happy Path with launch", async () => {
     let token = buildToken(false, true, false);
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
-    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({launch: "patient"});
+    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({
+      launch: "patient",
+    });
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy("patient");
     req = new MockExpressRequest();
@@ -120,10 +122,13 @@ describe("handleToken tests", () => {
     expect(response.responseBody.patient).toBe("patient");
   });
 
-  it("Happy Path with launch jwt", async () => {
+  it("Happy Path with launch base64", async () => {
     let token = buildToken(false, true, false);
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
-    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({launch: "eyJhbGciOiJIUzI1NiJ9.eyJwYXRpZW50IjoiMTIzNFY1Njc4IiwiZW5jb3VudGVyIjoiOTg3Ni01NDMyLTEwMDAifQ.TmcNO4ucyMrJA8VguD5Za8jTzgmNB3KLooI59gAbIrg"});
+    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({
+      launch:
+        "ewogICJwYXRpZW50IjogIjEyMzRWNTY3OCIsCiAgImVuY291bnRlciI6ICI5ODc2LTU0MzItMTAwMCIKfQ==",
+    });
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
     getPatientInfoStrategy = buildGetPatientInfoStrategy("patient");
     req = new MockExpressRequest();
