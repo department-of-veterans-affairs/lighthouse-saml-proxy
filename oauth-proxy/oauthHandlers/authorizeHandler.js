@@ -68,13 +68,11 @@ const authorizeHandler = async (
   try {
     let authorizePayload = { state: state, redirect_uri: client_redirect };
 
-    // If the IDP matches a config && launch scope included
-    // then also save the launch context provided (if any)
-    if (config.smart_launch_idps.split(",").includes(req.query.idp)) {
-      if (req.query.scope && req.query.scope.includes("launch")) {
-        if (req.query.launch) {
-          authorizePayload.launch = req.query.launch;
-        }
+    // If the launch scope is included then also
+    // save the launch context provided (if any)
+    if (req.query.scope && req.query.scope.split(" ").includes("launch")) {
+      if (req.query.launch) {
+        authorizePayload.launch = req.query.launch;
       }
     }
 

@@ -51,9 +51,7 @@ class TokenHandlerClient {
         responseBody: tokens,
       };
     }
-
     let document = await this.getDocumentStrategy.getDocument();
-
     let state;
     let launch;
     if (document && tokens) {
@@ -71,17 +69,22 @@ class TokenHandlerClient {
     let decoded = jwtDecode(tokens.access_token);
     let responseBody = { ...tokenResponseBase, state };
     if (decoded.scp != null) {
-      let filteredScopes = decoded.scp.filter((scp) => scp.includes("launch/"));
-      if (filteredScopes.length > 0) {
-        let launchField = filteredScopes[0].split("/")[1];
-        //Needed for patient ICN lookup
-        if (launchField == "patient" && launch === undefined) {
-          launch = await this.getPatientInfoStrategy.createPatientInfo(
-            tokens,
-            decoded
-          );
+      if (decoded.scp.indexOf("launch/patient") > -1) {
+        let patient = await this.getPatientInfoStrategy.createPatientInfo(
+          tokens,
+          decoded
+        );
+        responseBody["patient"] = patient;
+      } else if (decoded.scp.indexOf("launch") > -1 && launch) {
+        try {
+          let decodedLaunch = jwtDecode(launch);
+          for (var key in decodedLaunch) {
+            responseBody[key] = decodedLaunch[key];
+          }
+        } catch (error) {
+          //Assume patient and add normally
+          responseBody["patient"] = launch;
         }
-        responseBody[launchField] = launch;
       }
     }
     return { statusCode: 200, responseBody: responseBody };

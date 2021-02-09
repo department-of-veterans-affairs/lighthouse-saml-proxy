@@ -318,7 +318,7 @@ describe("authorizeHandler", () => {
     expect(res.statusCode).toEqual(400);
   });
 
-  it("Verify that launch is saved for SMART enabled IDP", async () => {
+  it("Verify that context is saved for SMART launch", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
     res = {
@@ -330,8 +330,38 @@ describe("authorizeHandler", () => {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
       scope: "openid profile offline_access launch/patient",
-      idp: "smart-idp-123",
       launch: "123V456",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
+
+  it("Verify that JWT context is saved for SMART launch", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch",
+      launch:
+        "eyJhbGciOiJIUzI1NiJ9.eyJwYXRpZW50IjoiMTIzNFY1Njc4In0.z-lvprpXx_3EncDYLBUFwRSw6j-gId6snhjcSrva6hU",
       aud: "aud",
     };
 

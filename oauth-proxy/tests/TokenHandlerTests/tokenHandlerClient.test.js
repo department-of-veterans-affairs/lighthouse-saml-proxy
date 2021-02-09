@@ -23,7 +23,7 @@ describe("handleToken tests", () => {
   let next;
 
   it("Happy Path Static", async () => {
-    let token = buildToken(true, false);
+    let token = buildToken(true, false, false);
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -47,7 +47,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path no launch/patient", async () => {
-    let token = buildToken(false, false);
+    let token = buildToken(false, false, false);
     getTokenResponseStrategy = buildGetTokenStrategy(token);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -71,7 +71,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path with launch/patient", async () => {
-    let token = buildToken(false, true);
+    let token = buildToken(false, true, true);
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -93,6 +93,56 @@ describe("handleToken tests", () => {
     expect(response.statusCode).toBe(200);
     expect(response.responseBody.access_token).toBe(token.access_token);
     expect(response.responseBody.patient).toBe("patient");
+  });
+
+  it("Happy Path with launch", async () => {
+    let token = buildToken(false, true, false);
+    getTokenResponseStrategy = buildGetTokenStrategy(token, false);
+    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({launch: "patient"});
+    saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
+    getPatientInfoStrategy = buildGetPatientInfoStrategy("patient");
+    req = new MockExpressRequest();
+    res = new MockExpressResponse();
+    next = jest.fn();
+
+    let response = await new TokenHandlerClient(
+      getTokenResponseStrategy,
+      pullDocumentFromDynamoStrategy,
+      saveDocumentToDynamoStrategy,
+      getPatientInfoStrategy,
+      req,
+      res,
+      next
+    ).handleToken();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.responseBody.access_token).toBe(token.access_token);
+    expect(response.responseBody.patient).toBe("patient");
+  });
+
+  it("Happy Path with launch jwt", async () => {
+    let token = buildToken(false, true, false);
+    getTokenResponseStrategy = buildGetTokenStrategy(token, false);
+    pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({launch: "eyJhbGciOiJIUzI1NiJ9.eyJwYXRpZW50IjoiMTIzNFY1Njc4IiwiZW5jb3VudGVyIjoiOTg3Ni01NDMyLTEwMDAifQ.TmcNO4ucyMrJA8VguD5Za8jTzgmNB3KLooI59gAbIrg"});
+    saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
+    getPatientInfoStrategy = buildGetPatientInfoStrategy("patient");
+    req = new MockExpressRequest();
+    res = new MockExpressResponse();
+    next = jest.fn();
+
+    let response = await new TokenHandlerClient(
+      getTokenResponseStrategy,
+      pullDocumentFromDynamoStrategy,
+      saveDocumentToDynamoStrategy,
+      getPatientInfoStrategy,
+      req,
+      res,
+      next
+    ).handleToken();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.responseBody.access_token).toBe(token.access_token);
+    expect(response.responseBody.patient).toBe("1234V5678");
   });
 
   it("getToken 401 Response", async () => {
