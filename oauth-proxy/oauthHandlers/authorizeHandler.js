@@ -150,7 +150,7 @@ const checkParameters = async (
   }
 
   if (
-    scopes !== undefined &&
+    scopes &&
     scopes.split(" ").filter((scope) => scope.includes("launch/")).length > 1
   ) {
     logger.error("Multiple launch contexts were specified.");
