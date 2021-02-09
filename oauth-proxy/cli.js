@@ -180,6 +180,20 @@ function processArgs() {
           },
         },
       },
+      idps: {
+        description: "Enabled identity providers",
+        required: false,
+        type: "array",
+        slug: {
+          description:
+            "A URL friendly descriptor consistent across all environments",
+          required: true,
+        },
+        id: {
+          description: "The identity provider ID",
+          required: true,
+        },
+      },
     })
     .wrap(yargs.terminalWidth()).argv;
 }

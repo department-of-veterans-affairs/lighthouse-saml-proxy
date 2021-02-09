@@ -8,6 +8,7 @@ const authorizeHandler = async (
   issuer,
   dynamoClient,
   oktaClient,
+  slugHelper,
   req,
   res,
   next
@@ -78,7 +79,9 @@ const authorizeHandler = async (
   }
   const params = new URLSearchParams(req.query);
   params.set("redirect_uri", redirect_uri);
-  if (!params.has("idp") && config.idp) {
+  if (params.has("idp")) {
+    params.set("idp", slugHelper.rewrite(params.get("idp")));
+  } else if (!params.has("idp") && config.idp) {
     params.set("idp", config.idp);
   }
 

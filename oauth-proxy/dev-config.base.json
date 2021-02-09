@@ -58,5 +58,19 @@
       "grants": "/grants",
       "smart_launch": "/smart/launch"
     }
-  }
+  },
+  "idps": [
+    {
+      "slug": "localhost",
+      "id": "<FIX ME>"
+    },
+    {
+      "slug": "lighthouse",
+      "id": "<FIX ME>"
+    },
+    {
+      "slug": "ssoi",
+      "id": "<FIX ME>"
+    }
+  ]
 }

@@ -15,7 +15,12 @@ const {
   createFakeConfig,
 } = require("./testUtils");
 const getAuthorizationServerInfoMock = jest.fn();
-
+const mockSlugHelper = {
+  rewrite: jest.fn(),
+};
+mockSlugHelper.rewrite.mockImplementation((slug) => {
+  return slug;
+});
 const userCollection = new Collection("", "", new ModelFactory(User));
 userCollection.currentItems = [{ id: 1 }];
 
@@ -89,6 +94,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -117,6 +123,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -143,6 +150,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -169,6 +177,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      authorizeHandler,
       req,
       res,
       next
@@ -199,6 +208,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -228,6 +238,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -249,6 +260,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -274,6 +286,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -290,6 +303,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -311,6 +325,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next

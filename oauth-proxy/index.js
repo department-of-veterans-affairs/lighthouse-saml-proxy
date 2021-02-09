@@ -18,6 +18,7 @@ const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 const rTracer = require("cls-rtracer");
+const { SlugHelper } = require("./slug_helper");
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -69,7 +70,6 @@ function filterProperty(object, property) {
 
 function buildApp(
   config,
-  oktaClient,
   dynamoClient,
   validateToken,
   isolatedIssuers,
@@ -91,6 +91,7 @@ function buildApp(
       },
     });
   }
+  const slugHelper = new SlugHelper(config);
 
   const setProxyResponse = (response, targetResponse) => {
     if (response.headers !== undefined) {
@@ -283,6 +284,7 @@ function buildApp(
           service_issuer,
           dynamoClient,
           okta_client,
+          slugHelper,
           req,
           res,
           next
@@ -353,12 +355,6 @@ function buildApp(
 }
 
 function startApp(config, isolatedIssuers) {
-  const oktaClient = new okta.Client({
-    orgUrl: config.okta_url,
-    token: config.okta_token,
-    requestExecutor: new okta.DefaultRequestExecutor(),
-  });
-
   const isolatedOktaClients = {};
   if (config.routes && config.routes.categories) {
     Object.entries(config.routes.categories).forEach(
@@ -388,7 +384,6 @@ function startApp(config, isolatedIssuers) {
   );
   const app = buildApp(
     config,
-    oktaClient,
     dynamoClient,
     validateToken,
     isolatedIssuers,
