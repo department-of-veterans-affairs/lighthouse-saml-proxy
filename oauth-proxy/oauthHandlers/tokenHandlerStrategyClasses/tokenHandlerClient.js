@@ -68,14 +68,14 @@ class TokenHandlerClient {
     const tokenResponseBase = translateTokenSet(tokens);
     let decoded = jwtDecode(tokens.access_token);
     let responseBody = { ...tokenResponseBase, state };
-    if (decoded.scp != null) {
-      if (decoded.scp.indexOf("launch/patient") > -1) {
+    if (decoded.scp) {
+      if (decoded.scp.includes("launch/patient")) {
         let patient = await this.getPatientInfoStrategy.createPatientInfo(
           tokens,
           decoded
         );
         responseBody["patient"] = patient;
-      } else if (decoded.scp.indexOf("launch") > -1 && launch) {
+      } else if (decoded.scp.includes("launch") && launch) {
         try {
           let decodedLaunch = JSON.parse(
             Buffer.from(launch, "base64").toString("ascii")
