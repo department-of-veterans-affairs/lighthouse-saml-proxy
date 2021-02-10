@@ -43,7 +43,6 @@ const defaultTestingConfig = {
   dynamo_launch_context_table: "launch_context_table",
   enable_smart_launch_service: true,
   enable_static_token_service: true,
-  smart_launch_idps: "",
   routes: {
     categories: [
       {

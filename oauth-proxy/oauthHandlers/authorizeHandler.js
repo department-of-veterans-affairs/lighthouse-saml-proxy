@@ -22,8 +22,7 @@ const authorizeHandler = async (
       issuer,
       logger,
       oktaClient,
-      client_redirect,
-      req.query.scope
+      client_redirect
     );
   } catch (err) {
     if (err.status == 500) {
@@ -103,8 +102,7 @@ const checkParameters = async (
   issuer,
   logger,
   oktaClient,
-  client_redirect,
-  scopes
+  client_redirect
 ) => {
   if (!client_redirect) {
     logger.error("No valid redirect_uri was found.");
@@ -147,18 +145,6 @@ const checkParameters = async (
         expected: serverAudiences,
       });
     }
-  }
-
-  if (
-    scopes &&
-    scopes.split(" ").filter((scope) => scope.includes("launch/")).length > 1
-  ) {
-    logger.error("Multiple launch contexts were specified.");
-    throw {
-      status: 400,
-      error: "invalid_request",
-      error_description: "Only 1 launch context can be specified.",
-    };
   }
 };
 
