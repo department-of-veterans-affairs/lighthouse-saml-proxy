@@ -136,9 +136,7 @@ dynamo.createTable(tableParams, (err, data) => {
 });
 
 tableParams = {
-  AttributeDefinitions: [
-    { AttributeName: "client_id", AttributeType: "S" },
-  ],
+  AttributeDefinitions: [{ AttributeName: "client_id", AttributeType: "S" }],
   KeySchema: [{ AttributeName: "client_id", KeyType: "HASH" }],
   ProvisionedThroughput: {
     ReadCapacityUnits: 10,
@@ -158,6 +156,7 @@ dynamo.createTable(tableParams, (err, data) => {
       "Created table. Table description JSON:",
       JSON.stringify(data, null, 2)
     );
+    createTestClientEntry();
   }
 });
 
@@ -229,6 +228,27 @@ function createStaticTokenEntry() {
       );
     } else {
       console.log("Created static token entry.");
+      console.log(data);
+    }
+  });
+}
+
+function createTestClientEntry() {
+  let itemParams = {
+    TableName: "Clients",
+    Item: {
+      client_id: { S: "testclient1" },
+      redirect_uris: { SS: ["http://localhost:8080/auth/cb", "http://localhost:18080/auth/cb"] },
+    },
+  };
+  dynamo.putItem(itemParams, (err, data) => {
+    if (err) {
+      console.error(
+        "Unable to create test client. Error JSON:",
+        JSON.stringify(err, null, 2)
+      );
+    } else {
+      console.log("Created test client.");
       console.log(data);
     }
   });
