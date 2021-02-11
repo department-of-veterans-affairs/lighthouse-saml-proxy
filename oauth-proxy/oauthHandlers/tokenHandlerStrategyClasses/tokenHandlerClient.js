@@ -81,7 +81,9 @@ class TokenHandlerClient {
             Buffer.from(launch, "base64").toString("ascii")
           );
           for (var key in decodedLaunch) {
-            responseBody[key] = decodedLaunch[key];
+            if (!responseBody[key]) {
+              responseBody[key] = decodedLaunch[key];
+            }
           }
         } catch (error) {
           //Assume patient and add normally
