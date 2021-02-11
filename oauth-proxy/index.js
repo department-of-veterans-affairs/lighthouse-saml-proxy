@@ -178,6 +178,7 @@ function buildApp(
     const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
     buildMetadataForOpenIdConfiguration(
       isolatedOktaConfig.api_category,
+      isolatedOktaConfig.manage_endpoint,
       app_routes,
       service_issuer,
       okta_client
@@ -246,6 +247,7 @@ function buildApp(
 
   function buildMetadataForOpenIdConfiguration(
     api_category,
+    manage_endpoint,
     app_routes,
     service_issuer,
     okta_client
@@ -310,8 +312,10 @@ function buildApp(
         .catch(next);
     });
 
-    router.get(api_category + app_routes.manage, (req, res) =>
-      res.redirect(config.manage_endpoint)
+    router.get(
+      api_category + app_routes.manage,
+      async (req, res, next) =>
+        await oauthHandlers.manageHandler(res, next, manage_endpoint)
     );
     router.get(api_category + app_routes.jwks, (req, res) =>
       proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET")

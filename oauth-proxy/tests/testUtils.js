@@ -306,7 +306,7 @@ const createFakeConfig = () => {
         {
           api_category: "/noManage",
           upstream_issuer:
-            "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7"
+            "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         },
       ],
       app_routes: {
