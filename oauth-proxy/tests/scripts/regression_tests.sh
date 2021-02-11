@@ -119,7 +119,7 @@ assign_code() {
   local code
   code=$(docker run \
       $network \
-      vasdvp/lighthouse-auth-utils:latest auth \
+      vasdvp/lighthouse-auth-utils:1.1.2 auth \
       --redirect-uri="$REDIRECT_URI" \
       --authorization-url="$HOST" \
       --user-email="$USER_EMAIL" \
@@ -147,7 +147,7 @@ assign_code() {
 # ----
 
 # Pulling latest lighthouse-auth-utils docker image if necessary
-docker pull vasdvp/lighthouse-auth-utils:latest
+docker pull vasdvp/lighthouse-auth-utils:1.1.2
 
 # Start Tests
 
