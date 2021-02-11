@@ -43,6 +43,11 @@ function processArgs() {
         description: "name of launch context table.",
         required: true,
       },
+      dynamo_clients_table: {
+        description: "name of clients table.",
+        required: true,
+        default: "Clients",
+      },
       dynamo_static_token_table: {
         description: "name of static token table.",
         required: true,
