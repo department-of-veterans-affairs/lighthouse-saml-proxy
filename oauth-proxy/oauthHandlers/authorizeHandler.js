@@ -62,13 +62,22 @@ const authorizeHandler = async (
       error_description:
         "The client specified by the application is not valid.",
     });
-
     return next();
   }
 
   try {
+    let authorizePayload = { state: state, redirect_uri: client_redirect };
+
+    // If the launch scope is included then also
+    // save the launch context provided (if any)
+    if (req.query.scope && req.query.scope.split(" ").includes("launch")) {
+      if (req.query.launch) {
+        authorizePayload.launch = req.query.launch;
+      }
+    }
+
     await dynamoClient.savePayloadToDynamo(
-      { state: state, redirect_uri: client_redirect },
+      authorizePayload,
       config.dynamo_table_name
     );
   } catch (error) {

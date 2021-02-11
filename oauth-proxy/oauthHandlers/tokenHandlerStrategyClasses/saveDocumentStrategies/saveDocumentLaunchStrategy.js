@@ -1,16 +1,17 @@
 const jwtDecode = require("jwt-decode");
+const { hashString } = require("../../../utils");
+
 class SaveDocumentLaunchStrategy {
-  constructor(logger, dynamoClient, config, hashingFunction) {
+  constructor(logger, dynamoClient, config) {
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
-    this.hashingFunction = hashingFunction;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.launch) {
         let launch = document.launch;
-        let accessToken = this.hashingFunction(
+        let accessToken = hashString(
           tokens.access_token,
           this.config.hmac_secret
         );

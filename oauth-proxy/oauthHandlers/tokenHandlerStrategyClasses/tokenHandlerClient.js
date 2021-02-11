@@ -51,33 +51,47 @@ class TokenHandlerClient {
         responseBody: tokens,
       };
     }
-
     let document = await this.getDocumentStrategy.getDocument();
-
     let state;
+    let launch;
     if (document && tokens) {
       await this.saveDocumentToDynamoStrategy.saveDocumentToDynamo(
         document,
         tokens
       );
       state = document.state || null;
+      launch = document.launch;
     }
     state = state || null;
 
     //Creates a Token Response
     const tokenResponseBase = translateTokenSet(tokens);
     let decoded = jwtDecode(tokens.access_token);
-    if (decoded.scp != null && decoded.scp.indexOf("launch/patient") > -1) {
-      let patient = await this.getPatientInfoStrategy.createPatientInfo(
-        tokens,
-        decoded
-      );
-      return {
-        statusCode: 200,
-        responseBody: { ...tokenResponseBase, patient, state },
-      };
+    let responseBody = { ...tokenResponseBase, state };
+    if (decoded.scp) {
+      if (decoded.scp.includes("launch/patient")) {
+        let patient = await this.getPatientInfoStrategy.createPatientInfo(
+          tokens,
+          decoded
+        );
+        responseBody["patient"] = patient;
+      } else if (decoded.scp.includes("launch") && launch) {
+        try {
+          let decodedLaunch = JSON.parse(
+            Buffer.from(launch, "base64").toString("ascii")
+          );
+          for (var key in decodedLaunch) {
+            if (!responseBody[key]) {
+              responseBody[key] = decodedLaunch[key];
+            }
+          }
+        } catch (error) {
+          //Assume patient and add normally
+          responseBody["patient"] = launch;
+        }
+      }
     }
-    return { statusCode: 200, responseBody: { ...tokenResponseBase, state } };
+    return { statusCode: 200, responseBody: responseBody };
   }
 }
 
