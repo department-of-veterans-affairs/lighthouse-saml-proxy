@@ -11,6 +11,7 @@ const {
 
 const HMAC_SECRET = "secret";
 const STATE = "abc123";
+const LAUNCH = "1234V5678";
 const CODE_HASH_PAIR = [
   "the_fake_authorization_code",
   "9daf298b2cb68502791f6f264aef8ebb56dc0ddd3542fbd1c4bd675538fd9cb8",
@@ -21,7 +22,8 @@ const REFRESH_TOKEN_HASH_PAIR = [
 ];
 const REDIRECT_URI = "http://localhost/thisDoesNotMatter";
 
-const ACCESS_TOKEN = "the_fake_access_token";
+const ACCESS_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaCJdLCJpYXQiOjE1MTYyMzkwMjJ9.61N3OfyoslutHtsG1PxVWztr77PyMiVz9Js4CwzPiV8";
 
 let dynamoClient;
 let config;
@@ -68,7 +70,43 @@ describe("saveDocumentStateStrategy tests", () => {
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
   });
-
+  it("Happy Path with launch", () => {
+    document.launch = LAUNCH;
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      launch: LAUNCH,
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config
+    );
+    strategy.saveDocumentToDynamo(document, tokens);
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+  it("Happy Path with launch w/o scope", () => {
+    document.launch = LAUNCH;
+    tokens.access_token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config
+    );
+    strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
+  });
   it("No Document State", () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({

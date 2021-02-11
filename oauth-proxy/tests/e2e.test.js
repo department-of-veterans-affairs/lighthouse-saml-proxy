@@ -165,6 +165,7 @@ describe("OpenID Connect Conformance", () => {
     fakeDynamoClient = buildFakeDynamoClient({
       state: "abc123",
       code: "xyz789",
+      launch: "123V456",
       refresh_token: "jkl456",
       redirect_uri: FAKE_CLIENT_APP_REDIRECT_URL,
     });
@@ -253,6 +254,7 @@ describe("OpenID Connect Conformance", () => {
         client_id: "clientId123",
         state: "abc123",
         redirect_uri: "http://localhost:8080/oauth/redirect",
+        scope: "openid profile offline_access",
       },
     };
     const authorizeResp = await axios.get(
@@ -329,6 +331,7 @@ describe("OpenID Connect Conformance", () => {
         client_id: "clientId123",
         state: "abc123",
         redirect_uri: "http://localhost:8080/oauth/redirect",
+        scope: "openid profile offline_access",
       },
     };
     const authorizeResp = await axios.get(

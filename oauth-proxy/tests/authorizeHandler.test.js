@@ -332,4 +332,65 @@ describe("authorizeHandler", () => {
     );
     expect(res.statusCode).toEqual(400);
   });
+
+  it("Verify that context is saved for SMART launch", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch/patient",
+      launch: "123V456",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
+
+  it("Verify that JWT context is saved for SMART launch", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch",
+      launch:
+        "ewogICJwYXRpZW50IjogIjEyMzRWNTY3OCIsCiAgImVuY291bnRlciI6ICI5ODc2LTU0MzItMTAwMCIKfQ==",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
 });
