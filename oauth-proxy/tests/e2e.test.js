@@ -744,7 +744,9 @@ describe("OpenID Connect Conformance", () => {
         fail("Manage endpoint should return 404 when none is specified.")
       })
       .catch(() => {
-        expect(err.response.status).toEqual(404);
+        expect(err.response.status).toEqual(404)
+        expect(err.response.error).toBe("NOT FOUND")
+        expect(err.response.error_description).toBe("No manage url defined for this endpoint.")
       });
   });
 
