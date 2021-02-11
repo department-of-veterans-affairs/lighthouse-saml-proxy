@@ -124,6 +124,16 @@ curl -s \
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=302
 track_result
 
+echo -e "\tRunning ... Manage no path"
+
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/noManage/manage" > "$curl_status"
+
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=404
+track_result
+
 echo -e "\tRunning ... Authorize Handler with no state parameter"
 
 if [[ -z $SCOPE ]];
