@@ -284,7 +284,6 @@ const createFakeConfig = () => {
     enable_smart_launch_service: true,
     enable_static_token_service: true,
     dynamo_static_token_table: "ut_static_tokens_table",
-    smart_launch_idps: "smart-idp-123",
     routes: {
       categories: [
         {
