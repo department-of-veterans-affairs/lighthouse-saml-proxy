@@ -137,6 +137,32 @@ dynamo.createTable(tableParams, (err, data) => {
 
 tableParams = {
   AttributeDefinitions: [
+    { AttributeName: "client_id", AttributeType: "S" },
+  ],
+  KeySchema: [{ AttributeName: "client_id", KeyType: "HASH" }],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 10,
+    WriteCapacityUnits: 10,
+  },
+  TableName: "Client",
+};
+
+dynamo.createTable(tableParams, (err, data) => {
+  if (err) {
+    console.error(
+      "Unable to create table. Error JSON:",
+      JSON.stringify(err, null, 2)
+    );
+  } else {
+    console.log(
+      "Created table. Table description JSON:",
+      JSON.stringify(data, null, 2)
+    );
+  }
+});
+
+tableParams = {
+  AttributeDefinitions: [
     { AttributeName: "static_refresh_token", AttributeType: "S" },
   ],
   KeySchema: [{ AttributeName: "static_refresh_token", KeyType: "HASH" }],
