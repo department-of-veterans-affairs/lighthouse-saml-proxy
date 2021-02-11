@@ -356,6 +356,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
@@ -387,6 +388,7 @@ describe("authorizeHandler", () => {
       issuer,
       dynamoClient,
       oktaClient,
+      mockSlugHelper,
       req,
       res,
       next
