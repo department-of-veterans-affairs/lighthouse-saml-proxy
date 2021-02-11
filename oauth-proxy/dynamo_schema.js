@@ -144,7 +144,7 @@ tableParams = {
     ReadCapacityUnits: 10,
     WriteCapacityUnits: 10,
   },
-  TableName: "Client",
+  TableName: "Clients",
 };
 
 dynamo.createTable(tableParams, (err, data) => {
