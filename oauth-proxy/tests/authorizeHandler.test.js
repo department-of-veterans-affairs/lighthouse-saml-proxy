@@ -40,7 +40,7 @@ beforeEach(() => {
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
   next = jest.fn();
-  req = new MockExpressRequest();
+  req = new MockExpressRequest({ url: "/veteran-verification/v1/authorization"});
   res = new MockExpressResponse();
 
   oktaClient = buildFakeOktaClient(
