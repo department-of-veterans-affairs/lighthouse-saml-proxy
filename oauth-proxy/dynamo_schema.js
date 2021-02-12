@@ -239,6 +239,7 @@ function createTestClientEntry() {
     Item: {
       client_id: { S: "testclient1" },
       redirect_uris: { SS: ["http://localhost:8080/auth/cb", "http://localhost:18080/auth/cb"] },
+      system: { S: "oauthi" },
     },
   };
   dynamo.putItem(itemParams, (err, data) => {
