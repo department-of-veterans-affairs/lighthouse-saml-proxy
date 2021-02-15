@@ -397,4 +397,56 @@ describe("authorizeHandler", () => {
     );
     expect(res.redirect).toHaveBeenCalled();
   });
+
+  it("Happy path auth with local client flag", async () => {
+    config.routes.categories = [
+      {
+        api_category: "/health/v1",
+        upstream_issuer:
+          "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
+      },
+      {
+        api_category: "/benefits/v1",
+        upstream_issuer:
+          "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
+      },
+      {
+        api_category: "/veteran-verification/v1",
+        upstream_issuer:
+          "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+        client_store: "local",
+      },
+    ];
+
+    dynamoClient = buildFakeDynamoClient({
+      client_id: "clientId123",
+      redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
+    });
+
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+  });
 });
