@@ -539,6 +539,7 @@ describe("authorizeHandler", () => {
     );
     expect(res.statusCode).toEqual(400);
     expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it("Invalid client in request, local client config, mimic no db table", async () => {
@@ -578,6 +579,7 @@ describe("authorizeHandler", () => {
     );
     expect(res.statusCode).toEqual(400);
     expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it("Invalid client in request, local client config, empty response from db", async () => {
@@ -623,5 +625,6 @@ describe("authorizeHandler", () => {
     );
     expect(res.statusCode).toEqual(400);
     expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 });

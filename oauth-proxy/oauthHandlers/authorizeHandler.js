@@ -49,15 +49,40 @@ const authorizeHandler = async (
   }
 
   if (app_category.client_store && app_category.client_store === "local") {
-    await localValidateClient(
-      config,
-      logger,
-      client_id,
-      client_redirect,
-      dynamoClient,
-      res,
-      next
-    );
+    try {
+      let clientInfo = await dynamoClient.getPayloadFromDynamo(
+        {
+          client_id: client_id,
+        },
+        config.dynamo_clients_table
+      );
+      if (clientInfo.Item) {
+        clientInfo = clientInfo.Item;
+      } else {
+        res.status(400).json({
+          error: "invalid_client",
+          error_description: "Invalid client for the authorization path",
+        });
+        return next();
+      }
+      if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
+        res.status(400).json({
+          error: "invalid_client",
+          error_description:
+            "The redirect URI specified by the application does not match any of the " +
+            `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
+        });
+        return next();
+      }
+    } catch (err) {
+      logger.error("Failed to retrieve client info from Dynamo DB.", err);
+      res.status(400).json({
+        error: "invalid_client",
+        error_description:
+          "The client specified by the application is not valid.",
+      });
+      return next();
+    }
   } else {
     try {
       const oktaApp = await oktaClient.getApplication(client_id);
@@ -173,51 +198,6 @@ const checkParameters = async (
         expected: serverAudiences,
       });
     }
-  }
-};
-
-const localValidateClient = async (
-  config,
-  logger,
-  client_id,
-  client_redirect,
-  dynamoClient,
-  res,
-  next
-) => {
-  try {
-    let clientInfo = await dynamoClient.getPayloadFromDynamo(
-      {
-        client_id: client_id,
-      },
-      config.dynamo_clients_table
-    );
-    if (clientInfo.Item) {
-      clientInfo = clientInfo.Item;
-    } else {
-      res.status(400).json({
-        error: "invalid_client",
-        error_description: "Invalid client for the authorization path",
-      });
-      return next();
-    }
-    if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
-      res.status(400).json({
-        error: "invalid_client",
-        error_description:
-          "The redirect URI specified by the application does not match any of the " +
-          `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
-      });
-      return next();
-    }
-  } catch (err) {
-    logger.error("Failed to retrieve client info from Dynamo DB.", err);
-    res.status(400).json({
-      error: "invalid_client",
-      error_description:
-        "The client specified by the application is not valid.",
-    });
-    return next();
   }
 };
 
