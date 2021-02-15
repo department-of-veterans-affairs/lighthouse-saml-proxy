@@ -219,7 +219,6 @@ const localValidateClient = async (
     });
     return next();
   }
-  return next();
 };
 
 module.exports = authorizeHandler;
