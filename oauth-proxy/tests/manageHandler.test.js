@@ -19,7 +19,7 @@ describe("Manage Endpoint Tests", () => {
   });
 
   it("Valid URL", async () => {
-    let url = "http://fakemanage.com";
+    let url = "http://example.com";
     await manageHandler(res, next, url);
     expect(res.redirect).toHaveBeenLastCalledWith(url);
   });
