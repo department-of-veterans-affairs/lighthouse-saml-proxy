@@ -502,18 +502,8 @@ describe("authorizeHandler", () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it("Invalid client in request, local client config", async () => {
+  it("Invalid redirect_uri in request, local client config", async () => {
     config.routes.categories = [
-      {
-        api_category: "/health/v1",
-        upstream_issuer:
-          "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
-      },
-      {
-        api_category: "/benefits/v1",
-        upstream_issuer:
-          "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
-      },
       {
         api_category: "/veteran-verification/v1",
         upstream_issuer:
@@ -525,6 +515,90 @@ describe("authorizeHandler", () => {
     dynamoClient = buildFakeDynamoClient({
       client_id: "clientId123",
       redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
+    });
+
+    res.redirect = jest.fn();
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/invalid/redirect",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+    expect(next).toHaveBeenCalled();
+  });
+
+  it("Invalid client in request, local client config, mimic no db table", async () => {
+    config.routes.categories = [
+      {
+        api_category: "/veteran-verification/v1",
+        upstream_issuer:
+          "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+        client_store: "local",
+      },
+    ];
+
+    dynamoClient = buildFakeDynamoClient({
+      client_id: "clientId123xxxx",
+      redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
+    });
+
+    res.redirect = jest.fn();
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/invalid/redirect",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+    expect(next).toHaveBeenCalled();
+  });
+
+  it("Invalid client in request, local client config, empty response from db", async () => {
+    config.routes.categories = [
+      {
+        api_category: "/veteran-verification/v1",
+        upstream_issuer:
+          "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+        client_store: "local",
+      },
+    ];
+
+    dynamoClient = buildFakeDynamoClient({
+      client_id: "clientId123xxxx",
+      redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
+    });
+
+    dynamoClient.getPayloadFromDynamo = jest.fn().mockImplementation(() => {
+      return new Promise((resolve) => {
+        resolve({});
+      });
     });
 
     res.redirect = jest.fn();
