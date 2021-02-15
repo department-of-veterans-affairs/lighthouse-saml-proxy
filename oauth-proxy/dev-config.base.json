@@ -51,10 +51,6 @@
         "api_category": "/veteran-verification/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         "manage_endpoint": "https://staging.va.gov/account"
-      },
-      {
-        "api_category": "/noManage",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default"
       }
     ],
     "app_routes": {
