@@ -38,7 +38,6 @@ const defaultTestingConfig = {
   upstream_issuer: upstreamOAuthTestServer.baseUrl(),
   validate_post_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
-  manage_endpoint: "http://localhost:9091/account",
   hmac_secret: "testsecret",
   dynamo_launch_context_table: "launch_context_table",
   enable_smart_launch_service: true,
@@ -48,9 +47,15 @@ const defaultTestingConfig = {
       {
         api_category: "/veteran-verification-apis/v1",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+        manage_endpoint: "http://localhost:9091/account",
       },
       {
         api_category: "",
+        upstream_issuer: upstreamOAuthTestServer.baseUrl(),
+        manage_endpoint: "http://localhost:9091/account",
+      },
+      {
+        api_category: "noManage",
         upstream_issuer: upstreamOAuthTestServer.baseUrl(),
       },
     ],
@@ -730,6 +735,17 @@ describe("OpenID Connect Conformance", () => {
       })
       .catch(() => {
         expect(true).toEqual(false);
+      });
+  });
+
+  it("tests manage endpoint redirect, isolated endpoint. No Manage endpoint defined.", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/noManage/manage")
+      .then(() => {
+        fail("Manage endpoint should return 404 when none is specified.");
+      })
+      .catch((err) => {
+        expect(err.response.status).toEqual(404);
       });
   });
 
