@@ -134,7 +134,7 @@ function processArgs() {
           },
           client_store: {
             description:
-              "Indicates if client information is to be retrieved locally from the dynamo instance, ie. set to 'local' if the app category requires the client information to be retrieved from a dymamo lookup",
+              "Indicates if client information is to be retrieved locally from the dynamo instance, ie. set to 'local' if the app category requires the client information to be retrieved from a dynamo lookup",
             required: false,
             default: null,
           },
