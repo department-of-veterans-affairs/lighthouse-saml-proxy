@@ -276,7 +276,6 @@ const createFakeConfig = () => {
     okta_url: "https://deptva-eval.okta.com",
     validate_post_endpoint:
       "https://sandbox-api.va.gov/internal/auth/v1/validation",
-    manage_endpoint: "https://staging.va.gov/account",
     validate_apiKey: "validate_apiKey",
     okta_token: "okta_token",
     enable_pkce_authorization_flow: true,
@@ -290,14 +289,22 @@ const createFakeConfig = () => {
           api_category: "/health/v1",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
+          manage_endpoint: "https://staging.va.gov/account",
         },
         {
           api_category: "/benefits/v1",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
+          manage_endpoint: "https://staging.va.gov/account",
         },
         {
           api_category: "/veteran-verification/v1",
+          upstream_issuer:
+            "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+          manage_endpoint: "https://staging.va.gov/account",
+        },
+        {
+          api_category: "/noManage",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         },

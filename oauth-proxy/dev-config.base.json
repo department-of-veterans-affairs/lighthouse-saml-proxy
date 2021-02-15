@@ -9,7 +9,6 @@
   "hmac_secret": "secret",
   "okta_url": "https://deptva-eval.okta.com",
   "validate_post_endpoint": "https://sandbox-api.va.gov/internal/auth/v1/validation",
-  "manage_endpoint": "https://staging.va.gov/account",
   "validate_apiKey": "<FIX ME>",
   "okta_token": "<FIX ME>",
   "enable_pkce_authorization_flow": true,
@@ -20,19 +19,23 @@
     "categories": [
       {
         "api_category": "",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
+        "manage_endpoint": "https://staging.va.gov/account"
       },
       {
         "api_category": "/claims/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
+        "manage_endpoint": "https://staging.va.gov/account"
       },
       {
         "api_category": "/community-care/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus89xnh1xznM13SK2p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus89xnh1xznM13SK2p7",
+        "manage_endpoint": "https://staging.va.gov/account"
       },
       {
         "api_category": "/health/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
+        "manage_endpoint": "https://staging.va.gov/account"
       },
       {
         "api_category": "/health-insurance/v1",
@@ -44,7 +47,8 @@
       },
       {
         "api_category": "/veteran-verification/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+        "manage_endpoint": "https://staging.va.gov/account"
       }
     ],
     "app_routes": {
