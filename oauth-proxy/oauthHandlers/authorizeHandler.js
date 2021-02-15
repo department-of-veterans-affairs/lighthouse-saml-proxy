@@ -19,6 +19,15 @@ const authorizeHandler = async (
     return item.api_category + config.routes.app_routes.authorize === req.path;
   });
 
+  if (!app_category) {
+    res.status(400).json({
+      error: "invalid_request",
+      error_description:
+        "Invalid path attempted for authorization: '" + req.path + "'",
+    });
+    return next();
+  }
+
   try {
     await checkParameters(
       state,
@@ -202,6 +211,7 @@ const localValidateClient = async (
     });
     return next();
   }
+  return next();
 };
 
 module.exports = authorizeHandler;
