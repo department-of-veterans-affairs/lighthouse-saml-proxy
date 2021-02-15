@@ -51,6 +51,7 @@ const authorizeHandler = async (
   if (app_category.client_store && app_category.client_store === "local") {
     await localValidateClient(
       config,
+      logger,
       client_id,
       client_redirect,
       dynamoClient,
@@ -177,6 +178,7 @@ const checkParameters = async (
 
 const localValidateClient = async (
   config,
+  logger,
   client_id,
   client_redirect,
   dynamoClient,
@@ -192,6 +194,12 @@ const localValidateClient = async (
     );
     if (clientInfo.Item) {
       clientInfo = clientInfo.Item;
+    } else {
+      res.status(400).json({
+        error: "invalid_client",
+        error_description: "Invalid client for the authorization path",
+      });
+      return next();
     }
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       res.status(400).json({
@@ -203,7 +211,7 @@ const localValidateClient = async (
       return next();
     }
   } catch (err) {
-    this.logger.error("Failed to retrieve client info from Dynamo DB.", err);
+    logger.error("Failed to retrieve client info from Dynamo DB.", err);
     res.status(400).json({
       error: "invalid_client",
       error_description:
