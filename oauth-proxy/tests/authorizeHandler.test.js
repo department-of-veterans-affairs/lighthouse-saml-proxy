@@ -448,6 +448,7 @@ describe("authorizeHandler", () => {
       next
     );
     expect(res.redirect).toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
   });
 
   it("Invalid path in request", async () => {
@@ -475,9 +476,9 @@ describe("authorizeHandler", () => {
       redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
     });
 
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
     res = new MockExpressResponse();
+    res.redirect = jest.fn();
+    res.next = jest.fn();
 
     req.query = {
       state: "fake_state",
@@ -526,9 +527,7 @@ describe("authorizeHandler", () => {
       redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
     });
 
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
-    res = new MockExpressResponse();
+    res.redirect = jest.fn();
 
     req.query = {
       state: "fake_state",
