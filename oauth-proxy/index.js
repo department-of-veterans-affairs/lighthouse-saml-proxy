@@ -312,11 +312,12 @@ function buildApp(
         .catch(next);
     });
 
-    router.get(
-      api_category + app_routes.manage,
-      async (req, res, next) =>
-        await oauthHandlers.manageHandler(res, next, manage_endpoint)
-    );
+    if (manage_endpoint) {
+      router.get(api_category + app_routes.manage, (req, res) =>
+        res.redirect(manage_endpoint)
+      );
+    }
+
     router.get(api_category + app_routes.jwks, (req, res) =>
       proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET")
     );
