@@ -1,12 +1,23 @@
 const { parseClientId } = require("../utils");
 const validator = require("validator");
 
-const revokeUserGrantHandler = async (oktaClient, config, req, res, next) => {
+const revokeUserGrantHandler = async (
+  oktaClient,
+  enable_consent_endpoint,
+  req,
+  res,
+  next
+) => {
   let client_id = req.body.client_id;
   let email = req.body.email;
 
   try {
-    await checkForValidParams(oktaClient, config, client_id, email);
+    await checkForValidParams(
+      oktaClient,
+      enable_consent_endpoint,
+      client_id,
+      email
+    );
   } catch (error) {
     setErrorResponse(res, error.status, error.errorMessage);
     return next();
@@ -82,8 +93,13 @@ const deleteGrantsOnClientAndUserId = async (oktaClient, userId, clientId) => {
   return retValue;
 };
 
-const checkForValidParams = async (oktaClient, config, clientId, email) => {
-  if (!config.enable_okta_consent_endpoint) {
+const checkForValidParams = async (
+  oktaClient,
+  enable_consent_endpoint,
+  clientId,
+  email
+) => {
+  if (!enable_consent_endpoint) {
     throw {
       status: 403,
       errorMessage: "Revoking grants is disabled in this environment.",

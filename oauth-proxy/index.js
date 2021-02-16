@@ -180,6 +180,7 @@ function buildApp(
       isolatedOktaConfig.api_category,
       isolatedOktaConfig.manage_endpoint,
       app_routes,
+      isolatedOktaConfig.enable_consent_endpoint,
       service_issuer,
       okta_client
     );
@@ -249,6 +250,7 @@ function buildApp(
     api_category,
     manage_endpoint,
     app_routes,
+    enable_consent_endpoint,
     service_issuer,
     okta_client
   ) {
@@ -351,7 +353,13 @@ function buildApp(
 
     router.delete(api_category + app_routes.grants, async (req, res, next) => {
       await oauthHandlers
-        .revokeUserGrantHandler(okta_client, config, req, res, next)
+        .revokeUserGrantHandler(
+          okta_client,
+          enable_consent_endpoint,
+          req,
+          res,
+          next
+        )
         .catch(next);
     });
   }

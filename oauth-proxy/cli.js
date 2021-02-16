@@ -132,6 +132,11 @@ function processArgs() {
             required: false,
             default: null,
           },
+          enable_consent_endpoint: {
+            description: "URL where developers can reset grants/consent.",
+            required: false,
+            default: false,
+          },
         },
         app_routes: {
           description:

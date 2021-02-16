@@ -82,12 +82,17 @@ describe("revokeUserGrantHandler", () => {
   });
 
   it("Revoke Grants Turned Off", async () => {
-    config = {
-      enable_okta_consent_endpoint: false,
-    };
+    const enable_okta_consent_endpoint = false;
+
     revokeGrantsForUserAndClientMock.mockResolvedValue({ status: 200 });
     req.body = { client_id: "clientid123", user_id: "userid123" };
-    await revokeUserGrantHandler(oktaClient, config, req, res, next);
+    await revokeUserGrantHandler(
+      oktaClient,
+      enable_okta_consent_endpoint,
+      req,
+      res,
+      next
+    );
     expect(res.statusCode).toEqual(403);
   });
 
