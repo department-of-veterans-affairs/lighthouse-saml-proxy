@@ -104,6 +104,44 @@ describe("authorizeHandler", () => {
     expect(res.redirect).toHaveBeenCalled();
   });
 
+  it("Happy Path Redirect using slug", async () => {
+    mockSlugHelper.rewrite.mockImplementation((slug) => {
+      return slug === "friendlyidp" ? "uglyipdid" : slug;
+    });
+
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+
+    let redirected_uri;
+    res.redirect = jest.fn();
+    res.redirect.mockImplementation((url) => {
+      redirected_uri = url;
+    });
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      idp: "friendlyidp",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirected_uri).toEqual(
+      "fake_endpoint?state=fake_state&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=uglyipdid"
+    );
+  });
+
   it("Happy Path Redirect with Aud parameter", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
