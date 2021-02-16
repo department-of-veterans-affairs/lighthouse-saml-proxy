@@ -326,7 +326,29 @@ describe("authorizeHandler", () => {
     });
   });
 
+  it("No client_redirect, returns 400", async () => {
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+  });
+
   it("No state, returns 400", async () => {
+    req.query = {
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue",
+    };
+
     await authorizeHandler(
       config,
       redirect_uri,
