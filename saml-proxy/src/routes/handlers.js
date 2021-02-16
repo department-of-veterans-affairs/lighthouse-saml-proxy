@@ -34,13 +34,13 @@ export const samlLogin = function (template) {
       ? req.authnRequest
       : req.session.authnRequest;
     req.authnRequest = authnRequest;
+    let relayState = req.RelayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request or session");
+    } else {
+      relayState = relayState ? relayState : req.authnRequest?.relayState;
     }
-    if (
-      req.authnRequest?.relayState == null ||
-      req.authnRequest?.relayState == ""
-    ) {
+    if (relayState == null || relayState == "") {
       let logMessage =
         template === "verify"
           ? "Empty relay state during verify. Invalid request."
@@ -69,7 +69,7 @@ export const samlLogin = function (template) {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
           (req.authnRequest && req.authnRequest.forceAuthn) || "false",
-          (req.authnRequest && req.authnRequest.relayState) || "/",
+          relayState || "/",
           authnContext
         );
         return memo.then((m) => {
