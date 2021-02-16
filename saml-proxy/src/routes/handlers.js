@@ -34,6 +34,9 @@ export const samlLogin = function (template) {
       ? req.authnRequest
       : req.session.authnRequest;
     req.authnRequest = authnRequest;
+    if (!authnRequest) {
+      logger.warn("There is no authnRequest in the request or session");
+    }
     if (
       req.authnRequest?.relayState == null ||
       req.authnRequest?.relayState == ""
@@ -104,6 +107,9 @@ export const samlLogin = function (template) {
 
 export const parseSamlRequest = function (req, res, next) {
   logRelayState(req, logger, "from Okta");
+  if (!req.session) {
+    logger.warn("session is null or undefined parsing the SAML request");
+  }
   samlp.parseRequest(req, function (err, data) {
     if (err) {
       logger.warn("Allowing login with no final redirect.");
