@@ -42,6 +42,10 @@
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
       },
       {
+        "api_category": "/health/system/v1",
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
+      },
+      {
         "api_category": "/pgd/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8x27nv4g4BS01v2p7"
       },
