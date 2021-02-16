@@ -627,4 +627,46 @@ describe("authorizeHandler", () => {
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
+
+  it("Error on save to dynamo", async () => {
+    dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation(() => {
+      return new Promise((resolve, reject) => {
+        // It's unclear whether this should resolve with a full records or just
+        // the identity field but thus far it has been irrelevant to the
+        // functional testing of the oauth-proxy.
+        reject({
+          error: "bad_things_error",
+          error_description: "Bad things happen",
+        });
+      });
+    });
+
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
+  });
 });
