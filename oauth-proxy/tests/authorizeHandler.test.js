@@ -142,6 +142,40 @@ describe("authorizeHandler", () => {
     );
   });
 
+  it("Happy Path Redirect using config idp", async () => {
+    config.idp = "defaultidp";
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+
+    let redirected_uri;
+    res.redirect = jest.fn();
+    res.redirect.mockImplementation((url) => {
+      redirected_uri = url;
+    });
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
+
+    await authorizeHandler(
+      config,
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirected_uri).toEqual(
+      "fake_endpoint?state=fake_state&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=defaultidp"
+    );
+  });
+
   it("Happy Path Redirect with Aud parameter", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
