@@ -1,10 +1,63 @@
 import "jest";
-import { getHashCode, samlLogin, parseSamlRequest } from "./handlers.js";
-jest.mock("../logger");
+import {
+  getHashCode,
+  samlLogin,
+  parseSamlRequest,
+  getSessionIndex,
+  getParticipant,
+  handleError,
+} from "./handlers.js";
 
-describe("getHashCode", () => {
-  it("should get hash code for a string", () => {
+jest.mock("../logger");
+describe("getHashCode, getSessionIndex", () => {
+  let mockReq: any;
+  let mockRes: any;
+  beforeEach(() => {
+    mockReq = {
+      cookies: {
+        idp_sid: "idp_sid1",
+      },
+      session: {
+        id: "test-string",
+      },
+      user: {
+        userName: "uname1",
+        nameIdFormat: "nameIdFormat1",
+      },
+      idp: {
+        options: { serviceProviderId: "serviceProviderId1", sloUrl: "sloUrl1" },
+      },
+    };
+    mockRes = {
+      render: jest.fn(),
+    };
+  });
+  test("should get hash code for a string", () => {
     expect(getHashCode("test-string")).toEqual(-1666277972);
+  });
+  test("getHashCode empty string hash", () => {
+    expect(getHashCode("")).toEqual(0);
+  });
+  test("getSessionIndex happy", () => {
+    expect(getSessionIndex(mockReq)).toEqual("1666277972");
+  });
+  test("getSessionIndex empty string", () => {
+    expect(getSessionIndex({})).toEqual(0);
+  });
+  test("getParticipant", () => {
+    expect(getParticipant(mockReq)).toEqual({
+      serviceProviderId: "serviceProviderId1",
+      sessionIndex: "1666277972",
+      serviceProviderLogoutURL: "sloUrl1",
+      nameId: "uname1",
+      nameIdFormat: "nameIdFormat1",
+    });
+  });
+  test("handleError", () => {
+    handleError(mockReq, mockRes);
+    expect(mockRes.render).toHaveBeenCalledWith("sensitiveError.hbs", {
+      request_id: undefined,
+    });
   });
 });
 
