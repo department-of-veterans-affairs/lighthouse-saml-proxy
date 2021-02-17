@@ -12,27 +12,33 @@ class GetDocumentByRefreshTokenStrategy {
       this.req.body.refresh_token,
       this.config.hmac_secret
     );
-    let document = await this.getDocumentDynamo(hashedRefreshToken);
+    let document = await this.getDocumentDynamo(
+      hashedRefreshToken,
+      this.config.dynamo_oauth_requests_table
+    );
 
     // Backwards compatibility.
-    // Remove after 42 Days of PR merge (DATE - 11/30/2020).
+    // Remove after 42 Days of PR merge (DATE - 02/19/2021).
     if (!document) {
       this.logger.warn(
-        "Hashed refresh_token not found. Searching for unhashed refresh_token."
+        "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
       );
-      document = await this.getDocumentDynamo(this.req.body.refresh_token);
+      document = await this.getDocumentDynamo(
+        this.req.body.refresh_token,
+        this.config.dynamo_table_name
+      );
     }
     return document;
   }
 
-  async getDocumentDynamo(refresh_token) {
+  async getDocumentDynamo(refresh_token, tableName) {
     let document;
     try {
       let payload = await this.dynamoClient.queryFromDynamo(
         {
           refresh_token: refresh_token,
         },
-        this.config.dynamo_table_name,
+        tableName,
         "oauth_refresh_token_index"
       );
       if (payload.Items && payload.Items[0]) {

@@ -1,5 +1,6 @@
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
+const { v4: uuidv4 } = require("uuid");
 
 const authorizeHandler = async (
   config,
@@ -65,8 +66,13 @@ const authorizeHandler = async (
     return next();
   }
 
+  let internal_state = uuidv4();
   try {
-    let authorizePayload = { state: state, redirect_uri: client_redirect };
+    let authorizePayload = {
+      internal_state: internal_state,
+      state: state,
+      redirect_uri: client_redirect,
+    };
 
     // If the launch scope is included then also
     // save the launch context provided (if any)
@@ -78,7 +84,7 @@ const authorizeHandler = async (
 
     await dynamoClient.savePayloadToDynamo(
       authorizePayload,
-      config.dynamo_table_name
+      config.dynamo_oauth_requests_table
     );
   } catch (error) {
     logger.error(
@@ -88,6 +94,8 @@ const authorizeHandler = async (
   }
   const params = new URLSearchParams(req.query);
   params.set("redirect_uri", redirect_uri);
+  // Rewrite to an internally maintained state for interaction with IDP
+  params.set("state", internal_state);
   if (params.has("idp")) {
     params.set("idp", slugHelper.rewrite(params.get("idp")));
   } else if (!params.has("idp") && config.idp) {

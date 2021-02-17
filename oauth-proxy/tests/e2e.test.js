@@ -39,6 +39,7 @@ const defaultTestingConfig = {
   validate_post_endpoint: "http://localhost",
   validate_apiKey: "fakeApiKey",
   hmac_secret: "testsecret",
+  dynamo_oauth_requests_table: "OAuthRequestsV2",
   dynamo_launch_context_table: "launch_context_table",
   enable_smart_launch_service: true,
   enable_static_token_service: true,
@@ -169,6 +170,7 @@ describe("OpenID Connect Conformance", () => {
     }
     fakeDynamoClient = buildFakeDynamoClient({
       state: "abc123",
+      internal_state: "1234-5678-9100-0000",
       code: "xyz789",
       launch: "123V456",
       refresh_token: "jkl456",
@@ -365,7 +367,7 @@ describe("OpenID Connect Conformance", () => {
         return status < 500;
       },
       params: {
-        state: "abc123",
+        state: "1234-5678-9100-0000",
         code: "xzy789",
       },
     };
