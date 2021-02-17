@@ -252,6 +252,10 @@ function buildApp(
     service_issuer,
     okta_client
   ) {
+    const app_category = config.routes.categories.find((item) => {
+      return item.api_category === api_category;
+    });
+
     var servicesMetadataRewrite = buildMetadataRewriteTable(
       config,
       api_category
@@ -286,7 +290,7 @@ function buildApp(
           dynamoClient,
           okta_client,
           slugHelper,
-          api_category,
+          app_category,
           config.dynamo_table_name,
           config.dynamo_clients_table,
           config.idp,
