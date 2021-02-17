@@ -32,7 +32,9 @@ export const samlLogin = function (template) {
       : getReqUrl(req, req.sp.options.requestAcsUrl);
     const authnRequest = req.authnRequest
       ? req.authnRequest
-      : req.session.authnRequest;
+      : req.session
+      ? req.session.authnRequest
+      : null;
     req.authnRequest = authnRequest;
     let relayState = req.RelayState;
     if (!authnRequest) {
