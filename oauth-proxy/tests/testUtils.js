@@ -283,6 +283,7 @@ const createFakeConfig = () => {
     enable_smart_launch_service: true,
     enable_static_token_service: true,
     dynamo_static_token_table: "ut_static_tokens_table",
+    dynamo_clients_table: "Clients",
     routes: {
       categories: [
         {
