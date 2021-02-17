@@ -93,11 +93,6 @@ function processArgs() {
         required: false,
         default: true,
       },
-      enable_okta_consent_endpoint: {
-        description: "Enable Delete Grants endpoint (Okta Consent)?",
-        required: false,
-        default: false,
-      },
       enable_smart_launch_service: {
         description: "Enable SMART launch lookup service?",
         required: false,
@@ -133,7 +128,7 @@ function processArgs() {
             default: null,
           },
           enable_consent_endpoint: {
-            description: "URL where developers can reset grants/consent.",
+            description: "Enable consent to Grants endpoint?",
             required: false,
             default: false,
           },

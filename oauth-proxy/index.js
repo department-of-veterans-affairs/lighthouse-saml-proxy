@@ -351,17 +351,16 @@ function buildApp(
       );
     });
 
-    router.delete(api_category + app_routes.grants, async (req, res, next) => {
-      await oauthHandlers
-        .revokeUserGrantHandler(
-          okta_client,
-          enable_consent_endpoint,
-          req,
-          res,
-          next
-        )
-        .catch(next);
-    });
+    if (enable_consent_endpoint) {
+      router.delete(
+        api_category + app_routes.grants,
+        async (req, res, next) => {
+          await oauthHandlers
+            .revokeUserGrantHandler(okta_client, req, res, next)
+            .catch(next);
+        }
+      );
+    }
   }
 
   return app;
