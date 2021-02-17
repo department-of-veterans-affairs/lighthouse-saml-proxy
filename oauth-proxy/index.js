@@ -280,13 +280,16 @@ function buildApp(
     router.get(api_category + app_routes.authorize, async (req, res, next) => {
       await oauthHandlers
         .authorizeHandler(
-          config,
           redirect_uri,
           logger,
           service_issuer,
           dynamoClient,
           okta_client,
           slugHelper,
+          api_category,
+          config.dynamo_table_name,
+          config.dynamo_clients_table,
+          config.idp,
           req,
           res,
           next

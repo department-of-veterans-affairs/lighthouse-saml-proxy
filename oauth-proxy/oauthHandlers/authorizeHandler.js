@@ -2,23 +2,22 @@ const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
 
 const authorizeHandler = async (
-  config,
   redirect_uri,
   logger,
   issuer,
   dynamoClient,
   oktaClient,
   slugHelper,
+  app_category,
+  dynamo_table_name,
+  dynamo_clients_table,
+  idp,
   req,
   res,
   next
 ) => {
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
-  const app_category = config.routes.categories.find((item) => {
-    return item.api_category + config.routes.app_routes.authorize === req.path;
-  });
-
   if (!app_category) {
     res.status(400).json({
       error: "invalid_request",
@@ -55,7 +54,7 @@ const authorizeHandler = async (
         client_id,
         client_redirect,
         dynamoClient,
-        config.dynamo_clients_table
+        dynamo_clients_table
       );
     } catch (err) {
       res.status(err.status).json({
@@ -107,10 +106,7 @@ const authorizeHandler = async (
       }
     }
 
-    await dynamoClient.savePayloadToDynamo(
-      authorizePayload,
-      config.dynamo_table_name
-    );
+    await dynamoClient.savePayloadToDynamo(authorizePayload, dynamo_table_name);
   } catch (error) {
     logger.error(
       `Failed to save client redirect URI ${client_redirect} in authorize handler`
@@ -121,8 +117,8 @@ const authorizeHandler = async (
   params.set("redirect_uri", redirect_uri);
   if (params.has("idp")) {
     params.set("idp", slugHelper.rewrite(params.get("idp")));
-  } else if (!params.has("idp") && config.idp) {
-    params.set("idp", config.idp);
+  } else if (!params.has("idp") && idp) {
+    params.set("idp", idp);
   }
 
   res.redirect(
