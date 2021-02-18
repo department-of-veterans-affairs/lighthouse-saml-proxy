@@ -190,7 +190,7 @@ describe("samlLogin", () => {
 
   it("Happy Path, no authnRequest", async () => {
     mockRequest.authnRequest = null;
-    mockRequest.RelayState = "theRelayState";
+    mockRequest.query.RelayState = "theRelayState";
     const doLogin = samlLogin("verify");
     try {
       doLogin(mockRequest, mockResponse, mockNext);
