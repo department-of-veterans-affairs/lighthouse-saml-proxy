@@ -18,15 +18,6 @@ const authorizeHandler = async (
 ) => {
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
-  if (!app_category) {
-    res.status(400).json({
-      error: "invalid_request",
-      error_description:
-        "Invalid path attempted for authorization: '" + req.path + "'",
-    });
-    return next();
-  }
-
   try {
     await checkParameters(
       state,

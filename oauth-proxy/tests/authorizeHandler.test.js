@@ -585,10 +585,10 @@ describe("authorizeHandler", () => {
 
     expect(res.redirect).toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
-    // expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
-    //   { client_id: "clientId123" },
-    //   "Clients"
-    // );
+    expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
+      { client_id: "clientId123" },
+      "Clients"
+    );
   });
 
   it("Invalid path in request", async () => {
@@ -626,6 +626,7 @@ describe("authorizeHandler", () => {
 
     expect(res.statusCode).toEqual(400);
     expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it("Invalid redirect_uri in request, local client config", async () => {
