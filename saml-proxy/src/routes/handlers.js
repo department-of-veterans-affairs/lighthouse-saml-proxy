@@ -35,7 +35,7 @@ export const samlLogin = function (template) {
       : req.session
       ? req.session.authnRequest
       : null;
-    let relayState = req.RelayState;
+    let relayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request or session");
       relayState = req.RelayState;
