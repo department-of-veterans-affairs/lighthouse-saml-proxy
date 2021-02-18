@@ -565,6 +565,8 @@ describe("authorizeHandler", () => {
       redirect_uri: "http://localhost:8080/oauth/redirect",
     };
 
+    api_category.client_store = "local";
+
     await authorizeHandler(
       redirect_uri,
       logger,
@@ -583,10 +585,10 @@ describe("authorizeHandler", () => {
 
     expect(res.redirect).toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
-    expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
-      { client_id: "clientId123" },
-      "Clients"
-    );
+    // expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
+    //   { client_id: "clientId123" },
+    //   "Clients"
+    // );
   });
 
   it("Invalid path in request", async () => {
@@ -604,6 +606,7 @@ describe("authorizeHandler", () => {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/invalid/redirect",
     };
+    api_category.client_store = "local";
 
     await authorizeHandler(
       redirect_uri,
@@ -673,6 +676,7 @@ describe("authorizeHandler", () => {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/invalid/redirect",
     };
+    api_category.client_store = "local";
 
     await authorizeHandler(
       redirect_uri,
@@ -719,6 +723,7 @@ describe("authorizeHandler", () => {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/invalid/redirect",
     };
+    api_category.client_store = "local";
 
     await authorizeHandler(
       redirect_uri,
