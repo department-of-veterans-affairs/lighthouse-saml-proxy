@@ -72,6 +72,7 @@ const authorizeHandler = async (
       internal_state: internal_state,
       state: state,
       redirect_uri: client_redirect,
+      expires_on: Math.round(Date.now() / 1000) + 60 * 10,
     };
 
     // If the launch scope is included then also

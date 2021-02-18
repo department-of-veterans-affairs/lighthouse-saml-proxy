@@ -66,6 +66,7 @@ const redirectHandler = async (
           state: state,
           redirect_uri: document.redirect_uri,
           code: hashString(req.query.code, config.hmac_secret),
+          expires_on: Math.round(Date.now() / 1000) + 60 * 10,
         };
         if (document.launch) {
           redirectPayload.launch = document.launch;
