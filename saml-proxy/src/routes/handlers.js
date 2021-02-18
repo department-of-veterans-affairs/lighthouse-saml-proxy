@@ -38,11 +38,11 @@ export const samlLogin = function (template) {
     let relayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request or session");
-      relayState = req.RelayState;
+      relayState = req.query?.RelayState || req.body?.RelayState;
     } else {
       relayState = authnRequest.relayState
         ? authnRequest.relayState
-        : req.RelayState;
+        : req.query?.RelayState;
     }
     if (relayState == null || relayState == "") {
       let logMessage =
