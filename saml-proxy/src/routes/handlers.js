@@ -35,12 +35,11 @@ export const samlLogin = function (template) {
       : req.session
       ? req.session.authnRequest
       : null;
-    req.authnRequest = authnRequest;
     let relayState = req.RelayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request or session");
     } else {
-      relayState = relayState ? relayState : req.authnRequest?.relayState;
+      relayState = relayState ? relayState : authnRequest?.relayState;
     }
     if (relayState == null || relayState == "") {
       let logMessage =
@@ -70,7 +69,7 @@ export const samlLogin = function (template) {
       .reduce((memo, [key, authnContext, exParams = null]) => {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
-          (req.authnRequest && req.authnRequest.forceAuthn) || "false",
+          (authnRequest && authnRequest.forceAuthn) || "false",
           relayState || "/",
           authnContext
         );
