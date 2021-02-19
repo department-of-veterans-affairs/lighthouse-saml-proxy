@@ -93,6 +93,11 @@ function processArgs() {
         required: false,
         default: true,
       },
+      enable_okta_consent_endpoint: {
+        description: "Enable Delete Grants endpoint (Okta Consent)?",
+        required: false,
+        default: false,
+      },
       enable_smart_launch_service: {
         description: "Enable SMART launch lookup service?",
         required: false,
@@ -131,6 +136,12 @@ function processArgs() {
             description: "Enable consent to Grants endpoint?",
             required: false,
             default: false,
+          },
+          client_store: {
+            description:
+              "Indicates if client information is to be retrieved locally from the dynamo instance, ie. set to 'local' if the app category requires the client information to be retrieved from a dynamo lookup",
+            required: false,
+            default: null,
           },
         },
         app_routes: {

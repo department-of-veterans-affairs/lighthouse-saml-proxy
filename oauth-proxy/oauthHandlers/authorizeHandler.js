@@ -2,20 +2,22 @@ const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
 
 const authorizeHandler = async (
-  config,
   redirect_uri,
   logger,
   issuer,
   dynamoClient,
   oktaClient,
   slugHelper,
+  app_category,
+  dynamo_table_name,
+  dynamo_clients_table,
+  idp,
   req,
   res,
   next
 ) => {
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
-
   try {
     await checkParameters(
       state,
@@ -36,33 +38,51 @@ const authorizeHandler = async (
     return next();
   }
 
-  try {
-    const oktaApp = await oktaClient.getApplication(client_id);
-    if (
-      oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1
-    ) {
+  if (app_category.client_store && app_category.client_store === "local") {
+    const errInfo = await localValidateClient(
+      logger,
+      client_id,
+      client_redirect,
+      dynamoClient,
+      dynamo_clients_table
+    );
+    if (errInfo) {
       res.status(400).json({
         error: "invalid_client",
-        error_description:
-          "The redirect URI specified by the application does not match any of the " +
-          `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
+        error_description: errInfo.error_description,
       });
       return next();
     }
-  } catch (error) {
-    // This error is unrecoverable because we would be unable to verify
-    // that we are redirecting to a whitelisted client url
-    logger.error(
-      "Unrecoverable error: could not get the Okta client app",
-      error
-    );
+  } else {
+    try {
+      const oktaApp = await oktaClient.getApplication(client_id);
+      if (
+        oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) ===
+        -1
+      ) {
+        res.status(400).json({
+          error: "invalid_client",
+          error_description:
+            "The redirect URI specified by the application does not match any of the " +
+            `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
+        });
+        return next();
+      }
+    } catch (error) {
+      // This error is unrecoverable because we would be unable to verify
+      // that we are redirecting to a whitelisted client url
+      logger.error(
+        "Unrecoverable error: could not get the Okta client app",
+        error
+      );
 
-    res.status(400).json({
-      error: "invalid_client",
-      error_description:
-        "The client specified by the application is not valid.",
-    });
-    return next();
+      res.status(400).json({
+        error: "invalid_client",
+        error_description:
+          "The client specified by the application is not valid.",
+      });
+      return next();
+    }
   }
 
   try {
@@ -76,10 +96,7 @@ const authorizeHandler = async (
       }
     }
 
-    await dynamoClient.savePayloadToDynamo(
-      authorizePayload,
-      config.dynamo_table_name
-    );
+    await dynamoClient.savePayloadToDynamo(authorizePayload, dynamo_table_name);
   } catch (error) {
     logger.error(
       `Failed to save client redirect URI ${client_redirect} in authorize handler`
@@ -90,8 +107,8 @@ const authorizeHandler = async (
   params.set("redirect_uri", redirect_uri);
   if (params.has("idp")) {
     params.set("idp", slugHelper.rewrite(params.get("idp")));
-  } else if (!params.has("idp") && config.idp) {
-    params.set("idp", config.idp);
+  } else if (!params.has("idp") && idp) {
+    params.set("idp", idp);
   }
 
   res.redirect(
@@ -148,6 +165,44 @@ const checkParameters = async (
         expected: serverAudiences,
       });
     }
+  }
+};
+
+const localValidateClient = async (
+  logger,
+  client_id,
+  client_redirect,
+  dynamoClient,
+  dynamo_clients_table
+) => {
+  try {
+    let clientInfo = await dynamoClient.getPayloadFromDynamo(
+      {
+        client_id: client_id,
+      },
+      dynamo_clients_table
+    );
+    if (clientInfo.Item) {
+      clientInfo = clientInfo.Item;
+    } else {
+      return {
+        error_description:
+          "The client specified by the application is not valid.",
+      };
+    }
+    if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
+      return {
+        error_description:
+          "The redirect URI specified by the application does not match any of the " +
+          `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
+      };
+    }
+  } catch (err) {
+    logger.error("Failed to retrieve client info from Dynamo DB.", err);
+    return {
+      error_description:
+        "The client specified by the application is not valid.",
+    };
   }
 };
 
