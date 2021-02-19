@@ -48,7 +48,7 @@ const authorizeHandler = async (
     );
     if (errInfo) {
       res.status(400).json({
-        error: errInfo.error,
+        error: "invalid_client",
         error_description: errInfo.error_description,
       });
       return next();
@@ -186,15 +186,12 @@ const localValidateClient = async (
       clientInfo = clientInfo.Item;
     } else {
       return {
-        status: 400,
-        error: "invalid_client",
-        error_description: "Invalid client for the authorization path",
+        error_description:
+          "The client specified by the application is not valid.",
       };
     }
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
-        status: 400,
-        error: "invalid_client",
         error_description:
           "The redirect URI specified by the application does not match any of the " +
           `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -203,8 +200,6 @@ const localValidateClient = async (
   } catch (err) {
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
-      status: 400,
-      error: "invalid_client",
       error_description:
         "The client specified by the application is not valid.",
     };
