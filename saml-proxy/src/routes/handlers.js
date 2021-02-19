@@ -32,15 +32,19 @@ export const samlLogin = function (template) {
       : getReqUrl(req, req.sp.options.requestAcsUrl);
     const authnRequest = req.authnRequest
       ? req.authnRequest
-      : req.session.authnRequest;
-    req.authnRequest = authnRequest;
+      : req.session
+      ? req.session.authnRequest
+      : null;
+    let relayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request or session");
+      relayState = req.query?.RelayState || req.body?.RelayState;
+    } else {
+      relayState = authnRequest.relayState
+        ? authnRequest.relayState
+        : req.query?.RelayState;
     }
-    if (
-      req.authnRequest?.relayState == null ||
-      req.authnRequest?.relayState == ""
-    ) {
+    if (relayState == null || relayState == "") {
       let logMessage =
         template === "verify"
           ? "Empty relay state during verify. Invalid request."
@@ -68,8 +72,8 @@ export const samlLogin = function (template) {
       .reduce((memo, [key, authnContext, exParams = null]) => {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
-          (req.authnRequest && req.authnRequest.forceAuthn) || "false",
-          (req.authnRequest && req.authnRequest.relayState) || "/",
+          (authnRequest && authnRequest.forceAuthn) || "false",
+          relayState || "/",
           authnContext
         );
         return memo.then((m) => {
