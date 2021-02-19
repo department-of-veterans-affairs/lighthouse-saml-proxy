@@ -1,10 +1,63 @@
 import "jest";
-import { getHashCode, samlLogin, parseSamlRequest } from "./handlers.js";
-jest.mock("../logger");
+import {
+  getHashCode,
+  samlLogin,
+  parseSamlRequest,
+  getSessionIndex,
+  getParticipant,
+  handleError,
+} from "./handlers.js";
 
-describe("getHashCode", () => {
-  it("should get hash code for a string", () => {
+jest.mock("../logger");
+describe("getHashCode, getSessionIndex", () => {
+  let mockReq: any;
+  let mockRes: any;
+  beforeEach(() => {
+    mockReq = {
+      cookies: {
+        idp_sid: "idp_sid1",
+      },
+      session: {
+        id: "test-string",
+      },
+      user: {
+        userName: "uname1",
+        nameIdFormat: "nameIdFormat1",
+      },
+      idp: {
+        options: { serviceProviderId: "serviceProviderId1", sloUrl: "sloUrl1" },
+      },
+    };
+    mockRes = {
+      render: jest.fn(),
+    };
+  });
+  test("should get hash code for a string", () => {
     expect(getHashCode("test-string")).toEqual(-1666277972);
+  });
+  test("getHashCode empty string hash", () => {
+    expect(getHashCode("")).toEqual(0);
+  });
+  test("getSessionIndex happy", () => {
+    expect(getSessionIndex(mockReq)).toEqual("1666277972");
+  });
+  test("getSessionIndex empty string", () => {
+    expect(getSessionIndex({})).toEqual(0);
+  });
+  test("getParticipant", () => {
+    expect(getParticipant(mockReq)).toEqual({
+      serviceProviderId: "serviceProviderId1",
+      sessionIndex: "1666277972",
+      serviceProviderLogoutURL: "sloUrl1",
+      nameId: "uname1",
+      nameIdFormat: "nameIdFormat1",
+    });
+  });
+  test("handleError", () => {
+    handleError(mockReq, mockRes);
+    expect(mockRes.render).toHaveBeenCalledWith("sensitiveError.hbs", {
+      request_id: undefined,
+    });
   });
 });
 
@@ -91,7 +144,7 @@ describe("samlLogin", () => {
           },
         },
       },
-      authnRequest: "authnRequest",
+      authnRequest: {},
       get: (param) => {
         return param;
       },
@@ -99,10 +152,54 @@ describe("samlLogin", () => {
 
     mockNext = jest.fn();
   });
-  it.skip("Happy Path", async () => {
-    samlLogin("login_selection")(mockRequest, mockResponse, mockNext);
-    expect(mockResponse.render).toHaveBeenCalled();
+  afterAll(() => {
+    expect(mockResponse.render).toHaveBeenCalledWith("login_selection", {
+      id_me_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBqsJADDz7F2Xvte2KCMEWFA8KiuXZ9w7e1rroQputm1T0711XD76LOU3IzCSTKam26WDW8xl%2F9KXXxNGtbZAgDHLROwSryBCgajUB17CbbdYghyl0zrKtbSMiX4OF1xpUbCzm4szcESSJOWpkw%2FfS2avH7tc1w9q2QbFa5OIFiHq9QmKFnAuZyixOZZxNqmwE4xRktg%2B08r1ubvBo8PT9tsOLRLCsqjIut7tKRH%2FaUbjOE0QxfSaEsNt9ZP5uq4i0e0b0%2BuTD4N39%2F2TxAA%3D%3D&RelayState=",
+      dslogon_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=",
+      mhv_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=",
+      id_me_signup_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=&op=signup",
+    });
+    expect(mockResponse.render).toHaveBeenCalledWith("verify", {
+      id_me_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBqsJADDz7F2Xvte2KCMEWFA8KiuXZ9w7e1rroQputm1T0711XD76LOU3IzCSTKam26WDW8xl%2F9KXXxNGtbZAgDHLROwSryBCgajUB17CbbdYghyl0zrKtbSMiX4OF1xpUbCzm4szcESSJOWpkw%2FfS2avH7tc1w9q2QbFa5OIFiHq9QmKFnAuZyixOZZxNqmwE4xRktg%2B08r1ubvBo8PT9tsOLRLCsqjIut7tKRH%2FaUbjOE0QxfSaEsNt9ZP5uq4i0e0b0%2BuTD4N39%2F2TxAA%3D%3D&RelayState=",
+      dslogon_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=",
+      mhv_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=",
+      id_me_signup_link:
+        "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=&op=signup",
+    });
   });
+
+  it("Happy Path", async () => {
+    mockRequest.authnRequest = {
+      relayState: "theRelayState",
+    };
+    const doLogin = samlLogin("login_selection");
+    try {
+      doLogin(mockRequest, mockResponse, mockNext);
+      expect(mockNext).not.toHaveBeenCalled();
+    } catch (err) {
+      fail("Should not reach here");
+    }
+  });
+
+  it("Happy Path, no authnRequest", async () => {
+    mockRequest.authnRequest = null;
+    mockRequest.query.RelayState = "theRelayState";
+    const doLogin = samlLogin("verify");
+    try {
+      doLogin(mockRequest, mockResponse, mockNext);
+      expect(mockNext).not.toHaveBeenCalled();
+    } catch (err) {
+      fail("Should not reach here");
+    }
+  });
+
   it("Login requests with a null relay state should throw an error", async () => {
     let thrownError;
     mockRequest.authnRequest = {
