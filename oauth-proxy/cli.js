@@ -132,6 +132,11 @@ function processArgs() {
             required: false,
             default: null,
           },
+          enable_consent_endpoint: {
+            description: "Enable consent to Grants endpoint?",
+            required: false,
+            default: false,
+          },
           client_store: {
             description:
               "Indicates if client information is to be retrieved locally from the dynamo instance, ie. set to 'local' if the app category requires the client information to be retrieved from a dynamo lookup",
