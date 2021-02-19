@@ -179,7 +179,6 @@ function buildApp(
     buildMetadataForOpenIdConfiguration(
       app_category,
       app_routes,
-      isolatedOktaConfig.enable_consent_endpoint,
       service_issuer,
       okta_client
     );
@@ -248,7 +247,6 @@ function buildApp(
   function buildMetadataForOpenIdConfiguration(
     app_category,
     app_routes,
-    enable_consent_endpoint,
     service_issuer,
     okta_client
   ) {
@@ -353,7 +351,7 @@ function buildApp(
       );
     });
 
-    if (enable_consent_endpoint) {
+    if (app_category.enable_consent_endpoint) {
       router.delete(
         api_category + app_routes.grants,
         async (req, res, next) => {
