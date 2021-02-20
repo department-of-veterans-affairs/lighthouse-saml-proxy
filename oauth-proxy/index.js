@@ -173,14 +173,12 @@ function buildApp(
   });
 
   const app_routes = config.routes.app_routes;
-  Object.entries(config.routes.categories).forEach(([, isolatedOktaConfig]) => {
-    const okta_client = isolatedOktaClients[isolatedOktaConfig.api_category];
-    const service_issuer = isolatedIssuers[isolatedOktaConfig.api_category];
+  Object.entries(config.routes.categories).forEach(([, app_category]) => {
+    const okta_client = isolatedOktaClients[app_category.api_category];
+    const service_issuer = isolatedIssuers[app_category.api_category];
     buildMetadataForOpenIdConfiguration(
-      isolatedOktaConfig.api_category,
-      isolatedOktaConfig.manage_endpoint,
+      app_category,
       app_routes,
-      isolatedOktaConfig.enable_consent_endpoint,
       service_issuer,
       okta_client
     );
@@ -247,13 +245,12 @@ function buildApp(
   });
 
   function buildMetadataForOpenIdConfiguration(
-    api_category,
-    manage_endpoint,
+    app_category,
     app_routes,
-    enable_consent_endpoint,
     service_issuer,
     okta_client
   ) {
+    const api_category = app_category.api_category;
     var servicesMetadataRewrite = buildMetadataRewriteTable(
       config,
       api_category
@@ -282,13 +279,16 @@ function buildApp(
     router.get(api_category + app_routes.authorize, async (req, res, next) => {
       await oauthHandlers
         .authorizeHandler(
-          config,
           redirect_uri,
           logger,
           service_issuer,
           dynamoClient,
           okta_client,
           slugHelper,
+          app_category,
+          config.dynamo_table_name,
+          config.dynamo_clients_table,
+          config.idp,
           req,
           res,
           next
@@ -314,9 +314,9 @@ function buildApp(
         .catch(next);
     });
 
-    if (manage_endpoint) {
+    if (app_category.manage_endpoint) {
       router.get(api_category + app_routes.manage, (req, res) =>
-        res.redirect(manage_endpoint)
+        res.redirect(app_category.manage_endpoint)
       );
     }
 
@@ -351,7 +351,7 @@ function buildApp(
       );
     });
 
-    if (enable_consent_endpoint) {
+    if (app_category.enable_consent_endpoint) {
       router.delete(
         api_category + app_routes.grants,
         async (req, res, next) => {
@@ -369,15 +369,13 @@ function buildApp(
 function startApp(config, isolatedIssuers) {
   const isolatedOktaClients = {};
   if (config.routes && config.routes.categories) {
-    Object.entries(config.routes.categories).forEach(
-      ([, isolatedOktaConfig]) => {
-        isolatedOktaClients[isolatedOktaConfig.api_category] = new okta.Client({
-          orgUrl: config.okta_url,
-          token: config.okta_token,
-          requestExecutor: new okta.DefaultRequestExecutor(),
-        });
-      }
-    );
+    Object.entries(config.routes.categories).forEach(([, app_category]) => {
+      isolatedOktaClients[app_category.api_category] = new okta.Client({
+        orgUrl: config.okta_url,
+        token: config.okta_token,
+        requestExecutor: new okta.DefaultRequestExecutor(),
+      });
+    });
   }
 
   const dynamoClient = new DynamoClient(
