@@ -66,7 +66,7 @@ const redirectHandler = async (
           state: state,
           redirect_uri: document.redirect_uri,
           code: hashString(req.query.code, config.hmac_secret),
-          expires_on: Math.round(Date.now() / 1000) + 60 * 10,
+          expires_on: Math.round(Date.now() / 1000) + 60 * 10, // 10 minutes
         };
         if (document.launch) {
           redirectPayload.launch = document.launch;
@@ -79,6 +79,7 @@ const redirectHandler = async (
 
       document = document.Item;
       const params = new URLSearchParams(req.query);
+      // Rewrite to original state
       params.set("state", document.state);
       loginEnd.inc();
       res.redirect(`${document.redirect_uri}?${params.toString()}`);
