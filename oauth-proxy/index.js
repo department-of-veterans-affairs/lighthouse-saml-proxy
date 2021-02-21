@@ -286,7 +286,7 @@ function buildApp(
           okta_client,
           slugHelper,
           app_category,
-          config.dynamo_table_name,
+          config.dynamo_oauth_requests_table,
           config.dynamo_clients_table,
           config.idp,
           req,

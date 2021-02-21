@@ -92,7 +92,7 @@ const authorizeHandler = async (
       internal_state: internal_state,
       state: state,
       redirect_uri: client_redirect,
-      expires_on: Math.round(Date.now() / 1000) + 60 * 10,
+      expires_on: Math.round(Date.now() / 1000) + 60 * 10, // 10 minutes
     };
 
     // If the launch scope is included then also
@@ -115,7 +115,7 @@ const authorizeHandler = async (
   }
   const params = new URLSearchParams(req.query);
   params.set("redirect_uri", redirect_uri);
-  // Rewrite to an internally maintained state for interaction with IDP
+  // Rewrite to an internally maintained state
   params.set("state", internal_state);
   if (params.has("idp")) {
     params.set("idp", slugHelper.rewrite(params.get("idp")));
