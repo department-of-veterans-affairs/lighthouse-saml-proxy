@@ -20,6 +20,7 @@ class SaveDocumentStateStrategy {
                 tokens.refresh_token,
                 this.config.hmac_secret
               ),
+              // 42 days
               expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
             },
             this.config.dynamo_oauth_requests_table
@@ -33,6 +34,7 @@ class SaveDocumentStateStrategy {
               tokens.refresh_token,
               this.config.hmac_secret
             ),
+            // 42 days
             expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
           };
           if (document.launch) {
