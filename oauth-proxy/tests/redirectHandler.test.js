@@ -118,7 +118,6 @@ describe("redirectHandler", () => {
 
     req.query = {
       state: "1234-5678-9100-0000",
-      code: "the_fake_authorization_code",
       error: "unit test error",
     };
 
