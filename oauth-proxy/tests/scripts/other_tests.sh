@@ -178,17 +178,6 @@ track_result
 "$DIR"/assertions.sh --expect-json --json="$(cat "$curl_body")" --expected-json='{"error": "invalid_client", "error_description": "There was no redirect URI specified by the application."}'
 track_result
 
-echo -e "\tRunning ... Authorize Handler with invalid scope"
-SCOPE="openid%20profile%20invalidscope.read"
-
-curl -s \
-  -w "%{http_code}" \
-  -o "$curl_body" \
-  "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=$REDIRECT_URI&aud=default&state=12345" > "$curl_status"
-
-"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=302
-track_result
-
 echo -e "\tRunning ... Redirect Handler without a redirect_url that can be looked up"
 curl -s \
   -w "%{http_code}" \
