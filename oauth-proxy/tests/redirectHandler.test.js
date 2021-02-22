@@ -110,4 +110,20 @@ describe("redirectHandler", () => {
     await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
   });
+
+  it("Request with error doesn't store code", async () => {
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "1234-5678-9100-0000",
+      code: "the_fake_authorization_code",
+      error: "unit test error",
+    };
+
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.redirect).toHaveBeenCalled();
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
+  });
 });
