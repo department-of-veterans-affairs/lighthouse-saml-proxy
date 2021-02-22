@@ -40,30 +40,6 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
     });
   });
 
-  it("Happy Path - Unhashed Token", async () => {
-    dynamoClient = buildFakeDynamoClient({
-      state: STATE,
-      code: CODE_HASH_PAIR[0],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI,
-    });
-
-    let strategy = new GetDocumentByRefreshTokenStrategy(
-      req,
-      logger,
-      dynamoClient,
-      config
-    );
-    let document = await strategy.getDocument();
-
-    expect(document).toEqual({
-      state: STATE,
-      code: CODE_HASH_PAIR[0],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI,
-    });
-  });
-
   it("Happy Path - Hashed Token", async () => {
     dynamoClient = buildFakeDynamoClient({
       state: STATE,

@@ -24,7 +24,7 @@ class GetDocumentByRefreshTokenStrategy {
         "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
       );
       document = await this.getDocumentDynamo(
-        this.req.body.refresh_token,
+        hashedRefreshToken,
         this.config.dynamo_table_name
       );
     }
