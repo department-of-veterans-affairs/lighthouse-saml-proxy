@@ -34,7 +34,7 @@ const redirectHandler = async (
   }
 
   // Backwards compatibility.
-  // Remove after 42 Days of PR merge (DATE - 02/19/2021).
+  // Remove after 42 Days of PR merge (DATE - 02/23/2021).
   try {
     if (!document) {
       logger.warn(
@@ -65,7 +65,7 @@ const redirectHandler = async (
           );
         } else {
           // Backwards compatibility.
-          // Remove after 1 Day of PR merge (DATE - 02/19/2021).
+          // Remove after 1 Day of PR merge (DATE - 02/23/2021).
           let redirectPayload = {
             internal_state: uuidv4(),
             state: state,

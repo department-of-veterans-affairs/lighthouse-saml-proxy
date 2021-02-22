@@ -57,7 +57,7 @@ describe("redirectHandler", () => {
   });
 
   // Backwards compatibility.
-  // Remove after 1 Day of PR merge (DATE - 02/19/2021).
+  // Remove after 1 Day of PR merge (DATE - 02/23/2021).
   it("Happy Path Redirect with OAuthRequests state", async () => {
     res = {
       redirect: jest.fn(),

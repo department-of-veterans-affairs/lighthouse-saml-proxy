@@ -15,7 +15,7 @@ class GetDocumentByCodeStrategy {
     );
 
     // Backwards compatibility.
-    // Remove after 1 day of PR merge (DATE - 02/19/2021).
+    // Remove after 1 day of PR merge (DATE - 02/23/2021).
     if (!document) {
       this.logger.warn(
         "OAuthRequestsV2 code not found. Searching in OAuthRequests."

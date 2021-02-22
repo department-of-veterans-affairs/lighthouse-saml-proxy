@@ -1,4 +1,4 @@
-const { hashString } = require("../../../utils");
+const { hashString, parseBasicAuth } = require("../../../utils");
 
 class GetDocumentByRefreshTokenStrategy {
   constructor(req, logger, dynamoClient, config) {
@@ -18,7 +18,7 @@ class GetDocumentByRefreshTokenStrategy {
     );
 
     // Backwards compatibility.
-    // Remove after 42 Days of PR merge (DATE - 02/19/2021).
+    // Remove after 42 days of PR merge (DATE - 02/23/2021).
     if (!document) {
       this.logger.warn(
         "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
@@ -28,6 +28,21 @@ class GetDocumentByRefreshTokenStrategy {
         this.config.dynamo_table_name
       );
     }
+
+    // Backwards compatibility.
+    // Remove after 42 days of PR merge (DATE - 02/23/2021).
+    if (!document) {
+      const basicAuth = parseBasicAuth(this.req);
+      let hashedClient = "empty";
+      if (basicAuth) {
+        hashedClient = hashString(basicAuth.username, this.config.hmac_secret);
+      }
+      this.logger.warn("Fallback OAuthRequests refresh_token not found.", {
+        client_id: hashedClient,
+        hashed_id: hashString(hashedRefreshToken, this.config.hmac_secret),
+      });
+    }
+
     return document;
   }
 
