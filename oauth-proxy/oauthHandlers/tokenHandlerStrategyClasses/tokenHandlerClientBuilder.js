@@ -78,6 +78,7 @@ const getStrategies = (
 ) => {
   let strategies;
   if (req.body.grant_type === "refresh_token") {
+    const temp_client_id = req.body.client_id;
     strategies = {
       getTokenStrategy: new RefreshTokenStrategy(
         req,
@@ -91,7 +92,8 @@ const getStrategies = (
         req,
         logger,
         dynamoClient,
-        config
+        config,
+        temp_client_id
       ),
       saveDocumentToDynamoStrategy: new SaveDocumentStateStrategy(
         req,

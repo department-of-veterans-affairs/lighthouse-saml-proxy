@@ -1,11 +1,15 @@
 const { hashString, parseBasicAuth } = require("../../../utils");
 
 class GetDocumentByRefreshTokenStrategy {
-  constructor(req, logger, dynamoClient, config) {
+  constructor(req, logger, dynamoClient, config, client_id) {
     this.req = req;
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
+
+    // Backwards compatibility.
+    // Remove after 42 days of PR merge (DATE - 02/23/2021).
+    this.client_id = client_id;
   }
   async getDocument() {
     let hashedRefreshToken = hashString(
@@ -36,6 +40,8 @@ class GetDocumentByRefreshTokenStrategy {
       let hashedClient = "empty";
       if (basicAuth) {
         hashedClient = hashString(basicAuth.username, this.config.hmac_secret);
+      } else if (this.client_id) {
+        hashedClient = hashString(this.client_id, this.config.hmac_secret);
       }
       this.logger.warn("Fallback OAuthRequests refresh_token not found.", {
         client_id: hashedClient,
