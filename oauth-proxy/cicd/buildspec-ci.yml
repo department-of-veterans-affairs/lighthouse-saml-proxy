@@ -53,6 +53,7 @@ phases:
         fi
       # printenv variables to Cloud Watch incase of failure
       - printenv
+      - echo test
   build:
     commands:
       # Login to Docker Hub prior to pulling base images to avoid rate limiting
