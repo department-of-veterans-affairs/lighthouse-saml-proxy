@@ -100,6 +100,11 @@ do_client_credentials() {
     url="https://sandbox-api.va.gov/oauth2/health-insurance/v1"
   fi
 
+  if [[ $HOST == *"staging"* ]];
+  then
+    url="https://staging-api.va.gov/oauth2/health-insurance/v1"
+  fi
+
   if [[ $HOST == *"localhost"* ]];
   then
     url="http://localhost:7100/oauth2/health-insurance/v1"
