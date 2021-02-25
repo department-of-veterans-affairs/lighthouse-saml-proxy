@@ -187,6 +187,8 @@ curl -s \
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
 
+echo -e "\tRunning ... Metadata endpoint test"
+
 if [[ $pass -lt 1 ]];
 then
   echo -e "\tFAIL - Some misc. tests did not pass."
