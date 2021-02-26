@@ -22,6 +22,7 @@ mockSlugHelper.rewrite.mockImplementation((slug) => {
 });
 const userCollection = new Collection("", "", new ModelFactory(User));
 userCollection.currentItems = [{ id: 1 }];
+jest.mock("uuid", () => ({ v4: () => "0000-1111-2222-3333" }));
 
 let redirect_uri;
 let issuer;
@@ -99,7 +100,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -137,7 +138,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -146,7 +147,7 @@ describe("authorizeHandler", () => {
     );
     expect(res.redirect).toHaveBeenCalled();
     expect(redirected_uri).toEqual(
-      "fake_endpoint?state=fake_state&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=uglyipdid"
+      "fake_endpoint?state=0000-1111-2222-3333&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=uglyipdid"
     );
   });
 
@@ -173,7 +174,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -182,7 +183,7 @@ describe("authorizeHandler", () => {
     );
     expect(res.redirect).toHaveBeenCalled();
     expect(redirected_uri).toEqual(
-      "fake_endpoint?state=fake_state&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=idp1"
+      "fake_endpoint?state=0000-1111-2222-3333&client_id=clientId123&redirect_uri=%5Bobject+Object%5D&idp=idp1"
     );
   });
 
@@ -208,7 +209,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -238,7 +239,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -268,7 +269,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -303,7 +304,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -337,7 +338,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -362,7 +363,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -388,7 +389,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -418,7 +419,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -439,7 +440,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -465,7 +466,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -500,7 +501,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -536,7 +537,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -575,7 +576,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -616,7 +617,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -651,7 +652,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -687,7 +688,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -734,7 +735,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,
@@ -784,7 +785,7 @@ describe("authorizeHandler", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
-      "OAuthRequests",
+      "OAuthRequestsV2",
       "Clients",
       "idp1",
       req,

@@ -39,6 +39,14 @@ function processArgs() {
         description: "flag to use local DynamoDB instance",
         required: false,
       },
+      dynamo_table_name: {
+        description: "DEPRECATED - name of request table",
+        required: true,
+      },
+      dynamo_oauth_requests_table: {
+        description: "name of request table (supersedes dynamo_table_name)",
+        required: true,
+      },
       dynamo_launch_context_table: {
         description: "name of launch context table.",
         required: true,

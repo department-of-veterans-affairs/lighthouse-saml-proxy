@@ -25,9 +25,14 @@ beforeEach(() => {
   next = jest.fn();
   req = new MockExpressRequest();
   res = new MockExpressResponse();
-  config = { dynamo_table_name: "tableName" };
+  config = {
+    dynamo_table_name: "tableName",
+    dynamo_oauth_requests_table: "tableNameV2",
+    hmac_secret: "secret",
+  };
   dynamoClient = buildFakeDynamoClient({
     state: "abc123",
+    internal_state: "1234-5678-9100-0000",
     code: "the_fake_authorization_code",
     refresh_token: "",
     redirect_uri: "http://localhost/thisDoesNotMatter",
@@ -43,10 +48,33 @@ describe("redirectHandler", () => {
     };
 
     req.query = {
-      state: "abc123",
+      state: "1234-5678-9100-0000",
+      code: "the_fake_authorization_code",
     };
 
     await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.redirect).toHaveBeenCalled();
+  });
+
+  // Backwards compatibility.
+  // Remove after 1 Day of PR merge (DATE - 02/23/2021).
+  it("Happy Path Redirect with OAuthRequests state", async () => {
+    res = {
+      redirect: jest.fn(),
+    };
+    let legacyDynamoClient = buildFakeDynamoClient({
+      state: "abc123",
+      code: "the_fake_authorization_code",
+      refresh_token: "",
+      redirect_uri: "http://localhost/thisDoesNotMatter",
+    });
+
+    req.query = {
+      state: "abc123",
+      code: "the_fake_authorization_code",
+    };
+
+    await redirectHandler(logger, legacyDynamoClient, config, req, res, next);
     expect(res.redirect).toHaveBeenCalled();
   });
 
@@ -81,5 +109,20 @@ describe("redirectHandler", () => {
     req.query = { state: "xxxxx" };
     await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.statusCode).toEqual(400);
+  });
+
+  it("Request with error doesn't store code", async () => {
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "1234-5678-9100-0000",
+      error: "unit test error",
+    };
+
+    await redirectHandler(logger, dynamoClient, config, req, res, next);
+    expect(res.redirect).toHaveBeenCalled();
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
 });

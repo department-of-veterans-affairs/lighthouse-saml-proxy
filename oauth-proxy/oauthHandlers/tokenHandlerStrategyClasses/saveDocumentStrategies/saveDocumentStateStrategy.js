@@ -1,5 +1,6 @@
 const { hashString } = require("../../../utils");
 const jwtDecode = require("jwt-decode");
+const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
   constructor(req, logger, dynamoClient, config) {
@@ -11,16 +12,39 @@ class SaveDocumentStateStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.state && tokens.refresh_token) {
-        await this.dynamoClient.updateToDynamo(
-          { state: document.state },
-          {
+        if (document.internal_state) {
+          await this.dynamoClient.updateToDynamo(
+            { internal_state: document.internal_state },
+            {
+              refresh_token: hashString(
+                tokens.refresh_token,
+                this.config.hmac_secret
+              ),
+              // 42 days
+              expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
+            },
+            this.config.dynamo_oauth_requests_table
+          );
+        } else {
+          let payload = {
+            internal_state: uuidv4(),
+            state: document.state,
+            redirect_uri: document.redirect_uri,
             refresh_token: hashString(
               tokens.refresh_token,
               this.config.hmac_secret
             ),
-          },
-          this.config.dynamo_table_name
-        );
+            // 42 days
+            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
+          };
+          if (document.launch) {
+            payload.launch = document.launch;
+          }
+          await this.dynamoClient.savePayloadToDynamo(
+            payload,
+            this.config.dynamo_oauth_requests_table
+          );
+        }
       }
     } catch (error) {
       this.logger.error(

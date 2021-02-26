@@ -38,7 +38,7 @@ function buildFakeDynamoClient(fakeDynamoRecord) {
       // It's unclear whether this should resolve with a full records or just
       // the identity field but thus far it has been irrelevant to the
       // functional testing of the oauth-proxy.
-      resolve({ pk: payload.state });
+      resolve({ pk: payload.internal_state });
     });
   });
   dynamoClient.updateToDynamo = jest
@@ -271,6 +271,7 @@ const createFakeConfig = () => {
     upstream_issuer_timeout_ms: 15000,
     dynamo_local: "dynamodb:8000",
     dynamo_table_name: "OAuthRequests",
+    dynamo_oauth_requests_table: "OAuthRequestsV2",
     dynamo_launch_context_table: "LaunchContext",
     hmac_secret: "secret",
     okta_url: "https://deptva-eval.okta.com",

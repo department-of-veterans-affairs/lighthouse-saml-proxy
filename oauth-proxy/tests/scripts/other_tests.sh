@@ -22,7 +22,7 @@ exit 1
 for i in "$@"
 do
 case $i in
-    
+
     --host=*)
       HOST="${i#*=}"; shift ;;
     --tokens=*)
@@ -59,7 +59,7 @@ track_result() {
 echo -e "\nMisc. Tests"
 
 echo -e "\tRunning ... User Info happy path"
-  
+
 access_token=$(echo "$TOKENS" | jq ".access_token" | tr -d '"')
 
 curl -s \
@@ -137,7 +137,7 @@ track_result
 echo -e "\tRunning ... Authorize Handler with no state parameter"
 
 if [[ -z $SCOPE ]];
-then 
+then
   SCOPE="openid%20profile%20disability_rating.read%20service_history.read%20veteran_status.read%20offline_access"
 fi
 

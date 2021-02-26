@@ -1,5 +1,6 @@
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
+const { v4: uuidv4 } = require("uuid");
 
 const authorizeHandler = async (
   redirect_uri,
@@ -9,7 +10,7 @@ const authorizeHandler = async (
   oktaClient,
   slugHelper,
   app_category,
-  dynamo_table_name,
+  dynamo_oauth_requests_table,
   dynamo_clients_table,
   idp,
   req,
@@ -85,8 +86,14 @@ const authorizeHandler = async (
     }
   }
 
+  let internal_state = uuidv4();
   try {
-    let authorizePayload = { state: state, redirect_uri: client_redirect };
+    let authorizePayload = {
+      internal_state: internal_state,
+      state: state,
+      redirect_uri: client_redirect,
+      expires_on: Math.round(Date.now() / 1000) + 60 * 10, // 10 minutes
+    };
 
     // If the launch scope is included then also
     // save the launch context provided (if any)
@@ -96,7 +103,10 @@ const authorizeHandler = async (
       }
     }
 
-    await dynamoClient.savePayloadToDynamo(authorizePayload, dynamo_table_name);
+    await dynamoClient.savePayloadToDynamo(
+      authorizePayload,
+      dynamo_oauth_requests_table
+    );
   } catch (error) {
     logger.error(
       `Failed to save client redirect URI ${client_redirect} in authorize handler`
@@ -105,6 +115,8 @@ const authorizeHandler = async (
   }
   const params = new URLSearchParams(req.query);
   params.set("redirect_uri", redirect_uri);
+  // Rewrite to an internally maintained state
+  params.set("state", internal_state);
   if (params.has("idp")) {
     params.set("idp", slugHelper.rewrite(params.get("idp")));
   } else if (!params.has("idp") && idp) {

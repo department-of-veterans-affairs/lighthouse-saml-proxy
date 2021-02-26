@@ -9,18 +9,26 @@ class GetDocumentByCodeStrategy {
   }
   async getDocument() {
     let hashedCode = hashString(this.req.body.code, this.config.hmac_secret);
-    let document = await this.getDocumentDynamo(hashedCode);
+    let document = await this.getDocumentDynamo(
+      hashedCode,
+      this.config.dynamo_oauth_requests_table
+    );
 
     // Backwards compatibility.
-    // Remove after 42 Days of PR merge (DATE - 11/30/2020).
+    // Remove after 1 day of PR merge (DATE - 02/23/2021).
     if (!document) {
-      this.logger.warn("Hashed code not found. Searching for unhashed code.");
-      document = await this.getDocumentDynamo(this.req.body.code);
+      this.logger.warn(
+        "OAuthRequestsV2 code not found. Searching in OAuthRequests."
+      );
+      document = await this.getDocumentDynamo(
+        hashedCode,
+        this.config.dynamo_table_name
+      );
     }
     return document;
   }
 
-  async getDocumentDynamo(code) {
+  async getDocumentDynamo(code, tableName) {
     let document;
 
     try {
@@ -28,7 +36,7 @@ class GetDocumentByCodeStrategy {
         {
           code: code,
         },
-        this.config.dynamo_table_name,
+        tableName,
         "oauth_code_index"
       );
       if (payload.Items && payload.Items[0]) {
