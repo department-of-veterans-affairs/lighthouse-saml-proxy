@@ -187,6 +187,56 @@ curl -s \
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=400
 track_result
 
+echo -e "\tRunning ... Metadata endpoint test"
+
+curl -s \
+  -w "%{http_code}" \
+  -o "$curl_body" \
+  "$HOST/.well-known/openid-configuration" > "$curl_status"
+
+"$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="issuer" --expected-value="$ISSUER"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="authorization_endpoint" --expected-value="$AUTHORIZATION_ENDPOINT"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="token_endpoint" --expected-value="$TOKEN_ENDPOINT"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="userinfo_endpoint" --expected-value="$USERINFO_ENDPOINT"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="introspection_endpoint" --expected-value="$INTROSPECTION_ENDPOINT"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="revocation_endpoint" --expected-value="$REVOCATION_ENDPOINT"
+track_result
+"$DIR"/assertions.sh --has-or-expect-property --json="$(cat "$curl_body")" --property="jwks_uri" --expected-value="$JWKS_URI"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="scopes_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="response_types_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="response_modes_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="grant_types_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="subject_types_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="id_token_signing_alg_values_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="token_endpoint_auth_methods_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="revocation_endpoint_auth_methods_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="claims_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="code_challenge_methods_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="introspection_endpoint_auth_methods_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="request_parameter_supported"
+track_result
+"$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="request_object_signing_alg_values_supported"
+track_result
+
 if [[ $pass -lt 1 ]];
 then
   echo -e "\tFAIL - Some misc. tests did not pass."
