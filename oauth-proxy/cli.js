@@ -192,6 +192,12 @@ function processArgs() {
               required: false,
               default: null,
             },
+            issuer: {
+              description:
+                "URL of the token issuer.",
+              required: false,
+              default: null,
+            },
           },
         },
         app_routes: {
