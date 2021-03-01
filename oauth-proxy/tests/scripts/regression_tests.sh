@@ -127,7 +127,7 @@ assign_code() {
       --client-id="$CLIENT_ID" \
       --client-secret="$CLIENT_SECRET" \
       --grant_consent="true" \
-      --scope="openid profile offline_access email address phone launch/patient" \
+      --scope="openid profile offline_access email address phone veteran_status.read" \
       --code-only)
 
   local CODE

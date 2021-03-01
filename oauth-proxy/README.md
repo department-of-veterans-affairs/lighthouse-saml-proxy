@@ -21,7 +21,7 @@ Set up Dynamo DB locally
 The following dev-config value needs to be set `"dynamo_local": "localhost:8000",`
 
 ```
-docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -inMemory
+docker run -d -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -inMemory
 node dynamo_schema.js --local=true
 ```
 

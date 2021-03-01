@@ -3,7 +3,7 @@ const { Issuer } = require("openid-client");
 const buildIssuer = async (serviceConfig) => {
   let discovered_issuer = await Issuer.discover(serviceConfig.upstream_issuer);
   if (serviceConfig.custom_metadata) {
-    new Issuer(
+    return new Issuer(
       overrideMetadata(
         serviceConfig.custom_metadata,
         discovered_issuer.metadata
