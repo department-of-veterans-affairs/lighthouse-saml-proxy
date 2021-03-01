@@ -9,6 +9,7 @@ const ISSUER_METADATA = {
   introspection: "http://example.com/introspect",
   revocation_endpoint: "http://example.com/revoke",
   jwks_uri: "http://example.com/keys",
+  issuer: "http://example.com/issuer",
 };
 
 function buildDynamoAttributeValue(value) {
@@ -332,6 +333,7 @@ const createFakeConfig = () => {
             introspection: "http://example.custom.com/introspect",
             revocation_endpoint: "http://example.custom.com/revoke",
             jwks_uri: "http://example.custom.com/keys",
+            issuer: "http://example.custom.com/issuer"
           },
         },
       ],
