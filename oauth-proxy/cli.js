@@ -158,41 +158,41 @@ function processArgs() {
             required: true,
             authorization_endpoint: {
               description:
-              "URL where the application will make the authorization request.",
+                "URL where the application will make the authorization request.",
               required: false,
               default: null,
             },
             token_endpoint: {
               description:
-              "URL where the application will make the token request.",
+                "URL where the application will make the token request.",
               required: false,
               default: null,
             },
             userinfo_endpoint: {
               description:
-              "URL where the application will make the user info request.",
+                "URL where the application will make the user info request.",
               required: false,
               default: null,
             },
             introspection: {
               description:
-              "URL where the application will make the introspection request.",
+                "URL where the application will make the introspection request.",
               required: false,
               default: null,
             },
             revocation_endpoint: {
               description:
-              "URL where the application will make the token revokation request.",
+                "URL where the application will make the token revokation request.",
               required: false,
               default: null,
             },
             jwks_uri: {
               description:
-              "URL where the application will make the jwks request.",
+                "URL where the application will make the jwks request.",
               required: false,
               default: null,
             },
-          }
+          },
         },
         app_routes: {
           description:
