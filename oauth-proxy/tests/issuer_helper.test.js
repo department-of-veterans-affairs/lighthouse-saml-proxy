@@ -2,10 +2,10 @@
 
 require("jest");
 const { createFakeConfig, ISSUER_METADATA } = require("./testUtils");
-const { createIssuer } = require("../issuer_helper");
+const { buildIssuer } = require("../issuer_helper");
 const { Issuer } = require("openid-client");
 
-describe("happy paths createIssuer tests", () => {
+describe("happy paths buildIssuer tests", () => {
   let config;
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe("happy paths createIssuer tests", () => {
     let category = config.routes.categories.find(
       (category) => category.api_category == "/health/v1"
     );
-    let issuer = await createIssuer(category);
+    let issuer = await buildIssuer(category);
     expect(issuer.metadata.authorization_endpoint).toEqual(
       ISSUER_METADATA.authorization_endpoint
     );
@@ -46,7 +46,7 @@ describe("happy paths createIssuer tests", () => {
     let category = config.routes.categories.find(
       (category) => category.api_category == "/overrideEndpoints"
     );
-    let issuer = await createIssuer(category);
+    let issuer = await buildIssuer(category);
 
     expect(issuer.metadata.authorization_endpoint).toEqual(
       category.custom_metadata.authorization_endpoint
