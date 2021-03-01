@@ -1,17 +1,68 @@
 "use strict";
 
 require("jest");
+const { createFakeConfig, ISSUER_METADATA } = require("./testUtils");
+const { createIssuer } = require("../issuer_helper");
+const { Issuer } = require("openid-client");
 
-describe('createIssuer tests', () => {
-  it('Happy Path no custom endpoints', async () => {
-    fail('not implemented')
-  })
+describe("happy paths createIssuer tests", () => {
+  let config;
 
-  it('Happy Path all custom endpoints', async () => {
-    fail('not implemented')
-  })
+  beforeEach(() => {
+    config = createFakeConfig();
+    let mockDiscover = jest.fn();
+    mockDiscover.mockImplementation(() => {
+      return {
+        metadata: ISSUER_METADATA,
+      };
+    });
+    Issuer.discover = mockDiscover;
+  });
 
-  it('Error in issuer discover', async () => {
-    fail('not implemented')
-  })
-})
+  it("Happy Path no custom endpoints", async () => {
+    let category = config.routes.categories.find(
+      (category) => category.api_category == "/health/v1"
+    );
+    let issuer = await createIssuer(category);
+    expect(issuer.metadata.authorization_endpoint).toEqual(
+      ISSUER_METADATA.authorization_endpoint
+    );
+    expect(issuer.metadata.token_endpoint).toEqual(
+      ISSUER_METADATA.token_endpoint
+    );
+    expect(issuer.metadata.userinfo_endpoint).toEqual(
+      ISSUER_METADATA.userinfo_endpoint
+    );
+    expect(issuer.metadata.introspection).toEqual(
+      ISSUER_METADATA.introspection
+    );
+    expect(issuer.metadata.revocation_endpoint).toEqual(
+      ISSUER_METADATA.revocation_endpoint
+    );
+    expect(issuer.metadata.jwks_uri).toEqual(ISSUER_METADATA.jwks_uri);
+  });
+
+  it("Happy Path all custom endpoints", async () => {
+    let category = config.routes.categories.find(
+      (category) => category.api_category == "/overrideEndpoints"
+    );
+    let issuer = await createIssuer(category);
+
+    expect(issuer.metadata.authorization_endpoint).toEqual(
+      category.custom_metadata.authorization_endpoint
+    );
+    expect(issuer.metadata.token_endpoint).toEqual(
+      category.custom_metadata.token_endpoint
+    );
+    expect(issuer.metadata.userinfo_endpoint).toEqual(
+      category.custom_metadata.userinfo_endpoint
+    );
+    expect(issuer.metadata.introspection).toEqual(
+      category.custom_metadata.introspection
+    );
+    expect(issuer.metadata.revocation_endpoint).toEqual(
+      category.custom_metadata.revocation_endpoint
+    );
+    expect(issuer.metadata.jwks_uri).toEqual(category.custom_metadata.jwks_uri);
+  });
+});
