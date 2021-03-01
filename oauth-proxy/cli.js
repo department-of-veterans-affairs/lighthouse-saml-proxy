@@ -151,7 +151,7 @@ function processArgs() {
             required: false,
             default: null,
           },
-          custom_endpoint: {
+          custom_metadata: {
             type: "array",
             description:
               "An array of endpoints that can be used to override the default metadata.",
