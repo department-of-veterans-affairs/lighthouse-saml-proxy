@@ -40,6 +40,7 @@ describe("happy paths buildIssuer tests", () => {
       ISSUER_METADATA.revocation_endpoint
     );
     expect(issuer.metadata.jwks_uri).toEqual(ISSUER_METADATA.jwks_uri);
+    expect(issuer.metadata.issuer).toEqual(ISSUER_METADATA.issuer);
   });
 
   it("Happy Path all custom endpoints", async () => {
@@ -64,5 +65,6 @@ describe("happy paths buildIssuer tests", () => {
       category.custom_metadata.revocation_endpoint
     );
     expect(issuer.metadata.jwks_uri).toEqual(category.custom_metadata.jwks_uri);
+    expect(issuer.metadata.issuer).toEqual(category.custom_metadata.issuer);
   });
 });

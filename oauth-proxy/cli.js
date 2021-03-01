@@ -193,8 +193,7 @@ function processArgs() {
               default: null,
             },
             issuer: {
-              description:
-                "URL of the token issuer.",
+              description: "URL of the token issuer.",
               required: false,
               default: null,
             },

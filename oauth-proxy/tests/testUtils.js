@@ -333,7 +333,7 @@ const createFakeConfig = () => {
             introspection: "http://example.custom.com/introspect",
             revocation_endpoint: "http://example.custom.com/revoke",
             jwks_uri: "http://example.custom.com/keys",
-            issuer: "http://example.custom.com/issuer"
+            issuer: "http://example.custom.com/issuer",
           },
         },
       ],
