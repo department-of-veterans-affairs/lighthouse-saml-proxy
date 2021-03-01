@@ -2,6 +2,15 @@ const { RequestError } = require("request-promise-native/errors");
 const jwt = require("njwt");
 const fs = require("fs");
 
+const ISSUER_METADATA = {
+  authorization_endpoint: "http://example.com/authorization",
+  token_endpoint: "http://example.com/token",
+  userinfo_endpoint: "http://example.com/userinfo",
+  introspection: "http://example.com/introspect",
+  revocation_endpoint: "http://example.com/revoke",
+  jwks_uri: "http://example.com/keys",
+};
+
 function buildDynamoAttributeValue(value) {
   // BEWARE: This doesn't work with number sets and a few other Dynamo types.
   if (value.constructor === String) {
@@ -105,6 +114,7 @@ class FakeIssuer {
       authorization_endpoint: "fake_endpoint",
       token_endpoint: "fake_endpoint",
     };
+    this.discover = jest.fn();
   }
 }
 
@@ -310,6 +320,20 @@ const createFakeConfig = () => {
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         },
+        {
+          api_category: "/overrideEndpoints",
+          upstream_issuer:
+            "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
+          manage_endpoint: "https://staging.va.gov/account",
+          custom_metadata: {
+            authorization_endpoint: "http://example.custom.com/authorization",
+            token_endpoint: "http://example.custom.com/token",
+            userinfo_endpoint: "http://example.custom.com/userinfo",
+            introspection: "http://example.custom.com/introspect",
+            revocation_endpoint: "http://example.custom.com/revoke",
+            jwks_uri: "http://example.custom.com/keys",
+          },
+        },
       ],
       app_routes: {
         authorize: "/authorization",
@@ -355,4 +379,5 @@ module.exports = {
   createFakeConfig,
   jwtEncodeClaims,
   createFakeHashingFunction,
+  ISSUER_METADATA,
 };
