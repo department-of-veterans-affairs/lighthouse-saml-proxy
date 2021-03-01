@@ -45,6 +45,7 @@ const openidMetadataWhitelist = [
 ];
 
 async function createIssuer(upstream_issuer) {
+  // Changes need to go here ...
   return await Issuer.discover(upstream_issuer);
 }
 
