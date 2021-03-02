@@ -1,3 +1,4 @@
+/** @module issuer_helper */
 const { Issuer } = require("openid-client");
 
 /**
