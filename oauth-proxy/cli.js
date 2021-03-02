@@ -174,7 +174,7 @@ function processArgs() {
               required: false,
               default: null,
             },
-            introspection: {
+            introspection_endpoint: {
               description:
                 "URL where the application will make the introspection request.",
               required: false,

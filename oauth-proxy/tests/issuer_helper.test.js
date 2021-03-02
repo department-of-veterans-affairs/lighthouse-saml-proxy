@@ -33,8 +33,8 @@ describe("happy paths buildIssuer tests", () => {
     expect(issuer.metadata.userinfo_endpoint).toEqual(
       ISSUER_METADATA.userinfo_endpoint
     );
-    expect(issuer.metadata.introspection).toEqual(
-      ISSUER_METADATA.introspection
+    expect(issuer.metadata.introspection_endpoint).toEqual(
+      ISSUER_METADATA.introspection_endpoint
     );
     expect(issuer.metadata.revocation_endpoint).toEqual(
       ISSUER_METADATA.revocation_endpoint
@@ -58,8 +58,8 @@ describe("happy paths buildIssuer tests", () => {
     expect(issuer.metadata.userinfo_endpoint).toEqual(
       category.custom_metadata.userinfo_endpoint
     );
-    expect(issuer.metadata.introspection).toEqual(
-      category.custom_metadata.introspection
+    expect(issuer.metadata.introspection_endpoint).toEqual(
+      category.custom_metadata.introspection_endpoint
     );
     expect(issuer.metadata.revocation_endpoint).toEqual(
       category.custom_metadata.revocation_endpoint
