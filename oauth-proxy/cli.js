@@ -152,10 +152,10 @@ function processArgs() {
             default: null,
           },
           custom_metadata: {
-            type: "array",
+            type: "object",
             description:
-              "An array of endpoints that can be used to override the default metadata.",
-            required: true,
+              "An object of endpoints that can be used to override the default metadata.",
+            required: false,
             authorization_endpoint: {
               description:
                 "URL where the application will make the authorization request.",
