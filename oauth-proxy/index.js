@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { Issuer, custom } = require("openid-client");
+const { custom } = require("openid-client");
 const process = require("process");
 const bodyParser = require("body-parser");
 const { DynamoClient } = require("./dynamo_client");
@@ -19,6 +19,7 @@ const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 const rTracer = require("cls-rtracer");
 const { SlugHelper } = require("./slug_helper");
+const { buildIssuer } = require("./issuer_helper");
 
 const openidMetadataWhitelist = [
   "issuer",
@@ -44,8 +45,8 @@ const openidMetadataWhitelist = [
   "request_object_signing_alg_values_supported",
 ];
 
-async function createIssuer(upstream_issuer) {
-  return await Issuer.discover(upstream_issuer);
+async function createIssuer(issuer_category) {
+  return await buildIssuer(issuer_category);
 }
 
 function buildMetadataRewriteTable(config, api_category) {
@@ -434,7 +435,7 @@ if (require.main === module) {
       if (config.routes && config.routes.categories) {
         for (const service_config of config.routes.categories) {
           isolatedIssuers[service_config.api_category] = await createIssuer(
-            service_config.upstream_issuer
+            service_config
           );
         }
       }
