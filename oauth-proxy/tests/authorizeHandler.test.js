@@ -655,14 +655,17 @@ describe("Server Error", () => {
       req,
       res,
       next
-    );
+    )
+      .then(() => {
+        fail("Error should bubble up");
+      })
+      .catch((err) => {
+        expect(err.status).toBe(500);
+      });
 
     expect(logger.error).toHaveBeenCalledWith(
       "Unable to get the authorization server."
     );
-    expect(next).toHaveBeenCalledWith({
-      status: 500,
-    });
   });
 
   it("Error on save to dynamo", async () => {
