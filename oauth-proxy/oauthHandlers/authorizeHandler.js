@@ -1,7 +1,25 @@
+/** @module issuer_helper */
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
 const { v4: uuidv4 } = require("uuid");
 
+/**
+ * Checks for valid authorization request and proxies to authorization server.
+ *
+ * @param {string} redirect_uri uri the authorization response will be sent to.
+ * @param {*} logger logs information.
+ * @param {*} issuer holds information and sends request to token issuer.
+ * @param {*} dynamoClient interacts with dynamodb.
+ * @param {*} oktaClient interacts with okta api.
+ * @param {*} slugHelper rewrites identity provider id to slug.
+ * @param {*} app_category contains information on the route's specific issuer and auth server.
+ * @param {string} dynamo_oauth_requests_table table that stores oauth request information.
+ * @param {string} dynamo_clients_table table that stores client information.
+ * @param {*} idp id of identify provider.
+ * @param {*} req express request object.
+ * @param {*} res express response object.
+ * @param {*} next express next object.
+ */
 const authorizeHandler = async (
   redirect_uri,
   logger,
@@ -100,6 +118,11 @@ const authorizeHandler = async (
   );
 };
 
+/**
+ * Checks for valid authorization parameters.
+ *
+ * @returns {Promise<{valid: boolean, error_description: string, error: string}>}
+ */
 const checkParameters = async (
   state,
   aud,
@@ -153,6 +176,11 @@ const checkParameters = async (
   return { valid: true };
 };
 
+/**
+ * Checks for authorization server or local database for valid client.
+ *
+ * @returns {Promise<{valid: boolean, error_description: string}>}
+ */
 const validateClient = async (
   logger,
   client_id,
@@ -180,6 +208,11 @@ const validateClient = async (
   );
 };
 
+/**
+ * Checks for authorization local database for valid client.
+ *
+ * @returns {Promise<{valid: boolean, error_description: string}>}
+ */
 const localValidateClient = async (
   logger,
   client_id,
@@ -222,6 +255,11 @@ const localValidateClient = async (
   return { valid: true };
 };
 
+/**
+ * Checks for authorization server for valid client.
+ *
+ * @returns {Promise<{valid: boolean, error_description: string}>}
+ */
 const serverValidateClient = async (
   oktaClient,
   logger,
