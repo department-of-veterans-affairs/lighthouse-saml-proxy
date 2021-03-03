@@ -29,8 +29,8 @@ const authorizeHandler = async (
     client_redirect
   );
 
-  if (missingParameters) {
-    res.status(missingParameters.status).json({
+  if (!missingParameters.valid) {
+    res.status(400).json({
       error: missingParameters.error,
       error_description: missingParameters.error_description,
     });
@@ -47,9 +47,9 @@ const authorizeHandler = async (
     app_category
   );
 
-  if (validationError) {
-    res.status(validationError.status).json({
-      error: validationError.error,
+  if (!validationError.valid) {
+    res.status(400).json({
+      error: "invalid_client",
       error_description: validationError.error_description,
     });
     return next();
@@ -111,7 +111,7 @@ const checkParameters = async (
   if (!client_redirect) {
     logger.error("No valid redirect_uri was found.");
     return {
-      status: 400,
+      valid: false,
       error: "invalid_client",
       error_description:
         "There was no redirect URI specified by the application.",
@@ -120,7 +120,7 @@ const checkParameters = async (
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
-      status: 400,
+      valid: false,
       error: "invalid_request",
       error_description: "State parameter required",
     };
@@ -150,7 +150,7 @@ const checkParameters = async (
       });
     }
   }
-  return null;
+  return { valid: true };
 };
 
 const validateClient = async (
@@ -198,16 +198,14 @@ const localValidateClient = async (
       clientInfo = clientInfo.Item;
     } else {
       return {
-        status: 400,
-        error: "invalid_client",
+        valid: false,
         error_description:
           "The client specified by the application is not valid.",
       };
     }
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
-        status: 400,
-        error: "invalid_client",
+        valid: false,
         error_description:
           "The redirect URI specified by the application does not match any of the " +
           `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -216,12 +214,12 @@ const localValidateClient = async (
   } catch (err) {
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
-      status: 400,
-      error: "invalid_client",
+      valid: false,
       error_description:
         "The client specified by the application is not valid.",
     };
   }
+  return { valid: true };
 };
 
 const serverValidateClient = async (
@@ -242,8 +240,7 @@ const serverValidateClient = async (
     );
 
     return {
-      status: 400,
-      error: "invalid_client",
+      valid: false,
       error_description:
         "The client specified by the application is not valid.",
     };
@@ -252,13 +249,13 @@ const serverValidateClient = async (
     oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1
   ) {
     return {
-      status: 400,
-      error: "invalid_client",
+      valid: false,
       error_description:
         "The redirect URI specified by the application does not match any of the " +
         `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
     };
   }
+  return { valid: true };
 };
 
 module.exports = authorizeHandler;
