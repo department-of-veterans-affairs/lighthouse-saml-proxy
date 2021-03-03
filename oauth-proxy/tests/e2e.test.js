@@ -812,4 +812,70 @@ describe("OpenID Connect Conformance", () => {
         expect(err.response.statusText).toEqual("Unauthorized");
       });
   });
+
+  it("returns an OIDC conformant status 302 on valid authorization request", async () => {
+    // By setting the maxRedirects to 0, the redirect uri can be checked without going through the whole flow
+    await axios
+      .get("http://localhost:9090/testServer/authorization", {
+        params: {
+          client_id: "clientId123",
+          scope: "scope",
+          response_type: "code",
+          redirect_uri: "http://localhost:8080/oauth/redirect",
+          state: "state",
+        },
+        maxRedirects: 0,
+      })
+      .then(() => fail("maxRedirects should be exceeded"))
+      .catch((err) => {
+        expect(err.response.config.url).toBe(
+          "http://localhost:9090/testServer/authorization"
+        );
+        expect(err.response.status).toEqual(302);
+      });
+  });
+
+  it("returns an OIDC conformant status 302 with invalid_request error on authorization request with missing state.", async () => {
+    // This test will be changed to redirect when proper RFC compliance is added
+    await axios
+      .get("http://localhost:9090/testServer/authorization", {
+        params: {
+          client_id: "clientId123",
+          scope: "scope",
+          response_type: "code",
+          state: "state",
+        },
+        maxRedirects: 0,
+      })
+      .then(() => fail("maxRedirects should be exceeded"))
+      .catch((err) => {
+        expect(err.response.data.error).toBe("invalid_client");
+        expect(err.response.data.error_description).toBe(
+          "There was no redirect URI specified by the application."
+        );
+        expect(err.response.status).toEqual(400);
+      });
+  });
+
+  it("OIDC conformant notification to resource owner on authorization request with missing redirect.", async () => {
+    // This test will be changed to redirect when proper RFC compliance is added
+    await axios
+      .get("http://localhost:9090/testServer/authorization", {
+        params: {
+          client_id: "clientId123",
+          scope: "scope",
+          response_type: "code",
+          redirect_uri: "http://localhost:8080/oauth/redirect",
+        },
+        maxRedirects: 0,
+      })
+      .then(() => fail("maxRedirects should be exceeded"))
+      .catch((err) => {
+        expect(err.response.data.error).toBe("invalid_request");
+        expect(err.response.data.error_description).toBe(
+          "State parameter required"
+        );
+        expect(err.response.status).toEqual(400);
+      });
+  });
 });

@@ -70,15 +70,11 @@ beforeEach(() => {
   });
 
   issuer = new FakeIssuer(dynamoClient);
+
+  getAuthorizationServerInfoMock.mockReset();
 });
 
-describe("authorizeHandler", () => {
-  afterEach(() => {});
-
-  beforeEach(() => {
-    getAuthorizationServerInfoMock.mockReset();
-  });
-
+describe("Happy Path", () => {
   it("Happy Path Redirect", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
@@ -219,6 +215,123 @@ describe("authorizeHandler", () => {
     expect(res.redirect).toHaveBeenCalled();
   });
 
+  it("Verify that context is saved for SMART launch", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch/patient",
+      launch: "123V456",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+
+    expect(res.redirect).toHaveBeenCalled();
+  });
+
+  it("Verify that JWT context is saved for SMART launch", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      scope: "openid profile offline_access launch",
+      launch:
+        "ewogICJwYXRpZW50IjogIjEyMzRWNTY3OCIsCiAgImVuY291bnRlciI6ICI5ODc2LTU0MzItMTAwMCIKfQ==",
+      aud: "aud",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+
+    expect(res.redirect).toHaveBeenCalled();
+  });
+
+  it("Happy path auth with local client flag", async () => {
+    dynamoClient = buildFakeDynamoClient({
+      client_id: "clientId123",
+      redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
+    });
+
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
+
+    api_category.client_store = "local";
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+
+    expect(res.redirect).toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+    expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
+      { client_id: "clientId123" },
+      "Clients"
+    );
+  });
+});
+
+describe("Invalid Request", () => {
   it("Verify that empty string redirect_uri results in 400", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
@@ -318,40 +431,6 @@ describe("authorizeHandler", () => {
       expected: response.audiences,
     });
     expect(res.redirect).toHaveBeenCalled();
-  });
-
-  it("getAuthorizationServerInfo Error, return 500", async () => {
-    getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "notAPIValue",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    );
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "Unable to get the authorization server."
-    );
-    expect(next).toHaveBeenCalledWith({
-      status: 500,
-    });
   });
 
   it("No client_redirect, returns 400", async () => {
@@ -477,121 +556,6 @@ describe("authorizeHandler", () => {
     expect(res.statusCode).toEqual(400);
   });
 
-  it("Verify that context is saved for SMART launch", async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn(),
-    };
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access launch/patient",
-      launch: "123V456",
-      aud: "aud",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    );
-
-    expect(res.redirect).toHaveBeenCalled();
-  });
-
-  it("Verify that JWT context is saved for SMART launch", async () => {
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn(),
-    };
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      scope: "openid profile offline_access launch",
-      launch:
-        "ewogICJwYXRpZW50IjogIjEyMzRWNTY3OCIsCiAgImVuY291bnRlciI6ICI5ODc2LTU0MzItMTAwMCIKfQ==",
-      aud: "aud",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    );
-
-    expect(res.redirect).toHaveBeenCalled();
-  });
-
-  it("Happy path auth with local client flag", async () => {
-    dynamoClient = buildFakeDynamoClient({
-      client_id: "clientId123",
-      redirect_uris: { values: ["http://localhost:8080/oauth/redirect"] },
-    });
-
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn(),
-    };
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-    };
-
-    api_category.client_store = "local";
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    );
-
-    expect(res.redirect).toHaveBeenCalled();
-    expect(next).not.toHaveBeenCalled();
-    expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
-      { client_id: "clientId123" },
-      "Clients"
-    );
-  });
-
   it("Invalid path in request", async () => {
     dynamoClient = buildFakeDynamoClient({
       client_id: "clientId123",
@@ -664,7 +628,93 @@ describe("authorizeHandler", () => {
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
+});
 
+describe("Server Error", () => {
+  it("getAuthorizationServerInfo Error, return 500", async () => {
+    getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+      aud: "notAPIValue",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    )
+      .then(() => {
+        fail("Error should bubble up");
+      })
+      .catch((err) => {
+        expect(err.status).toBe(500);
+      });
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Unable to get the authorization server."
+    );
+  });
+
+  it("Error on save to dynamo", async () => {
+    dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation(() => {
+      return new Promise((resolve, reject) => {
+        // It's unclear whether this should resolve with a full records or just
+        // the identity field but thus far it has been irrelevant to the
+        // functional testing of the oauth-proxy.
+        reject({
+          error: "bad_things_error",
+          error_description: "Bad things happen",
+        });
+      });
+    });
+
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+    res = {
+      redirect: jest.fn(),
+    };
+
+    req.query = {
+      state: "fake_state",
+      client_id: "clientId123",
+      redirect_uri: "http://localhost:8080/oauth/redirect",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
+  });
+});
+
+describe("Unauthorized Client", () => {
   it("Invalid client in request, local client config, mimic no db table", async () => {
     dynamoClient = buildFakeDynamoClient({
       client_id: "clientId123xxxx",
@@ -750,50 +800,5 @@ describe("authorizeHandler", () => {
       { client_id: "clientId123" },
       "Clients"
     );
-  });
-
-  it("Error on save to dynamo", async () => {
-    dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation(() => {
-      return new Promise((resolve, reject) => {
-        // It's unclear whether this should resolve with a full records or just
-        // the identity field but thus far it has been irrelevant to the
-        // functional testing of the oauth-proxy.
-        reject({
-          error: "bad_things_error",
-          error_description: "Bad things happen",
-        });
-      });
-    });
-
-    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
-    getAuthorizationServerInfoMock.mockResolvedValue(response);
-    res = {
-      redirect: jest.fn(),
-    };
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    );
-    expect(res.redirect).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalled();
   });
 });
