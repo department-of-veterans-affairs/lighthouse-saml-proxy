@@ -19,71 +19,40 @@ const authorizeHandler = async (
 ) => {
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
-  try {
-    await checkParameters(
-      state,
-      aud,
-      issuer,
-      logger,
-      oktaClient,
-      client_redirect
-    );
-  } catch (err) {
-    if (err.status == 500) {
-      return next(err);
-    }
-    res.status(err.status).json({
-      error: err.error,
-      error_description: err.error_description,
+
+  let missingParameters = await checkParameters(
+    state,
+    aud,
+    issuer,
+    logger,
+    oktaClient,
+    client_redirect
+  );
+
+  if (missingParameters) {
+    res.status(missingParameters.status).json({
+      error: missingParameters.error,
+      error_description: missingParameters.error_description,
     });
     return next();
   }
 
-  if (app_category.client_store && app_category.client_store === "local") {
-    const errInfo = await localValidateClient(
-      logger,
-      client_id,
-      client_redirect,
-      dynamoClient,
-      dynamo_clients_table
-    );
-    if (errInfo) {
-      res.status(400).json({
-        error: "invalid_client",
-        error_description: errInfo.error_description,
-      });
-      return next();
-    }
-  } else {
-    try {
-      const oktaApp = await oktaClient.getApplication(client_id);
-      if (
-        oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) ===
-        -1
-      ) {
-        res.status(400).json({
-          error: "invalid_client",
-          error_description:
-            "The redirect URI specified by the application does not match any of the " +
-            `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
-        });
-        return next();
-      }
-    } catch (error) {
-      // This error is unrecoverable because we would be unable to verify
-      // that we are redirecting to a whitelisted client url
-      logger.error(
-        "Unrecoverable error: could not get the Okta client app",
-        error
-      );
+  let validationError = await validateClient(
+    logger,
+    client_id,
+    client_redirect,
+    dynamoClient,
+    dynamo_clients_table,
+    oktaClient,
+    app_category
+  );
 
-      res.status(400).json({
-        error: "invalid_client",
-        error_description:
-          "The client specified by the application is not valid.",
-      });
-      return next();
-    }
+  if (validationError) {
+    res.status(validationError.status).json({
+      error: validationError.error,
+      error_description: validationError.error_description,
+    });
+    return next();
   }
 
   let internal_state = uuidv4();
@@ -97,10 +66,12 @@ const authorizeHandler = async (
 
     // If the launch scope is included then also
     // save the launch context provided (if any)
-    if (req.query.scope && req.query.scope.split(" ").includes("launch")) {
-      if (req.query.launch) {
-        authorizePayload.launch = req.query.launch;
-      }
+    if (
+      req.query.scope &&
+      req.query.scope.split(" ").includes("launch") &&
+      req.query.launch
+    ) {
+      authorizePayload.launch = req.query.launch;
     }
 
     await dynamoClient.savePayloadToDynamo(
@@ -113,6 +84,7 @@ const authorizeHandler = async (
     );
     return next(error); // This error is unrecoverable because we can't create a record to lookup the requested redirect
   }
+
   const params = new URLSearchParams(req.query);
   params.set("redirect_uri", redirect_uri);
   // Rewrite to an internally maintained state
@@ -138,7 +110,7 @@ const checkParameters = async (
 ) => {
   if (!client_redirect) {
     logger.error("No valid redirect_uri was found.");
-    throw {
+    return {
       status: 400,
       error: "invalid_client",
       error_description:
@@ -147,7 +119,7 @@ const checkParameters = async (
   }
   if (!state) {
     logger.error("No valid state parameter was found.");
-    throw {
+    return {
       status: 400,
       error: "invalid_request",
       error_description: "State parameter required",
@@ -178,6 +150,34 @@ const checkParameters = async (
       });
     }
   }
+  return null;
+};
+
+const validateClient = async (
+  logger,
+  client_id,
+  client_redirect,
+  dynamoClient,
+  dynamo_clients_table,
+  oktaClient,
+  app_category
+) => {
+  if (app_category.client_store && app_category.client_store === "local") {
+    return await localValidateClient(
+      logger,
+      client_id,
+      client_redirect,
+      dynamoClient,
+      dynamo_clients_table
+    );
+  }
+
+  return await serverValidateClient(
+    oktaClient,
+    logger,
+    client_id,
+    client_redirect
+  );
 };
 
 const localValidateClient = async (
@@ -198,12 +198,16 @@ const localValidateClient = async (
       clientInfo = clientInfo.Item;
     } else {
       return {
+        status: 400,
+        error: "invalid_client",
         error_description:
           "The client specified by the application is not valid.",
       };
     }
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
+        status: 400,
+        error: "invalid_client",
         error_description:
           "The redirect URI specified by the application does not match any of the " +
           `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -212,8 +216,47 @@ const localValidateClient = async (
   } catch (err) {
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
+      status: 400,
+      error: "invalid_client",
       error_description:
         "The client specified by the application is not valid.",
+    };
+  }
+};
+
+const serverValidateClient = async (
+  oktaClient,
+  logger,
+  client_id,
+  client_redirect
+) => {
+  let oktaApp;
+  try {
+    oktaApp = await oktaClient.getApplication(client_id);
+  } catch (error) {
+    // This error is unrecoverable because we would be unable to verify
+    // that we are redirecting to a whitelisted client url
+    logger.error(
+      "Unrecoverable error: could not get the Okta client app",
+      error
+    );
+
+    return {
+      status: 400,
+      error: "invalid_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    };
+  }
+  if (
+    oktaApp.settings.oauthClient.redirect_uris.indexOf(client_redirect) === -1
+  ) {
+    return {
+      status: 400,
+      error: "invalid_client",
+      error_description:
+        "The redirect URI specified by the application does not match any of the " +
+        `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
     };
   }
 };
