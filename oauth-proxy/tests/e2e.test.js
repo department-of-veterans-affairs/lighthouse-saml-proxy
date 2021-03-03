@@ -849,16 +849,20 @@ describe("OpenID Connect Conformance", () => {
       })
       .then(() => fail("maxRedirects should be exceeded"))
       .catch((err) => {
-        expect(err.response.data.error).toBe("invalid_client");
-        expect(err.response.data.error_description).toBe(
-          "There was no redirect URI specified by the application."
+        expect(err.response.config.url).toBe(
+          "http://localhost:8080/oauth/redirect"
         );
-        expect(err.response.status).toEqual(400);
+        expect(err.response.config.params.error).toBe(
+          "invalid_request"
+        );
+        expect(err.response.config.params.error).toBe(
+          "State parameter required"
+        );
+        expect(err.response.status).toEqual(302);
       });
   });
 
   it("OIDC conformant notification to resource owner on authorization request with missing redirect.", async () => {
-    // This test will be changed to redirect when proper RFC compliance is added
     await axios
       .get("http://localhost:9090/testServer/authorization", {
         params: {
