@@ -843,15 +843,13 @@ describe("OpenID Connect Conformance", () => {
           client_id: "clientId123",
           scope: "scope",
           response_type: "code",
-          state: "state"
+          state: "state",
         },
         maxRedirects: 0,
       })
       .then(() => fail("maxRedirects should be exceeded"))
       .catch((err) => {
-        expect(err.response.data.error).toBe(
-          "invalid_client"
-        );
+        expect(err.response.data.error).toBe("invalid_client");
         expect(err.response.data.error_description).toBe(
           "There was no redirect URI specified by the application."
         );
@@ -873,9 +871,7 @@ describe("OpenID Connect Conformance", () => {
       })
       .then(() => fail("maxRedirects should be exceeded"))
       .catch((err) => {
-        expect(err.response.data.error).toBe(
-          "invalid_request"
-        );
+        expect(err.response.data.error).toBe("invalid_request");
         expect(err.response.data.error_description).toBe(
           "State parameter required"
         );
