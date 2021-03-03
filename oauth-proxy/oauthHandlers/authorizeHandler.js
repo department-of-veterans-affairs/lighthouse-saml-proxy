@@ -1,7 +1,7 @@
 const { URLSearchParams, URL } = require("url");
 const { loginBegin } = require("../metrics");
 const { v4: uuidv4 } = require("uuid");
-// Refactor this ..
+
 const authorizeHandler = async (
   redirect_uri,
   logger,
