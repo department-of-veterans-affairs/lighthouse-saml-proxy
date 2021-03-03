@@ -35,6 +35,7 @@ const authorizeHandler = async (
   res,
   next
 ) => {
+  // implement rfc compliant error handling ...
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
