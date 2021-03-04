@@ -460,7 +460,7 @@ describe("Invalid Request", () => {
 
     expect(res.statusCode).toEqual(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "invalid_client",
+      error: "invalid_request",
       error_description:
         "There was no redirect URI specified by the application.",
     });
@@ -636,7 +636,7 @@ describe("Invalid Request", () => {
         "http://localhost:8080/oauth/invalid/redirect"
       ),
     });
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
@@ -678,7 +678,7 @@ describe("Invalid Request", () => {
         "http://localhost:8080/oauth/invalid/redirect"
       ),
     });
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 });

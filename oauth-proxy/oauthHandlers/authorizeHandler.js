@@ -48,7 +48,18 @@ const authorizeHandler = async (
     client_redirect
   );
 
-  if (!missingParameters.valid) {
+  if (!missingParameters.valid && missingParameters.redirect) {
+    let uri = buildRedirectErrorUri(
+      {
+        error: missingParameters.error,
+        error_description: missingParameters.error_description,
+      },
+      client_redirect
+    );
+    return res.redirect(uri.toString());
+  }
+
+  if (!missingParameters.valid && !missingParameters.redirect) {
     res.status(400).json({
       error: missingParameters.error,
       error_description: missingParameters.error_description,
@@ -66,9 +77,20 @@ const authorizeHandler = async (
     app_category
   );
 
-  if (!validationError.valid) {
+  if (!validationError.valid && validationError.redirect) {
+    let uri = buildRedirectErrorUri(
+      {
+        error: validationError.error,
+        error_description: validationError.error_description,
+      },
+      client_redirect
+    );
+    return res.redirect(uri.toString());
+  }
+
+  if (!validationError.valid && !validationError.redirect) {
     res.status(400).json({
-      error: "invalid_client",
+      error: validationError.error,
       error_description: validationError.error_description,
     });
     return next();
@@ -136,7 +158,8 @@ const checkParameters = async (
     logger.error("No valid redirect_uri was found.");
     return {
       valid: false,
-      error: "invalid_client",
+      redirect: false,
+      error: "invalid_request",
       error_description:
         "There was no redirect URI specified by the application.",
     };
@@ -145,6 +168,7 @@ const checkParameters = async (
     logger.error("No valid state parameter was found.");
     return {
       valid: false,
+      redirect: true,
       error: "invalid_request",
       error_description: "State parameter required",
     };
@@ -233,6 +257,8 @@ const localValidateClient = async (
     } else {
       return {
         valid: false,
+        redirect: true,
+        error: "invalid_client",
         error_description:
           "The client specified by the application is not valid.",
       };
@@ -240,6 +266,8 @@ const localValidateClient = async (
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
         valid: false,
+        redirect: false,
+        error: "invalid_request",
         error_description:
           "The redirect URI specified by the application does not match any of the " +
           `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -249,6 +277,8 @@ const localValidateClient = async (
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
       valid: false,
+      redirect: true,
+      error: "invalid_client",
       error_description:
         "The client specified by the application is not valid.",
     };
@@ -280,6 +310,8 @@ const serverValidateClient = async (
 
     return {
       valid: false,
+      redirect: true,
+      error: "invalid_client",
       error_description:
         "The client specified by the application is not valid.",
     };
@@ -289,6 +321,8 @@ const serverValidateClient = async (
   ) {
     return {
       valid: false,
+      redirect: false,
+      error: "invalid_request",
       error_description:
         "The redirect URI specified by the application does not match any of the " +
         `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -297,4 +331,13 @@ const serverValidateClient = async (
   return { valid: true };
 };
 
+/**
+ * Builds errors to be sent to client's redirect uri.
+ */
+const buildRedirectErrorUri = (err, redirect_uri) => {
+  let uri = new URL(redirect_uri);
+  uri.searchParams.append("error", err.error);
+  uri.searchParams.append("error_description", err.error_description);
+  return uri;
+};
 module.exports = authorizeHandler;

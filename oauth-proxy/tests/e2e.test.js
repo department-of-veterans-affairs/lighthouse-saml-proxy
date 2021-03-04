@@ -871,7 +871,7 @@ describe("OpenID Connect Conformance", () => {
       .catch((err) => {
         expect(err.response.data.error).toBe("invalid_request");
         expect(err.response.data.error_description).toBe(
-          "State parameter required"
+          "There was no redirect URI specified by the application."
         );
         expect(err.response.status).toEqual(400);
       });
