@@ -843,18 +843,14 @@ describe("OpenID Connect Conformance", () => {
           client_id: "clientId123",
           scope: "scope",
           response_type: "code",
-          state: "state",
+          redirect_uri: "http://localhost:8080/oauth/redirect"
         },
         maxRedirects: 0,
       })
       .then(() => fail("maxRedirects should be exceeded"))
       .catch((err) => {
-        expect(err.response.config.url).toBe(
-          "http://localhost:8080/oauth/redirect"
-        );
-        expect(err.response.config.params.error).toBe("invalid_request");
-        expect(err.response.config.params.error).toBe(
-          "State parameter required"
+        expect(err.response.data).toBe(
+          "Found. Redirecting to http://localhost:8080/oauth/redirect?error=invalid_request&error_description=State+parameter+required"
         );
         expect(err.response.status).toEqual(302);
       });
@@ -867,7 +863,7 @@ describe("OpenID Connect Conformance", () => {
           client_id: "clientId123",
           scope: "scope",
           response_type: "code",
-          redirect_uri: "http://localhost:8080/oauth/redirect",
+          state: "state",
         },
         maxRedirects: 0,
       })
