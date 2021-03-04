@@ -852,9 +852,7 @@ describe("OpenID Connect Conformance", () => {
         expect(err.response.config.url).toBe(
           "http://localhost:8080/oauth/redirect"
         );
-        expect(err.response.config.params.error).toBe(
-          "invalid_request"
-        );
+        expect(err.response.config.params.error).toBe("invalid_request");
         expect(err.response.config.params.error).toBe(
           "State parameter required"
         );
