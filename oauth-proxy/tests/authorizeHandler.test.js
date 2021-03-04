@@ -684,6 +684,7 @@ describe("Invalid Request", () => {
 });
 
 describe("Server Error", () => {
+  //I am unsure of this functionality??
   it("getAuthorizationServerInfo Error, return 500", async () => {
     getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
 
