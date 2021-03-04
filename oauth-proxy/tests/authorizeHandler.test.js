@@ -33,6 +33,15 @@ let oktaClient;
 let req;
 let res;
 let api_category;
+let redirect_uri
+const redirectUriBuilder = (redirect, params) => {
+  let uri = new URL(redirect);
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      uri.searchParams.append(key, value);
+    }
+  });
+};
 
 beforeEach(() => {
   redirect_uri = jest.mock();
@@ -43,6 +52,10 @@ beforeEach(() => {
     url: "/veteran-verification/v1/authorization",
   });
   res = new MockExpressResponse();
+  res.redirect = jest.fn();
+    res.redirect.mockImplementation((url) => {
+      redirected_uri = url;
+    });
   api_category = {
     api_category: "/veteran-verification/v1",
     upstream_issuer: "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
@@ -453,7 +466,7 @@ describe("Invalid Request", () => {
     expect(res.statusCode).toEqual(400);
   });
 
-  it("No state, returns 400", async () => {
+  it("No state, redirect", async () => {
     req.query = {
       client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
@@ -476,10 +489,14 @@ describe("Invalid Request", () => {
       next
     );
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "invalid_request",
+      error_description: "State parameter required",
+    }))
   });
 
-  it("Should return a 400 status code on invalid client_id", async () => {
+  it("Should redirect error on invalid client_id", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
 
@@ -506,10 +523,14 @@ describe("Invalid Request", () => {
       next
     );
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "invalid_client",
+      error_description: "The client specified by the application is not valid.",
+    }))
   });
 
-  it("State is empty, returns 400", async () => {
+  it("State is empty, redirects", async () => {
     req.query = { state: null };
     await authorizeHandler(
       redirect_uri,
@@ -527,14 +548,18 @@ describe("Invalid Request", () => {
       next
     );
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "invalid_request",
+      error_description: "State parameter required",
+    }))
   });
 
   it("Bad redirect_uri", async () => {
     req.query = {
       state: "fake_state",
       client_id: "clientId123",
-      redirect_uri: "https://www.google.com",
+      redirect_uri: "https://www.example.bad.com",
     };
 
     await authorizeHandler(
@@ -708,9 +733,11 @@ describe("Server Error", () => {
       res,
       next
     );
-    expect(res.redirect).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "server_error",
+      error_description: "IDK",
+    }))
   });
 });
 
@@ -746,9 +773,11 @@ describe("Unauthorized Client", () => {
       next
     );
 
-    expect(res.statusCode).toEqual(400);
-    expect(next).toHaveBeenCalled();
-    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "invalid_client",
+      error_description: "The client specified by the application is not valid.",
+    }))
     expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
       { client_id: "clientId123" },
       "Clients"
@@ -793,9 +822,11 @@ describe("Unauthorized Client", () => {
       next
     );
 
-    expect(res.statusCode).toEqual(400);
-    expect(next).toHaveBeenCalled();
-    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalled();
+    expect(redirect_uri).toBe(redirectUriBuilder("http://localhost:8080/oauth/redirect", {
+      error: "invalid_client",
+      error_description: "The client specified by the application is not valid.",
+    }))
     expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
       { client_id: "clientId123" },
       "Clients"
