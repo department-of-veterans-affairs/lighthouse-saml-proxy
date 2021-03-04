@@ -843,7 +843,7 @@ describe("OpenID Connect Conformance", () => {
           client_id: "clientId123",
           scope: "scope",
           response_type: "code",
-          redirect_uri: "http://localhost:8080/oauth/redirect"
+          redirect_uri: "http://localhost:8080/oauth/redirect",
         },
         maxRedirects: 0,
       })
