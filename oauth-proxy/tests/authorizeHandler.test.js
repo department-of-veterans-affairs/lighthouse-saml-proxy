@@ -529,7 +529,7 @@ describe("Invalid Request", () => {
     expect(res.redirect).toHaveBeenCalledWith(
       buildRedirectErrorUri(
         {
-          error: "invalid_client",
+          error: "unauthorized_client",
           error_description:
             "The client specified by the application is not valid.",
         },
@@ -837,7 +837,7 @@ describe("Unauthorized Client", () => {
     expect(res.redirect).toHaveBeenCalledWith(
       buildRedirectErrorUri(
         {
-          error: "invalid_client",
+          error: "unauthorized_client",
           error_description:
             "The client specified by the application is not valid.",
         },
@@ -891,7 +891,7 @@ describe("Unauthorized Client", () => {
     expect(res.redirect).toHaveBeenCalledWith(
       buildRedirectErrorUri(
         {
-          error: "invalid_client",
+          error: "unauthorized_client",
           error_description:
             "The client specified by the application is not valid.",
         },
