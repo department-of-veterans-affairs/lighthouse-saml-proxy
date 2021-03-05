@@ -862,7 +862,7 @@ describe("OpenID Connect Conformance", () => {
         params: {
           client_id: "clientId123",
           scope: "scope",
-          response_type: "code", 
+          response_type: "code",
         },
         maxRedirects: 0,
       })
@@ -882,8 +882,8 @@ describe("OpenID Connect Conformance", () => {
         params: {
           client_id: "clientId123",
           scope: "scope",
-          response_type: "code", 
-          redirect_uri: "http://localhost:8080/invalid/oauth/redirect"
+          response_type: "code",
+          redirect_uri: "http://localhost:8080/invalid/oauth/redirect",
         },
         maxRedirects: 0,
       })
@@ -891,8 +891,8 @@ describe("OpenID Connect Conformance", () => {
       .catch((err) => {
         expect(err.response.data.error).toBe("invalid_request");
         expect(err.response.data.error_description).toBe(
-          "The redirect URI specified by the application does not match any of the registered redirect URIs."
-          +" Erroneous redirect URI: http://localhost:8080/invalid/oauth/redirect"
+          "The redirect URI specified by the application does not match any of the registered redirect URIs." +
+            " Erroneous redirect URI: http://localhost:8080/invalid/oauth/redirect"
         );
         expect(err.response.status).toEqual(400);
       });
