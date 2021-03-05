@@ -592,7 +592,6 @@ describe("Invalid Request", () => {
       res,
       next
     );
-
     expect(res.statusCode).toEqual(400);
     expect(res.json).toHaveBeenCalledWith({
       error: "invalid_request",
@@ -600,6 +599,35 @@ describe("Invalid Request", () => {
     });
   });
 
+  it("Bad redirect_uri and missing state", async () => {
+    req.query = {
+      client_id: "clientId123",
+      redirect_uri: "https://www.example.bad.com",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "invalid_request",
+      error_description: badRedirectMessage("https://www.example.bad.com"),
+    });
+  });
   it("Invalid path in request", async () => {
     dynamoClient = buildFakeDynamoClient({
       client_id: "clientId123",
