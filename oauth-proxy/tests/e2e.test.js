@@ -856,14 +856,34 @@ describe("OpenID Connect Conformance", () => {
       });
   });
 
-  it("OIDC conformant notification to resource owner on authorization request with missing redirect.", async () => {
+  it("OIDC conformant notification to resource owner on authorization request with missing state and redirect.", async () => {
     await axios
       .get("http://localhost:9090/testServer/authorization", {
         params: {
           client_id: "clientId123",
           scope: "scope",
-          response_type: "code",
-          state: "state",
+          response_type: "code", 
+        },
+        maxRedirects: 0,
+      })
+      .then(() => fail("maxRedirects should be exceeded"))
+      .catch((err) => {
+        expect(err.response.data.error).toBe("invalid_request");
+        expect(err.response.data.error_description).toBe(
+          "There was no redirect URI specified by the application."
+        );
+        expect(err.response.status).toEqual(400);
+      });
+  });
+
+  it("OIDC conformant notification to resource owner on authorization request with missing state and invalid redirect.", async () => {
+    await axios
+      .get("http://localhost:9090/testServer/authorization", {
+        params: {
+          client_id: "clientId123",
+          scope: "scope",
+          response_type: "code", 
+          redirect_uri: "http://localhost:8080/invalid/oauth/redirect"
         },
         maxRedirects: 0,
       })
