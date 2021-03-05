@@ -539,8 +539,12 @@ describe("Invalid Request", () => {
   });
 
   it("State is empty, redirects", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+
     req.query = {
       state: null,
+      client_id: "clientId123",
       redirect_uri: "http://localhost:8080/oauth/redirect",
     };
     await authorizeHandler(
