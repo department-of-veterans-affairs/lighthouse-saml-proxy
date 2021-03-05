@@ -48,18 +48,7 @@ const authorizeHandler = async (
     app_category
   );
 
-  if (!validationError.valid && validationError.redirect) {
-    let uri = buildRedirectErrorUri(
-      {
-        error: validationError.error,
-        error_description: validationError.error_description,
-      },
-      client_redirect
-    );
-    return res.redirect(uri.toString());
-  }
-
-  if (!validationError.valid && !validationError.redirect) {
+  if (!validationError.valid) {
     res.status(400).json({
       error: validationError.error,
       error_description: validationError.error_description,
@@ -75,7 +64,7 @@ const authorizeHandler = async (
     oktaClient
   );
 
-  if (!missingParameters.valid && missingParameters.redirect) {
+  if (!missingParameters.valid) {
     let uri = buildRedirectErrorUri(
       {
         error: missingParameters.error,
@@ -84,14 +73,6 @@ const authorizeHandler = async (
       client_redirect
     );
     return res.redirect(uri.toString());
-  }
-
-  if (!missingParameters.valid && !missingParameters.redirect) {
-    res.status(400).json({
-      error: missingParameters.error,
-      error_description: missingParameters.error_description,
-    });
-    return next();
   }
 
   let internal_state = uuidv4();
@@ -149,7 +130,6 @@ const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
     logger.error("No valid state parameter was found.");
     return {
       valid: false,
-      redirect: true,
       error: "invalid_request",
       error_description: "State parameter required",
     };
@@ -200,7 +180,6 @@ const validateClient = async (
     logger.error("No valid redirect_uri was found.");
     return {
       valid: false,
-      redirect: false,
       error: "invalid_request",
       error_description:
         "There was no redirect URI specified by the application.",
@@ -248,7 +227,6 @@ const localValidateClient = async (
     } else {
       return {
         valid: false,
-        redirect: true,
         error: "unauthorized_client",
         error_description:
           "The client specified by the application is not valid.",
@@ -257,7 +235,6 @@ const localValidateClient = async (
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
         valid: false,
-        redirect: false,
         error: "invalid_request",
         error_description:
           "The redirect URI specified by the application does not match any of the " +
@@ -268,7 +245,6 @@ const localValidateClient = async (
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
       valid: false,
-      redirect: true,
       error: "unauthorized_client",
       error_description:
         "The client specified by the application is not valid.",
@@ -301,7 +277,6 @@ const serverValidateClient = async (
 
     return {
       valid: false,
-      redirect: true,
       error: "unauthorized_client",
       error_description:
         "The client specified by the application is not valid.",
@@ -312,7 +287,6 @@ const serverValidateClient = async (
   ) {
     return {
       valid: false,
-      redirect: false,
       error: "invalid_request",
       error_description:
         "The redirect URI specified by the application does not match any of the " +

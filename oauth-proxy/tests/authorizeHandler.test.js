@@ -526,16 +526,13 @@ describe("Invalid Request", () => {
       next
     );
 
-    expect(res.redirect).toHaveBeenCalledWith(
-      buildRedirectErrorUri(
-        {
-          error: "unauthorized_client",
-          error_description:
-            "The client specified by the application is not valid.",
-        },
-        "http://localhost:8080/oauth/redirect"
-      ).toString()
-    );
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    });
   });
 
   it("State is empty, redirects", async () => {
@@ -834,16 +831,13 @@ describe("Unauthorized Client", () => {
       next
     );
 
-    expect(res.redirect).toHaveBeenCalledWith(
-      buildRedirectErrorUri(
-        {
-          error: "unauthorized_client",
-          error_description:
-            "The client specified by the application is not valid.",
-        },
-        "http://localhost:8080/oauth/redirect"
-      ).toString()
-    );
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    });
     expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
       { client_id: "clientId123" },
       "Clients"
@@ -888,16 +882,13 @@ describe("Unauthorized Client", () => {
       next
     );
 
-    expect(res.redirect).toHaveBeenCalledWith(
-      buildRedirectErrorUri(
-        {
-          error: "unauthorized_client",
-          error_description:
-            "The client specified by the application is not valid.",
-        },
-        "http://localhost:8080/oauth/redirect"
-      ).toString()
-    );
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.statusCode).toEqual(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    });
     expect(dynamoClient.getPayloadFromDynamo).toHaveBeenCalledWith(
       { client_id: "clientId123" },
       "Clients"
