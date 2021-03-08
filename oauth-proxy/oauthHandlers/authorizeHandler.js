@@ -38,24 +38,7 @@ const authorizeHandler = async (
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
-  let missingParameters = await checkParameters(
-    state,
-    aud,
-    issuer,
-    logger,
-    oktaClient,
-    client_redirect
-  );
-
-  if (!missingParameters.valid) {
-    res.status(400).json({
-      error: missingParameters.error,
-      error_description: missingParameters.error_description,
-    });
-    return next();
-  }
-
-  let validationError = await validateClient(
+  let clientValidation = await validateClient(
     logger,
     client_id,
     client_redirect,
@@ -65,12 +48,31 @@ const authorizeHandler = async (
     app_category
   );
 
-  if (!validationError.valid) {
+  if (!clientValidation.valid) {
     res.status(400).json({
-      error: "invalid_client",
-      error_description: validationError.error_description,
+      error: clientValidation.error,
+      error_description: clientValidation.error_description,
     });
     return next();
+  }
+
+  let paramValidation = await checkParameters(
+    state,
+    aud,
+    issuer,
+    logger,
+    oktaClient
+  );
+
+  if (!paramValidation.valid) {
+    let uri = buildRedirectErrorUri(
+      {
+        error: paramValidation.error,
+        error_description: paramValidation.error_description,
+      },
+      client_redirect
+    );
+    return res.redirect(uri.toString());
   }
 
   let internal_state = uuidv4();
@@ -121,25 +123,9 @@ const authorizeHandler = async (
 /**
  * Checks for valid authorization parameters.
  *
- * @returns {Promise<{valid: boolean, error_description: string, error: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
-const checkParameters = async (
-  state,
-  aud,
-  issuer,
-  logger,
-  oktaClient,
-  client_redirect
-) => {
-  if (!client_redirect) {
-    logger.error("No valid redirect_uri was found.");
-    return {
-      valid: false,
-      error: "invalid_client",
-      error_description:
-        "There was no redirect URI specified by the application.",
-    };
-  }
+const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
@@ -179,7 +165,7 @@ const checkParameters = async (
 /**
  * Checks for authorization server or local database for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const validateClient = async (
   logger,
@@ -190,6 +176,26 @@ const validateClient = async (
   oktaClient,
   app_category
 ) => {
+  if (!client_id || !/^\w+$/.test(client_id)) {
+    logger.error("No valid client_id was found.");
+    return {
+      valid: false,
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    };
+  }
+
+  if (!client_redirect) {
+    logger.error("No valid redirect_uri was found.");
+    return {
+      valid: false,
+      error: "invalid_request",
+      error_description:
+        "There was no redirect URI specified by the application.",
+    };
+  }
+
   if (app_category.client_store && app_category.client_store === "local") {
     return await localValidateClient(
       logger,
@@ -211,7 +217,7 @@ const validateClient = async (
 /**
  * Checks for authorization local database for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const localValidateClient = async (
   logger,
@@ -232,6 +238,7 @@ const localValidateClient = async (
     } else {
       return {
         valid: false,
+        error: "unauthorized_client",
         error_description:
           "The client specified by the application is not valid.",
       };
@@ -239,6 +246,7 @@ const localValidateClient = async (
     if (!clientInfo.redirect_uris.values.includes(client_redirect)) {
       return {
         valid: false,
+        error: "invalid_request",
         error_description:
           "The redirect URI specified by the application does not match any of the " +
           `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
@@ -248,6 +256,7 @@ const localValidateClient = async (
     logger.error("Failed to retrieve client info from Dynamo DB.", err);
     return {
       valid: false,
+      error: "unauthorized_client",
       error_description:
         "The client specified by the application is not valid.",
     };
@@ -258,7 +267,7 @@ const localValidateClient = async (
 /**
  * Checks for authorization server for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const serverValidateClient = async (
   oktaClient,
@@ -279,6 +288,7 @@ const serverValidateClient = async (
 
     return {
       valid: false,
+      error: "unauthorized_client",
       error_description:
         "The client specified by the application is not valid.",
     };
@@ -288,12 +298,25 @@ const serverValidateClient = async (
   ) {
     return {
       valid: false,
+      error: "invalid_request",
       error_description:
         "The redirect URI specified by the application does not match any of the " +
         `registered redirect URIs. Erroneous redirect URI: ${client_redirect}`,
     };
   }
   return { valid: true };
+};
+
+/**
+ * Builds errors to be sent to client's redirect uri.
+ *
+ * @returns {module:url.URL}
+ */
+const buildRedirectErrorUri = (err, redirect_uri) => {
+  let uri = new URL(redirect_uri);
+  uri.searchParams.append("error", err.error);
+  uri.searchParams.append("error_description", err.error_description);
+  return uri;
 };
 
 module.exports = authorizeHandler;
