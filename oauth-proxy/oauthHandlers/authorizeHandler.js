@@ -176,8 +176,8 @@ const validateClient = async (
   oktaClient,
   app_category
 ) => {
-  if (!client_id) {
-    logger.error("No client_id present.");
+  if (!client_id || !/^\w+$/.test(client_id)) {
+    logger.error("No valid client_id was found.");
     return {
       valid: false,
       error: "unauthorized_client",
@@ -187,7 +187,7 @@ const validateClient = async (
   }
 
   if (!client_redirect) {
-    logger.error("No redirect_uri present.");
+    logger.error("No valid redirect_uri was found.");
     return {
       valid: false,
       error: "invalid_request",

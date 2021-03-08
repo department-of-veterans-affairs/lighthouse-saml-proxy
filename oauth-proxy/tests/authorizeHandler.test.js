@@ -367,6 +367,38 @@ describe("Invalid Request", () => {
     expect(next).toHaveBeenCalled();
   });
 
+  it("Invalid client_id results in 400", async () => {
+    let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
+    getAuthorizationServerInfoMock.mockResolvedValue(response);
+
+    req.query = {
+      client_id: "a.b",
+    };
+
+    await authorizeHandler(
+      redirect_uri,
+      logger,
+      issuer,
+      dynamoClient,
+      oktaClient,
+      mockSlugHelper,
+      api_category,
+      "OAuthRequestsV2",
+      "Clients",
+      "idp1",
+      req,
+      res,
+      next
+    );
+    expect(res.statusCode).toEqual(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    });
+    expect(next).toHaveBeenCalled();
+  });
+
   it("Verify that undefined redirect_uri results in 400", async () => {
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
