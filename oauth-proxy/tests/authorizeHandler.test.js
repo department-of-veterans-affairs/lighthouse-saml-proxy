@@ -442,6 +442,10 @@ describe("Invalid Request", () => {
   });
 
   it("No client_redirect, returns 400", async () => {
+    req.query = {
+      client_id: "clientId123",
+    };
+
     await authorizeHandler(
       redirect_uri,
       logger,

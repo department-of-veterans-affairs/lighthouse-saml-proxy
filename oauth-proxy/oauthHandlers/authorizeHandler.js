@@ -38,7 +38,7 @@ const authorizeHandler = async (
   loginBegin.inc();
   const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
 
-  let validationError = await validateClient(
+  let clientValidation = await validateClient(
     logger,
     client_id,
     client_redirect,
@@ -48,15 +48,15 @@ const authorizeHandler = async (
     app_category
   );
 
-  if (!validationError.valid) {
+  if (!clientValidation.valid) {
     res.status(400).json({
-      error: validationError.error,
-      error_description: validationError.error_description,
+      error: clientValidation.error,
+      error_description: clientValidation.error_description,
     });
     return next();
   }
 
-  let missingParameters = await checkParameters(
+  let paramValidation = await checkParameters(
     state,
     aud,
     issuer,
@@ -64,11 +64,11 @@ const authorizeHandler = async (
     oktaClient
   );
 
-  if (!missingParameters.valid) {
+  if (!paramValidation.valid) {
     let uri = buildRedirectErrorUri(
       {
-        error: missingParameters.error,
-        error_description: missingParameters.error_description,
+        error: paramValidation.error,
+        error_description: paramValidation.error_description,
       },
       client_redirect
     );
@@ -176,8 +176,18 @@ const validateClient = async (
   oktaClient,
   app_category
 ) => {
+  if (!client_id) {
+    logger.error("No client_id present.");
+    return {
+      valid: false,
+      error: "unauthorized_client",
+      error_description:
+        "The client specified by the application is not valid.",
+    };
+  }
+
   if (!client_redirect) {
-    logger.error("No valid redirect_uri was found.");
+    logger.error("No redirect_uri present.");
     return {
       valid: false,
       error: "invalid_request",
@@ -185,6 +195,7 @@ const validateClient = async (
         "There was no redirect URI specified by the application.",
     };
   }
+
   if (app_category.client_store && app_category.client_store === "local") {
     return await localValidateClient(
       logger,
