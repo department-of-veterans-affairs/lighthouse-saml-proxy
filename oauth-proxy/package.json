@@ -45,7 +45,6 @@
     "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy/issues"
   },
   "homepage": "https://github.com/department-of-veterans-affairs/vets-saml-proxy#readme",
-  //update
   "dependencies": {
     "@okta/okta-sdk-nodejs": "^4.2.0",
     "@sentry/node": "^5.7.1",
