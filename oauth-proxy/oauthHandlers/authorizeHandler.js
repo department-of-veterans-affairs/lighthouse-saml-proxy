@@ -123,7 +123,7 @@ const authorizeHandler = async (
 /**
  * Checks for valid authorization parameters.
  *
- * @returns {Promise<{valid: boolean, error_description: string, error: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
   if (!state) {
@@ -165,7 +165,7 @@ const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
 /**
  * Checks for authorization server or local database for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const validateClient = async (
   logger,
@@ -206,7 +206,7 @@ const validateClient = async (
 /**
  * Checks for authorization local database for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const localValidateClient = async (
   logger,
@@ -256,7 +256,7 @@ const localValidateClient = async (
 /**
  * Checks for authorization server for valid client.
  *
- * @returns {Promise<{valid: boolean, error_description: string}>}
+ * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
 const serverValidateClient = async (
   oktaClient,
@@ -298,6 +298,8 @@ const serverValidateClient = async (
 
 /**
  * Builds errors to be sent to client's redirect uri.
+ *
+ * @returns {module:url.URL}
  */
 const buildRedirectErrorUri = (err, redirect_uri) => {
   let uri = new URL(redirect_uri);
@@ -305,4 +307,5 @@ const buildRedirectErrorUri = (err, redirect_uri) => {
   uri.searchParams.append("error_description", err.error_description);
   return uri;
 };
+
 module.exports = authorizeHandler;
