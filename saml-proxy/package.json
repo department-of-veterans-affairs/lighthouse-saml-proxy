@@ -64,7 +64,6 @@
   "engines": {
     "node": ">=6.0.0"
   },
-  // update
   "dependencies": {
     "@department-of-veterans-affairs/formation": "^6.9.5",
     "@sentry/node": "^5.7.1",
