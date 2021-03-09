@@ -105,7 +105,7 @@
     "redis": "^3.0.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
-    "samlp": "^4.0.0",
+    "samlp": "^6.0.0",
     "uswds": "^1.6.10",
     "uuid": "^3.3.2",
     "winston": "^3.3.3",
@@ -136,7 +136,6 @@
     "typescript": "^3.9.7"
   },
   "resolutions": {
-    "node-forge": ">=0.10.0",
     "xml-crypto": ">=2.0.0"
   }
 }
