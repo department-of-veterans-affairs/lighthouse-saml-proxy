@@ -19,6 +19,10 @@ EXPOSE 7100 7100
 HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
   CMD node bin/healthcheck.js
 
+COPY ./oauth-proxy/entrypoint.sh /tmp/entrypoint.sh
+RUN chmod 777 /tmp/entrypoint.sh
+
 USER node
-ENTRYPOINT ["/usr/local/bin/tini", "--"]
+
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/tmp/entrypoint.sh"]
 CMD ["node", "index.js"]
