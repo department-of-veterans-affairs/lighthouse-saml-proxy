@@ -8,8 +8,8 @@ const MockExpressRequest = require("mock-express-request");
 const {
   SaveDocumentStateStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
-jest.mock('uuid',() => ({
-  v4: () => 'fake-uuid'
+jest.mock("uuid", () => ({
+  v4: () => "fake-uuid",
 }));
 
 const HMAC_SECRET = "secret";
