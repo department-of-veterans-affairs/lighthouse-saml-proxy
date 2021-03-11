@@ -151,6 +151,12 @@ function processArgs() {
             required: false,
             default: null,
           },
+          opaque_token: {
+            description:
+              "Indicates if the issued token will be opaque and therefore need extra handling.",
+            required: false,
+            default: false,
+          },
           custom_metadata: {
             description:
               "An object of endpoints that can be used to override the default metadata.",
