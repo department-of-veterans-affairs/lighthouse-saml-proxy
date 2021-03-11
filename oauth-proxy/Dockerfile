@@ -20,7 +20,6 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
   CMD node bin/healthcheck.js
 
 COPY ./oauth-proxy/entrypoint.sh /tmp/entrypoint.sh
-RUN chmod 777 /tmp/entrypoint.sh
 
 USER node
 
