@@ -5,6 +5,7 @@ const {
   createFakeConfig,
 } = require("../testUtils");
 const MockExpressRequest = require("mock-express-request");
+const { Issuer } = require("openid-client");
 const {
   SaveDocumentStateStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
@@ -75,7 +76,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -93,7 +95,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -113,7 +116,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.updateToDynamo).toHaveBeenCalledWith(
@@ -122,6 +126,8 @@ describe("saveDocumentStateStrategy tests", () => {
         expires_on: 3628800,
         refresh_token:
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
+        access_token: tokens.access_token,
+        iss: "issuer",
       },
       "OAuthRequestsV2"
     );
@@ -146,7 +152,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
@@ -157,6 +164,8 @@ describe("saveDocumentStateStrategy tests", () => {
         refresh_token:
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
         state: "abc123",
+        access_token: tokens.access_token,
+        iss: "issuer",
       },
       "OAuthRequestsV2"
     );
@@ -174,7 +183,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -189,7 +199,8 @@ describe("saveDocumentStateStrategy tests", () => {
       req,
       logger,
       dynamoClient,
-      config
+      config,
+      new Issuer({ issuer: "issuer" })
     );
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).toHaveBeenCalled();
