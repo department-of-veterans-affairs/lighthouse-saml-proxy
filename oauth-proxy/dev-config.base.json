@@ -61,7 +61,7 @@
       },
       {
         "api_category": "/iam/v1",
-        "upstream_issuer": "https://sqa.fed.eauth.va.gov/oauthi/sps/oauth/oauth20",
+        "upstream_issuer": "https://<TBD>/oauth20",
         "opaque_token": true
       }
     ],
