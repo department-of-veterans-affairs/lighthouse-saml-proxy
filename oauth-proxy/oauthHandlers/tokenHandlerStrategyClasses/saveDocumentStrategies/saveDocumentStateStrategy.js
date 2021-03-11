@@ -3,11 +3,12 @@ const jwtDecode = require("jwt-decode");
 const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
-  constructor(req, logger, dynamoClient, config) {
+  constructor(req, logger, dynamoClient, config, issuer_client) {
     this.req = req;
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
+    this.issuer_client = issuer_client;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
@@ -20,6 +21,8 @@ class SaveDocumentStateStrategy {
                 tokens.refresh_token,
                 this.config.hmac_secret
               ),
+              access_token: tokens.access_token,
+              iss: this.issuer_client.issuer,
               // 42 days
               expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
             },
@@ -34,6 +37,8 @@ class SaveDocumentStateStrategy {
               tokens.refresh_token,
               this.config.hmac_secret
             ),
+            access_token: tokens.access_token,
+            iss: this.issuer_client.issuer,
             // 42 days
             expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
           };
