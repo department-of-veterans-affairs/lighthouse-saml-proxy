@@ -92,22 +92,22 @@ do_client_credentials() {
   local network=""
   if [[ $HOST == *"dev"* ]];
   then
-    url="https://dev-api.va.gov/oauth2/health-insurance/v1"
+    url="https://dev-api.va.gov/oauth2/health/system/v1"
   fi
 
   if [[ $HOST == *"sandbox"* ]];
   then
-    url="https://sandbox-api.va.gov/oauth2/health-insurance/v1"
+    url="https://sandbox-api.va.gov/oauth2/health/system/v1"
   fi
 
   if [[ $HOST == *"staging"* ]];
   then
-    url="https://staging-api.va.gov/oauth2/health-insurance/v1"
+    url="https://staging-api.va.gov/oauth2/health/system/v1"
   fi
 
   if [[ $HOST == *"localhost"* ]];
   then
-    url="http://localhost:7100/oauth2/health-insurance/v1"
+    url="http://localhost:7100/oauth2/health/system/v1"
     network="-it --network container:oauth-proxy_oauth-proxy_1"
   fi
 
