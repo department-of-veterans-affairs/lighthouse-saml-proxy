@@ -56,10 +56,7 @@ describe("saveDocumentStateStrategy tests", () => {
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
       redirect_uri: REDIRECT_URI,
     };
-    tokens = {
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      access_token: ACCESS_TOKEN,
-    };
+    tokens = buildToken(false, true, true, "launch");
     jest.spyOn(global.Math, "round").mockReturnValue(0);
   });
 

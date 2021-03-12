@@ -60,6 +60,7 @@ const buildToken = (is_static, patient, standaloneLaunch, scp = "status.read") =
         ? access_token_patient
         : access_token_launch
       : access_token,
+    refresh_token: "the_fake_refresh_token",
     scope: scp
   };
 
