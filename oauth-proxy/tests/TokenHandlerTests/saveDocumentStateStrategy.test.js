@@ -12,9 +12,7 @@ jest.mock("uuid", () => ({
   v4: () => "fake-uuid",
 }));
 
-const {
-  buildToken,
-} = require("./tokenHandlerTestUtils");
+const { buildToken } = require("./tokenHandlerTestUtils");
 
 const HMAC_SECRET = "secret";
 const STATE = "abc123";
@@ -29,8 +27,6 @@ const REFRESH_TOKEN_HASH_PAIR = [
   "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
 ];
 const REDIRECT_URI = "http://localhost/thisDoesNotMatter";
-
-const ACCESS_TOKEN = buildToken(false, true, true, "launch").access_token;
 
 let dynamoClient;
 let config;
