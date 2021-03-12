@@ -58,6 +58,11 @@
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         "manage_endpoint": "https://staging.va.gov/account",
         "enable_consent_endpoint" : true
+      },
+      {
+        "api_category": "/iam/v1",
+        "upstream_issuer": "https://<TBD>/oauth20",
+        "opaque_token": true
       }
     ],
     "app_routes": {
