@@ -21,7 +21,10 @@ class SaveDocumentStateStrategy {
                 tokens.refresh_token,
                 this.config.hmac_secret
               ),
-              access_token: tokens.access_token,
+              access_token: hashString(
+                tokens.access_token,
+                this.config.hmac_secret
+              ),
               iss: this.issuer_client.issuer,
               // 42 days
               expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
@@ -37,7 +40,10 @@ class SaveDocumentStateStrategy {
               tokens.refresh_token,
               this.config.hmac_secret
             ),
-            access_token: tokens.access_token,
+            access_token: hashString(
+              tokens.access_token,
+              this.config.hmac_secret
+            ),
             iss: this.issuer_client.issuer,
             // 42 days
             expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
