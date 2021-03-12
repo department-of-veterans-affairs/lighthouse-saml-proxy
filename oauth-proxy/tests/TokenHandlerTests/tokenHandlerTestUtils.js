@@ -52,7 +52,7 @@ const buildGetPatientInfoStrategy = (patient, error) => {
   return getPatientInfoStrategy;
 };
 
-const buildToken = (is_static, patient, standaloneLaunch) => {
+const buildToken = (is_static, patient, standaloneLaunch, scp = "status.read") => {
   let token = {
     is_static: is_static,
     access_token: patient
@@ -60,6 +60,7 @@ const buildToken = (is_static, patient, standaloneLaunch) => {
         ? access_token_patient
         : access_token_launch
       : access_token,
+    scope: scp
   };
 
   return token;
