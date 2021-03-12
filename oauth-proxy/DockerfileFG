@@ -46,4 +46,4 @@ COPY ./oauth-proxy/entrypoint.sh /tmp/entrypoint.sh
 USER node
 
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/tmp/entrypoint.sh"]
-CMD ["node", "index.js", "--config", "/oauth-proxy/config.json"]
+CMD ["node", "index.js", "--config", "/etc/oauth-proxy/config.json"]
