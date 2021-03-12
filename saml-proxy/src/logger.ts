@@ -38,7 +38,7 @@ const sassLogger = createLogger({
 });
 
 const middlewareJsonFormat = (
-  tokens: TokenIndexer,
+  tokens: TokenIndexer<Request, Response>,
   req: Request,
   res: Response
 ) => {
@@ -58,7 +58,7 @@ const middlewareJsonFormat = (
   );
 };
 
-const morganMiddleware = (options: Options) =>
+const morganMiddleware = (options: Options<Request, Response>) =>
   morgan(middlewareJsonFormat, options);
 
 const winstonMiddleware = (req: Request, res: Response, next: NextFunction) => {

@@ -26,6 +26,8 @@ class SaveDocumentStateStrategy {
             this.config.dynamo_oauth_requests_table
           );
         } else {
+          // Backwards compatibility.
+          // Remove after 42 day of PR merge (DATE - 02/23/2021).
           let payload = {
             internal_state: uuidv4(),
             state: document.state,
