@@ -12,6 +12,10 @@ jest.mock("uuid", () => ({
   v4: () => "fake-uuid",
 }));
 
+const {
+  buildToken,
+} = require("./tokenHandlerTestUtils");
+
 const HMAC_SECRET = "secret";
 const STATE = "abc123";
 const INTERNAL_STATE = "1234-5678-9100-0000";
@@ -26,8 +30,7 @@ const REFRESH_TOKEN_HASH_PAIR = [
 ];
 const REDIRECT_URI = "http://localhost/thisDoesNotMatter";
 
-const ACCESS_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaCJdLCJpYXQiOjE1MTYyMzkwMjJ9.61N3OfyoslutHtsG1PxVWztr77PyMiVz9Js4CwzPiV8";
+const ACCESS_TOKEN = buildToken(false, true, true, "launch").access_token;
 
 let dynamoClient;
 let config;
@@ -100,8 +103,7 @@ describe("saveDocumentStateStrategy tests", () => {
   });
   it("Happy Path with launch w/o scope", () => {
     document.launch = LAUNCH;
-    tokens.access_token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
+    tokens = buildToken(false, true, true, "openid");
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
       internal_state: INTERNAL_STATE,
@@ -134,8 +136,7 @@ describe("saveDocumentStateStrategy tests", () => {
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
       redirect_uri: REDIRECT_URI,
     };
-    tokens.access_token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
+    tokens = buildToken(false, true, true, "openid");
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
       code: CODE_HASH_PAIR[1],
