@@ -96,6 +96,7 @@ tableParams = {
     { AttributeName: "state", AttributeType: "S" },
     { AttributeName: "code", AttributeType: "S" },
     { AttributeName: "refresh_token", AttributeType: "S" },
+    { AttributeName: "access_token", AttributeType: "S" },
   ],
   KeySchema: [{ AttributeName: "internal_state", KeyType: "HASH" }],
   ProvisionedThroughput: {
@@ -140,6 +141,22 @@ tableParams = {
       KeySchema: [
         {
           AttributeName: "refresh_token",
+          KeyType: "HASH",
+        },
+      ],
+      Projection: {
+        ProjectionType: "ALL",
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 10,
+        WriteCapacityUnits: 10,
+      },
+    },
+    {
+      IndexName: "oauth_access_token_index",
+      KeySchema: [
+        {
+          AttributeName: "access_token",
           KeyType: "HASH",
         },
       ],
