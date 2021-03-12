@@ -8,6 +8,9 @@ const MockExpressRequest = require("mock-express-request");
 const {
   SaveDocumentStateStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
+jest.mock("uuid", () => ({
+  v4: () => "fake-uuid",
+}));
 
 const HMAC_SECRET = "secret";
 const STATE = "abc123";
@@ -54,6 +57,11 @@ describe("saveDocumentStateStrategy tests", () => {
       refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
       access_token: ACCESS_TOKEN,
     };
+    jest.spyOn(global.Math, "round").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    jest.spyOn(global.Math, "round").mockRestore();
   });
 
   it("Happy Path", () => {
@@ -108,6 +116,15 @@ describe("saveDocumentStateStrategy tests", () => {
       config
     );
     strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.updateToDynamo).toHaveBeenCalledWith(
+      { internal_state: "1234-5678-9100-0000" },
+      {
+        expires_on: 3628800,
+        refresh_token:
+          "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
+      },
+      "OAuthRequestsV2"
+    );
     expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
   });
   it("Happy Path w/o internal_state", () => {
@@ -132,6 +149,17 @@ describe("saveDocumentStateStrategy tests", () => {
       config
     );
     strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        expires_on: 3628800,
+        internal_state: "fake-uuid",
+        redirect_uri: "http://localhost/thisDoesNotMatter",
+        refresh_token:
+          "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
+        state: "abc123",
+      },
+      "OAuthRequestsV2"
+    );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
   it("No Document State", () => {

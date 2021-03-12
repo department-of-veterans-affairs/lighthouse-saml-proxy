@@ -5,6 +5,7 @@ import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
 
 import { VetsAPIClient } from "../VetsAPIClient";
+import { User } from "@sentry/types";
 
 interface IExtendedStrategy extends Strategy {
   options: any;
@@ -17,6 +18,7 @@ export interface IConfiguredRequest extends Request {
   strategy: IExtendedStrategy;
   sp: any;
   idp: any;
+  user: User;
 }
 
 /**
