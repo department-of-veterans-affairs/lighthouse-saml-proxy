@@ -19,7 +19,7 @@ env:
   variables:
     # Honor Docker ignore at folder level
     DOCKER_BUILDKIT: 1
-    FWD_PROXY_CRT: "/dvp/common/ecs-oauth-proxy/fwd-proxy-certificate"
+    FWD_PROXY_CRT: "/dvp/common/ecs-oauth-proxy/codebuild/fwd-proxy-cert"
     IMAGE: "oauth-proxy"
   parameter-store:
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
