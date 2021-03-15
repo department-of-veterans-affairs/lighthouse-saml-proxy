@@ -19,7 +19,6 @@
   },
   "main": "./app.js",
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "build": "tsc",
     "watch": "tsc --watch",
     "prestart": "yarn build && npx eslint .",
@@ -36,7 +35,7 @@
     "collectCoverage": true,
     "coverageThreshold": {
       "global": {
-        "lines": 80.62
+        "lines": 80.59
       }
     },
     "transform": {
@@ -100,7 +99,7 @@
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.1",
-    "passport-wsfed-saml2": "git+https://github.com/department-of-veterans-affairs/lighthouse-passport-wsfed-saml2.git",
+    "passport-wsfed-saml2": "^4.4.0",
     "prom-client": "^11.5.3",
     "redis": "^3.0.2",
     "request": "^2.88.2",
@@ -134,9 +133,5 @@
     "ts-jest": "^26.5.3",
     "ts-node": "^7.0.1",
     "typescript": "^3.9.9"
-  },
-  "resolutions": {
-    "node-forge": ">=0.10.0",
-    "xml-crypto": ">=2.0.0"
   }
 }
