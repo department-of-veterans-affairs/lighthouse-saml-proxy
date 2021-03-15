@@ -105,7 +105,7 @@
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
-    "samlp": "^4.0.1",
+    "samlp": "^6.0.1",
     "uswds": "^1.6.13",
     "uuid": "^3.4.0",
     "winston": "^3.3.3",
