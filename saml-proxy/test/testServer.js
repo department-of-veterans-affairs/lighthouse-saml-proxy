@@ -5,7 +5,6 @@ import IDPConfig from "../src/IDPConfig";
 import configureExpress from "../src/routes";
 import { TestCache } from "../src/routes/types";
 import SPConfig from "../src/SPConfig";
-import { removeHeaders } from "../src/utils";
 
 import { idpCert, idpKey, spCert, spKey } from "./testCerts";
 
