@@ -43,6 +43,7 @@ phases:
       - GET_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#"refs/heads/"}
       # add fwd proxy cert
       - echo ${FWD_PROXY_CRT} > fwdproxy.crt
+      - cat fwdproxy.crt
       # set branch if not set from webhook
       - |
         if [[ $BRANCH ]]; then
