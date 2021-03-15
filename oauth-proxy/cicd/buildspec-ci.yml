@@ -62,7 +62,7 @@ phases:
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
-      - aws ssm get-parameter  --name ${FWD_PROXY_CRT} | jq -r .Parameter.Value > fwdproxy.crt
+      - aws ssm get-parameters  --name ${FWD_PROXY_CRT} | jq -r '.Parameters[0].Value' > fwdproxy.crt
       - |
         make build  \
          TAG=${COMMIT_HASH} \
