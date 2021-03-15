@@ -14,20 +14,26 @@ class SaveDocumentStateStrategy {
     try {
       if (document.state && tokens.access_token) {
         if (document.internal_state) {
+          let updated_document = {
+            access_token: hashString(
+              tokens.access_token,
+              this.config.hmac_secret
+            ),
+            iss: this.issuer_client.issuer,
+            // 42 days
+            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
+          };
+
+          if (tokens.refresh_token) {
+            updated_document.refresh_token = hashString(
+              tokens.refresh_token,
+              this.config.hmac_secret
+            );
+          }
+
           await this.dynamoClient.updateToDynamo(
             { internal_state: document.internal_state },
-            {
-              refresh_token: tokens.refresh_token
-                ? hashString(tokens.refresh_token, this.config.hmac_secret)
-                : null,
-              access_token: hashString(
-                tokens.access_token,
-                this.config.hmac_secret
-              ),
-              iss: this.issuer_client.issuer,
-              // 42 days
-              expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
-            },
+            updated_document,
             this.config.dynamo_oauth_requests_table
           );
         } else {
