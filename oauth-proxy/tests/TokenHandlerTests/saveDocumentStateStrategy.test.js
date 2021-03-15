@@ -263,7 +263,8 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     await strategy
       .saveDocumentToDynamo(document, tokens)
-      .then(() => fail("should have thrown error")).catch(() => expect(true));
+      .then(() => fail("should have thrown error"))
+      .catch(() => expect(true));
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
