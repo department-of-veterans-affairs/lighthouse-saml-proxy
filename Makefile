@@ -20,6 +20,8 @@ BUILD_DATE_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_TOOL ?= Makefile
 BUILD_VERSION ?= $(shell git rev-parse --short HEAD) 
 BUILD_NUMBER ?= $(shell echo $$RANDOM) 
+TARGET ?= base
+
 
 # https://stackoverflow.com/questions/10858261/abort-makefile-if-variable-not-set
 # Fuction to check if variables are defined
@@ -46,6 +48,7 @@ build:
 	## build:	Build Docker image 
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
+		--target $(TARGET) \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
 		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
 		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
