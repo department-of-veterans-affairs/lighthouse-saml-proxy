@@ -65,6 +65,12 @@ test:
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		npm run test:ci
 
+## pull: 	Pull an image to ECR
+.PHONY: pull
+pull:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+	docker pull $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG)
+
 ## push: 	Pushes an image to ECR
 .PHONY: push
 push:
