@@ -43,18 +43,22 @@ class SaveDocumentStateStrategy {
             internal_state: uuidv4(),
             state: document.state,
             redirect_uri: document.redirect_uri,
-            refresh_token: hashString(
-              tokens.refresh_token,
-              this.config.hmac_secret
-            ),
             access_token: hashString(
               tokens.access_token,
               this.config.hmac_secret
             ),
             iss: this.issuer_client.issuer,
-            // 42 days
-            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
           };
+          if (tokens.refresh_token) {
+            payload.refresh_token = hashString(
+              tokens.refresh_token,
+              this.config.hmac_secret
+            );
+            payload.expires_on =
+              Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
+          } else {
+            payload.expires_on = tokens.expires_at;
+          }
           if (document.launch) {
             payload.launch = document.launch;
           }

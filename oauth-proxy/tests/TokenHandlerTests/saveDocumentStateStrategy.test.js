@@ -65,7 +65,7 @@ describe("saveDocumentStateStrategy tests", () => {
     jest.spyOn(global.Math, "round").mockRestore();
   });
 
-  it("Happy Path", () => {
+  it("Happy Path", async () => {
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
       code: CODE_HASH_PAIR[1],
@@ -79,10 +79,10 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
   });
-  it("Happy Path with launch", () => {
+  it("Happy Path with launch", async () => {
     document.launch = LAUNCH;
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
@@ -98,11 +98,11 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it("Happy Path no Refresh in Token", () => {
+  it("Happy Path no Refresh in Token", async () => {
     document.launch = LAUNCH;
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
@@ -118,13 +118,13 @@ describe("saveDocumentStateStrategy tests", () => {
       new Issuer({ issuer: "issuer" })
     );
 
-    delete tokens.access_token;
+    delete tokens.refresh_token;
 
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it("Happy Path with launch w/o scope", () => {
+  it("Happy Path with launch w/o scope", async () => {
     document.launch = LAUNCH;
     tokens.access_token =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
@@ -142,7 +142,7 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.updateToDynamo).toHaveBeenCalledWith(
       { internal_state: "1234-5678-9100-0000" },
       {
@@ -157,7 +157,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
   });
-  it("Happy Path w/o internal_state", () => {
+  it("Happy Path w/o internal_state", async () => {
     document = {
       state: STATE,
       code: CODE_HASH_PAIR[0],
@@ -179,7 +179,7 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
       {
         expires_on: 3628800,
@@ -196,7 +196,119 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-  it("No Document State", () => {
+  it("Happy Path w/o internal_state with launchy", async () => {
+    document = {
+      state: STATE,
+      code: CODE_HASH_PAIR[0],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
+      launch: LAUNCH,
+    };
+    tokens.access_token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      new Issuer({ issuer: "issuer" })
+    );
+    await strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        expires_on: 3628800,
+        internal_state: "fake-uuid",
+        redirect_uri: "http://localhost/thisDoesNotMatter",
+        refresh_token:
+          "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
+        state: "abc123",
+        access_token:
+          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
+        iss: "issuer",
+        launch: LAUNCH,
+      },
+      "OAuthRequestsV2"
+    );
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
+  });
+
+  it("Happy Path w/o internal_state err on dynamo save", async () => {
+    document = {
+      state: STATE,
+      code: CODE_HASH_PAIR[0],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
+      launch: LAUNCH,
+    };
+    tokens.expires_at = 1234;
+    dynamoClient = {
+      savePayloadToDynamo: jest.fn(),
+      updateToDynamo: jest.fn(),
+    };
+    dynamoClient.savePayloadToDynamo.mockImplementation(() => {
+      throw {};
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      new Issuer({ issuer: "issuer" })
+    );
+    await strategy
+      .saveDocumentToDynamo(document, tokens)
+      .then(() => fail("should have thrown error")).catch(() => expect(true));
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
+  });
+
+  it("Happy Path w/o internal_state no Refresh Token", async () => {
+    document = {
+      state: STATE,
+      code: CODE_HASH_PAIR[0],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
+      redirect_uri: REDIRECT_URI,
+    };
+    tokens.access_token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      new Issuer({ issuer: "issuer" })
+    );
+
+    delete tokens.refresh_token;
+    tokens.expires_at = 1234;
+    await strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        expires_on: 1234,
+        internal_state: "fake-uuid",
+        redirect_uri: "http://localhost/thisDoesNotMatter",
+        state: "abc123",
+        access_token:
+          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
+        iss: "issuer",
+      },
+      "OAuthRequestsV2"
+    );
+    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
+  });
+  it("No Document State", async () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
@@ -211,11 +323,11 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-  it("Could not save documents", () => {
+  it("Could not save documents", async () => {
     dynamoClient = jest.fn();
     dynamoClient.mockImplementation(() => {
       throw new Error("Test Error");
@@ -227,7 +339,7 @@ describe("saveDocumentStateStrategy tests", () => {
       config,
       new Issuer({ issuer: "issuer" })
     );
-    strategy.saveDocumentToDynamo(document, tokens);
+    await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).toHaveBeenCalled();
   });
 });
