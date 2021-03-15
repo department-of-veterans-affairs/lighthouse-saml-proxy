@@ -19,11 +19,11 @@ env:
   variables:
     # Honor Docker ignore at folder level
     DOCKER_BUILDKIT: 1
+    FWD_PROXY_CRT: "/dvp/common/ecs-oauth-proxy/fwd-proxy-certificate"
     IMAGE: "oauth-proxy"
   parameter-store:
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
     DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
-    FWD_PROXY_CRT: "/dvp/common/ecs-oauth-proxy/fwd-proxy-certificate"
   exported-variables:
     - DOCKER_BUILDKIT
 phases:
@@ -41,9 +41,6 @@ phases:
       - COMMIT_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
       # Get usable branch name
       - GET_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#"refs/heads/"}
-      # add fwd proxy cert
-      - echo ${FWD_PROXY_CRT} > fwdproxy.crt
-      - cat fwdproxy.crt
       # set branch if not set from webhook
       - |
         if [[ $BRANCH ]]; then
@@ -65,11 +62,13 @@ phases:
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
+      - aws ssm get-parameter  --name ${FWD_PROXY_CRT} | jq -r .Parameter.Value > fwdproxy.crt
       - |
         make build  \
          TAG=${COMMIT_HASH} \
          IMAGE=${IMAGE} \
          VERSION=${COMMIT_HASH} \
+         TARGET=deploy \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run unit tests
