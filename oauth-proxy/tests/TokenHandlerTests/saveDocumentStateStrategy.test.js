@@ -101,6 +101,29 @@ describe("saveDocumentStateStrategy tests", () => {
     strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
   });
+
+  it("Happy Path no Refresh in Token", () => {
+    document.launch = LAUNCH;
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      launch: LAUNCH,
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      new Issuer({ issuer: "issuer" })
+    );
+
+    delete tokens.access_token;
+
+    strategy.saveDocumentToDynamo(document, tokens);
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
   it("Happy Path with launch w/o scope", () => {
     document.launch = LAUNCH;
     tokens.access_token =
