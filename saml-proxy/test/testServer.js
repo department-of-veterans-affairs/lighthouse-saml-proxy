@@ -23,7 +23,7 @@ const defaultTestingConfig = {
   spIdpIssuer: "api.idmelabs.com",
   spAuthnContextClassRef: "http://idmanagement.gov/ns/assurance/loa/3",
   spAcsUrls: ["/samlproxy/sp/saml/sso"],
-  idpCert: removeHeaders(idpCert),
+  idpCert: idpCert,
   idpKey: Buffer.from(idpKey, "utf-8"),
   spCert: Buffer.from(spCert, "utf-8"),
   spKey: Buffer.from(spKey, "utf-8"),
