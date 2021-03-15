@@ -12,15 +12,14 @@ class SaveDocumentStateStrategy {
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
-      if (document.state && tokens.refresh_token) {
+      if (document.state && tokens.access_token) {
         if (document.internal_state) {
           await this.dynamoClient.updateToDynamo(
             { internal_state: document.internal_state },
             {
-              refresh_token: hashString(
-                tokens.refresh_token,
-                this.config.hmac_secret
-              ),
+              refresh_token: tokens.refresh_token
+                ? hashString(tokens.refresh_token, this.config.hmac_secret)
+                : null,
               access_token: hashString(
                 tokens.access_token,
                 this.config.hmac_secret
