@@ -20,8 +20,6 @@ class SaveDocumentStateStrategy {
               this.config.hmac_secret
             ),
             iss: this.issuer_client.issuer,
-            // 42 days
-            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
           };
 
           if (tokens.refresh_token) {
@@ -29,6 +27,10 @@ class SaveDocumentStateStrategy {
               tokens.refresh_token,
               this.config.hmac_secret
             );
+            updated_document.expires_on =
+              Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
+          } else {
+            updated_document.expires_on = tokens.expires_at;
           }
 
           await this.dynamoClient.updateToDynamo(
