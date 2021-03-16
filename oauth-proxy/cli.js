@@ -154,7 +154,13 @@ function processArgs() {
           opaque_token: {
             description:
               "Indicates if the issued token will be opaque and therefore need extra handling.",
-            required: false,
+            required: true,
+            default: "api://default",
+          },
+          audience: {
+            description:
+              "The audience for the route in the app catetory.",
+            required: true,
             default: false,
           },
           custom_metadata: {
