@@ -267,7 +267,7 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-  
+
   it("No Document State", async () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({
