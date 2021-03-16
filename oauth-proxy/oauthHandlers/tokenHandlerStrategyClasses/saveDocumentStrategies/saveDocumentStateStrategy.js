@@ -58,7 +58,7 @@ class SaveDocumentStateStrategy {
     try {
       if (document.launch && tokens.access_token) {
         let decodedToken = jwtDecode(tokens.access_token);
-        if (tokens.scope && tokens.scope.split(/(\s)/).includes("launch")) {
+        if (tokens.scope && tokens.scope.split(" ").includes("launch")) {
           let launch = document.launch;
           let accessToken = hashString(
             tokens.access_token,

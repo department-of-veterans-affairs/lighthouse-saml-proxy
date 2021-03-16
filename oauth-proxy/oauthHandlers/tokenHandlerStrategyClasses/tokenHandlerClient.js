@@ -70,13 +70,13 @@ class TokenHandlerClient {
     let responseBody = { ...tokenResponseBase, state };
 
     if (tokens && tokens.scope) {
-      if (tokens.scope.split(/(\s)/).includes("launch/patient")) {
+      if (tokens.scope.split(" ").includes("launch/patient")) {
         let patient = await this.getPatientInfoStrategy.createPatientInfo(
           tokens,
           decoded
         );
         responseBody["patient"] = patient;
-      } else if (tokens.scope.split(/(\s)/).includes("launch") && launch) {
+      } else if (tokens.scope.split(" ").includes("launch") && launch) {
         try {
           let decodedLaunch = JSON.parse(
             Buffer.from(launch, "base64").toString("ascii")
