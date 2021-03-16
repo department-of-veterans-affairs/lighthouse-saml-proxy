@@ -154,7 +154,7 @@ function processArgs() {
           opaque_token: {
             description:
               "Indicates if the issued token will be opaque and therefore need extra handling.",
-            required: true,
+            required: false,
             default: false,
           },
           audience: {
