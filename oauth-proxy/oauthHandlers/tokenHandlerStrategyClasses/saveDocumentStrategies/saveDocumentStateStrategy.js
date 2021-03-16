@@ -48,17 +48,13 @@ class SaveDocumentStateStrategy {
               this.config.hmac_secret
             ),
             iss: this.issuer,
-          };
-          if (tokens.refresh_token) {
-            payload.refresh_token = hashString(
+            refresh_token: hashString(
               tokens.refresh_token,
               this.config.hmac_secret
-            );
-            payload.expires_on =
-              Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
-          } else {
-            payload.expires_on = tokens.expires_at;
-          }
+            ),
+            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
+          };
+
           if (document.launch) {
             payload.launch = document.launch;
           }
