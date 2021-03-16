@@ -267,47 +267,7 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-
-  it("Happy Path w/o internal_state no Refresh Token", async () => {
-    document = {
-      state: STATE,
-      code: CODE_HASH_PAIR[0],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[0],
-      redirect_uri: REDIRECT_URI,
-    };
-    tokens.access_token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbIm9wZW5pZCJdLCJpYXQiOjE1MTYyMzkwMjJ9.cLdCTxvmVuJEr5gJEG_gv0C2j1AZyIYMWplicL9LYJA";
-    dynamoClient = buildFakeDynamoClient({
-      state: STATE,
-      code: CODE_HASH_PAIR[1],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI,
-    });
-    let strategy = new SaveDocumentStateStrategy(
-      req,
-      logger,
-      dynamoClient,
-      config,
-      "issuer"
-    );
-
-    delete tokens.refresh_token;
-    tokens.expires_at = 1234;
-    await strategy.saveDocumentToDynamo(document, tokens);
-    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
-      {
-        expires_on: 1234,
-        internal_state: "fake-uuid",
-        redirect_uri: "http://localhost/thisDoesNotMatter",
-        state: "abc123",
-        access_token:
-          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
-        iss: "issuer",
-      },
-      "OAuthRequestsV2"
-    );
-    expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
-  });
+  
   it("No Document State", async () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({
