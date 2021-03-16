@@ -5,6 +5,7 @@ import IDPConfig from "../src/IDPConfig";
 import configureExpress from "../src/routes";
 import { TestCache } from "../src/routes/types";
 import SPConfig from "../src/SPConfig";
+import { removeHeaders } from "../src/utils";
 
 import { idpCert, idpKey, spCert, spKey } from "./testCerts";
 
@@ -22,7 +23,7 @@ const defaultTestingConfig = {
   spIdpIssuer: "api.idmelabs.com",
   spAuthnContextClassRef: "http://idmanagement.gov/ns/assurance/loa/3",
   spAcsUrls: ["/samlproxy/sp/saml/sso"],
-  idpCert: idpCert,
+  idpCert: removeHeaders(idpCert),
   idpKey: Buffer.from(idpKey, "utf-8"),
   spCert: Buffer.from(spCert, "utf-8"),
   spKey: Buffer.from(spKey, "utf-8"),
