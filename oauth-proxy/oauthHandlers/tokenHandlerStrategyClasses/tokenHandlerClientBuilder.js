@@ -100,7 +100,7 @@ const getStrategies = (
         logger,
         dynamoClient,
         config,
-        issuer
+        issuer.issuer
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,
@@ -126,7 +126,7 @@ const getStrategies = (
         logger,
         dynamoClient,
         config,
-        issuer
+        issuer.issuer
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,

@@ -5,7 +5,6 @@ const {
   createFakeConfig,
 } = require("../testUtils");
 const MockExpressRequest = require("mock-express-request");
-const { Issuer } = require("openid-client");
 const {
   SaveDocumentStateStrategy,
 } = require("../../oauthHandlers/tokenHandlerStrategyClasses/saveDocumentStrategies/saveDocumentStateStrategy");
@@ -77,7 +76,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -96,7 +95,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -115,7 +114,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
 
     delete tokens.refresh_token;
@@ -140,7 +139,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.updateToDynamo).toHaveBeenCalledWith(
@@ -177,7 +176,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
@@ -217,7 +216,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
@@ -259,7 +258,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy
       .saveDocumentToDynamo(document, tokens)
@@ -289,7 +288,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
 
     delete tokens.refresh_token;
@@ -322,7 +321,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).not.toHaveBeenCalled();
@@ -338,7 +337,7 @@ describe("saveDocumentStateStrategy tests", () => {
       logger,
       dynamoClient,
       config,
-      new Issuer({ issuer: "issuer" })
+      "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
     expect(logger.error).toHaveBeenCalled();
