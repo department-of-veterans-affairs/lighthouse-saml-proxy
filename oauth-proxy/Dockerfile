@@ -1,4 +1,4 @@
-FROM vasdvp/lighthouse-node-application-base:node12
+FROM vasdvp/lighthouse-node-application-base:node12 as base
 
 WORKDIR /home/node
 
