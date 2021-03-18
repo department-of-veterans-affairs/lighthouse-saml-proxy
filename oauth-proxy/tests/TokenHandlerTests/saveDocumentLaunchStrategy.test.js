@@ -7,7 +7,6 @@ const {
   buildFakeLogger,
   createFakeConfig,
   createFakeHashingFunction,
-  jwtEncodeClaims,
   convertObjectToDynamoAttributeValues,
 } = require("../testUtils");
 
@@ -80,8 +79,8 @@ describe("saveDocumentToDynamo tests", () => {
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
       {
         access_token:
-          "8ce1212e7c1ce218f9fc5daf75d918eaa18feb06507d096f5bb9d6846b02e98c",
-        expires_on: 5678,
+          "e0f866111645e58199f0382a6fa50a217b0c2ccc1ca07e27738e758e1183a8db",
+        expires_on: 1516239023,
         launch: {
           S: "launch",
         },

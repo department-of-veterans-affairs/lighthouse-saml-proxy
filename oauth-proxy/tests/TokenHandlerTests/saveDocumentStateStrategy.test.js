@@ -97,7 +97,7 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
       {
         access_token:
-          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+          "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
         expires_on: 5678,
         launch: "1234V5678",
       },
@@ -128,7 +128,7 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
       {
         access_token:
-          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+          "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
         expires_on: 5678,
         launch: "1234V5678",
       },
@@ -162,7 +162,7 @@ describe("saveDocumentStateStrategy tests", () => {
         refresh_token:
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
         access_token:
-          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+          "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
         iss: "issuer",
       },
       "OAuthRequestsV2"
@@ -200,7 +200,7 @@ describe("saveDocumentStateStrategy tests", () => {
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
         state: "abc123",
         access_token:
-          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+          "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
         iss: "issuer",
       },
       "OAuthRequestsV2"
