@@ -1,5 +1,4 @@
 const { hashString } = require("../../../utils");
-const jwtDecode = require("jwt-decode");
 const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
