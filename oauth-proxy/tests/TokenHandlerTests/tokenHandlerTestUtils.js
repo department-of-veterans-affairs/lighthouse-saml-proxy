@@ -67,6 +67,7 @@ const buildToken = (
       : access_token,
     refresh_token: "the_fake_refresh_token",
     scope: scp,
+    expires_in: 5678,
   };
 
   return token;
