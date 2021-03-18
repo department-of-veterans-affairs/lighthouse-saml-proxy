@@ -1,4 +1,5 @@
 const { hashString } = require("../../../utils");
+const jwtDecode = require("jwt-decode");
 const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
@@ -74,6 +75,7 @@ class SaveDocumentStateStrategy {
 
     try {
       if (document.launch && tokens.access_token) {
+        let decodedToken = jwtDecode(tokens.access_token);
         if (tokens.scope && tokens.scope.split(" ").includes("launch")) {
           let launch = document.launch;
           let accessToken = hashString(
@@ -84,7 +86,7 @@ class SaveDocumentStateStrategy {
           let payload = {
             access_token: accessToken,
             launch: launch,
-            expires_on: tokens.expires_at,
+            expires_on: decodedToken.exp,
           };
 
           await this.dynamoClient.savePayloadToDynamo(

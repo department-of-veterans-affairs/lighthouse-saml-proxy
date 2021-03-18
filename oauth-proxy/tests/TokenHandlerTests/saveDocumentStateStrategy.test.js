@@ -98,7 +98,7 @@ describe("saveDocumentStateStrategy tests", () => {
       {
         access_token:
           "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
-        expires_on: 5678,
+        expires_on: 1516239023,
         launch: "1234V5678",
       },
       "LaunchContext"
@@ -129,7 +129,7 @@ describe("saveDocumentStateStrategy tests", () => {
       {
         access_token:
           "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
-        expires_on: 5678,
+        expires_on: 1516239023,
         launch: "1234V5678",
       },
       "LaunchContext"
