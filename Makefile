@@ -41,14 +41,28 @@ help : Makefile
 login:
 	aws ecr get-login-password | docker login --username AWS --password-stdin $(REPOSITORY)
 
-## build:	Build an image
-.PHONY: build
-build: 
-	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+## build/oauth:	Build oauth-proxy image
+.PHONY: build/oauth
+build/oauth : IMAGE = oauth-proxy
+build/oauth: 
 	## build:	Build Docker image 
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
 		--target $(TARGET) \
+		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
+		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
+		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
+		--build-arg VERSION=$(BUILD_VERSION) \
+		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
+		--no-cache .
+
+## build/saml:	Build saml-proxy image
+.PHONY: build/saml
+build/saml : IMAGE = saml-proxy
+build/saml: 
+	## build:	Build Docker image 
+	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		-f $(IMAGE)/DockerfileFG \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
 		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
 		--build-arg BUILD_TOOL=$(BUILD_TOOL) \

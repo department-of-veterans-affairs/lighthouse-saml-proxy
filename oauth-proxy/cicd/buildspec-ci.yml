@@ -64,7 +64,7 @@ phases:
       - time="${time}\nBuild - $(date +%r) - started"
       - aws ssm get-parameters  --name ${FWD_PROXY_CRT} | jq -r '.Parameters[0].Value' > fwdproxy.crt
       - |
-        make build  \
+        make build/oauth  \
          TAG=${COMMIT_HASH} \
          IMAGE=${IMAGE} \
          VERSION=${COMMIT_HASH} \
