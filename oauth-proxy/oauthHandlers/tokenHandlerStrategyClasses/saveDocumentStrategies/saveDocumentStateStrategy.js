@@ -3,26 +3,39 @@ const jwtDecode = require("jwt-decode");
 const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
-  constructor(req, logger, dynamoClient, config) {
+  constructor(req, logger, dynamoClient, config, issuer) {
     this.req = req;
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
+    this.issuer = issuer;
   }
   async saveDocumentToDynamo(document, tokens) {
     try {
-      if (document.state && tokens.refresh_token) {
+      if (document.state && tokens.access_token) {
         if (document.internal_state) {
+          let updated_document = {
+            access_token: hashString(
+              tokens.access_token,
+              this.config.hmac_secret
+            ),
+            iss: this.issuer,
+          };
+
+          if (tokens.refresh_token) {
+            updated_document.refresh_token = hashString(
+              tokens.refresh_token,
+              this.config.hmac_secret
+            );
+            updated_document.expires_on =
+              Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
+          } else {
+            updated_document.expires_on = tokens.expires_at;
+          }
+
           await this.dynamoClient.updateToDynamo(
             { internal_state: document.internal_state },
-            {
-              refresh_token: hashString(
-                tokens.refresh_token,
-                this.config.hmac_secret
-              ),
-              // 42 days
-              expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
-            },
+            updated_document,
             this.config.dynamo_oauth_requests_table
           );
         } else {
@@ -32,13 +45,18 @@ class SaveDocumentStateStrategy {
             internal_state: uuidv4(),
             state: document.state,
             redirect_uri: document.redirect_uri,
+            access_token: hashString(
+              tokens.access_token,
+              this.config.hmac_secret
+            ),
+            iss: this.issuer,
             refresh_token: hashString(
               tokens.refresh_token,
               this.config.hmac_secret
             ),
-            // 42 days
             expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
           };
+
           if (document.launch) {
             payload.launch = document.launch;
           }
