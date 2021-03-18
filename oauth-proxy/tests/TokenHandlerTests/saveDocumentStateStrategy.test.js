@@ -144,7 +144,7 @@ describe("saveDocumentStateStrategy tests", () => {
         refresh_token:
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
         access_token:
-          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
+          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
         iss: "issuer",
       },
       "OAuthRequestsV2"
@@ -182,7 +182,7 @@ describe("saveDocumentStateStrategy tests", () => {
           "9b4dba523ad0a7e323452871556d691787cd90c6fe959b040c5864979db5e337",
         state: "abc123",
         access_token:
-          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
+          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
         iss: "issuer",
       },
       "OAuthRequestsV2"
