@@ -45,7 +45,6 @@ login:
 .PHONY: build/oauth
 build/oauth : IMAGE = oauth-proxy
 build/oauth: 
-	IMAGE="oauth-proxy"
 	## build:	Build Docker image 
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
