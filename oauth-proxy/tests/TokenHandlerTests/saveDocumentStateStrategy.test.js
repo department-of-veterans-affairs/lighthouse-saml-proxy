@@ -94,6 +94,15 @@ describe("saveDocumentStateStrategy tests", () => {
       "issuer"
     );
     await strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+        expires_on: 5678,
+        launch: "1234V5678",
+      },
+      "LaunchContext"
+    );
     expect(logger.error).not.toHaveBeenCalled();
   });
 
@@ -116,6 +125,15 @@ describe("saveDocumentStateStrategy tests", () => {
     delete tokens.refresh_token;
 
     await strategy.saveDocumentToDynamo(document, tokens);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "9e518839129a53e22a82dbe99f3ee1b3981700108823c587370b59e9b913ef3c",
+        expires_on: 5678,
+        launch: "1234V5678",
+      },
+      "LaunchContext"
+    );
     expect(logger.error).not.toHaveBeenCalled();
   });
 
