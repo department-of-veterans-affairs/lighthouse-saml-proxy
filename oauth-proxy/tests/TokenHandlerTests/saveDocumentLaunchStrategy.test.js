@@ -53,12 +53,9 @@ describe("saveDocumentToDynamo tests", () => {
       config,
       hashingFunction
     );
-    const expire_on = new Date().getTime() + 300 * 1000;
-    let encoded_token = jwtEncodeClaims(token, expire_on);
-    await strategy.saveDocumentToDynamo(document, {
-      access_token: encoded_token,
-    });
 
+    await strategy.saveDocumentToDynamo(document, token);
+    expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
     expect(logger.error.mock.calls).toHaveLength(0);
   });
 
@@ -78,12 +75,19 @@ describe("saveDocumentToDynamo tests", () => {
       config,
       hashingFunction
     );
-    const expire_on = new Date().getTime() + 300 * 1000;
-    let encoded_token = jwtEncodeClaims(token, expire_on);
-    await strategy.saveDocumentToDynamo(document, {
-      access_token: encoded_token,
-    });
 
+    await strategy.saveDocumentToDynamo(document, token);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "8ce1212e7c1ce218f9fc5daf75d918eaa18feb06507d096f5bb9d6846b02e98c",
+        expires_on: 5678,
+        launch: {
+          S: "launch",
+        },
+      },
+      "LaunchContext"
+    );
     expect(logger.error.mock.calls).toHaveLength(0);
   });
 });
