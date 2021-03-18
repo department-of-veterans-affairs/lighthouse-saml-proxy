@@ -20,6 +20,8 @@ BUILD_DATE_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_TOOL ?= Makefile
 BUILD_VERSION ?= $(shell git rev-parse --short HEAD) 
 BUILD_NUMBER ?= $(shell echo $$RANDOM) 
+TARGET ?= base
+
 
 # https://stackoverflow.com/questions/10858261/abort-makefile-if-variable-not-set
 # Fuction to check if variables are defined
@@ -39,10 +41,25 @@ help : Makefile
 login:
 	aws ecr get-login-password | docker login --username AWS --password-stdin $(REPOSITORY)
 
-## build:	Build an image
-.PHONY: build
-build: 
-	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+## build/oauth:	Build oauth-proxy image
+.PHONY: build/oauth
+build/oauth : IMAGE = oauth-proxy
+build/oauth: 
+	## build:	Build Docker image 
+	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		-f $(IMAGE)/DockerfileFG \
+		--target $(TARGET) \
+		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
+		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
+		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
+		--build-arg VERSION=$(BUILD_VERSION) \
+		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
+		--no-cache .
+
+## build/saml:	Build saml-proxy image
+.PHONY: build/saml
+build/saml : IMAGE = saml-proxy
+build/saml: 
 	## build:	Build Docker image 
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
@@ -61,6 +78,12 @@ test:
 		-w "/home/node" \
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		npm run test:ci
+
+## pull: 	Pull an image to ECR
+.PHONY: pull
+pull:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+	docker pull $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG)
 
 ## push: 	Pushes an image to ECR
 .PHONY: push

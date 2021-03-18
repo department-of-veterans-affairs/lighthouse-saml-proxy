@@ -1,3 +1,4 @@
 */**
 !oauth-proxy
 !common
+!fwdproxy.crt

@@ -49,7 +49,7 @@ phases:
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
       - |
-        make build  \
+        make build/saml  \
          TAG=${COMMIT_HASH} \
          IMAGE=${IMAGE} \
          VERSION=${COMMIT_HASH} \

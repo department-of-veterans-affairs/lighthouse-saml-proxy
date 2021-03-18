@@ -19,6 +19,7 @@ env:
   variables:
     # Honor Docker ignore at folder level
     DOCKER_BUILDKIT: 1
+    FWD_PROXY_CRT: "/dvp/common/ecs-oauth-proxy/codebuild/fwd-proxy-cert"
     IMAGE: "oauth-proxy"
   parameter-store:
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
@@ -61,11 +62,13 @@ phases:
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
+      - aws ssm get-parameters  --name ${FWD_PROXY_CRT} | jq -r '.Parameters[0].Value' > fwdproxy.crt
       - |
-        make build  \
+        make build/oauth  \
          TAG=${COMMIT_HASH} \
          IMAGE=${IMAGE} \
          VERSION=${COMMIT_HASH} \
+         TARGET=deploy \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run unit tests
