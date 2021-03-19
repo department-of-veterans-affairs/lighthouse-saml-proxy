@@ -13,10 +13,21 @@ const {
 require("jest");
 
 describe("saveDocumentToDynamo tests", () => {
-  let logger = buildFakeLogger();
+  let logger;
   let dynamoClient;
-  let config = createFakeConfig();
-  let hashingFunction = createFakeHashingFunction();
+  let config;
+  let hashingFunction;
+
+  beforeEach(() => {
+    logger = buildFakeLogger();
+    config = createFakeConfig();
+    hashingFunction = createFakeHashingFunction();
+    jest.spyOn(global.Math, "round").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    jest.spyOn(global.Math, "round").mockRestore();
+  });
 
   it("Empty Tokens", async () => {
     let token = buildToken(false, false);
@@ -80,7 +91,7 @@ describe("saveDocumentToDynamo tests", () => {
       {
         access_token:
           "e0f866111645e58199f0382a6fa50a217b0c2ccc1ca07e27738e758e1183a8db",
-        expires_on: 1516239023,
+        expires_on: 300,
         launch: {
           S: "launch",
         },
