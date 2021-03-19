@@ -98,7 +98,7 @@ describe("saveDocumentStateStrategy tests", () => {
       {
         access_token:
           "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
-        expires_on: 1516239023,
+        expires_on: 300,
         launch: "1234V5678",
       },
       "LaunchContext"
@@ -129,7 +129,7 @@ describe("saveDocumentStateStrategy tests", () => {
       {
         access_token:
           "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
-        expires_on: 1516239023,
+        expires_on: 300,
         launch: "1234V5678",
       },
       "LaunchContext"
@@ -207,7 +207,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-  it("Happy Path w/o internal_state with launchy", async () => {
+  it("Happy Path w/o internal_state with launch", async () => {
     document = {
       state: STATE,
       code: CODE_HASH_PAIR[0],
@@ -246,6 +246,15 @@ describe("saveDocumentStateStrategy tests", () => {
       },
       "OAuthRequestsV2"
     );
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "445e86848afba374749043f46fbee19b4d06eec99f3b876ddc32a7f8aec67dcd",
+        expires_on: 300,
+        launch: "1234V5678",
+      },
+      "LaunchContext"
+    );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
 
@@ -276,7 +285,16 @@ describe("saveDocumentStateStrategy tests", () => {
       .saveDocumentToDynamo(document, tokens)
       .then(() => fail("should have thrown error"))
       .catch(() => expect(true));
-    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
+    // expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalled();
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "4116ff9d9b7bb73aff7680b14eb012670eb93cfc7266f142f13bd1486ae6cbb1",
+        expires_on: 300,
+        launch: "1234V5678",
+      },
+      "LaunchContext"
+    );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
 
