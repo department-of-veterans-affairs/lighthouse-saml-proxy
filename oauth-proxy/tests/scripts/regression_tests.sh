@@ -23,7 +23,6 @@ exit 1
 for i in "$@"
 do
 case $i in
-    
     --help|-h)
       usage ;  exit 1 ;;
     --) shift ; break ;;
@@ -163,6 +162,8 @@ track_result
 "$DIR"/introspect_tests.sh --host="$HOST" --tokens="$TOKEN" --expired-access="$EXPIRED_ACCESS"
 track_result
 "$DIR"/other_tests.sh --host="$HOST" --tokens="$TOKEN"
+track_result
+"$DIR"/claims_tests.sh --host="$HOST"
 track_result
 
 # End of Tests ----
