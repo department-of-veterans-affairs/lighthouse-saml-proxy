@@ -1,0 +1,117 @@
+"use strict";
+
+require("jest");
+
+const { claimsHandler } = require("../../oauthHandlers");
+const { hashString } = require("../../utils");
+let { beforeEach, describe, it } = global; // ESLint
+
+// Static test config
+const token = "token";
+const issuer = "issuer";
+const dynamoIndex = "oauth_access_token_index";
+const config = {
+  hmac_secret: "hmac_secret",
+  dynamo_oauth_requests_table: "dynamo_oauth_requests_table",
+};
+const dynamoQueryParams = {
+  access_token: hashString(token, config.hmac_secret),
+};
+
+// Static mocks
+const res = {
+  sendStatus: jest.fn(),
+  status: jest.fn(() => res),
+  json: jest.fn(() => res),
+};
+const next = jest.fn();
+const logger = { error: jest.fn() };
+
+// Dynamic mocks
+let req;
+let dynamoClient;
+beforeEach(() => {
+  req = { body: { token: token } };
+  dynamoClient = {};
+});
+
+describe("claimsHandler", () => {
+  it("missing token parameter returns 400", async () => {
+    req = { body: {} };
+
+    await claimsHandler(config, logger, dynamoClient, req, res, next);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "invalid_request",
+      error_description: "Missing parameter: token",
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("dynamoClient error returns next(error)", async () => {
+    const error = { error: "dynamoDb error" };
+    dynamoClient = {
+      queryFromDynamo: jest.fn(() => {
+        throw error;
+      }),
+    };
+
+    await claimsHandler(config, logger, dynamoClient, req, res, next);
+    expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
+      dynamoQueryParams,
+      config.dynamo_oauth_requests_table,
+      dynamoIndex
+    );
+    expect(next).toHaveBeenCalledWith(error);
+  });
+
+  it("token not found returns 403", async () => {
+    dynamoClient = mockDynamoClient({ Items: [] });
+
+    await claimsHandler(config, logger, dynamoClient, req, res, next);
+    expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
+      dynamoQueryParams,
+      config.dynamo_oauth_requests_table,
+      dynamoIndex
+    );
+    expect(res.sendStatus).toHaveBeenCalledWith(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("iss not found returns 403", async () => {
+    dynamoClient = mockDynamoClient({ Items: [{}] });
+
+    await claimsHandler(config, logger, dynamoClient, req, res, next);
+    expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
+      dynamoQueryParams,
+      config.dynamo_oauth_requests_table,
+      dynamoIndex
+    );
+    expect(res.sendStatus).toHaveBeenCalledWith(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("token found returns claims", async () => {
+    dynamoClient = mockDynamoClient({ Items: [{ iss: issuer }] });
+
+    await claimsHandler(config, logger, dynamoClient, req, res, next);
+    expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
+      dynamoQueryParams,
+      config.dynamo_oauth_requests_table,
+      dynamoIndex
+    );
+    expect(res.json).toHaveBeenCalledWith({ iss: issuer });
+    expect(next).toHaveBeenCalled();
+  });
+});
+
+/**
+ * Mock a dynamoClient to return a given payload.
+ */
+function mockDynamoClient(payload) {
+  return {
+    queryFromDynamo: jest.fn(() => {
+      return payload;
+    }),
+  };
+}
