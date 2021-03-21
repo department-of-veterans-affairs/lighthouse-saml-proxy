@@ -102,15 +102,18 @@ function buildApp(
     response.data.pipe(targetResponse);
   };
 
-  const proxyRequestToOkta = (
-    req,
-    res,
-    redirectUrl,
-    requestMethod,
-    bodyencoder
-  ) => {
+  /**
+   * Proxy a request to another location.
+   *
+   * @param req The request.
+   * @param res The response.
+   * @param redirectUrl The proxied location.
+   * @param requestMethod The HTTP method.
+   * @param bodyencoder The optional body encoder.
+   */
+  const proxyRequest = (req, res, redirectUrl, requestMethod, bodyencoder) => {
     delete req.headers.host;
-    var payload = req.body;
+    let payload = req.body;
 
     if (bodyencoder !== undefined) {
       payload = bodyencoder.stringify(req.body);
@@ -184,6 +187,7 @@ function buildApp(
       okta_client
     );
   });
+
   if (config.enable_smart_launch_service) {
     router.get(
       config.routes.app_routes.smart_launch,
@@ -194,6 +198,14 @@ function buildApp(
           .catch(next);
       }
     );
+  }
+
+  if (config.enable_claims_service) {
+    router.post(config.routes.app_routes.claims, async (req, res, next) => {
+      await oauthHandlers
+        .claimsHandler(config, logger, dynamoClient, req, res, next)
+        .catch(next);
+    });
   }
 
   app.use(well_known_base_path, router);
@@ -322,18 +334,13 @@ function buildApp(
     }
 
     router.get(api_category + app_routes.jwks, (req, res) =>
-      proxyRequestToOkta(req, res, service_issuer.metadata.jwks_uri, "GET")
+      proxyRequest(req, res, service_issuer.metadata.jwks_uri, "GET")
     );
     router.get(api_category + app_routes.userinfo, (req, res) =>
-      proxyRequestToOkta(
-        req,
-        res,
-        service_issuer.metadata.userinfo_endpoint,
-        "GET"
-      )
+      proxyRequest(req, res, service_issuer.metadata.userinfo_endpoint, "GET")
     );
     router.post(api_category + app_routes.introspection, (req, res) =>
-      proxyRequestToOkta(
+      proxyRequest(
         req,
         res,
         service_issuer.metadata.introspection_endpoint,
@@ -343,7 +350,7 @@ function buildApp(
     );
 
     router.post(api_category + app_routes.revoke, (req, res) => {
-      proxyRequestToOkta(
+      proxyRequest(
         req,
         res,
         service_issuer.metadata.revocation_endpoint,
