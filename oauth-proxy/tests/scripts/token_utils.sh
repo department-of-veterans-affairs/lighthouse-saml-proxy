@@ -43,7 +43,7 @@ fi
 
 REDIRECT_URI=${REDIRECT_URI:-https://app/after-auth}
 
-get_token() {
+get_access_token() {
   local network=""
   if [[ $HOST == *"localhost"* ]]; then
     network="-it --network container:oauth-proxy_oauth-proxy_1"

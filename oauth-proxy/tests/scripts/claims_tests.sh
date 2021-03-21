@@ -77,7 +77,7 @@ do_claims abc
 track_result
 
 echo -e "\tRunning ... Claims valid token"
-token=$(get_token)
+token=$(get_access_token)
 do_claims $token
 "$DIR"/assertions.sh --expect-status --status="$(cat "$curl_status")" --expected-status=200
 "$DIR"/assertions.sh --has-property --json="$(cat "$curl_body")" --property="iss"
