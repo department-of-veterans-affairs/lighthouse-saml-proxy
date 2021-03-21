@@ -13,7 +13,7 @@ const migrationConfig = yargs
   })
   .wrap(yargs.terminalWidth()).argv;
 
-// The credenials set here must match those found in docker-compose.yml, oauth-proxy
+// The credentials set here must match those found in docker-compose.yml, oauth-proxy
 config.update({
   accessKeyId: "NONE",
   region: "us-west-2",
