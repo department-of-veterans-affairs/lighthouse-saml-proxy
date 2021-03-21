@@ -46,8 +46,6 @@ const claimsHandler = async (config, logger, dynamoClient, req, res, next) => {
     return res.sendStatus(403);
   }
 
-  // TODO expired
-
   res.json({ iss: document.iss });
 
   return next();
