@@ -85,7 +85,7 @@ track_result
 
 if [[ $pass -lt 1 ]];
 then
-  echo -e "\tFAIL - Some introspect tests did not pass."
+  echo -e "\tFAIL - Some claims tests did not pass."
   exit 1
 fi
 
