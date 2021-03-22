@@ -40,6 +40,21 @@ function convertObjectToDynamoAttributeValues(obj) {
   }, {});
 }
 
+/**
+ * Mock dynamoClient implementation.
+ *
+ * Implemented methods:
+ * - savePayloadToDynamo
+ * - updateToDynamo
+ * - queryFromDynamo
+ * - getPayloadFromDynamo
+ * - scanFromDynamo
+ *
+ * @param mockRecord The mock record.
+ */
+function mockDynamoClient(mockRecord) {
+  return buildFakeDynamoClient(mockRecord);
+}
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
@@ -389,6 +404,7 @@ const createFakeHashingFunction = () => {
 module.exports = {
   convertObjectToDynamoAttributeValues,
   buildFakeOktaClient,
+  mockDynamoClient,
   buildFakeDynamoClient,
   buildFakeGetAuthorizationServerInfoResponse,
   buildOpenIDClient,

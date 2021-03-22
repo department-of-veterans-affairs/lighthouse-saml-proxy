@@ -4,7 +4,7 @@ require("jest");
 
 const { claimsHandler } = require("../../oauthHandlers");
 const { hashString } = require("../../utils");
-const { defaultConfig, mockLogger } = require("../testUtils");
+const { defaultConfig, mockDynamoClient, mockLogger } = require("../testUtils");
 let { beforeEach, describe, it } = global; // ESLint
 
 // Static test config
@@ -64,7 +64,11 @@ describe("claimsHandler", () => {
   });
 
   it("token not found returns 403", async () => {
-    dynamoClient = mockDynamoClient({ Items: [] });
+    dynamoClient = {
+      queryFromDynamo: jest.fn(() => {
+        return { Items: [] };
+      }),
+    };
 
     await claimsHandler(config, logger, dynamoClient, req, res, next);
     expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
@@ -77,7 +81,9 @@ describe("claimsHandler", () => {
   });
 
   it("iss not found returns 403", async () => {
-    dynamoClient = mockDynamoClient({ Items: [{}] });
+    dynamoClient = mockDynamoClient({
+      access_token: dynamoQueryParams.access_token,
+    });
 
     await claimsHandler(config, logger, dynamoClient, req, res, next);
     expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
@@ -90,7 +96,10 @@ describe("claimsHandler", () => {
   });
 
   it("token found returns claims", async () => {
-    dynamoClient = mockDynamoClient({ Items: [{ iss: issuer }] });
+    dynamoClient = mockDynamoClient({
+      access_token: dynamoQueryParams.access_token,
+      iss: issuer,
+    });
 
     await claimsHandler(config, logger, dynamoClient, req, res, next);
     expect(dynamoClient.queryFromDynamo).toHaveBeenCalledWith(
@@ -102,14 +111,3 @@ describe("claimsHandler", () => {
     expect(next).toHaveBeenCalledWith();
   });
 });
-
-/**
- * Mock a dynamoClient to return a given payload.
- */
-function mockDynamoClient(payload) {
-  return {
-    queryFromDynamo: jest.fn(() => {
-      return payload;
-    }),
-  };
-}
