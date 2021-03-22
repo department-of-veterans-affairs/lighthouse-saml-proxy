@@ -4,7 +4,7 @@ require("jest");
 
 const { claimsHandler } = require("../../oauthHandlers");
 const { hashString } = require("../../utils");
-const { defaultConfig, mockLogger } = require("../testUtils")
+const { defaultConfig, mockLogger } = require("../testUtils");
 let { beforeEach, describe, it } = global; // ESLint
 
 // Static test config
