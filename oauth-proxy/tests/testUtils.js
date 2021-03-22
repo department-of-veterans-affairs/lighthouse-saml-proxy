@@ -40,10 +40,6 @@ function convertObjectToDynamoAttributeValues(obj) {
   }, {});
 }
 
-function mockDynamoClient(mockDynamoRecord) {
-  return buildFakeDynamoClient(mockDynamoRecord);
-}
-
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
@@ -393,7 +389,6 @@ const createFakeHashingFunction = () => {
 module.exports = {
   convertObjectToDynamoAttributeValues,
   buildFakeOktaClient,
-  mockDynamoClient,
   buildFakeDynamoClient,
   buildFakeGetAuthorizationServerInfoResponse,
   buildOpenIDClient,
