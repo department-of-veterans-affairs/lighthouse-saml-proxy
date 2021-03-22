@@ -41,6 +41,8 @@ phases:
       - printenv
   build:
     commands:
+      # provide delay for CI jobs to kickoff.
+      - sleep 90s
       - slackpost.sh -t started "started OAuth Proxy release..."
       # check ci status of current commit hash
       - gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
