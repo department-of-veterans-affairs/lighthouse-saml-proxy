@@ -4,16 +4,14 @@ require("jest");
 
 const { claimsHandler } = require("../../oauthHandlers");
 const { hashString } = require("../../utils");
+const { defaultConfig, mockLogger } = require("../testUtils")
 let { beforeEach, describe, it } = global; // ESLint
 
 // Static test config
 const token = "token";
 const issuer = "issuer";
 const dynamoIndex = "oauth_access_token_index";
-const config = {
-  hmac_secret: "hmac_secret",
-  dynamo_oauth_requests_table: "dynamo_oauth_requests_table",
-};
+const config = defaultConfig();
 const dynamoQueryParams = {
   access_token: hashString(token, config.hmac_secret),
 };
@@ -25,7 +23,7 @@ const res = {
   json: jest.fn(() => res),
 };
 const next = jest.fn();
-const logger = { error: jest.fn() };
+const logger = mockLogger();
 
 // Dynamic mocks
 let req;
@@ -101,7 +99,7 @@ describe("claimsHandler", () => {
       dynamoIndex
     );
     expect(res.json).toHaveBeenCalledWith({ iss: issuer });
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith();
   });
 });
 
