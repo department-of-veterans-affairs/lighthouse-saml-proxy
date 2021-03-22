@@ -39,19 +39,6 @@ phases:
       - time="Start - $(date +%r)"
       # Generate short ref
       - COMMIT_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
-      # Get usable branch name
-      - GET_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#"refs/heads/"}
-      # set branch if not set from webhook
-      - |
-        if [[ $BRANCH ]]; then
-          echo branch set as -- ${BRANCH} -- from console
-        elif [[ ${GET_BRANCH} ]]; then
-          echo branch set as -- ${GET_BRANCH} -- from webhook
-          BRANCH=${GET_BRANCH}
-        else
-          echo No branch found... setting to \"default\"
-          BRANCH=default
-        fi
       # printenv variables to Cloud Watch incase of failure
       - printenv
   build:
@@ -80,8 +67,3 @@ phases:
       - echo Pushing image to ECR
       - time="${time}\nPush - $(date +%r) - started"
       - make push IMAGE=${IMAGE} TAG=${COMMIT_HASH}
-      - time="${time}\nRelease - $(date +%r) - started"
-      - |
-        if [[ ${BRANCH} == 'master' ]]; then
-          aws codebuild start-build --project-name oauth-proxy-release --source-version ${CODEBUILD_RESOLVED_SOURCE_VERSION}
-        fi
