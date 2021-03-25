@@ -15,14 +15,17 @@
 # Custom Scripts:
 #  - slackpost.sh
 #  - increment.sh
+#  - gh-status.sh
 #######################################################################
 version: 0.2
 env:
   shell: bash
   variables:
     DEPLOY: "true"
-    REPO: "/repos/department-of-veterans-affairs/vets-saml-proxy"
+    REPO: "vets-saml-proxy"
     IMAGE: "saml-proxy"
+    # Checks that are not included for the ghstatus script.
+    XCHECKS: "saml-proxy-release,oauth-proxy,jenkins"
   parameter-store:
     GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
@@ -38,24 +41,12 @@ phases:
       - printenv
   build:
     commands:
+      # provide delay for CI jobs to kickoff.
+      - sleep 90s
       - slackpost.sh -t started "started SAML Proxy release..."
       # check ci status of current commit hash
-      - ci_status=$(gh api ${REPO}/commits/${COMMIT_HASH}/status | jq -r .state)
-      - |
-        echo "commit status: ${ci_status}"
-      - |
-        while [[ ${ci_status} == "pending" ]]; do
-          echo "ci still running -- sleep"
-          ci_status=$(gh api ${REPO}/commits/${COMMIT_HASH}/status | jq -r .state)
-          echo "commit status: ${ci_status}"
-          sleep 10
-        done
-      - |
-        if [[ ${ci_status} != "success" ]]; then
-          echo "ci failed release aborted. ci status was ${ci_status}"
-          exit 1
-        fi
-      # create new tag
+      - gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
+      # create old tag
       - old_tag=$(git tag --sort=-creatordate | grep fargate-saml-proxy | head -1)
       - echo "found ${old_tag} - incrementing..."
       # create new tag

@@ -1,4 +1,3 @@
-const jwtDecode = require("jwt-decode");
 const { hashString } = require("../../../utils");
 
 class SaveDocumentLaunchStrategy {
@@ -16,11 +15,10 @@ class SaveDocumentLaunchStrategy {
           this.config.hmac_secret
         );
 
-        let decodedToken = jwtDecode(tokens.access_token);
         let payload = {
           access_token: accessToken,
           launch: launch,
-          expires_on: decodedToken.exp,
+          expires_on: Math.round(Date.now() / 1000) + tokens.expires_in,
         };
 
         await this.dynamoClient.savePayloadToDynamo(

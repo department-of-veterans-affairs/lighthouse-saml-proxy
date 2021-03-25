@@ -23,7 +23,7 @@ describe("handleToken tests", () => {
   let next;
 
   it("Happy Path Static", async () => {
-    let token = buildToken(true, false, false);
+    let token = buildToken(true, false, false, "email.read");
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -47,7 +47,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path no launch/patient", async () => {
-    let token = buildToken(false, false, false);
+    let token = buildToken(false, false, false, "email.readt");
     getTokenResponseStrategy = buildGetTokenStrategy(token);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -71,7 +71,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path with launch/patient", async () => {
-    let token = buildToken(false, true, true);
+    let token = buildToken(false, true, true, "launch/patient");
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({});
     saveDocumentToDynamoStrategy = buildSaveDocumentStrategy();
@@ -96,7 +96,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path with launch", async () => {
-    let token = buildToken(false, true, false);
+    let token = buildToken(false, true, false, "launch");
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({
       launch: "patient",
@@ -123,7 +123,7 @@ describe("handleToken tests", () => {
   });
 
   it("Happy Path with launch base64", async () => {
-    let token = buildToken(false, true, false);
+    let token = buildToken(false, true, false, "launch");
     getTokenResponseStrategy = buildGetTokenStrategy(token, false);
     pullDocumentFromDynamoStrategy = buildGetDocumentStrategy({
       launch:

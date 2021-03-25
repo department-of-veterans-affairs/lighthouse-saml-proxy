@@ -1,4 +1,4 @@
-FROM vasdvp/lighthouse-node-application-base:node12
+FROM vasdvp/lighthouse-node-application-base:node12 as base
 
 WORKDIR /home/node
 
@@ -20,5 +20,12 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
   CMD node bin/healthcheck.js
 
 USER node
+
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["node", "index.js"]
+
+from base as deploy
+USER root
+COPY ./fwdproxy.crt /ca-certificates/fwdproxy.crt
+RUN  openssl x509 -in /ca-certificates/fwdproxy.crt >> /ca-certificates/ca-certs.pem
+USER node

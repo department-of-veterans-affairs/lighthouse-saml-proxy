@@ -65,7 +65,7 @@ pipeline {
           dir "."
           filename "oauth-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
-          additionalBuildArgs '--pull'
+          additionalBuildArgs '--target base --pull'
         }
       }
 
@@ -86,7 +86,7 @@ pipeline {
           dir "."
           filename "oauth-proxy/Dockerfile"
           label 'vetsgov-general-purpose'
-          additionalBuildArgs '--pull'
+          additionalBuildArgs '--target base --pull'
         }
       }
 
