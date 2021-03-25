@@ -34,6 +34,7 @@ let logger;
 let dynamoClient;
 let next;
 let oktaClient;
+let audience;
 let req;
 let res;
 let api_category;
@@ -48,6 +49,7 @@ beforeEach(() => {
   redirect_uri = jest.mock();
   issuer = jest.mock();
   logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+  audience = "testAudience";
   next = jest.fn();
   req = new MockExpressRequest({
     url: "/veteran-verification/v1/authorization",
@@ -58,6 +60,7 @@ beforeEach(() => {
   api_category = {
     api_category: "/veteran-verification/v1",
     upstream_issuer: "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+    audience: "testAudience",
   };
 
   oktaClient = buildFakeOktaClient(
@@ -108,6 +111,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -141,6 +145,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -171,6 +176,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -205,6 +211,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -239,6 +246,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -275,6 +283,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -314,6 +323,7 @@ describe("Happy Path", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -351,6 +361,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -383,6 +394,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -417,6 +429,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -457,6 +470,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -468,7 +482,7 @@ describe("Invalid Request", () => {
     expect(logger.warn).toHaveBeenCalledWith({
       message: "Unexpected audience",
       actual: req.query.aud,
-      expected: response.audiences,
+      expected: audience,
     });
     expect(res.redirect).toHaveBeenCalled();
   });
@@ -486,6 +500,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -517,6 +532,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -554,6 +570,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -588,6 +605,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -622,6 +640,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -650,6 +669,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -686,6 +706,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -728,6 +749,7 @@ describe("Invalid Request", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -749,44 +771,6 @@ describe("Invalid Request", () => {
 });
 
 describe("Server Error", () => {
-  //I am unsure of this functionality??
-  it("getAuthorizationServerInfo Error, return 500", async () => {
-    getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "notAPIValue",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    )
-      .then(() => {
-        fail("Error should bubble up");
-      })
-      .catch((err) => {
-        expect(err.status).toBe(500);
-      });
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "Unable to get the authorization server."
-    );
-  });
-
   it("Error on save to dynamo", async () => {
     dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation(() => {
       return new Promise((resolve, reject) => {
@@ -820,6 +804,7 @@ describe("Server Error", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -859,6 +844,7 @@ describe("Unauthorized Client", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",
@@ -910,6 +896,7 @@ describe("Unauthorized Client", () => {
       oktaClient,
       mockSlugHelper,
       api_category,
+      audience,
       "OAuthRequestsV2",
       "Clients",
       "idp1",

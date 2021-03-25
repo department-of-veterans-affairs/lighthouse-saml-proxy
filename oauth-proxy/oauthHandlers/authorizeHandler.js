@@ -28,6 +28,7 @@ const authorizeHandler = async (
   oktaClient,
   slugHelper,
   app_category,
+  audience,
   dynamo_oauth_requests_table,
   dynamo_clients_table,
   idp,
@@ -56,13 +57,7 @@ const authorizeHandler = async (
     return next();
   }
 
-  let paramValidation = await checkParameters(
-    state,
-    aud,
-    issuer,
-    logger,
-    oktaClient
-  );
+  let paramValidation = await checkParameters(state, aud, audience, logger);
 
   if (!paramValidation.valid) {
     let uri = buildRedirectErrorUri(
@@ -125,7 +120,7 @@ const authorizeHandler = async (
  *
  * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
  */
-const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
+const checkParameters = async (state, aud, audience, logger) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
@@ -136,26 +131,11 @@ const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
   }
 
   if (aud) {
-    let authorizationServerId = new URL(issuer.metadata.issuer).pathname
-      .split("/")
-      .pop();
-    let serverAudiences;
-
-    await oktaClient
-      .getAuthorizationServer(authorizationServerId)
-      .then((res) => {
-        serverAudiences = res.audiences;
-      })
-      .catch(() => {
-        logger.error("Unable to get the authorization server.");
-        throw { status: 500 };
-      });
-
-    if (!serverAudiences.includes(aud)) {
+    if (!(aud === audience)) {
       logger.warn({
         message: "Unexpected audience",
         actual: aud,
-        expected: serverAudiences,
+        expected: audience,
       });
     }
   }
