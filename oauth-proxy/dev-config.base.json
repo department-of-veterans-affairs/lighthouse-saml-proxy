@@ -42,7 +42,7 @@
         "api_category": "/health/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
         "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "https://sandbox-api.va.gov/services/fhir",
+        "audience": "api://default",
         "enable_consent_endpoint" : true
       },
       {
