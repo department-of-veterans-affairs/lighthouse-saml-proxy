@@ -3,7 +3,7 @@ class GetPatientInfoFromLaunchStrategy {
     this.req = req;
   }
   // eslint-disable-next-line no-unused-vars
-  async createPatientInfo(tokens, decoded) {
+  async createPatientInfo(tokens) {
     //Consider some validation on the request body here
     return this.req.body.launch;
   }

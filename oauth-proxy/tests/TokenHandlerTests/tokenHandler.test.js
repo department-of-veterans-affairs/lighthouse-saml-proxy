@@ -40,7 +40,8 @@ beforeEach(() => {
   });
   validateToken = buildValidateToken({});
   staticTokens = new Map();
-  (audience = "https://sandbox-api.va.gov/services/fhir"), (next = jest.fn());
+  audience = "https://sandbox-api.va.gov/services/fhir";
+  next = jest.fn();
   issuer = new FakeIssuer(dynamoClient);
   req = new MockExpressRequest();
   res = {};

@@ -71,8 +71,7 @@ class TokenHandlerClient {
     if (decoded.scp) {
       if (decoded.scp.includes("launch/patient")) {
         let patient = await this.getPatientInfoStrategy.createPatientInfo(
-          tokens,
-          decoded
+          tokens
         );
         responseBody["patient"] = patient;
       } else if (decoded.scp.includes("launch") && launch) {

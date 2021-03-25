@@ -158,7 +158,7 @@ function processArgs() {
             default: false,
           },
           audience: {
-            description: "The audience for the app catetory.",
+            description: "The audience for the app category.",
             required: true,
             default: "api://default",
           },
