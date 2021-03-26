@@ -177,7 +177,7 @@ function buildApp(
   Object.entries(config.routes.categories).forEach(([, app_category]) => {
     const okta_client = isolatedOktaClients[app_category.api_category];
     const service_issuer = isolatedIssuers[app_category.api_category];
-    const audience = isolatedIssuers[app_category.audience];
+    const audience = app_category.audience;
     buildMetadataForOpenIdConfiguration(
       app_category,
       app_routes,
