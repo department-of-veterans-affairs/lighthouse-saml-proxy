@@ -65,7 +65,7 @@
     "uuid": "^8.3.2",
     "validator": "^13.5.2",
     "winston": "^3.3.3",
-    "yargs": "^15.4.1"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "axios-mock-adapter": "^1.19.0",
