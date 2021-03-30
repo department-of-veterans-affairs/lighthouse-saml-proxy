@@ -32,20 +32,20 @@ describe("slug helper tests", () => {
     expect(slugHelper.rewrite("xxx")).toBe("xxx");
   });
 
-  it("rewrite preference 1", async() => {
+  it("rewrite preference 1", async () => {
     const slugHelper = new SlugHelper(config);
     expect(slugHelper.rewrite("localhost", "xx")).toBe("rewritten_localhost");
     expect(slugHelper.rewrite("lighthouse", "xx")).toBe("rewritten_lighthouse");
   });
 
-  it("rewrite preference 2", async() => {
+  it("rewrite preference 2", async () => {
     const slugHelper = new SlugHelper(config);
     expect(slugHelper.rewrite(null, "lighthouse")).toBe("rewritten_lighthouse");
     expect(slugHelper.rewrite(undefined, "xx")).toBe("xx");
     expect(slugHelper.rewrite("", "xx")).toBe("xx");
   });
 
-  it("rewrite empty", async() => {
+  it("rewrite empty", async () => {
     const slugHelper = new SlugHelper(config);
     expect(slugHelper.rewrite(null)).toBe(null);
     expect(slugHelper.rewrite(undefined)).toBe(null);
