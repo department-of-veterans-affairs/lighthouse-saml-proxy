@@ -109,10 +109,11 @@ const authorizeHandler = async (
   params.set("redirect_uri", redirect_uri);
   // Rewrite to an internally maintained state
   params.set("state", internal_state);
-  if (params.has("idp")) {
-    params.set("idp", slugHelper.rewrite(params.get("idp")));
-  } else if (!params.has("idp") && idp) {
-    params.set("idp", idp);
+
+  // Set the optional IDP (using a preferred order)
+  const oktaIdp = slugHelper.rewrite(params.get("idp"), app_category.idp, idp);
+  if (oktaIdp) {
+    params.set("idp", oktaIdp);
   }
 
   res.redirect(
