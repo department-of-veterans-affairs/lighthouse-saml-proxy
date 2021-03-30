@@ -177,12 +177,10 @@ function buildApp(
   Object.entries(config.routes.categories).forEach(([, app_category]) => {
     const okta_client = isolatedOktaClients[app_category.api_category];
     const service_issuer = isolatedIssuers[app_category.api_category];
-    const audience = app_category.audience;
     buildMetadataForOpenIdConfiguration(
       app_category,
       app_routes,
       service_issuer,
-      audience,
       okta_client
     );
   });
@@ -251,7 +249,6 @@ function buildApp(
     app_category,
     app_routes,
     service_issuer,
-    audience,
     okta_client
   ) {
     const api_category = app_category.api_category;
@@ -290,7 +287,6 @@ function buildApp(
           okta_client,
           slugHelper,
           app_category,
-          audience,
           config.dynamo_oauth_requests_table,
           config.dynamo_clients_table,
           config.idp,
@@ -312,7 +308,7 @@ function buildApp(
           dynamoClient,
           validateToken,
           staticTokens,
-          audience,
+          app_category.audience,
           req,
           res,
           next

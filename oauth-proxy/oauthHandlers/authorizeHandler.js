@@ -28,7 +28,6 @@ const authorizeHandler = async (
   oktaClient,
   slugHelper,
   app_category,
-  audience,
   dynamo_oauth_requests_table,
   dynamo_clients_table,
   idp,
@@ -57,7 +56,12 @@ const authorizeHandler = async (
     return next();
   }
 
-  let paramValidation = await checkParameters(state, aud, audience, logger);
+  let paramValidation = checkParameters(
+    state,
+    aud,
+    app_category.audience,
+    logger
+  );
 
   if (!paramValidation.valid) {
     let uri = buildRedirectErrorUri(
@@ -116,11 +120,19 @@ const authorizeHandler = async (
 };
 
 /**
- * Checks for valid authorization parameters.
  *
- * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
+ * @param {*} state The state parameter that came with the inbound request.
+ * @param {*} requestAudience The audience that came with the inbound request.
+ * @param {*} configuredAudience The audience that is allowed for this api_category.
+ * @param {*} logger logs information.
+ * @returns An object with a "valid" boolean parameter.
  */
-const checkParameters = async (state, aud, audience, logger) => {
+const checkParameters = (
+  state,
+  requestAudience,
+  configuredAudience,
+  logger
+) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
@@ -130,12 +142,12 @@ const checkParameters = async (state, aud, audience, logger) => {
     };
   }
 
-  if (aud) {
-    if (!(aud === audience)) {
+  if (requestAudience) {
+    if (!(requestAudience === configuredAudience)) {
       logger.warn({
         message: "Unexpected audience",
-        actual: aud,
-        expected: audience,
+        actual: requestAudience,
+        expected: configuredAudience,
       });
     }
   }
