@@ -132,3 +132,5 @@ build/
 # Coverage data for the test suite
 /oauth-proxy/tests/coverage
 
+## Webstorm
+.idea/

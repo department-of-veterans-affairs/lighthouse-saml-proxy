@@ -7,17 +7,27 @@ const {
   buildFakeLogger,
   createFakeConfig,
   createFakeHashingFunction,
-  jwtEncodeClaims,
   convertObjectToDynamoAttributeValues,
 } = require("../testUtils");
 
 require("jest");
 
 describe("saveDocumentToDynamo tests", () => {
-  let logger = buildFakeLogger();
+  let logger;
   let dynamoClient;
-  let config = createFakeConfig();
-  let hashingFunction = createFakeHashingFunction();
+  let config;
+  let hashingFunction;
+
+  beforeEach(() => {
+    logger = buildFakeLogger();
+    config = createFakeConfig();
+    hashingFunction = createFakeHashingFunction();
+    jest.spyOn(global.Math, "round").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    jest.spyOn(global.Math, "round").mockRestore();
+  });
 
   it("Empty Tokens", async () => {
     let token = buildToken(false, false);
@@ -53,12 +63,9 @@ describe("saveDocumentToDynamo tests", () => {
       config,
       hashingFunction
     );
-    const expire_on = new Date().getTime() + 300 * 1000;
-    let encoded_token = jwtEncodeClaims(token, expire_on);
-    await strategy.saveDocumentToDynamo(document, {
-      access_token: encoded_token,
-    });
 
+    await strategy.saveDocumentToDynamo(document, token);
+    expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
     expect(logger.error.mock.calls).toHaveLength(0);
   });
 
@@ -78,12 +85,19 @@ describe("saveDocumentToDynamo tests", () => {
       config,
       hashingFunction
     );
-    const expire_on = new Date().getTime() + 300 * 1000;
-    let encoded_token = jwtEncodeClaims(token, expire_on);
-    await strategy.saveDocumentToDynamo(document, {
-      access_token: encoded_token,
-    });
 
+    await strategy.saveDocumentToDynamo(document, token);
+    expect(dynamoClient.savePayloadToDynamo).toHaveBeenCalledWith(
+      {
+        access_token:
+          "e0f866111645e58199f0382a6fa50a217b0c2ccc1ca07e27738e758e1183a8db",
+        expires_on: 300,
+        launch: {
+          S: "launch",
+        },
+      },
+      "LaunchContext"
+    );
     expect(logger.error.mock.calls).toHaveLength(0);
   });
 });

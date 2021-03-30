@@ -1,7 +1,7 @@
 const access_token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImVtYWlsLnJlYWQiXSwiaWF0IjoxNTE2MjM5MDIyfQ.lybRIPdhq6UslRqKRtiEuyqnCUY6OoDFeXRaogoPROk";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImVtYWlsLnJlYWQiXSwiZXhwIjoxNTE2MjM5MDIzLCJpYXQiOjE1MTYyMzkwMjJ9.SM1PDbyfkFrCk9MPIpcQ7bTVh0fW6u0xLgL4_z_2HQo";
 const access_token_patient =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sImlhdCI6MTUxNjIzOTAyMn0.2PU4pZHbSRhOgpmG9jfCgY0YEoq5hmq9LH_56e6VfzA";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaC9wYXRpZW50Il0sImV4cCI6MTUxNjIzOTAyMywiaWF0IjoxNTE2MjM5MDIyfQ.QNd9R70JPNEhXHxHRVRZFuxL-K8437fO-grm_8L1-GA";
 const access_token_launch =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwic2NwIjpbImxhdW5jaCJdLCJpYXQiOjE1MTYyMzkwMjJ9.61N3OfyoslutHtsG1PxVWztr77PyMiVz9Js4CwzPiV8";
 const buildGetTokenStrategy = (response, error = false) => {
@@ -67,6 +67,8 @@ const buildToken = (
       : access_token,
     refresh_token: "the_fake_refresh_token",
     scope: scp,
+    expires_at: 5678,
+    expires_in: 300,
   };
 
   return token;
