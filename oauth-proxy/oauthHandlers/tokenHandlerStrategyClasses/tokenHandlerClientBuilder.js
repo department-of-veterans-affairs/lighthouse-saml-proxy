@@ -134,7 +134,8 @@ const getStrategies = (
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,
-        logger
+        logger,
+        audience
       ),
     };
   } else if (req.body.grant_type === "client_credentials") {

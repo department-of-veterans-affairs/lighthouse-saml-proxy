@@ -143,7 +143,7 @@ const checkParameters = (
   }
 
   if (requestAudience) {
-    if (!(requestAudience === configuredAudience)) {
+    if (requestAudience !== configuredAudience) {
       logger.warn({
         message: "Unexpected audience",
         actual: requestAudience,
