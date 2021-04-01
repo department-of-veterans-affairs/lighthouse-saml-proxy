@@ -40,6 +40,21 @@ function convertObjectToDynamoAttributeValues(obj) {
   }, {});
 }
 
+/**
+ * Mock dynamoClient implementation.
+ *
+ * Implemented methods:
+ * - savePayloadToDynamo
+ * - updateToDynamo
+ * - queryFromDynamo
+ * - getPayloadFromDynamo
+ * - scanFromDynamo
+ *
+ * @param mockRecord The mock record.
+ */
+function mockDynamoClient(mockRecord) {
+  return buildFakeDynamoClient(mockRecord);
+}
 function buildFakeDynamoClient(fakeDynamoRecord) {
   const dynamoClient = {};
 
@@ -270,10 +285,27 @@ const buildExpiredRefreshTokenClient = () => {
   });
 };
 
+/**
+ * Mock logger implementation.
+ *
+ * Implemented methods:
+ * - error
+ * - info
+ * - warn
+ */
+const mockLogger = () => {
+  return buildFakeLogger();
+};
 const buildFakeLogger = () => {
   return { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 };
 
+/**
+ * Default / sample application config.
+ */
+const defaultConfig = () => {
+  return createFakeConfig();
+};
 const createFakeConfig = () => {
   return {
     host: "http://localhost:7100",
@@ -327,13 +359,13 @@ const createFakeConfig = () => {
             "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
           manage_endpoint: "https://staging.va.gov/account",
           custom_metadata: {
-            authorization_endpoint: "http://example.custom.com/authorization",
-            token_endpoint: "http://example.custom.com/token",
-            userinfo_endpoint: "http://example.custom.com/userinfo",
-            introspection_endpoint: "http://example.custom.com/introspect",
-            revocation_endpoint: "http://example.custom.com/revoke",
-            jwks_uri: "http://example.custom.com/keys",
-            issuer: "http://example.custom.com/issuer",
+            authorization_endpoint: "http://example.com/authorization",
+            token_endpoint: "http://example.com/token",
+            userinfo_endpoint: "http://example.com/userinfo",
+            introspection_endpoint: "http://example.com/introspect",
+            revocation_endpoint: "http://example.com/revoke",
+            jwks_uri: "http://example.com/keys",
+            issuer: "http://example.com/issuer",
           },
         },
       ],
@@ -372,12 +404,15 @@ const createFakeHashingFunction = () => {
 module.exports = {
   convertObjectToDynamoAttributeValues,
   buildFakeOktaClient,
+  mockDynamoClient,
   buildFakeDynamoClient,
   buildFakeGetAuthorizationServerInfoResponse,
   buildOpenIDClient,
   buildExpiredRefreshTokenClient,
   FakeIssuer,
+  mockLogger,
   buildFakeLogger,
+  defaultConfig,
   createFakeConfig,
   jwtEncodeClaims,
   createFakeHashingFunction,

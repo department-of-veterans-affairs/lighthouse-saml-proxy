@@ -15,6 +15,7 @@
   "enable_pkce_authorization_flow": true,
   "enable_smart_launch_service": true,
   "enable_static_token_service": true,
+  "enable_claims_service": true,
   "routes": {
     "categories": [
       {
@@ -74,7 +75,8 @@
       "revoke": "/revoke",
       "jwks": "/keys",
       "grants": "/grants",
-      "smart_launch": "/smart/launch"
+      "smart_launch": "/smart/launch",
+      "claims": "/claims"
     }
   },
   "idps": [
