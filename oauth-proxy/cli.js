@@ -203,6 +203,11 @@ function processArgs() {
               default: null,
             },
           },
+          idp: {
+            description:
+              "Default Okta IDP for this authz server (overrides global default)",
+            required: false,
+          },
         },
         app_routes: {
           description:

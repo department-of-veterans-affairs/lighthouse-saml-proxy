@@ -17,8 +17,14 @@ const getAuthorizationServerInfoMock = jest.fn();
 const mockSlugHelper = {
   rewrite: jest.fn(),
 };
-mockSlugHelper.rewrite.mockImplementation((slug) => {
-  return slug;
+mockSlugHelper.rewrite.mockImplementation((...slugs) => {
+  for (const slug of slugs) {
+    if (slug) {
+      return slug;
+    }
+  }
+
+  return null;
 });
 const userCollection = new Collection("", "", new ModelFactory(User));
 userCollection.currentItems = [{ id: 1 }];
@@ -154,6 +160,12 @@ describe("Happy Path", () => {
   });
 
   it("Happy Path Redirect using config idp", async () => {
+    mockSlugHelper.rewrite.mockImplementation(
+      (slugFromParam, slugFromAuthzRoute, slugFromConfig) => {
+        return slugFromConfig;
+      }
+    );
+
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
 
