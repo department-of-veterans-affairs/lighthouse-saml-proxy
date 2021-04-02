@@ -1,3 +1,5 @@
+.gitallowed
+.git-secrets
 password="\$USER_PASSWORD"
 .*client_id=\"*\$[A-z]*[0-9]*\"*
 .*client_secret=\"*\$[A-z]+\"*
