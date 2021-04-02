@@ -11,4 +11,3 @@ git secrets 2>&1 | grep "is not a git command" > /dev/null
 git secrets --install --force
 git secrets --register-aws
 git secrets --add-provider -- cat $REPO/.git-secrets-patterns
-
