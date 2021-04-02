@@ -1,0 +1,6 @@
+spring\.datasource\.url=jdbc:sqlserver://.*;user=secret;password=secret
+spring\.datasource\.url=(secret|unset|\${?[a-zA-Z_]+}?)
+spring\.datasource\.username=(secret|unset|\${?[a-zA-Z_]+}?)
+[a-z.-]+(\.|-)password=(secret|unset|\${?[a-zA-Z_]+}?)
+.*<argument>-Dspring.datasource.password=sa</argument>
+.*options\+=" -Dspring\.datasource\.password=sa"
