@@ -6,4 +6,5 @@ module.exports = {
   redirectHandler: require("./redirectHandler"),
   revokeUserGrantHandler: require("./revokeUserGrantHandler"),
   launchRequestHandler: require("./launchRequestHandler"),
+  claimsHandler: require("./claimsHandler"),
 };

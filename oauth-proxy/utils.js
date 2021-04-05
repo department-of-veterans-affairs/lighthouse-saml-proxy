@@ -69,10 +69,8 @@ function Credentials(username, password) {
 }
 
 function parseClientId(clientId) {
-  var regex = /^[A-Za-z0-9]+$/;
-  var isValid = regex.test(clientId);
-
-  return isValid;
+  const regex = /^[A-Za-z0-9]+$/;
+  return regex.test(clientId);
 }
 
 const hashString = (unhashedString, secret) => {
