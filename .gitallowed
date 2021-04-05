@@ -2,7 +2,5 @@
 .git-secrets
 password="\$USER_PASSWORD"
 .*client_id=\"*\$[A-z]*[0-9]*\"*
-.*client_secret=\"*\$[A-z]+\"*
-.*client_secret=\$[0-9]+.*
-.*client_secret=\"\$[0-9]+\".*
+.*client_secret=\"*\$[A-z]*[0-9]*\"*
 client_id=clientId123
