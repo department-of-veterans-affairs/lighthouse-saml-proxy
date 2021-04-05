@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Team Pivot!
 
-# Assertions 
+# Assertions
 EXPECT_STATUS=
 EXPECT_JSON=
 EXPECT_PROPERTY=
@@ -22,7 +22,7 @@ Commands
   --expect-status [--status] [--expected-status]
       Compares status to expected-status.
 
-  --expect-json [--json] [--expected-json] 
+  --expect-json [--json] [--expected-json]
       Compares json to expected-json.
 
   --expect-property [--json] [--property] [--expected-value]
@@ -32,7 +32,7 @@ Commands
       Checks for json property.
 
   --has-or-expect-property [--json] [--property] [--expected-value]
-      If expected-value is present, compares json property to expected-value. 
+      If expected-value is present, compares json property to expected-value.
       If expected value is not present check for json property.
 
 Example
@@ -74,7 +74,7 @@ case $i in
 esac
 done
 
-# Assertion functions 
+# Assertion functions
 
 #
 # Compare the status ($1) with
@@ -142,7 +142,7 @@ has_json_property() {
   local value=
   value="$(echo "$JSON" | jq ".$property" | tr -d '"')"
 
-  if [[ -z "$value" ]] || [ "$value" = "null" ]; 
+  if [[ -z "$value" ]] || [ "$value" = "null" ];
   then
     echo "----"
     echo "FAIL:"
@@ -158,7 +158,7 @@ has_json_property() {
 has_or_expect_property() {
   if [[ -z $EXPECTED_VALUE ]];
   then
-    has_json_property 
+    has_json_property
   else
     expect_json_property
   fi
@@ -169,7 +169,7 @@ has_or_expect_property() {
 
 if [[ "$EXPECT_STATUS" -gt 0 ]]
 then
-  expect_status 
+  expect_status
   exit $?
 fi
 

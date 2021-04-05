@@ -17,8 +17,14 @@ const getAuthorizationServerInfoMock = jest.fn();
 const mockSlugHelper = {
   rewrite: jest.fn(),
 };
-mockSlugHelper.rewrite.mockImplementation((slug) => {
-  return slug;
+mockSlugHelper.rewrite.mockImplementation((...slugs) => {
+  for (const slug of slugs) {
+    if (slug) {
+      return slug;
+    }
+  }
+
+  return null;
 });
 const userCollection = new Collection("", "", new ModelFactory(User));
 userCollection.currentItems = [{ id: 1 }];
@@ -58,6 +64,7 @@ beforeEach(() => {
   api_category = {
     api_category: "/veteran-verification/v1",
     upstream_issuer: "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+    audience: "testAudience",
   };
 
   oktaClient = buildFakeOktaClient(
@@ -154,6 +161,12 @@ describe("Happy Path", () => {
   });
 
   it("Happy Path Redirect using config idp", async () => {
+    mockSlugHelper.rewrite.mockImplementation(
+      (slugFromParam, slugFromAuthzRoute, slugFromConfig) => {
+        return slugFromConfig;
+      }
+    );
+
     let response = buildFakeGetAuthorizationServerInfoResponse(["aud"]);
     getAuthorizationServerInfoMock.mockResolvedValue(response);
 
@@ -305,6 +318,7 @@ describe("Happy Path", () => {
     };
 
     api_category.client_store = "local";
+    api_category.audience = "testAudience";
 
     await authorizeHandler(
       redirect_uri,
@@ -468,7 +482,7 @@ describe("Invalid Request", () => {
     expect(logger.warn).toHaveBeenCalledWith({
       message: "Unexpected audience",
       actual: req.query.aud,
-      expected: response.audiences,
+      expected: api_category.audience,
     });
     expect(res.redirect).toHaveBeenCalled();
   });
@@ -749,44 +763,6 @@ describe("Invalid Request", () => {
 });
 
 describe("Server Error", () => {
-  //I am unsure of this functionality??
-  it("getAuthorizationServerInfo Error, return 500", async () => {
-    getAuthorizationServerInfoMock.mockRejectedValue({ error: "fakeError" });
-
-    req.query = {
-      state: "fake_state",
-      client_id: "clientId123",
-      redirect_uri: "http://localhost:8080/oauth/redirect",
-      aud: "notAPIValue",
-    };
-
-    await authorizeHandler(
-      redirect_uri,
-      logger,
-      issuer,
-      dynamoClient,
-      oktaClient,
-      mockSlugHelper,
-      api_category,
-      "OAuthRequestsV2",
-      "Clients",
-      "idp1",
-      req,
-      res,
-      next
-    )
-      .then(() => {
-        fail("Error should bubble up");
-      })
-      .catch((err) => {
-        expect(err.status).toBe(500);
-      });
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "Unable to get the authorization server."
-    );
-  });
-
   it("Error on save to dynamo", async () => {
     dynamoClient.savePayloadToDynamo = jest.fn().mockImplementation(() => {
       return new Promise((resolve, reject) => {

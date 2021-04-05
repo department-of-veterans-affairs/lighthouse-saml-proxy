@@ -24,6 +24,7 @@ let dynamoClient;
 let next;
 let validateToken;
 let staticTokens;
+let audience;
 let req;
 let res;
 
@@ -39,6 +40,7 @@ beforeEach(() => {
   });
   validateToken = buildValidateToken({});
   staticTokens = new Map();
+  audience = "https://sandbox-api.va.gov/services/fhir";
   next = jest.fn();
   issuer = new FakeIssuer(dynamoClient);
   req = new MockExpressRequest();
@@ -78,6 +80,7 @@ describe("tokenHandler tests", () => {
       dynamoClient,
       validateToken,
       staticTokens,
+      audience,
       req,
       res,
       next
@@ -103,6 +106,7 @@ describe("tokenHandler tests", () => {
       dynamoClient,
       validateToken,
       staticTokens,
+      audience,
       req,
       res,
       next
@@ -131,6 +135,7 @@ describe("tokenHandler tests", () => {
       dynamoClient,
       validateToken,
       staticTokens,
+      audience,
       req,
       res,
       next

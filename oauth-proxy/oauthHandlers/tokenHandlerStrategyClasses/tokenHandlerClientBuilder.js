@@ -43,7 +43,8 @@ const buildTokenHandlerClient = (
   res,
   next,
   validateToken,
-  staticTokens
+  staticTokens,
+  audience
 ) => {
   const strategies = getStrategies(
     redirect_uri,
@@ -53,7 +54,8 @@ const buildTokenHandlerClient = (
     config,
     req,
     validateToken,
-    staticTokens
+    staticTokens,
+    audience
   );
   return new TokenHandlerClient(
     strategies.getTokenStrategy,
@@ -74,7 +76,8 @@ const getStrategies = (
   config,
   req,
   validateToken,
-  staticTokens
+  staticTokens,
+  audience
 ) => {
   let strategies;
   if (req.body.grant_type === "refresh_token") {
@@ -104,7 +107,8 @@ const getStrategies = (
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,
-        logger
+        logger,
+        audience
       ),
     };
   } else if (req.body.grant_type === "authorization_code") {
@@ -130,7 +134,8 @@ const getStrategies = (
       ),
       getPatientInfoStrategy: new GetPatientInfoFromValidateEndpointStrategy(
         validateToken,
-        logger
+        logger,
+        audience
       ),
     };
   } else if (req.body.grant_type === "client_credentials") {

@@ -15,7 +15,7 @@ Example
   export CC_CLIENT_ID={{ client id }}
   export CC_CLIENT_SECRET={{ client secret }}
 
-  ./regression_tests.sh
+  ./regression_tests.sh [--test-claims]
 EOF
 exit 1
 }
@@ -23,7 +23,8 @@ exit 1
 for i in "$@"
 do
 case $i in
-    
+    --test-claims)
+      TEST_CLAIMS="true"; shift ;;
     --help|-h)
       usage ;  exit 1 ;;
     --) shift ; break ;;
@@ -164,6 +165,10 @@ track_result
 track_result
 "$DIR"/other_tests.sh --host="$HOST" --tokens="$TOKEN"
 track_result
+if [ ! -z "$TEST_CLAIMS" ]; then
+  "$DIR"/claims_tests.sh --host="$HOST"
+  track_result
+fi
 
 # End of Tests ----
 

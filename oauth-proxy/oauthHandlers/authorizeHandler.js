@@ -56,12 +56,11 @@ const authorizeHandler = async (
     return next();
   }
 
-  let paramValidation = await checkParameters(
+  let paramValidation = checkParameters(
     state,
     aud,
-    issuer,
-    logger,
-    oktaClient
+    app_category.audience,
+    logger
   );
 
   if (!paramValidation.valid) {
@@ -109,10 +108,11 @@ const authorizeHandler = async (
   params.set("redirect_uri", redirect_uri);
   // Rewrite to an internally maintained state
   params.set("state", internal_state);
-  if (params.has("idp")) {
-    params.set("idp", slugHelper.rewrite(params.get("idp")));
-  } else if (!params.has("idp") && idp) {
-    params.set("idp", idp);
+
+  // Set the optional IDP (using a preferred order)
+  const oktaIdp = slugHelper.rewrite(params.get("idp"), app_category.idp, idp);
+  if (oktaIdp) {
+    params.set("idp", oktaIdp);
   }
 
   res.redirect(
@@ -121,11 +121,19 @@ const authorizeHandler = async (
 };
 
 /**
- * Checks for valid authorization parameters.
  *
- * @returns {Promise<{valid: boolean, error?: string, error_description?: string}>}
+ * @param {*} state The state parameter that came with the inbound request.
+ * @param {*} requestAudience The audience that came with the inbound request.
+ * @param {*} configuredAudience The audience that is allowed for this api_category.
+ * @param {*} logger logs information.
+ * @returns An object with a "valid" boolean parameter.
  */
-const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
+const checkParameters = (
+  state,
+  requestAudience,
+  configuredAudience,
+  logger
+) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
@@ -135,27 +143,12 @@ const checkParameters = async (state, aud, issuer, logger, oktaClient) => {
     };
   }
 
-  if (aud) {
-    let authorizationServerId = new URL(issuer.metadata.issuer).pathname
-      .split("/")
-      .pop();
-    let serverAudiences;
-
-    await oktaClient
-      .getAuthorizationServer(authorizationServerId)
-      .then((res) => {
-        serverAudiences = res.audiences;
-      })
-      .catch(() => {
-        logger.error("Unable to get the authorization server.");
-        throw { status: 500 };
-      });
-
-    if (!serverAudiences.includes(aud)) {
+  if (requestAudience) {
+    if (requestAudience !== configuredAudience) {
       logger.warn({
         message: "Unexpected audience",
-        actual: aud,
-        expected: serverAudiences,
+        actual: requestAudience,
+        expected: configuredAudience,
       });
     }
   }

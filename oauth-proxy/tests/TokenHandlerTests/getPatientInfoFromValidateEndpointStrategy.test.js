@@ -21,10 +21,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       mockValidate,
       logger
     );
-    let response = await strategy.createPatientInfo(
-      { access_token: "token" },
-      { aud: "aud" }
-    );
+    let response = await strategy.createPatientInfo({ access_token: "token" });
     expect(response).toBe("patient");
   });
   it("Type Error", async () => {
@@ -35,10 +32,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       logger
     );
     try {
-      await strategy.createPatientInfo(
-        { access_token: "token" },
-        { aud: "aud" }
-      );
+      await strategy.createPatientInfo({ access_token: "token" });
       fail("Type error should have been thrown.");
     } catch (err) {
       expect(logger.error).toHaveBeenCalledWith({
@@ -55,10 +49,7 @@ describe("getPatientInfoFromValidateEndpointStrategy tests", () => {
       logger
     );
     try {
-      await strategy.createPatientInfo(
-        { access_token: "token" },
-        { aud: "aud" }
-      );
+      await strategy.createPatientInfo({ access_token: "token" });
       fail("Validate error should have been thrown.");
     } catch (err) {
       expect(err.statusCode).toBe(503);

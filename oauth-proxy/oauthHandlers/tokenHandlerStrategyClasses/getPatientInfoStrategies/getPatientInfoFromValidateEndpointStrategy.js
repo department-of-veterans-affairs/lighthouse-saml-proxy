@@ -1,15 +1,16 @@
 const { rethrowIfRuntimeError } = require("../../../utils");
 class GetPatientInfoFromValidateEndpointStrategy {
-  constructor(validateToken, logger) {
+  constructor(validateToken, logger, audience) {
     this.logger = logger;
     this.validateToken = validateToken;
+    this.audience = audience;
   }
-  async createPatientInfo(tokens, decoded) {
+  async createPatientInfo(tokens) {
     let patient;
     try {
       const validation_result = await this.validateToken(
         tokens.access_token,
-        decoded.aud
+        this.audience
       );
       patient = validation_result.va_identifiers.icn;
     } catch (error) {

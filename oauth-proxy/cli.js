@@ -116,6 +116,11 @@ function processArgs() {
         required: false,
         default: false,
       },
+      enable_claims_service: {
+        description: "Enable claims service?",
+        required: false,
+        default: false,
+      },
       routes: {
         description:
           "An object that describes route configurations for isolated api categories",
@@ -156,6 +161,11 @@ function processArgs() {
               "Indicates if the issued token will be opaque and therefore need extra handling.",
             required: false,
             default: false,
+          },
+          audience: {
+            description: "The audience for the app category.",
+            required: true,
+            default: "api://default",
           },
           custom_metadata: {
             description:
@@ -202,6 +212,11 @@ function processArgs() {
               required: false,
               default: null,
             },
+          },
+          idp: {
+            description:
+              "Default Okta IDP for this authz server (overrides global default)",
+            required: false,
           },
         },
         app_routes: {
@@ -253,6 +268,10 @@ function processArgs() {
             description: "The path component for the SMART launch service",
             required: true,
             default: "/smart/launch",
+          },
+          claims: {
+            description: "The path component for the claims service",
+            required: false,
           },
         },
       },
