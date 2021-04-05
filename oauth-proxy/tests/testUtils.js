@@ -335,23 +335,27 @@ const createFakeConfig = () => {
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0ho1w0bSNLDV2p7",
           manage_endpoint: "https://staging.va.gov/account",
+          audience: "https://sandbox-api.va.gov/services/fhir",
         },
         {
           api_category: "/benefits/v1",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
           manage_endpoint: "https://staging.va.gov/account",
+          audience: "https://sandbox-api.va.gov/services/fhir",
         },
         {
           api_category: "/veteran-verification/v1",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
           manage_endpoint: "https://staging.va.gov/account",
+          audience: "https://sandbox-api.va.gov/services/fhir",
         },
         {
           api_category: "/noManage",
           upstream_issuer:
             "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
+          audience: "https://sandbox-api.va.gov/services/fhir",
         },
         {
           api_category: "/overrideEndpoints",
@@ -367,6 +371,7 @@ const createFakeConfig = () => {
             jwks_uri: "http://example.com/keys",
             issuer: "http://example.com/issuer",
           },
+          audience: "https://sandbox-api.va.gov/services/fhir",
         },
       ],
       app_routes: {

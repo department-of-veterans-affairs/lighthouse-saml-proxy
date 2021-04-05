@@ -22,42 +22,50 @@
         "api_category": "",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
         "manage_endpoint": "https://staging.va.gov/account",
+        "audience": "api://default",
         "enable_consent_endpoint" : true
       },
       {
         "api_category": "/claims/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
         "manage_endpoint": "https://staging.va.gov/account",
+        "audience": "https://sandbox-api.va.gov/services/claims",
         "enable_consent_endpoint" : true
       },
       {
         "api_category": "/community-care/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus89xnh1xznM13SK2p7",
         "manage_endpoint": "https://staging.va.gov/account",
+        "audience": "https://sandbox-api.va.gov/services/community-care",
         "enable_consent_endpoint" : true
       },
       {
         "api_category": "/health/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
         "manage_endpoint": "https://staging.va.gov/account",
+        "audience": "api://default",
         "enable_consent_endpoint" : true
       },
       {
         "api_category": "/health-insurance/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7",
+        "audience": "https://sandbox-api.va.gov/services/fhir"
       },
       {
         "api_category": "/health/system/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7",
+        "audience": "https://sandbox-api.va.gov/services/fhir"
       },
       {
         "api_category": "/pgd/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8x27nv4g4BS01v2p7"
+        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8x27nv4g4BS01v2p7",
+        "audience": "https://sandbox-api.va.gov/services/pgd"
       },
       {
         "api_category": "/veteran-verification/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
         "manage_endpoint": "https://staging.va.gov/account",
+        "audience": "https://sandbox-api.va.gov/services/veteran_verification",
         "enable_consent_endpoint" : true
       },
       {

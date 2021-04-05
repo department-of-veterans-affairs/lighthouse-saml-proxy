@@ -162,6 +162,11 @@ function processArgs() {
             required: false,
             default: false,
           },
+          audience: {
+            description: "The audience for the app category.",
+            required: true,
+            default: "api://default",
+          },
           custom_metadata: {
             description:
               "An object of endpoints that can be used to override the default metadata.",

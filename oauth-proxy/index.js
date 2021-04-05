@@ -320,6 +320,7 @@ function buildApp(
           dynamoClient,
           validateToken,
           staticTokens,
+          app_category.audience,
           req,
           res,
           next

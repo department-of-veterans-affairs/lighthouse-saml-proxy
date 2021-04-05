@@ -1,4 +1,3 @@
-const jwtDecode = require("jwt-decode");
 const { rethrowIfRuntimeError } = require("../../utils");
 const { translateTokenSet } = require("../tokenResponse");
 
@@ -66,14 +65,12 @@ class TokenHandlerClient {
 
     //Creates a Token Response
     const tokenResponseBase = translateTokenSet(tokens);
-    let decoded = jwtDecode(tokens.access_token);
     let responseBody = { ...tokenResponseBase, state };
 
     if (tokens && tokens.scope) {
       if (tokens.scope.split(" ").includes("launch/patient")) {
         let patient = await this.getPatientInfoStrategy.createPatientInfo(
-          tokens,
-          decoded
+          tokens
         );
         responseBody["patient"] = patient;
       } else if (tokens.scope.split(" ").includes("launch") && launch) {
