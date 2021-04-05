@@ -40,3 +40,10 @@ If you're a VA developer, you can look at the [vets-contrib](https://github.com/
 
 You'll also want to setup a local instance of DynamoDB either by running `docker-compose` to start the proxy or 
 by downloading and running it following [Amazon's instructions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html).
+
+
+### git-secrets
+git-secrets must be installed and configured to scan for AWS entries and the patterns in
+[.git-secrets-patterns](.git-secrets-patterns). Exclusions are managed in
+[.gitallowed](.gitallowed).
+The [init-git-secrets.sh](common/scripts/init-git-secrets.sh) script can be used to simply set up.
