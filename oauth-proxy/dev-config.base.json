@@ -47,11 +47,6 @@
         "enable_consent_endpoint" : true
       },
       {
-        "api_category": "/health-insurance/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7",
-        "audience": "https://sandbox-api.va.gov/services/fhir"
-      },
-      {
         "api_category": "/health/system/v1",
         "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7",
         "audience": "https://sandbox-api.va.gov/services/fhir"
