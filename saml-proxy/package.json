@@ -83,7 +83,6 @@
     "cookie-parser": "^1.4.5",
     "debug": "~3.1.0",
     "eslint-plugin-jest": "^23.20.0",
-    "event-stream": "^3.3.5",
     "express": "^4.17.1",
     "express-prom-bundle": "^5.1.5",
     "express-session": "^1.17.1",
