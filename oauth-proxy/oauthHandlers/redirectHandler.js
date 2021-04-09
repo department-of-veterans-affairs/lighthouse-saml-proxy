@@ -54,34 +54,14 @@ const redirectHandler = async (
   try {
     if (document && document.Item && document.Item.redirect_uri) {
       if (!Object.prototype.hasOwnProperty.call(req.query, "error")) {
-        if (document.Item.internal_state) {
-          await dynamoClient.updateToDynamo(
-            { internal_state: state },
-            {
-              code: hashString(req.query.code, config.hmac_secret),
-              expires_on: Math.round(Date.now() / 1000) + 60 * 10, // 10 minutes
-            },
-            config.dynamo_oauth_requests_table
-          );
-        } else {
-          // REMOVE
-          // Backwards compatibility.
-          // Remove after 1 Day of PR merge (DATE - 02/23/2021).
-          let redirectPayload = {
-            internal_state: uuidv4(),
-            state: state,
-            redirect_uri: document.redirect_uri,
+        await dynamoClient.updateToDynamo(
+          { internal_state: state },
+          {
             code: hashString(req.query.code, config.hmac_secret),
             expires_on: Math.round(Date.now() / 1000) + 60 * 10, // 10 minutes
-          };
-          if (document.launch) {
-            redirectPayload.launch = document.launch;
-          }
-          await dynamoClient.savePayloadToDynamo(
-            redirectPayload,
-            config.dynamo_oauth_requests_table
-          );
-        }
+          },
+          config.dynamo_oauth_requests_table
+        );
       }
 
       document = document.Item;

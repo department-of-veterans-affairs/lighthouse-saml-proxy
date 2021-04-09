@@ -21,35 +21,6 @@ class GetDocumentByRefreshTokenStrategy {
       this.config.dynamo_oauth_requests_table
     );
 
-    // REMOVE
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
-    if (!document) {
-      this.logger.warn(
-        "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
-      );
-      document = await this.getDocumentDynamo(
-        hashedRefreshToken,
-        this.config.dynamo_table_name
-      );
-    }
-    // REMOVE
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
-    if (!document) {
-      const basicAuth = parseBasicAuth(this.req);
-      let hashedClient = "empty";
-      if (basicAuth) {
-        hashedClient = hashString(basicAuth.username, this.config.hmac_secret);
-      } else if (this.client_id) {
-        hashedClient = hashString(this.client_id, this.config.hmac_secret);
-      }
-      this.logger.warn("Fallback OAuthRequests refresh_token not found.", {
-        client_id: hashedClient,
-        hashed_id: hashString(hashedRefreshToken, this.config.hmac_secret),
-      });
-    }
-
     return document;
   }
 

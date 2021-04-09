@@ -77,43 +77,7 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
 
     let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
-    expect(logger.warn).toHaveBeenCalledWith(
-      "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
-    );
-    expect(logger.warn).toHaveBeenCalledWith(
-      "Fallback OAuthRequests refresh_token not found.",
-      {
-        client_id:
-          "590723609fa552658d3fc7aad1d720245b3e5bd904e6d59b0e4433b4b5c749b4",
-        hashed_id:
-          "69e8cdbb4940d26e6d11a81e56b3d754f49b33453754bbd087b35d09f9c5f7ba",
-      }
-    );
-  });
-  // CHANGE
-  it("Could not retrieve Token, ClientID in body", async () => {
-    dynamoClient = buildFakeDynamoClient();
-    let strategy = new GetDocumentByRefreshTokenStrategy(
-      req,
-      logger,
-      dynamoClient,
-      config,
-      "user1"
-    );
 
-    let document = await strategy.getDocument();
-    expect(document).toEqual(undefined);
-    expect(logger.warn).toHaveBeenCalledWith(
-      "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
-    );
-    expect(logger.warn).toHaveBeenCalledWith(
-      "Fallback OAuthRequests refresh_token not found.",
-      {
-        client_id:
-          "590723609fa552658d3fc7aad1d720245b3e5bd904e6d59b0e4433b4b5c749b4",
-        hashed_id:
-          "69e8cdbb4940d26e6d11a81e56b3d754f49b33453754bbd087b35d09f9c5f7ba",
-      }
-    );
+    expect(logger.error).toHaveBeenCalledWith("Could not retrieve state from DynamoDB", expect.anything());
   });
 });

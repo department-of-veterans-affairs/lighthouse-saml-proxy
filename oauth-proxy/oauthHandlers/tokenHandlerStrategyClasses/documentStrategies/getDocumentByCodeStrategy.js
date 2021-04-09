@@ -13,18 +13,7 @@ class GetDocumentByCodeStrategy {
       hashedCode,
       this.config.dynamo_oauth_requests_table
     );
-    // REMOVE
-    // Backwards compatibility.
-    // Remove after 1 day of PR merge (DATE - 02/23/2021).
-    if (!document) {
-      this.logger.warn(
-        "OAuthRequestsV2 code not found. Searching in OAuthRequests."
-      );
-      document = await this.getDocumentDynamo(
-        hashedCode,
-        this.config.dynamo_table_name
-      );
-    }
+
     return document;
   }
 
