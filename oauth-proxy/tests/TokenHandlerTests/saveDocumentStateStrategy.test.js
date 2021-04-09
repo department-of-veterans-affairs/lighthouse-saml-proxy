@@ -136,7 +136,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(logger.error).not.toHaveBeenCalled();
   });
-
+  // REMOVE
   it("Happy Path with launch w/o scope", async () => {
     document.launch = LAUNCH;
     tokens = buildToken(false, true, true, "openid");
@@ -169,6 +169,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.savePayloadToDynamo).not.toHaveBeenCalled();
   });
+  // REMOVE
   it("Happy Path w/o internal_state", async () => {
     document = {
       state: STATE,
@@ -207,6 +208,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
+  // REMOVE
   it("Happy Path w/o internal_state with launch", async () => {
     document = {
       state: STATE,
@@ -257,7 +259,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-
+  // REMOVE
   it("Happy Path w/o internal_state err on dynamo save", async () => {
     document = {
       state: STATE,
@@ -297,7 +299,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(dynamoClient.updateToDynamo).not.toHaveBeenCalled();
   });
-
+  // CHANGE ???
   it("No Document State", async () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({

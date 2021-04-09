@@ -21,6 +21,7 @@ class GetDocumentByRefreshTokenStrategy {
       this.config.dynamo_oauth_requests_table
     );
 
+    // REMOVE
     // Backwards compatibility.
     // Remove after 42 days of PR merge (DATE - 02/23/2021).
     if (!document) {
@@ -32,7 +33,7 @@ class GetDocumentByRefreshTokenStrategy {
         this.config.dynamo_table_name
       );
     }
-
+    // REMOVE
     // Backwards compatibility.
     // Remove after 42 days of PR merge (DATE - 02/23/2021).
     if (!document) {

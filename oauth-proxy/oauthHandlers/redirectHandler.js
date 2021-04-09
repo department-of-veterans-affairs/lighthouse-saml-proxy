@@ -32,7 +32,7 @@ const redirectHandler = async (
   } catch (error) {
     logger.error("Failed to look up by internal_state.", error);
   }
-
+  // REMOVE
   // Backwards compatibility.
   // Remove after 42 Days of PR merge (DATE - 02/23/2021).
   try {
@@ -64,6 +64,7 @@ const redirectHandler = async (
             config.dynamo_oauth_requests_table
           );
         } else {
+          // REMOVE
           // Backwards compatibility.
           // Remove after 1 Day of PR merge (DATE - 02/23/2021).
           let redirectPayload = {

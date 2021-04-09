@@ -63,7 +63,7 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
   });
-
+  // CHANGE
   it("Could not retrieve Token", async () => {
     dynamoClient = buildFakeDynamoClient();
     let usernamePassword = Buffer.from("user1:pass1").toString("base64");
@@ -90,7 +90,7 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
       }
     );
   });
-
+  // CHANGE
   it("Could not retrieve Token, ClientID in body", async () => {
     dynamoClient = buildFakeDynamoClient();
     let strategy = new GetDocumentByRefreshTokenStrategy(

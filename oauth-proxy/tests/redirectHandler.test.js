@@ -55,7 +55,7 @@ describe("redirectHandler", () => {
     await redirectHandler(logger, dynamoClient, config, req, res, next);
     expect(res.redirect).toHaveBeenCalled();
   });
-
+  // REMOVE
   // Backwards compatibility.
   // Remove after 1 Day of PR merge (DATE - 02/23/2021).
   it("Happy Path Redirect with OAuthRequests state", async () => {

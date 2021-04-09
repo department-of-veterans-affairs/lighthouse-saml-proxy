@@ -13,7 +13,7 @@ class GetDocumentByCodeStrategy {
       hashedCode,
       this.config.dynamo_oauth_requests_table
     );
-
+    // REMOVE
     // Backwards compatibility.
     // Remove after 1 day of PR merge (DATE - 02/23/2021).
     if (!document) {
