@@ -1,5 +1,4 @@
 const { hashString } = require("../../../utils");
-const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
   constructor(req, logger, dynamoClient, config, issuer) {

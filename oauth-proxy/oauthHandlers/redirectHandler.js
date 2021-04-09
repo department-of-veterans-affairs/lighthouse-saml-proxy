@@ -1,7 +1,6 @@
 const { URLSearchParams } = require("url");
 const { loginEnd } = require("../metrics");
 const { hashString } = require("../utils");
-const { v4: uuidv4 } = require("uuid");
 
 const redirectHandler = async (
   logger,

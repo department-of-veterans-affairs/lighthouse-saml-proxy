@@ -1,4 +1,4 @@
-const { hashString, parseBasicAuth } = require("../../../utils");
+const { hashString } = require("../../../utils");
 
 class GetDocumentByRefreshTokenStrategy {
   constructor(req, logger, dynamoClient, config, client_id) {

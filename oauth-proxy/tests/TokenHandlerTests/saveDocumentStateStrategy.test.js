@@ -132,7 +132,11 @@ describe("saveDocumentStateStrategy tests", () => {
 
   it("Save Launch Document throws error", async () => {
     document.launch = LAUNCH;
-    dynamoClient = { saveDocumentToDynamo: () => {throw "Error"} }
+    dynamoClient = {
+      saveDocumentToDynamo: () => {
+        throw "Error";
+      },
+    };
     let strategy = new SaveDocumentStateStrategy(
       req,
       logger,
@@ -142,12 +146,11 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     try {
       await strategy.saveDocumentToDynamo(document, tokens);
-      fail("Should have thrown error")
-    }catch(error) {
-      expect(error.status).toBe(500)
-      expect(error.errorMessage).toBe("Could not save the launch context.")
+      fail("Should have thrown error");
+    } catch (error) {
+      expect(error.status).toBe(500);
+      expect(error.errorMessage).toBe("Could not save the launch context.");
     }
- 
   });
   it("Happy Path no Refresh in Token", async () => {
     document.launch = LAUNCH;
