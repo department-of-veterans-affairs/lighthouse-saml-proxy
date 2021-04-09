@@ -106,6 +106,49 @@ describe("saveDocumentStateStrategy tests", () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  it("Launch in Document not in Tokens", async () => {
+    document.launch = LAUNCH;
+    dynamoClient = buildFakeDynamoClient({
+      state: STATE,
+      code: CODE_HASH_PAIR[1],
+      launch: LAUNCH,
+      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
+      redirect_uri: REDIRECT_URI,
+    });
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      "issuer"
+    );
+    tokens = buildToken(false, true, false, "");
+    await strategy.saveDocumentToDynamo(document, tokens);
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Launch context specified but scope not granted."
+    );
+  });
+
+  it("Save Launch Document throws error", async () => {
+    document.launch = LAUNCH;
+    dynamoClient = { saveDocumentToDynamo: () => {throw "Error"} }
+    let strategy = new SaveDocumentStateStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      "issuer"
+    );
+    try {
+      await strategy.saveDocumentToDynamo(document, tokens);
+      fail("Should have thrown error")
+    }catch(error) {
+      expect(error.status).toBe(500)
+      expect(error.errorMessage).toBe("Could not save the launch context.")
+    }
+ 
+  });
   it("Happy Path no Refresh in Token", async () => {
     document.launch = LAUNCH;
     dynamoClient = buildFakeDynamoClient({
@@ -136,7 +179,7 @@ describe("saveDocumentStateStrategy tests", () => {
     );
     expect(logger.error).not.toHaveBeenCalled();
   });
-  // CHANGE ???
+
   it("No Document State", async () => {
     document.state = null;
     dynamoClient = buildFakeDynamoClient({

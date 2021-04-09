@@ -63,7 +63,7 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
       redirect_uri: REDIRECT_URI,
     });
   });
-  // CHANGE
+
   it("Could not retrieve Token", async () => {
     dynamoClient = buildFakeDynamoClient();
     let usernamePassword = Buffer.from("user1:pass1").toString("base64");
@@ -78,6 +78,9 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
     let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
 
-    expect(logger.error).toHaveBeenCalledWith("Could not retrieve state from DynamoDB", expect.anything());
+    expect(logger.error).toHaveBeenCalledWith(
+      "Could not retrieve state from DynamoDB",
+      expect.anything()
+    );
   });
 });
