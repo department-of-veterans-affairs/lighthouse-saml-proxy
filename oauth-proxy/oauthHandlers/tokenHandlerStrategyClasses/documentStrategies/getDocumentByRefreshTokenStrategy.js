@@ -6,10 +6,6 @@ class GetDocumentByRefreshTokenStrategy {
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
-
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
-    this.client_id = client_id;
   }
   async getDocument() {
     let hashedRefreshToken = hashString(
