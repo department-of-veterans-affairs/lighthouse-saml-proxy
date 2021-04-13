@@ -1,7 +1,7 @@
 const { hashString } = require("../../../utils");
 
 class GetDocumentByRefreshTokenStrategy {
-  constructor(req, logger, dynamoClient, config, client_id) {
+  constructor(req, logger, dynamoClient, config) {
     this.req = req;
     this.logger = logger;
     this.dynamoClient = dynamoClient;
