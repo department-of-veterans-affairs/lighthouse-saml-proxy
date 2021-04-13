@@ -31,24 +31,6 @@ const redirectHandler = async (
   } catch (error) {
     logger.error("Failed to look up by internal_state.", error);
   }
-  // REMOVE
-  // Backwards compatibility.
-  // Remove after 42 Days of PR merge (DATE - 02/23/2021).
-  try {
-    if (!document) {
-      logger.warn(
-        "OAuthRequestsV2 state not found. Searching for OAuthRequests state."
-      );
-      document = await dynamoClient.getPayloadFromDynamo(
-        {
-          state: state,
-        },
-        config.dynamo_table_name
-      );
-    }
-  } catch (error) {
-    logger.error("Failed fallback to look up by state.", error);
-  }
 
   try {
     if (document && document.Item && document.Item.redirect_uri) {
