@@ -4,7 +4,7 @@ This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests
 
 ## Installation
 
-Requires Docker and/or Node.js > 8.
+Requires Docker and/or Node.js > 10.
 
 ### Config File
 
