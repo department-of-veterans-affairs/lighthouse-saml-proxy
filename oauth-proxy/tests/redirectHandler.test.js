@@ -26,7 +26,6 @@ beforeEach(() => {
   req = new MockExpressRequest();
   res = new MockExpressResponse();
   config = {
-    dynamo_table_name: "tableName",
     dynamo_oauth_requests_table: "tableNameV2",
     hmac_secret: "secret",
   };
