@@ -82,5 +82,38 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
       "Could not retrieve state from DynamoDB",
       expect.anything()
     );
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Fallback OAuthRequests refresh_token not found.",
+      {
+        client_id:
+          "590723609fa552658d3fc7aad1d720245b3e5bd904e6d59b0e4433b4b5c749b4",
+        hashed_id:
+          "69e8cdbb4940d26e6d11a81e56b3d754f49b33453754bbd087b35d09f9c5f7ba",
+      }
+    );
+  });
+
+  it("Could not retrieve Token, ClientID in body", async () => {
+    dynamoClient = buildFakeDynamoClient();
+    let strategy = new GetDocumentByRefreshTokenStrategy(
+      req,
+      logger,
+      dynamoClient,
+      config,
+      "user1"
+    );
+
+    let document = await strategy.getDocument();
+    expect(document).toEqual(undefined);
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Fallback OAuthRequests refresh_token not found.",
+      {
+        client_id:
+          "590723609fa552658d3fc7aad1d720245b3e5bd904e6d59b0e4433b4b5c749b4",
+        hashed_id:
+          "69e8cdbb4940d26e6d11a81e56b3d754f49b33453754bbd087b35d09f9c5f7ba",
+      }
+    );
   });
 });
