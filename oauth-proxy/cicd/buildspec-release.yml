@@ -25,7 +25,7 @@ env:
     REPO: "vets-saml-proxy"
     IMAGE: "oauth-proxy"
     # Checks that are not included for the ghstatus script.
-    XCHECKS: "oauth-proxy-release,saml-proxy,jenkins"
+    XCHECKS: "oauth-proxy-release,saml-proxy"
   parameter-store:
     GITHUB_TOKEN: "/dvp/devops/va_bot_github_token"
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
