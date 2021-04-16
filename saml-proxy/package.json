@@ -75,7 +75,7 @@
     "@types/request": "^2.48.5",
     "@types/request-promise-native": "^1.0.17",
     "@types/xml2js": "^0.4.8",
-    "acorn": "^8.1.1",
+    "acorn": "^8.1.1",\
     "body-parser": "^1.19.0",
     "btoa": "^1.2.1",
     "cls-rtracer": "^2.6.0",
@@ -83,7 +83,6 @@
     "cookie-parser": "^1.4.5",
     "debug": "~3.1.0",
     "eslint-plugin-jest": "^23.20.0",
-    "event-stream": "^3.3.5",
     "express": "^4.17.1",
     "express-prom-bundle": "^5.1.5",
     "express-session": "^1.17.1",
@@ -96,7 +95,6 @@
     "lodash.template": "^4.5.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
-    "node-sass": "^4.14.1",
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.1",
@@ -111,8 +109,7 @@
     "winston": "^3.3.3",
     "xml2js": "^0.4.23",
     "xmldom": "^0.5.0",
-    "yargs": "^16.2.0",
-    "yargs-parser": "^13.1.2"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
