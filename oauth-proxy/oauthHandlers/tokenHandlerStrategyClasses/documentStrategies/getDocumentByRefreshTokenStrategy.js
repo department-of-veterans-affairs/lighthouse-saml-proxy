@@ -6,9 +6,6 @@ class GetDocumentByRefreshTokenStrategy {
     this.logger = logger;
     this.dynamoClient = dynamoClient;
     this.config = config;
-
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
     this.client_id = client_id;
   }
   async getDocument() {
@@ -21,20 +18,7 @@ class GetDocumentByRefreshTokenStrategy {
       this.config.dynamo_oauth_requests_table
     );
 
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
-    if (!document) {
-      this.logger.warn(
-        "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
-      );
-      document = await this.getDocumentDynamo(
-        hashedRefreshToken,
-        this.config.dynamo_table_name
-      );
-    }
-
-    // Backwards compatibility.
-    // Remove after 42 days of PR merge (DATE - 02/23/2021).
+    // Will be usefull in finding stateless tokens and throwing errors
     if (!document) {
       const basicAuth = parseBasicAuth(this.req);
       let hashedClient = "empty";

@@ -77,9 +77,12 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
 
     let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
-    expect(logger.warn).toHaveBeenCalledWith(
-      "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Could not retrieve state from DynamoDB",
+      expect.anything()
     );
+
     expect(logger.warn).toHaveBeenCalledWith(
       "Fallback OAuthRequests refresh_token not found.",
       {
@@ -103,9 +106,6 @@ describe("getDocumentByRefreshTokenStrategy tests", () => {
 
     let document = await strategy.getDocument();
     expect(document).toEqual(undefined);
-    expect(logger.warn).toHaveBeenCalledWith(
-      "OAuthRequestsV2 refresh_token not found. Searching for OAuthRequests refresh_token."
-    );
     expect(logger.warn).toHaveBeenCalledWith(
       "Fallback OAuthRequests refresh_token not found.",
       {

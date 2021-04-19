@@ -1,5 +1,4 @@
 const { hashString } = require("../../../utils");
-const { v4: uuidv4 } = require("uuid");
 
 class SaveDocumentStateStrategy {
   constructor(req, logger, dynamoClient, config, issuer) {
@@ -12,58 +11,30 @@ class SaveDocumentStateStrategy {
   async saveDocumentToDynamo(document, tokens) {
     try {
       if (document.state && tokens.access_token) {
-        if (document.internal_state) {
-          let updated_document = {
-            access_token: hashString(
-              tokens.access_token,
-              this.config.hmac_secret
-            ),
-            iss: this.issuer,
-          };
+        let updated_document = {
+          access_token: hashString(
+            tokens.access_token,
+            this.config.hmac_secret
+          ),
+          iss: this.issuer,
+        };
 
-          if (tokens.refresh_token) {
-            updated_document.refresh_token = hashString(
-              tokens.refresh_token,
-              this.config.hmac_secret
-            );
-            updated_document.expires_on =
-              Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
-          } else {
-            updated_document.expires_on = tokens.expires_at;
-          }
-
-          await this.dynamoClient.updateToDynamo(
-            { internal_state: document.internal_state },
-            updated_document,
-            this.config.dynamo_oauth_requests_table
+        if (tokens.refresh_token) {
+          updated_document.refresh_token = hashString(
+            tokens.refresh_token,
+            this.config.hmac_secret
           );
+          updated_document.expires_on =
+            Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42;
         } else {
-          // Backwards compatibility.
-          // Remove after 42 day of PR merge (DATE - 02/23/2021).
-          let payload = {
-            internal_state: uuidv4(),
-            state: document.state,
-            redirect_uri: document.redirect_uri,
-            access_token: hashString(
-              tokens.access_token,
-              this.config.hmac_secret
-            ),
-            iss: this.issuer,
-            refresh_token: hashString(
-              tokens.refresh_token,
-              this.config.hmac_secret
-            ),
-            expires_on: Math.round(Date.now() / 1000) + 60 * 60 * 24 * 42,
-          };
-
-          if (document.launch) {
-            payload.launch = document.launch;
-          }
-          await this.dynamoClient.savePayloadToDynamo(
-            payload,
-            this.config.dynamo_oauth_requests_table
-          );
+          updated_document.expires_on = tokens.expires_at;
         }
+
+        await this.dynamoClient.updateToDynamo(
+          { internal_state: document.internal_state },
+          updated_document,
+          this.config.dynamo_oauth_requests_table
+        );
       }
     } catch (error) {
       this.logger.error(

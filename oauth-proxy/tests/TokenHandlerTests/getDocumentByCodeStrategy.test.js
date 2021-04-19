@@ -40,29 +40,6 @@ describe("getDocumentByCodeStrategy tests", () => {
     });
   });
 
-  it("Happy Path - Existing OAuthRequest State", async () => {
-    dynamoClient = buildFakeDynamoClient({
-      state: STATE,
-      code: CODE_HASH_PAIR[1],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI,
-    });
-
-    let strategy = new GetDocumentByCodeStrategy(
-      req,
-      logger,
-      dynamoClient,
-      config
-    );
-    let document = await strategy.getDocument();
-    expect(document).toEqual({
-      state: STATE,
-      code: CODE_HASH_PAIR[1],
-      refresh_token: REFRESH_TOKEN_HASH_PAIR[1],
-      redirect_uri: REDIRECT_URI,
-    });
-  });
-
   it("Happy Path", async () => {
     dynamoClient = buildFakeDynamoClient({
       state: STATE,
