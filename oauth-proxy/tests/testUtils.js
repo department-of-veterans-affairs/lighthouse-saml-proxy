@@ -313,7 +313,6 @@ const createFakeConfig = () => {
     upstream_issuer: "https://deptva-eval.okta.com/oauth2/default",
     upstream_issuer_timeout_ms: 15000,
     dynamo_local: "dynamodb:8000",
-    dynamo_table_name: "OAuthRequests",
     dynamo_oauth_requests_table: "OAuthRequestsV2",
     dynamo_launch_context_table: "LaunchContext",
     hmac_secret: "secret",

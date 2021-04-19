@@ -26,7 +26,6 @@ beforeEach(() => {
   req = new MockExpressRequest();
   res = new MockExpressResponse();
   config = {
-    dynamo_table_name: "tableName",
     dynamo_oauth_requests_table: "tableNameV2",
     hmac_secret: "secret",
   };
@@ -53,28 +52,6 @@ describe("redirectHandler", () => {
     };
 
     await redirectHandler(logger, dynamoClient, config, req, res, next);
-    expect(res.redirect).toHaveBeenCalled();
-  });
-
-  // Backwards compatibility.
-  // Remove after 1 Day of PR merge (DATE - 02/23/2021).
-  it("Happy Path Redirect with OAuthRequests state", async () => {
-    res = {
-      redirect: jest.fn(),
-    };
-    let legacyDynamoClient = buildFakeDynamoClient({
-      state: "abc123",
-      code: "the_fake_authorization_code",
-      refresh_token: "",
-      redirect_uri: "http://localhost/thisDoesNotMatter",
-    });
-
-    req.query = {
-      state: "abc123",
-      code: "the_fake_authorization_code",
-    };
-
-    await redirectHandler(logger, legacyDynamoClient, config, req, res, next);
     expect(res.redirect).toHaveBeenCalled();
   });
 
