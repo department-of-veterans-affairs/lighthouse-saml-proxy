@@ -5,7 +5,7 @@ cat <<EOF
 Tests the oauth-proxy claims endpoint.
 
 Example
-  HOST="https://sandbox-api.va.gov/oauth2" bats ./claims_tests.sh
+  HOST="https://sandbox-api.va.gov/oauth2" bats ./claims_tests.bats
 EOF
 }
 

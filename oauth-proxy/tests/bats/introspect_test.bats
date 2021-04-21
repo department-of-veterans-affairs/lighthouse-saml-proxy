@@ -5,7 +5,7 @@ cat <<EOF
 Tests the Oauth Proxy's Introspect endpoint.
 
 Example
-  HOST="https://sandbox-api.va.gov/oauth2" TOKEN_FILE={ Token File } EXPIRED_TOKEN_FILE={ Expired Token File } CLIENT_ID={Client ID} CLIENT_SECRET={Client Secret} ./introspect_tests.sh
+  HOST="https://sandbox-api.va.gov/oauth2" TOKEN_FILE={ Token File } EXPIRED_TOKEN_FILE={ Expired Token File } CLIENT_ID={Client ID} CLIENT_SECRET={Client Secret} bats ./introspect_tests.bats
 EOF
 }
 

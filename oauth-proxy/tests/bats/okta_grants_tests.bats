@@ -5,7 +5,7 @@ cat <<EOF
 Tests the Oauth Proxy's Introspect endpoint.
 
 Example
-  HOST="https://sandbox-api.va.gov/oauth2" CLIENT_ID={Client ID} USER_EMAIL={email} ./okta_grants_tests.sh
+  HOST="https://sandbox-api.va.gov/oauth2" CLIENT_ID={Client ID} USER_EMAIL={email} bats ./okta_grants_tests.bats
 EOF
 }
 
