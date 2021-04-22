@@ -61,7 +61,7 @@ do_introspect() {
   do_introspect "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq .active)" == "true" ]
+  [ "$(cat "$curl_body" | jq .active | tr -d '"')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("scope")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("username")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("exp")')" == "true" ]
@@ -70,17 +70,17 @@ do_introspect() {
   [ "$(cat "$curl_body" | jq 'has("aud")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("iss")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("jti")')" == "true" ]
-  [ "$(cat "$curl_body" | jq .token_type)" == "Bearer" ]
-  [ "$(cat "$curl_body" | jq .client_id)" == "$CLIENT_ID" ]
+  [ "$(cat "$curl_body" | jq .token_type | tr -d '"')" == "Bearer" ]
+  [ "$(cat "$curl_body" | jq .client_id | tr -d '"')" == "$CLIENT_ID" ]
   [ "$(cat "$curl_body" | jq 'has("uid")')" == "true" ]
 }
 
 @test 'valid id token' {
-  id_token=$(echo "$TOKENS" | jq ".id_token" | tr -d '"')
+  id_token=$(cat "$TOKEN_FILE" | jq ".id_token" | tr -d '"')
   do_introspect "$id_token" "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq .active)" == "true" ]
+  [ "$(cat "$curl_body" | jq .active | tr -d '"')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("username")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("preferred_username")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("exp")')" == "true" ]
@@ -89,7 +89,7 @@ do_introspect() {
   [ "$(cat "$curl_body" | jq 'has("aud")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("iss")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("jti")')" == "true" ]
-  [ "$(cat "$curl_body" | jq .token_type)" == "Bearer" ]
+  [ "$(cat "$curl_body" | jq .token_type | tr -d '"')" == "Bearer" ]
   [ "$(cat "$curl_body" | jq 'has("at_hash")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("idp")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("auth_time")')" == "true" ]
@@ -98,15 +98,15 @@ do_introspect() {
 }
 
 @test 'expired access token' {
-  do_introspect "$EXPIRED_ACCESS" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
+  do_introspect "$(cat $EXPIRED_TOKEN_FILE | jq .access_token | tr -d '"')" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq .active)" == "false" ]
+  [ "$(cat "$curl_body" | jq .active | tr -d '"')" == "false" ]
 }
 
 @test 'invalid id token' {
   do_introspect invalid "id_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq .active)" == "false" ]
+  [ "$(cat "$curl_body" | jq .active | tr -d '"')" == "false" ]
 }

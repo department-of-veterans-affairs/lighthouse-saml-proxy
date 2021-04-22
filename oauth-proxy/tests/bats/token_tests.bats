@@ -2,10 +2,10 @@
 
 usage() {
 cat <<EOF
-Tests the Oauth Proxy's Introspect endpoint.
+Tests the Oauth Proxy's token endpoint.
 
 Example
-  HOST="https://sandbox-api.va.gov/oauth2" TOKEN_FILE={ Token File } EXPIRED_TOKEN_FILE={ Expired Token File } CLIENT_ID={Client ID} CLIENT_SECRET={Client Secret} CC_CLIENT_ID={CC Client ID} CC_CLIENT_SECRET={CC Client Secret} bats ./token_tests.bats
+  HOST="https://sandbox-api.va.gov/oauth2" CODE={code} TOKEN_FILE={ Token File } EXPIRED_TOKEN_FILE={ Expired Token File } CLIENT_ID={Client ID} CLIENT_SECRET={Client Secret} CC_CLIENT_ID={CC Client ID} CC_CLIENT_SECRET={CC Client Secret} bats ./token_tests.bats
 EOF
 }
 
@@ -152,10 +152,10 @@ do_token() {
   [ "$(cat "$curl_body" | jq 'has("access_token")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("id_token")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("refresh_token")')" == "true" ]
-  [ "$(cat "$curl_body" | jq .token_type)" == "Bearer" ]
+  [ "$(cat "$curl_body" | jq .token_type | tr -d '"')" == "Bearer" ]
   [ "$(cat "$curl_body" | jq 'has("scope")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("expires_in")')" == "true" ]
-  if [[ "$(cat "$curl_body" | jq .scope)" == *"launch/patient"* ]];
+  if [[ "$(cat "$curl_body" | jq .scope  | tr -d '"')" == *"launch/patient"* ]];
   then
     [ "$(cat "$curl_body" | jq 'has("patient")')" == "true" ]
   fi
@@ -173,8 +173,8 @@ do_token() {
                   '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_grant" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "The authorization code is invalid or has expired." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_grant" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "The authorization code is invalid or has expired." ]
 }
 
 @test 'Token Handler invalid code' {
@@ -187,8 +187,8 @@ do_token "$(jq \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_grant" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "The authorization code is invalid or has expired." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_grant" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "The authorization code is invalid or has expired." ]
 }
 
 @test 'Token Handler code path invalid client id' {
@@ -201,20 +201,20 @@ do_token "$(jq \
                 '{"client_id": $client_id, "grant_type": $grant_type, "code": $code, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 401 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_client" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "Invalid value for client_id parameter." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_client" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "Invalid value for client_id parameter." ]
 }
 
 @test 'Revoke active token happy path' {
-  access_token=$(echo "$TOKEN" | jq ".access_token" | tr -d '"')
+  access_token=$(cat "$TOKEN_FILE" | jq ".access_token" | tr -d '"')
   do_revoke_token "$access_token" "access_token" "$CLIENT_ID" "$CLIENT_SECRET"
 
   [ "$(cat "$curl_status")" -eq 200 ]
-  echo "$TOKEN" > "$EXPIRED_TOKEN_FILE"
+  cat "$TOKEN_FILE" > "$EXPIRED_TOKEN_FILE"
 }
 
 @test 'Token Handler refresh happy path' {
-  refresh=$(echo "$TOKEN" | jq ".refresh_token" | tr -d '"')
+  refresh=$(cat "$TOKEN_FILE" | jq ".refresh_token" | tr -d '"')
 
   do_token "$(jq \
                 -scn \
@@ -228,10 +228,10 @@ do_token "$(jq \
   [ "$(cat "$curl_body" | jq 'has("access_token")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("id_token")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("refresh_token")')" == "true" ]
-  [ "$(cat "$curl_body" | jq .token_type)" == "Bearer" ]
+  [ "$(cat "$curl_body" | jq .token_type | tr -d '"')" == "Bearer" ]
   [ "$(cat "$curl_body" | jq 'has("scope")')" == "true" ]
   [ "$(cat "$curl_body" | jq 'has("expires_in")')" == "true" ]
-  if [[ "$(cat "$curl_body" | jq .scope)" == *"launch/patient"* ]];
+  if [[ "$(cat "$curl_body" | jq .scope | tr -d '"')" == *"launch/patient"* ]];
   then
     [ "$(cat "$curl_body" | jq 'has("patient")')" == "true" ]
   fi
@@ -248,31 +248,31 @@ do_token "$(jq \
               '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_grant" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "The refresh token is invalid or expired." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_grant" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "The refresh token is invalid or expired." ]
 }
 
 @test 'Token Handler refresh path invalid client id' {
-do_token "$(jq \
-              -scn \
-              --arg client_id "Invalid" \
-              --arg grant_type "refresh_token" \
-              --arg refresh_token "$(echo "$TOKEN" | jq ".refresh_token" | tr -d '"')" \
-              --arg secret "$CLIENT_SECRET" \
-              '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
+  do_token "$(jq \
+                -scn \
+                --arg client_id "Invalid" \
+                --arg grant_type "refresh_token" \
+                --arg refresh_token "$(cat "$TOKEN_FILE" | jq ".refresh_token" | tr -d '"')" \
+                --arg secret "$CLIENT_SECRET" \
+                '{"client_id": $client_id, "grant_type": $grant_type, "refresh_token": $refresh_token, "client_secret": $secret}')"
 
-  [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_client" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "Invalid value for client_id parameter." ]
+  [ "$(cat "$curl_status")" -eq 401 ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_client" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "Invalid value for client_id parameter." ]
 }
 
 @test 'Client Credentials happy path' {
   cc=$(do_client_credentials "launch/patient" "123V456")
 
-  [ "$(cat "$curl_body" | jq 'has("access_token")')" == "true" ]
-  [ "$(cat "$curl_body" | jq .token_type)" == "Bearer" ]
-  [ "$(cat "$curl_body" | jq .scope)" == "launch/patient" ]
-  [ "$(cat "$curl_body" | jq 'has("expires_in")')" == "true" ]
+  [ "$(echo "$cc" | jq 'has("access_token")')" == "true" ]
+  [ "$(echo "$cc" | jq .token_type | tr -d '"')" == "Bearer" ]
+  [ "$(echo "$cc" | jq .scope | tr -d '"')" == "launch/patient" ]
+  [ "$(echo "$cc" | jq 'has("expires_in")')" == "true" ]
 }
 
 @test 'Token Handler invalid strategy' {
@@ -284,8 +284,8 @@ do_token "$(jq \
                 '{"client_id": $client_id, "grant_type": $grant_type, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "unsupported_grant_type" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "Only authorization_code, refresh_token, and client_credentials grant types are supported" ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "unsupported_grant_type" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "Only authorization_code, refresh_token, and client_credentials grant types are supported" ]
 }
 
 @test 'Token Handler missing grant_type' {
@@ -297,6 +297,6 @@ do_token "$(jq \
                 '{"client_id": $client_id, "grant_type": $grant_type, "client_secret": $secret}')"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_request" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "A grant type is required. Supported grant types are authorization_code, refresh_token, and client_credentials." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_request" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "A grant type is required. Supported grant types are authorization_code, refresh_token, and client_credentials." ]
 }

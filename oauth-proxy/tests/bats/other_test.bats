@@ -59,13 +59,14 @@ teardown() {
     -o "$curl_body" \
     "$HOST/keys" > "$curl_status"
 
+cat "$curl_body"
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].kty")')" == "true" ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].alg")')" == "true" ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].kid")')" == "true" ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].use")')" == "true" ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].e")')" == "true" ]
-  [ "$(cat "$curl_body" | jq 'has("keys[0].n")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("kty")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("alg")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("kid")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("use")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("e")')" == "true" ]
+  [ "$(cat "$curl_body" | jq '.keys[0] | has("n")')" == "true" ]
 }
 
 @test 'Manage happy path' {
@@ -86,13 +87,20 @@ teardown() {
   [ "$(cat "$curl_status")" -eq 404 ]
 }
 
+authorization() {
+  local redirect_uri=$1
+  response=$(curl -s \
+    -Ls -w "%{url_effective}" -o "%{http_code}" \
+    "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=$redirect_uri&aud=default")
+  echo $response
+  return 0
+}
+
 @test 'Authorize Handler with no state parameter' {
   SCOPE="openid%20profile%20disability_rating.read%20service_history.read%20veteran_status.read%20offline_access"
-  curl -s \
-    -Ls -w "%{url_effective}" -o /dev/null \
-    "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=$REDIRECT_URI&aud=default" > "$curl_status"
-    
-  [ "$(cat "$curl_status")" == "$REDIRECT_URI?error=invalid_request&error_description=State+parameter+required" ]
+  
+  response=$(authorization $REDIRECT_URI)
+  [ "$response" == "$REDIRECT_URI?error=invalid_request&error_description=State+parameter+required" ]
 }
 
 @test 'Authorize Handler with no redirect_uri' {
@@ -102,8 +110,8 @@ teardown() {
     "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&redirect_uri=&aud=default" > "$curl_status"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_request" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "There was no redirect URI specified by the application." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_request" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "There was no redirect URI specified by the application." ]
 }
 
 @test 'Authorize Handler with undefined redirect_uri' {
@@ -113,8 +121,8 @@ teardown() {
     "$HOST/authorization?client_id=$CLIENT_ID&scope=$SCOPE&response_type=code&aud=default" > "$curl_status"
 
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_request" ]
-  [ "$(cat "$curl_body" | jq .error_description)" == "There was no redirect URI specified by the application." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_request" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "There was no redirect URI specified by the application." ]
 }
 
 @test 'Redirect Handler without a redirect_url that can be looked up' {

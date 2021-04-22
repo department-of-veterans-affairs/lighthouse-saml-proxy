@@ -45,25 +45,26 @@ do_revoke_grant() {
 
 @test 'Delete Okta grant happy path' {
   do_revoke_grant "$CLIENT_ID" "$USER_EMAIL"
-
+  cat "$curl_status"
+  cat "$curl_body" 
   [ "$(cat "$curl_status")" -eq 200 ]
-  [ "$(cat "$curl_body" | jq .email)" == "$USER_EMAIL" ]
-  [ "$(cat "$curl_body" | jq .responses[0].status)" == "204" ]
-  [ "$(cat "$curl_body" | jq .responses[0].message)" == "Okta grants successfully revoked" ]
+  [ "$(cat "$curl_body" | jq .email | tr -d '"')" == "$USER_EMAIL" ]
+  [ "$(cat "$curl_body" | jq .responses[0].status | tr -d '"')" == "204" ]
+  [ "$(cat "$curl_body" | jq .responses[0].message | tr -d '"')" == "Okta grants successfully revoked" ]
 }
 
 @test 'Revoke Okta grants invalid email' {
   do_revoke_grant "$CLIENT_ID" "invalid"
-
+  
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_request" ]
-  [ "$(cat "$curl_body" | jq .error)" == "Invalid email address." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_request" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "Invalid email address." ]
 }
 
 @test 'Revoke Okta grants invalid client' {
   do_revoke_grant "invalid" "$USER_EMAIL"
   
   [ "$(cat "$curl_status")" -eq 400 ]
-  [ "$(cat "$curl_body" | jq .error)" == "invalid_request" ]
-  [ "$(cat "$curl_body" | jq .error)" == "Invalid client_id." ]
+  [ "$(cat "$curl_body" | jq .error | tr -d '"')" == "invalid_request" ]
+  [ "$(cat "$curl_body" | jq .error_description | tr -d '"')" == "Invalid client_id." ]
 }
