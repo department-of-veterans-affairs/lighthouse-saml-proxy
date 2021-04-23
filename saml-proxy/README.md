@@ -4,7 +4,7 @@ This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests
 
 ## Installation
 
-Requires Docker and/or Node.js > 8.
+Requires Docker and/or Node.js > 10.
 
 ### Config File
 
@@ -32,12 +32,20 @@ dev-config.json
 ### Commands
 
 Docker: 
+
+Stop redis, if it is running locally. Make sure the following config value is set: `redisHost: redis`.
+
 ```bash
 docker build -t saml-idp .
 docker run -p 7000:7000 saml-idp --config dev-config.json
 ```
 
 Node:
+
+Redis must be running locally.
+
+Make sure the following config value is set properly: `redisHost: 127.0.0.1`.
+
 ```bash
 npm install
 npm run-script start-dev
@@ -129,4 +137,4 @@ Flow of the SAML login process:
 
 ## Contributing
 
-This is a hybrid JavaScript/Typescript application. Our goal is eventually have it be completely written in Typescript, therefor all new features should be written in TypeScript and have accompanying test written using Jest. 
+This is a hybrid JavaScript/Typescript application. Our goal is eventually have it be completely written in Typescript, therefore all new features should be written in TypeScript and have accompanying test written using Jest. 
