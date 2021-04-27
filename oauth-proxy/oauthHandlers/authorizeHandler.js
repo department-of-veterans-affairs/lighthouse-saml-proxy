@@ -36,7 +36,7 @@ const authorizeHandler = async (
   next
 ) => {
   loginBegin.inc();
-  const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
+  const { state, client_id, redirect_uri: client_redirect } = req.query;
 
   let clientValidation = await validateClient(
     logger,
@@ -56,10 +56,7 @@ const authorizeHandler = async (
     return next();
   }
 
-  let paramValidation = checkParameters(
-    state,
-    logger
-  );
+  let paramValidation = checkParameters(state, logger);
 
   if (!paramValidation.valid) {
     let uri = buildRedirectErrorUri(
@@ -124,10 +121,7 @@ const authorizeHandler = async (
  * @param {*} logger logs information.
  * @returns An object with a "valid" boolean parameter.
  */
-const checkParameters = (
-  state,
-  logger
-) => {
+const checkParameters = (state, logger) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
