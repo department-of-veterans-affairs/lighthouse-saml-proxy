@@ -58,7 +58,6 @@ const authorizeHandler = async (
 
   let paramValidation = checkParameters(
     state,
-    aud,
     app_category.audience,
     logger
   );
