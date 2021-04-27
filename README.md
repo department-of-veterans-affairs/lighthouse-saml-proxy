@@ -15,7 +15,7 @@ configure it as if it were running in a deployed environment.
 
 To begin, you'll want to create a file named `dev-config.json`. That file should contain a JSON object
 containing fields that correspond to the options documented by the `--help` option. Once you've created that
-config file you can run `npm run-script start-dev` in order to run the proxy with your code changes.
+config file you can run `npm run-script start-dev` in order to run the proxy with your code changes. A fully function dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository.
 
 If you're a VA developer looking for the specific values to use for the dev environment, see the documentation
 in the [vets-contrib](https://github.com/department-of-veterans-affairs/vets-contrib/tree/master/practice-areas/engineering/Developer%20Process/SAML%20Proxy)
