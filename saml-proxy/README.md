@@ -29,7 +29,7 @@ dev-config.json
 
 `idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided from id.me.
 
-A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/vets-saml-proxy/pull/292) repository.
+A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository.
 
 ### Commands
 
