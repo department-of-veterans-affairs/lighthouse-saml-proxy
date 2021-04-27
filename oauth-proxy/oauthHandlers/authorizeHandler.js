@@ -143,15 +143,6 @@ const checkParameters = (
     };
   }
 
-  if (requestAudience) {
-    if (requestAudience !== configuredAudience) {
-      logger.warn({
-        message: "Unexpected audience",
-        actual: requestAudience,
-        expected: configuredAudience,
-      });
-    }
-  }
   return { valid: true };
 };
 
