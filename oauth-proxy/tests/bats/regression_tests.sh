@@ -152,24 +152,41 @@ docker pull vasdvp/lighthouse-auth-utils:1.1.2
 
 # Start Tests
 
+# will track test failures
+status=0
+
+echo "Running Grants Tests ..."
 HOST="$HOST" USER_EMAIL="$USER_EMAIL" "$DIR"/okta_grants_tests.bats
-echo "Status - $?"
+status=$(($status + $?))
+
 echo "Fetching code ..."
 CODE=$(assign_code)
 
+echo "Running Token Tests ..."
 token_file="$(mktemp)"
 expired_token_file="$(mktemp)"
 HOST="$HOST" CODE="$CODE" TOKEN_FILE="$token_file" EXPIRED_TOKEN_FILE="$expired_token_file" CLIENT_ID="$CLIENT_ID" CLIENT_SECRET="$CLIENT_SECRET" CC_CLIENT_ID="$CC_CLIENT_ID" CC_CLIENT_SECRET="$CC_CLIENT_SECRET" bats ./token_tests.bats
-echo "Status - $?"
+status=$(($status + $?))
 # TOKEN and EXPIRED_ACCESS are assigned in token_tests.sh
 
+echo "Running Introspect Tests"
 HOST="$HOST" TOKEN_FILE="$token_file" EXPIRED_TOKEN_FILE="$expired_token_file" CLIENT_ID="$CLIENT_ID" CLIENT_SECRET="$CLIENT_SECRET" bats "$DIR"/introspect_test.bats
-echo "Status - $?"
+status=$(($status + $?))
 
+echo "Running Misc Tests ..."
 HOST="$HOST" CODE="$CODE" TOKEN_FILE="$token_file" CLIENT_ID="$CLIENT_ID" REDIRECT_URI="$REDIRECT_URI" bats "$DIR"/other_test.bats
-echo "Status - $?"
+status=$(($status + $?))
 
 if [ ! -z "$TEST_CLAIMS" ]; then
- "$DIR"/claims_tests.sh --host="$HOST"
+  echo "Running Claims Tests ..."
+  HOST="$HOST" TOKEN_FILE="$token_file" bats "$DIR"/claims_tests.bats
+  status=$(($status + $?))
 fi
 
+if [ "$status" -gt 0 ];
+then
+  echo "Some tests failed"
+  exit 1
+fi
+
+echo "All tests passed!"
