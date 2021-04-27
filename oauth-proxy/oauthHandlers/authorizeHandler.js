@@ -123,14 +123,11 @@ const authorizeHandler = async (
 /**
  *
  * @param {*} state The state parameter that came with the inbound request.
- * @param {*} requestAudience The audience that came with the inbound request.
- * @param {*} configuredAudience The audience that is allowed for this api_category.
  * @param {*} logger logs information.
  * @returns An object with a "valid" boolean parameter.
  */
 const checkParameters = (
   state,
-  requestAudience,
   configuredAudience,
   logger
 ) => {
