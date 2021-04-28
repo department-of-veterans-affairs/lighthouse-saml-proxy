@@ -17,7 +17,7 @@ To begin, you'll want to create a file named `dev-config.json`. That file should
 containing fields that correspond to the options documented by the `--help` option. Once you've created that
 config file you can run `npm run-script start-dev` in order to run the proxy with your code changes.
 
-If you're a VA developer looking for the specific values to use for the dev environment, a functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository.
+If you're a VA developer looking for the specific values to use for the dev environment, a functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value will need to be replaced with real values.
 
 
 ## OAuth Proxy
@@ -35,7 +35,7 @@ To being you'll want to create a `dev-config.json` in the oauth-proxy subdirecto
 JSON object containing fields that corresponesd to the options document by the `--help` option. Once you've
 created that config you can run `npm start` to run the OAuth proxy with the code changes.
 
-If you're a VA developer, a dev-config file can be found in the [oauth-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-oauth-proxy-configs) repository. The developer will have to replace `okta_token` field with a functional token.
+If you're a VA developer, a dev-config file can be found in the [oauth-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-oauth-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with the real value.
 
 You'll also want to setup a local instance of DynamoDB either by running `docker-compose` to start the proxy or 
 by downloading and running it following [Amazon's instructions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html).

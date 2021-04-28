@@ -29,7 +29,7 @@ dev-config.json
 
 `idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided from id.me.
 
-A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository.
+A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with real values.
 
 ### Commands
 
