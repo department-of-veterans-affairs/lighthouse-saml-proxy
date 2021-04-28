@@ -479,11 +479,6 @@ describe("Invalid Request", () => {
       next
     );
 
-    expect(logger.warn).toHaveBeenCalledWith({
-      message: "Unexpected audience",
-      actual: req.query.aud,
-      expected: api_category.audience,
-    });
     expect(res.redirect).toHaveBeenCalled();
   });
 

@@ -36,7 +36,7 @@ const authorizeHandler = async (
   next
 ) => {
   loginBegin.inc();
-  const { state, client_id, aud, redirect_uri: client_redirect } = req.query;
+  const { state, client_id, redirect_uri: client_redirect } = req.query;
 
   let clientValidation = await validateClient(
     logger,
@@ -56,12 +56,7 @@ const authorizeHandler = async (
     return next();
   }
 
-  let paramValidation = checkParameters(
-    state,
-    aud,
-    app_category.audience,
-    logger
-  );
+  let paramValidation = checkParameters(state, logger);
 
   if (!paramValidation.valid) {
     let uri = buildRedirectErrorUri(
@@ -123,17 +118,10 @@ const authorizeHandler = async (
 /**
  *
  * @param {*} state The state parameter that came with the inbound request.
- * @param {*} requestAudience The audience that came with the inbound request.
- * @param {*} configuredAudience The audience that is allowed for this api_category.
  * @param {*} logger logs information.
  * @returns An object with a "valid" boolean parameter.
  */
-const checkParameters = (
-  state,
-  requestAudience,
-  configuredAudience,
-  logger
-) => {
+const checkParameters = (state, logger) => {
   if (!state) {
     logger.error("No valid state parameter was found.");
     return {
@@ -143,15 +131,6 @@ const checkParameters = (
     };
   }
 
-  if (requestAudience) {
-    if (requestAudience !== configuredAudience) {
-      logger.warn({
-        message: "Unexpected audience",
-        actual: requestAudience,
-        expected: configuredAudience,
-      });
-    }
-  }
   return { valid: true };
 };
 
