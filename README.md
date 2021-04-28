@@ -35,7 +35,7 @@ To being you'll want to create a `dev-config.json` in the oauth-proxy subdirecto
 JSON object containing fields that corresponesd to the options document by the `--help` option. Once you've
 created that config you can run `npm start` to run the OAuth proxy with the code changes.
 
-If you're a VA developer, a dev-config file can be found in the [oauth-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-oauth-proxy-configs) repository. The developer will have to replace `okta_token` field with a functional token.
+If you're a VA developer, a dev-config file can be found in the [oauth-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-oauth-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with the real value.
 
 You'll also want to setup a local instance of DynamoDB either by running `docker-compose` to start the proxy or 
 by downloading and running it following [Amazon's instructions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html).
