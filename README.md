@@ -17,7 +17,7 @@ To begin, you'll want to create a file named `dev-config.json`. That file should
 containing fields that correspond to the options documented by the `--help` option. Once you've created that
 config file you can run `npm run-script start-dev` in order to run the proxy with your code changes.
 
-If you're a VA developer looking for the specific values to use for the dev environment, a functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository.
+If you're a VA developer looking for the specific values to use for the dev environment, a functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value will need to be replaced with real values.
 
 
 ## OAuth Proxy
