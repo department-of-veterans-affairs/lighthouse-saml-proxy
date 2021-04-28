@@ -16,6 +16,8 @@ This is a slim proxy for transforming and storing values from Okta's OpenID Conn
 
 ### Quick Start Local
 
+A functional dev-config.json file can be pulled from the [oauth-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-oauth-proxy-configs) repository.
+
 Set up Dynamo DB locally
 
 The following dev-config value needs to be set `"dynamo_local": "localhost:8000",`

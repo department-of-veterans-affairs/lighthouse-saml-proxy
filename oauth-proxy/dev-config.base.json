@@ -3,14 +3,14 @@
   "well_known_base_path": "/oauth2",
   "upstream_issuer_timeout_ms": 15000,
   "dynamo_local": "dynamodb:8000",
-  "dynamo_oauth_requests_table": "OAuthRequestsV2",
-  "dynamo_launch_context_table": "LaunchContext",
-  "dynamo_static_token_table": "StaticTokens",
-  "hmac_secret": "secret",
-  "okta_url": "https://deptva-eval.okta.com",
-  "validate_post_endpoint": "https://sandbox-api.va.gov/internal/auth/v1/validation",
-  "validate_apiKey": "<FIX ME>",
-  "okta_token": "<FIX ME>",
+  "dynamo_oauth_requests_table": "oauth-requests-table",
+  "dynamo_launch_context_table": "launch-context-table",
+  "dynamo_static_token_table": "static-token-table",
+  "hmac_secret": "hmac-secret",
+  "okta_url": "https://example.okta.com",
+  "validate_post_endpoint": "https://example.com/validation",
+  "validate_apiKey": "validate-api-key",
+  "okta_token": "okta-token",
   "enable_pkce_authorization_flow": true,
   "enable_smart_launch_service": true,
   "enable_static_token_service": true,
@@ -19,53 +19,18 @@
     "categories": [
       {
         "api_category": "",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
-        "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "api://default",
+        "upstream_issuer": "https://example.com/oauth2/issuer/1",
+        "manage_endpoint": "https://example.com/manage/endpoint",
+        "audience": "audience-1",
         "enable_consent_endpoint" : true
       },
       {
-        "api_category": "/claims/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0lyttrObgW622p7",
-        "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "https://sandbox-api.va.gov/services/claims",
-        "enable_consent_endpoint" : true
-      },
-      {
-        "api_category": "/community-care/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus89xnh1xznM13SK2p7",
-        "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "https://sandbox-api.va.gov/services/community-care",
-        "enable_consent_endpoint" : true
-      },
-      {
-        "api_category": "/health/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/default",
-        "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "api://default",
-        "enable_consent_endpoint" : true
-      },
-      {
-        "api_category": "/health/system/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7",
-        "audience": "https://sandbox-api.va.gov/services/fhir"
-      },
-      {
-        "api_category": "/pgd/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus8x27nv4g4BS01v2p7",
-        "audience": "https://sandbox-api.va.gov/services/pgd"
-      },
-      {
-        "api_category": "/veteran-verification/v1",
-        "upstream_issuer": "https://deptva-eval.okta.com/oauth2/aus7y0sefudDrg2HI2p7",
-        "manage_endpoint": "https://staging.va.gov/account",
-        "audience": "https://sandbox-api.va.gov/services/veteran_verification",
-        "enable_consent_endpoint" : true
-      },
-      {
-        "api_category": "/iam/v1",
-        "upstream_issuer": "https://<TBD>/oauth20",
-        "opaque_token": true
+        "api_category": "/api-category/v1",
+        "upstream_issuer": "https://example.com/oauth2/issuer/2",
+        "manage_endpoint": "https://example.com/manage/endpoint",
+        "audience": "audience-2",
+        "enable_consent_endpoint" : true,
+        "idp": "idp-slug-2"
       }
     ],
     "app_routes": {
@@ -83,16 +48,12 @@
   },
   "idps": [
     {
-      "slug": "localhost",
-      "id": "<FIX ME>"
+      "slug": "idp-slug-1",
+      "id": "id-1"
     },
     {
-      "slug": "lighthouse",
-      "id": "<FIX ME>"
-    },
-    {
-      "slug": "ssoi",
-      "id": "<FIX ME>"
+      "slug": "idp-slug-2",
+      "id": "id-2"
     }
   ]
 }
