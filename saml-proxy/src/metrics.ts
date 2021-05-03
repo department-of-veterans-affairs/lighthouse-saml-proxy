@@ -57,7 +57,7 @@ export const VSORequestMetrics = {
 };
 
 export interface IRequestMetrics {
-  histogram: client.Histogram;
-  attempt: client.Counter;
-  failure: client.Counter;
+  histogram: client.Histogram<any>;
+  attempt: client.Counter<any>;
+  failure: client.Counter<any>;
 }
