@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import flash from "connect-flash";
 import sassMiddleware from "node-sass-middleware";
 import tildeImporter from "node-sass-tilde-importer";
-import uuidv4 from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import rTracer from "cls-rtracer";
 import { RedisCache } from "./types";
 import {
