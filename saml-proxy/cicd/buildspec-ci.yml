@@ -55,6 +55,8 @@ phases:
          VERSION=${COMMIT_HASH} \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
+      # run linter
+      - make lint IMAGE=${IMAGE} TAG=${COMMIT_HASH}
       # run unit tests
       - make test IMAGE=${IMAGE} TAG=${COMMIT_HASH}
       # Login to ECR prior to push
