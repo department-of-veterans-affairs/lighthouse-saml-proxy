@@ -18,7 +18,7 @@ const { jwtAuthorizationHandler } = require("./jwtAuthorizationHandler");
 const oauthHandlers = require("./oauthHandlers");
 const { configureTokenValidator } = require("./tokenValidation");
 const rTracer = require("cls-rtracer");
-const { SlugHelper } = require("./slug_helper");
+const {SlugHelper }   =  require( "./slug_helper") ;
 const { buildIssuer } = require("./issuer_helper");
 
 const openidMetadataWhitelist = [
