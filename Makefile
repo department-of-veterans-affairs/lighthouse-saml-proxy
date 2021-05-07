@@ -1,5 +1,5 @@
 ## variables:
-## 	AWS_REGION = AWS Region: defaults to us-gov-west-1 
+## 	AWS_REGION = AWS Region: defaults to us-gov-west-1
 ## 	IMAGE      = Folder for image: defaults to base
 ## 	TAG        = Tag for image reference: defaults to latest
 ##	NAMESPACE  = Namespace for the repositories
@@ -13,13 +13,13 @@ NAMESPACE ?= dvp
 AWS_REGION ?= us-gov-west-1
 # Sets default tag
 TAG ?= dev
-# Shorten full repo path 
+# Shorten full repo path
 REPOSITORY:=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 # Build Args
 BUILD_DATE_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_TOOL ?= Makefile
-BUILD_VERSION ?= $(shell git rev-parse --short HEAD) 
-BUILD_NUMBER ?= $(shell echo $$RANDOM) 
+BUILD_VERSION ?= $(shell git rev-parse --short HEAD)
+BUILD_NUMBER ?= $(shell echo $$RANDOM)
 TARGET ?= base
 
 
@@ -44,8 +44,8 @@ login:
 ## build/oauth:	Build oauth-proxy image
 .PHONY: build/oauth
 build/oauth : IMAGE = oauth-proxy
-build/oauth: 
-	## build:	Build Docker image 
+build/oauth:
+	## build:	Build Docker image
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
 		--target $(TARGET) \
@@ -59,8 +59,8 @@ build/oauth:
 ## build/saml:	Build saml-proxy image
 .PHONY: build/saml
 build/saml : IMAGE = saml-proxy
-build/saml: 
-	## build:	Build Docker image 
+build/saml:
+	## build:	Build Docker image
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f $(IMAGE)/DockerfileFG \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
@@ -69,6 +69,15 @@ build/saml:
 		--build-arg VERSION=$(BUILD_VERSION) \
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
+
+## lint: Linting
+.PHONY: lint
+lint:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy or oauth-proxy)
+	docker run --rm --entrypoint='' \
+		-w "/home/node" \
+		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		npm run-script lint
 
 ## test: Unit Tests
 .PHONY: test
