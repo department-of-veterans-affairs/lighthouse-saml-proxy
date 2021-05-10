@@ -44,6 +44,27 @@ const VSOFailure = new client.Counter({
   help: "counter of number of lookup request failures from VSO",
 });
 
+const IdMeLoginCounter = new client.Counter({
+  name: "id_me_login_counter",
+  help: "counter of number of id.me logins",
+});
+
+const DsLogonLoginCounter = new client.Counter({
+  name: "ds_logon_login_counter",
+  help: "counter of number of ds logon logins",
+});
+
+const MyHealtheVetLoginCounter = new client.Counter({
+  name: "my_healthe_vet_login_counter",
+  help: "counter of number of my healthe vet logins",
+});
+
+export const IdpLoginMetrics = {
+  idMeLoginCounter: IdMeLoginCounter,
+  dsLogonLoginCounter: DsLogonLoginCounter,
+  myHealtheVetLoginCount: MyHealtheVetLoginCounter,
+};
+
 export const MVIRequestMetrics = {
   histogram: MVILookupBucket,
   attempt: MVIAttempt,

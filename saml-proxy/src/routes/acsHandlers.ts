@@ -11,6 +11,7 @@ import {
   MVIRequestMetrics,
   VSORequestMetrics,
   IRequestMetrics,
+  IdpLoginMetrics,
 } from "../metrics";
 import rTracer from "cls-rtracer";
 
@@ -37,10 +38,16 @@ export const urlUserErrorTemplate = () => {
 // the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_account_type) {
+    logger.info("Checking MyHealtheVet LOA.");
+    IdpLoginMetrics.myHealtheVetLoginCount.inc();
     return claims.mhv_account_type === "Premium";
   } else if (claims.dslogon_assurance) {
+    logger.info("Checking DsLogon LOA.");
+    IdpLoginMetrics.dsLogonLoginCounter.inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
   } else {
+    logger.info("Checking ID.me LOA.");
+    IdpLoginMetrics.idMeLoginCounter.inc();
     return claims.level_of_assurance === "3";
   }
 };
