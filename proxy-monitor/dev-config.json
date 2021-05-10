@@ -1,5 +1,0 @@
-{
-  "saml_proxy_endpoint": "http://saml-proxy:7000/samlproxy/idp/metadata",
-  "oauth_proxy_endpoint": "http://oauth-proxy:7100/.well-known/openid-configuration.json",
-  "port": 7200
-}
