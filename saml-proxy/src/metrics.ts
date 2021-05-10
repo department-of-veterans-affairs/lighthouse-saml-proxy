@@ -62,8 +62,8 @@ const MyHealtheVetLoginCounter = new client.Counter({
 export const IdpLoginMetrics = {
   idMeLoginCounter: IdMeLoginCounter,
   dsLogonLoginCounter: DsLogonLoginCounter,
-  myHealtheVetLoginCount: MyHealtheVetLoginCounter
-}
+  myHealtheVetLoginCount: MyHealtheVetLoginCounter,
+};
 
 export const MVIRequestMetrics = {
   histogram: MVILookupBucket,
