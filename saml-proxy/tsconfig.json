@@ -11,7 +11,7 @@
   },
   "include": [
     "./src/**/*"
-  ],
+, "test/utils.test.js"  ],
   "exclude": [
     "node_modules",
     "./src/**/*.test.ts"

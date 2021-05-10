@@ -36,7 +36,7 @@
     "collectCoverage": true,
     "coverageThreshold": {
       "global": {
-        "lines": 80.62
+        "lines": 80.88
       }
     },
     "transform": {
@@ -96,7 +96,7 @@
     "node-sass-middleware": "^0.11.0",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.1",
-    "passport-wsfed-saml2": "git+https://github.com/department-of-veterans-affairs/lighthouse-passport-wsfed-saml2.git",
+    "passport-wsfed-saml2": "^4.4.0",
     "prom-client": "^13.1.0",
     "redis": "^3.0.2",
     "request": "^2.88.2",
