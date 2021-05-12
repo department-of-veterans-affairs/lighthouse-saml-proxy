@@ -80,7 +80,6 @@
     "mock-express-response": "^0.3.0",
     "njwt": "^1.0.0",
     "prettier": "2.2.1",
-    "timekeeper": "^2.2.0",
-    "underscore": "^1.12.1"
+    "timekeeper": "^2.2.0"
   }
 }
