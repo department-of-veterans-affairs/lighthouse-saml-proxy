@@ -10,7 +10,6 @@
     "start": "node index.js --config dev-config.json",
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "jsdoc": "./node_modules/.bin/jsdoc .",
     "help": "node index.js --help"
   },
   "jest": {
