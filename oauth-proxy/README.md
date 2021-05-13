@@ -34,7 +34,12 @@ npm start
 
 Generate jsdocs for Oauth Proxy
 ```
-npm run-script jsdoc
+npm install -g jsdoc
+jsdoc .
+```
+Browsable jsdocs will be located in
+```
+./out/
 ```
 
 
