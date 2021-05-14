@@ -133,6 +133,7 @@
   "resolutions": {
     "node-forge": ">=0.10.0",
     "xml-crypto": ">=2.0.0",
-    "trim": ">=0.0.3"
+    "trim": ">=0.0.3",
+    "postcss": ">=8.2.10"
   }
 }
