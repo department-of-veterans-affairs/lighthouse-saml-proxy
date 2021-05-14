@@ -69,7 +69,7 @@ export default class SPConfig {
     };
   }
 
-  getAuthnRequestParams(acsUrl, forceAuthn, relayState, authnContext) {
+  getAuthnRequestParams(acsUrl, forceAuthn, relayState, authnContext, id) {
     const params = {
       protocol: this.protocol,
       realm: this.audience,
@@ -80,6 +80,7 @@ export default class SPConfig {
       forceAuthn: forceAuthn,
       authnContext: authnContext || this.authnContextClassRef,
       requestContext: {
+        ID: id,
         NameIDFormat: this.nameIDFormat,
       },
       requestTemplate: AUTHN_REQUEST_TEMPLATE({
