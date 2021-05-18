@@ -5,7 +5,9 @@ usage() {
 cat <<EOF
 Runs oauth proxy's regression tests.
 
-docker run --rm vasdvp/lighthouse-oauth-proxy-tests \
+docker run \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --rm vasdvp/lighthouse-oauth-proxy-tests \
   --user-email="\$USER_EMAIL" \
   --user-password="\$USER_PASSWORD" \
   --client-id="\$CLIENT_ID" \
