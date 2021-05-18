@@ -6,13 +6,13 @@ cat <<EOF
 Runs oauth proxy's regression tests.
 
 docker run --rm vasdvp/lighthouse-oauth-proxy-tests \
-  --user-email="$USER_EMAIL" \
-  --user-password="$USER_PASSWORD" \
-  --client-id="$CLIENT_ID" \
-  --client-secret="$CLIENT_SECRET" \
-  --cc-client-id="$CC_CLIENT_ID" \
-  --cc-client-secret="$CC_CLIENT_SECRET" \
-  --host="$HOST" \
+  --user-email="\$USER_EMAIL" \
+  --user-password="\$USER_PASSWORD" \
+  --client-id="\$CLIENT_ID" \
+  --client-secret="\$CLIENT_SECRET" \
+  --cc-client-id="\$CC_CLIENT_ID" \
+  --cc-client-secret="\$CC_CLIENT_SECRET" \
+  --host="\$HOST" \
   --test-claims
 EOF
 }
@@ -55,4 +55,4 @@ case $i in
 esac
 done
 
-./bats/regression_tests.sh $TEST_CLAIMS
+./regression_tests.sh $TEST_CLAIMS
