@@ -75,6 +75,42 @@ openssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San 
 
 You can also grab the development certificates from [here](https://github.com/department-of-veterans-affairs/vets-contrib/blob/master/Developer%20Process/SAML%20Proxy/Certificates.md).
 
+### How to setup Sentry Locally
+
+There are cases where a developer may want to confirm that sentry error reporting is working.
+
+Clone sentry/onpremise from github
+
+```sh
+git clone https://github.com/getsentry/onpremise.git
+```
+
+In the onpremise repository run the following command and follow its prompts:
+
+```sh
+./initialize.sh
+```
+
+After initialization build project
+
+```sh
+docker-compose up -d
+```
+
+you can log into your local sentry instance at `http://127.0.0.1:9000/`.
+
+Set the following variables in your local config:
+
+```json
+"sentryDSN": "http://d89d94561646443ab59ff3f262cbb3bc@127.0.0.1:9000/1",
+"sentryEnvironment": "TEST"
+```
+
+To create an error run one of the following cases:
+
+1. Intercept a SAMLRequest and malform the xml.
+2. Intercept a SAMLResponse and malform the xml.
+
 ## SAML Flow
 
 The proxy fills both roles typically seen in a SAML interaction:
