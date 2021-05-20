@@ -12,10 +12,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy.git"
+    "url": "https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy.git"
   },
   "bugs": {
-    "url": "https://github.com/department-of-veterans-affairs/vets-saml-proxy/issues"
+    "url": "https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/issues"
   },
   "main": "./app.js",
   "scripts": {
