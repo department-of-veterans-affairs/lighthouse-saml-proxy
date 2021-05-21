@@ -7,8 +7,6 @@ ID.me to go through further identity verification steps.
 
 ## Running Locally
 
-Test2 (ci/cd)
-
 While you're developing the SAML proxy you will likely want to run it locally. It's possible to do this but,
 since your local instance of the proxy will have to interact with ID.me and an Okta instance, you'll need to
 configure it as if it were running in a deployed environment.
@@ -20,6 +18,7 @@ config file you can run `npm run-script start-dev` in order to run the proxy wit
 If you're a VA developer looking for the specific values to use for the dev environment, a functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value will need to be replaced with real values.
 
 ## git-secrets
+
 git-secrets must be installed and configured to scan for AWS entries and the patterns in
 [.git-secrets-patterns](.git-secrets-patterns). Exclusions are managed in
 [.gitallowed](.gitallowed).
