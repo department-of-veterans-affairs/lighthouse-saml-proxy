@@ -3,6 +3,7 @@
  */
 
 import express from "express";
+import http from "http";
 import https from "https";
 import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
@@ -57,14 +58,12 @@ function runServer(argv) {
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
-      const httpServer = https.createServer(
-        {
-          key: argv.idpHttpsPrivateKey,
-          cert: argv.idpHttpsCert,
-          secureProtocol: "TLSv1_2_method",
-        },
-        app
-      );
+      const httpServer = argv.idpHttps
+        ? https.createServer(
+            { key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert },
+            app
+          )
+        : http.createServer(app);
 
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
