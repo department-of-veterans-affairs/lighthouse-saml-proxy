@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Generates objects that can be used to start and stop a server hosting an
 // express app. Returns an object with two fields:
@@ -9,7 +9,7 @@ function buildBackgroundServerModule(name) {
   return {
     startServerInBackground: (app, port) => {
       (async () => {
-        if (!!serverRef) {
+        if (serverRef) {
           throw new Error(`The ${name} server is already running.`);
         }
         serverRef = app.listen(port);
@@ -20,10 +20,10 @@ function buildBackgroundServerModule(name) {
         throw new Error(`The ${name} server is not running.`);
       }
       serverRef.close();
-    }
+    },
   };
-};
+}
 
 module.exports = {
-  buildBackgroundServerModule
+  buildBackgroundServerModule,
 };
