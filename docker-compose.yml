@@ -10,8 +10,8 @@ services:
       - '6379'
   saml-proxy:
     build:
-      context: .
-      dockerfile: ,.Dockerfile
+      context: ./
+      dockerfile: ./Dockerfile
     ports:
       - '7000:7000'
     command: 'node build/app.js --config dev-config.json'
