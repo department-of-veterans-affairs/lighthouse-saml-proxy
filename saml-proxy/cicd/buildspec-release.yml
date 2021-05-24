@@ -53,7 +53,7 @@ phases:
       - new_tag=$(increment.sh ${old_tag})
       - echo "creating ${new_tag} release"
       # create release
-      - gh release create ${new_tag}
+      - gh release create ${new_tag} -t ${new_tag}
       - echo tag image
       # tag ecr image with release
       - make tag IMAGE=${IMAGE} TAG=${COMMIT_HASH:0:7} NEW_TAG=${new_tag#*/}
