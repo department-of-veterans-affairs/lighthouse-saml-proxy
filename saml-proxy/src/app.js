@@ -60,7 +60,7 @@ function runServer(argv) {
       const app = express();
       const httpServer = argv.idpHttps
         ? https.createServer(
-            { key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert },
+            { key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert, secureProtocol: 'TLSv1_2_method' },
             app
           )
         : http.createServer(app);
