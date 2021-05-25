@@ -125,7 +125,7 @@ build/
 /saml-proxy/sp-metadata.xml
 
 # Local config
-/saml-proxy/dev-config.json
+dev-config.json
 
 ## Webstorm
 .idea/
