@@ -9,7 +9,6 @@ RUN npm install
 
 
 COPY --chown=node:node ./saml-proxy ./
-COPY --chown=node:node ./common/ /home/common/
 
 EXPOSE 7000 7000
 
