@@ -19,8 +19,12 @@ import path from "path";
 import template from "lodash.template";
 import samlp from "samlp";
 
+const meta_data_template_path = path.join(process.cwd(), "./templates/metadata.tpl");
+if (meta_data_template_path.length > 4096) {
+  throw new Error('Unexpected large path');
+}
 const METADATA_TEMPLATE = template(
-  fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
+  fs.readFileSync(meta_data_template_path, "utf8")
 );
 
 export default function addRoutes(
