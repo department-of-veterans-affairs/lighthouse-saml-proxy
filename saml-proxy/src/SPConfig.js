@@ -6,15 +6,15 @@ import process from "process";
 import path from "path";
 import template from "lodash.template";
 
-const authn_req_template_path = path.join(process.cwd(), "./templates/authnrequest.tpl");
+const authn_req_template_path = path.join(
+  process.cwd(),
+  "./templates/authnrequest.tpl"
+);
 if (authn_req_template_path.length > 4096) {
-  throw new Error('Unexpected large path');
+  throw new Error("Unexpected large path");
 }
 const AUTHN_REQUEST_TEMPLATE = template(
-  fs.readFileSync(
-    authn_req_template_path,
-    "utf8"
-  )
+  fs.readFileSync(authn_req_template_path, "utf8")
 );
 
 export default class SPConfig {
