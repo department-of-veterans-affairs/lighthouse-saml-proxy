@@ -12,8 +12,12 @@ const authn_req_template_path = path.join(
 );
 let authn_template_str;
 const MAX_FILEPATH_LEN = 4096;
+const MAX_TEMPLATE_SIZE = 1 * 1024 * 1024;
 if (authn_req_template_path.length <= MAX_FILEPATH_LEN) {
   authn_template_str = fs.readFileSync(authn_req_template_path, "utf8");
+  if (authn_template_str > MAX_TEMPLATE_SIZE) {
+    throw new Error("Unexpected large template");
+  }
 } else {
   throw new Error("Unexpected large path");
 }

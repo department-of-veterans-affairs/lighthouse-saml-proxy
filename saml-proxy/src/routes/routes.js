@@ -24,10 +24,14 @@ const meta_data_template_path = path.join(
   "./templates/metadata.tpl"
 );
 const MAX_FILEPATH_LEN = 4096;
+const MAX_TEMPLATE_SIZE = 1 * 1024 * 1024;
 let meta_data_template_str;
 
 if (meta_data_template_path.length <= MAX_FILEPATH_LEN) {
   meta_data_template_str = fs.readFileSync(meta_data_template_path, "utf8");
+  if (meta_data_template_str > MAX_TEMPLATE_SIZE) {
+    throw new Error("Unexpected large template");
+  }
 } else {
   throw new Error("Unexpected large path");
 }
