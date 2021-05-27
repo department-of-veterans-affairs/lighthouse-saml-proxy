@@ -23,12 +23,16 @@ const meta_data_template_path = path.join(
   process.cwd(),
   "./templates/metadata.tpl"
 );
-if (meta_data_template_path.length > 4096) {
+const MAX_FILEPATH_LEN = 4096;
+let meta_data_template_str;
+
+if (meta_data_template_path.length <= MAX_FILEPATH_LEN) {
+  meta_data_template_str = fs.readFileSync(meta_data_template_path, "utf8");
+} else {
   throw new Error("Unexpected large path");
 }
-const METADATA_TEMPLATE = template(
-  fs.readFileSync(meta_data_template_path, "utf8")
-);
+
+const METADATA_TEMPLATE = template(meta_data_template_str);
 
 export default function addRoutes(
   app,

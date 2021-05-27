@@ -10,12 +10,14 @@ const authn_req_template_path = path.join(
   process.cwd(),
   "./templates/authnrequest.tpl"
 );
-if (authn_req_template_path.length > 4096) {
+let authn_template_str;
+const MAX_FILEPATH_LEN = 4096;
+if (authn_req_template_path.length <= MAX_FILEPATH_LEN) {
+  authn_template_str = fs.readFileSync(authn_req_template_path, "utf8");
+} else {
   throw new Error("Unexpected large path");
 }
-const AUTHN_REQUEST_TEMPLATE = template(
-  fs.readFileSync(authn_req_template_path, "utf8")
-);
+const AUTHN_REQUEST_TEMPLATE = template(authn_template_str);
 
 export default class SPConfig {
   constructor(argv) {
