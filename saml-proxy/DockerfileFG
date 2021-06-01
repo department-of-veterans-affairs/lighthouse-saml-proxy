@@ -35,7 +35,7 @@ EXPOSE 7000 7000
 
 RUN ./node_modules/.bin/tsc
 HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
-  CMD node bin/healthcheck.js
+  CMD curl -f http://localhost:7000/samlproxy/idp/metadata || exit 1
 
 USER node
 
