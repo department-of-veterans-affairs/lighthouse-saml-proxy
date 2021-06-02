@@ -4,7 +4,7 @@ import request from "request-promise-native";
 import { getSamlResponse } from "samlp";
 import { DOMParser } from "xmldom";
 
-import { buildBackgroundServerModule } from "../../common/backgroundServer";
+import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp, idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER, getUser } from "./testUsers";
 import MockVetsApiClient from "./mockVetsApiClient";

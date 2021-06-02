@@ -4,7 +4,6 @@
 
 import express from "express";
 import http from "http";
-import https from "https";
 import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
@@ -58,13 +57,7 @@ function runServer(argv) {
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
-      const httpServer = argv.idpHttps
-        ? https.createServer(
-            { key: argv.idpHttpsPrivateKey, cert: argv.idpHttpsCert },
-            app
-          )
-        : http.createServer(app);
-
+      const httpServer = http.createServer(app);
       const spConfig = new SPConfig(argv);
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
