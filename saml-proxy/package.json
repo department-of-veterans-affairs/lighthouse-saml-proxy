@@ -133,6 +133,7 @@
   "resolutions": {
     "xml-crypto": ">=2.0.0",
     "trim": ">=0.0.3",
-    "postcss": ">=8.2.10"
+    "postcss": ">=8.2.10",
+    "trim-newlines": ">=3.0.1"
   }
 }
