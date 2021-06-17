@@ -3,9 +3,7 @@ require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const { isSensitiveError, isIcnError } = require("./page-assertions");
-const {
-  logger,
-} = require("saml-proxy-automation/logging/logger.js");
+const { logger } = require("saml-proxy-automation/logging/logger.js");
 const qs = require("querystring");
 const SAML = require("saml-encoder-decoder-js");
 var parseString = require("xml2js").parseString;
@@ -27,33 +25,32 @@ const defaultScope = [
 const authorization_url = "https://sandbox-api.va.gov/oauth2";
 const redirect_uri = "https://app/after-auth";
 
-const create_dir = ((dir) => {
-  console.log('Creating ' +  dir + ' directory');
+const create_dir = (dir) => {
+  console.log("Creating " + dir + " directory");
   fs.mkdir(dir, (err) => {
     if (err) {
       console.info(err.message);
-    }
-    else {
+    } else {
       console.info("Created screenshots directory");
     }
-  })
-});
+  });
+};
 
 const idp_num_to_env = (idp) => {
-  switch(idp){
+  switch (idp) {
     case process.env.LOCAL:
-      return "Local"
+      return "Local";
     case process.env.DEV:
-      return "Dev"
+      return "Dev";
     case process.env.SANDBOX:
-      return "Sandbox"
+      return "Sandbox";
     case process.env.STAGING:
-      return "Staging"
+      return "Staging";
   }
-  return "Unknown"
-}
+  return "Unknown";
+};
 
-create_dir('screenshots');
+create_dir("screenshots");
 jest.setTimeout(30000);
 
 test("Happy Path", async () => {
@@ -140,8 +137,8 @@ test("Replay", async () => {
 });
 
 test("modify", async () => {
-    // TODO Implement
-    await browser.close();
+  // TODO Implement
+  await browser.close();
 });
 
 test("Empty SSO", async () => {
