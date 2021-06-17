@@ -1,0 +1,14 @@
+{
+  "name": "saml-proxy-regression-tests",
+  "version": "1.0.0",
+  "description": "Automated regression tests for the lighthouse-saml-proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "lighthouse-saml-proxy"
+  ],
+  "author": "Pivot!",
+  "license": "ISC"
+}
