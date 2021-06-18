@@ -1,10 +1,9 @@
 require("jest");
-require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const { isSensitiveError, isIcnError } = require("./page-assertions");
 const qs = require("querystring");
-const { ModifyAttack } = require("saml-attacks")
+const { ModifyAttack } = require("saml-attacks");
 const SAML = require("saml-encoder-decoder-js");
 const launchArgs = {
   headless: false,
@@ -132,7 +131,11 @@ test("modify", async () => {
       request.method() == "POST"
     ) {
       let post_data = decode(request);
-      post_data.SAMLResponse = ModifyAttack(post_data.SAMLResponse, "uuid", "modify");
+      post_data.SAMLResponse = ModifyAttack(
+        post_data.SAMLResponse,
+        "uuid",
+        "modify"
+      );
 
       await request.continue({
         method: "POST",
@@ -193,8 +196,8 @@ const requestToken = async (page) => {
   });
 };
 
-const login = async (page, email, password, get_code = false) => {
-  await authentication(page, (email = email));
+const login = async (page, useremail, password, get_code = false) => {
+  await authentication(page, useremail);
 
   let code;
   if (get_code) {
@@ -230,24 +233,21 @@ const authentication = async (
 const encode = async (data) => {
   await SAML.encodeSamlPost(data.SAMLResponse, function (err, encoded) {
     if (!err) {
-      data.SAMLResponse = encoded
+      data.SAMLResponse = encoded;
     }
-  })
+  });
 
-  return qs.stringify(data)
-}
+  return qs.stringify(data);
+};
 
 const decode = async (request) => {
-  post_string = request.postData()
-  post_data = qs.parse(post_string)
-  await SAML.decodeSamlPost(post_data.SAMLResponse, function (
-    err,
-    result
-  ) {
+  let post_string = request.postData();
+  let post_data = qs.parse(post_string);
+  await SAML.decodeSamlPost(post_data.SAMLResponse, function (err, result) {
     if (!err) {
-      post_data.SAMLResponse = result
+      post_data.SAMLResponse = result;
     }
-  })
+  });
 
-  return post_data
-}
+  return post_data;
+};
