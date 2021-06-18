@@ -89,7 +89,7 @@ describe("Regression tests", () => {
     await anotherPage.setRequestInterception(true);
     anotherPage.on("request", async (request) => {
       if (
-        request.url().includes("/samlproxy/sp/saml/sso") &&
+        request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
         request.method() == "GET"
       ) {
         await request.continue({
@@ -135,14 +135,16 @@ describe("Regression tests", () => {
         request.method() == "POST"
       ) {
         let post_data = await decode(request);
-        post_data.SAMLResponse = await ModifyAttack(
+        let modify = await ModifyAttack(
           post_data.SAMLResponse,
-          "fname",
-          "TAM<!-- attack -->ARA"
+          "uuid",
+          "b24346a788c0<!-- attack -->4dfea5048d44ad071181"
         );
+        let data = await encode(post_data);
+        post_data.SAMLResponse = modify;
         await request.continue({
           method: "POST",
-          postData: await encode(post_data),
+          postData: data,
           headers: {
             ...request.headers(),
             "Content-Type": "application/x-www-form-urlencoded",
@@ -153,11 +155,13 @@ describe("Regression tests", () => {
       }
     });
 
-    await page.waitForSelector(".usa-alert-error");
-
-    await isSensitiveError(page);
+    let request = await page.waitForRequest((request) =>
+      request.url().includes(redirect_uri)
+    );
+    let url = new URL(request.url());
+    let code = url.searchParams.get("code");
+    expect(code).not.toBeNull;
   });
-});
 
   test("modify", async () => {
     const page = await browser.newPage();
@@ -166,18 +170,20 @@ describe("Regression tests", () => {
 
     page.on("request", async (request) => {
       if (
-        request.url().includes("/samlproxy/sp/saml/sso") &&
+        request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
         request.method() == "POST"
       ) {
         let post_data = await decode(request);
-        post_data.SAMLResponse = await ModifyAttack(
+        let modify = await ModifyAttack(
           post_data.SAMLResponse,
           "uuid",
           "modify"
         );
+        post_data.SAMLResponse = modify;
+        let data = await encode(post_data);
         await request.continue({
           method: "POST",
-          postData: await encode(post_data),
+          postData: data,
           headers: {
             ...request.headers(),
             "Content-Type": "application/x-www-form-urlencoded",
