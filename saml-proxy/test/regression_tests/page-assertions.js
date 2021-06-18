@@ -1,5 +1,4 @@
 require("jest");
-const puppeteer = require("puppeteer");
 
 const isError = async (page, errorMessage) => {
   const heading = await page.$eval(

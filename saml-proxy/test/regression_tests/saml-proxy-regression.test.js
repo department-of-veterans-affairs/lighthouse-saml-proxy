@@ -9,7 +9,6 @@ const launchArgs = {
   headless: false,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
 };
-const fs = require("fs");
 
 const defaultScope = [
   "openid",
@@ -22,18 +21,6 @@ const defaultScope = [
 const authorization_url = "https://sandbox-api.va.gov/oauth2";
 const redirect_uri = "https://app/after-auth";
 
-const create_dir = (dir) => {
-  console.log("Creating " + dir + " directory");
-  fs.mkdir(dir, (err) => {
-    if (err) {
-      console.info(err.message);
-    } else {
-      console.info("Created screenshots directory");
-    }
-  });
-};
-
-create_dir("screenshots");
 jest.setTimeout(30000);
 
 test("Happy Path", async () => {
@@ -68,7 +55,6 @@ test("ICN Error", async () => {
   });
 
   await isIcnError(page);
-  await page.screenshot({ path: "./screenshots/icn_error.png" });
   await browser.close();
 });
 
@@ -77,7 +63,6 @@ test("Replay", async () => {
   const page = await browser.newPage();
 
   await requestToken(page);
-  await page.screenshot({ path: "./screenshots/idpSelection.png" });
   await authentication(page);
 
   let post_data;
@@ -115,7 +100,6 @@ test("Replay", async () => {
 
   // assertion
   await isSensitiveError(anotherPage);
-  await anotherPage.screenshot({ path: "./screenshots/replay.png" });
   await browser.close();
 });
 
@@ -153,7 +137,6 @@ test("modify", async () => {
   await page.waitForSelector(".usa-alert-error");
 
   await isSensitiveError(page);
-  await page.screenshot({ path: "./screenshots/modify.png" });
 
   await browser.close();
 });
@@ -166,7 +149,6 @@ test("Empty SSO", async () => {
 
   // assertion
   await isSensitiveError(page);
-  await page.screenshot({ path: "./screenshots/empty_request.png" });
   await browser.close();
 });
 
@@ -176,7 +158,6 @@ test("404", async () => {
 
   await page.goto("http://localhost:7000/bad");
 
-  await page.screenshot({ path: "./screenshots/404_request.png" });
   await browser.close();
 });
 
