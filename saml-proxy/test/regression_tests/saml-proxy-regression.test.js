@@ -124,6 +124,41 @@ describe("Regression tests", () => {
     await isError(page, "Error", "Route Not Found");
   });
 
+  test("comment truncation", async () => {
+    const page = await browser.newPage();
+    await requestToken(page);
+    await authentication(page, "va.api.user+idme.001@gmail.com", true);
+
+    page.on("request", async (request) => {
+      if (
+        request.url().includes("/samlproxy/sp/saml/sso") &&
+        request.method() == "POST"
+      ) {
+        let post_data = await decode(request);
+        post_data.SAMLResponse = await ModifyAttack(
+          post_data.SAMLResponse,
+          "fname",
+          "TAM<!-- attack -->ARA"
+        );
+        await request.continue({
+          method: "POST",
+          postData: await encode(post_data),
+          headers: {
+            ...request.headers(),
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+      } else {
+        await request.continue();
+      }
+    });
+
+    await page.waitForSelector(".usa-alert-error");
+
+    await isSensitiveError(page);
+  });
+});
+
   test("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
