@@ -3,11 +3,9 @@ require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const { isSensitiveError, isIcnError } = require("./page-assertions");
-const { logger } = require("saml-proxy-automation/logging/logger.js");
 const qs = require("querystring");
+const { ModifyAttack } = require("saml-attacks")
 const SAML = require("saml-encoder-decoder-js");
-var parseString = require("xml2js").parseString;
-var xml2js = require("xml2js");
 const launchArgs = {
   headless: false,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
@@ -34,20 +32,6 @@ const create_dir = (dir) => {
       console.info("Created screenshots directory");
     }
   });
-};
-
-const idp_num_to_env = (idp) => {
-  switch (idp) {
-    case process.env.LOCAL:
-      return "Local";
-    case process.env.DEV:
-      return "Dev";
-    case process.env.SANDBOX:
-      return "Sandbox";
-    case process.env.STAGING:
-      return "Staging";
-  }
-  return "Unknown";
 };
 
 create_dir("screenshots");
@@ -137,7 +121,37 @@ test("Replay", async () => {
 });
 
 test("modify", async () => {
-  // TODO Implement
+  const browser = await puppeteer.launch(launchArgs);
+  const page = await browser.newPage();
+  await requestToken(page);
+  await authentication(page, "va.api.user+idme.001@gmail.com", true);
+
+  page.on("request", async (request) => {
+    if (
+      request.url().includes("/samlproxy/sp/saml/sso") &&
+      request.method() == "POST"
+    ) {
+      let post_data = decode(request);
+      post_data.SAMLResponse = ModifyAttack(post_data.SAMLResponse, "uuid", "modify");
+
+      await request.continue({
+        method: "POST",
+        postData: encode(post_data),
+        headers: {
+          ...request.headers(),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+    } else {
+      await request.continue();
+    }
+  });
+
+  await page.waitForSelector(".usa-alert-error");
+
+  await isSensitiveError(page);
+  await page.screenshot({ path: "./screenshots/modify.png" });
+
   await browser.close();
 });
 
@@ -212,3 +226,28 @@ const authentication = async (
 
   await page.click("button.btn-primary");
 };
+
+const encode = async (data) => {
+  await SAML.encodeSamlPost(data.SAMLResponse, function (err, encoded) {
+    if (!err) {
+      data.SAMLResponse = encoded
+    }
+  })
+
+  return qs.stringify(data)
+}
+
+const decode = async (request) => {
+  post_string = request.postData()
+  post_data = qs.parse(post_string)
+  await SAML.decodeSamlPost(post_data.SAMLResponse, function (
+    err,
+    result
+  ) {
+    if (!err) {
+      post_data.SAMLResponse = result
+    }
+  })
+
+  return post_data
+}
