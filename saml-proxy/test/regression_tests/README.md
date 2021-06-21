@@ -2,18 +2,35 @@
 
 ## Quick Start
 
-`cp .env.SAMPLE .env`
+```sh
+export SAML_PROXY_URL={ saml proxy url }
+export IDP={ idp }
+export CLIENT_ID={ client id }
+export HEADLESS={ 0 (true) or 1 (false) } // note: this value only is important for local runs
+```
 
-configure .env
+**local**
 
-`mkdir screenshots`
+```js
+npm i
+npm test
+```
 
-`npm test`
+**docker**
 
-or
+```sh
+docker build -f Dockerfile.test . -t vasdvp/lighthouse-saml-proxy-tests
 
-`npm test -- tests/saml-proxy.test.js`
+docker run \
+    --rm \
+    --network="container:<container id>" \
+    vasdvp/lighthouse-saml-proxy-tests \
+    --saml-proxy-url=$SAML_PROXY_URL \
+    --client-id=$CLIENT_ID \
+    --idp=$IDP
+```
 
+**Note**: the newtwork option is only needed if you are running the test against a local saml proxy. Because our auth servers determine the saml-proxy url based on the idp, the docker version of the regression tests will only work against local instances of the saml proxy if they are running via docker. It is recommended to run the tests locally if possible.
 
 ## SAML Proxy Tests
 
