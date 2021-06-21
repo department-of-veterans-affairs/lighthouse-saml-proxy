@@ -5,7 +5,7 @@ const qs = require("querystring");
 const { ModifyAttack } = require("saml-attacks");
 const SAML = require("saml-encoder-decoder-js");
 const launchArgs = {
-  headless: true,
+  headless: process.env.HEADLESS > 0,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
 };
 
@@ -162,14 +162,6 @@ describe("Regression tests", () => {
 });
 
 const requestToken = async (page) => {
-  console.log("here")
-  console.log(`${authorization_url}/authorization?client_id=${
-    process.env.CLIENT_ID
-  }&scope=${defaultScope.join(
-    " "
-  )}&response_type=code&redirect_uri=${redirect_uri}&aud=default&state=${uuidv4()}&idp=${
-    process.env.IDP
-  }`)
   await page.goto(
     `${authorization_url}/authorization?client_id=${
       process.env.CLIENT_ID
@@ -179,7 +171,6 @@ const requestToken = async (page) => {
       process.env.IDP
     }`
   );
-  console.log("After request")
   await page.waitForNavigation({
     waitUntil: "networkidle0",
   });

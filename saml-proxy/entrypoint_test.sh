@@ -18,9 +18,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-SAML_PROXY_URL=
-CLIENT_ID=
-IDP=
+export HEADLESS=1
 
 for i in "$@"
 do
