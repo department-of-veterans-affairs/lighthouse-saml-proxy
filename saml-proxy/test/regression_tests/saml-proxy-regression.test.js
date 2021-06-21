@@ -5,7 +5,7 @@ const qs = require("querystring");
 const { ModifyAttack } = require("saml-attacks");
 const SAML = require("saml-encoder-decoder-js");
 const launchArgs = {
-  headless: false,
+  headless: true,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
 };
 
@@ -124,45 +124,6 @@ describe("Regression tests", () => {
     await isError(page, "Error", "Route Not Found");
   });
 
-  test("comment truncation", async () => {
-    const page = await browser.newPage();
-    await requestToken(page);
-    await authentication(page, "va.api.user+idme.001@gmail.com", true);
-
-    page.on("request", async (request) => {
-      if (
-        request.url().includes("/samlproxy/sp/saml/sso") &&
-        request.method() == "POST"
-      ) {
-        let post_data = await decode(request);
-        let modify = await ModifyAttack(
-          post_data.SAMLResponse,
-          "uuid",
-          "b24346a788c0<!-- attack -->4dfea5048d44ad071181"
-        );
-        let data = await encode(post_data);
-        post_data.SAMLResponse = modify;
-        await request.continue({
-          method: "POST",
-          postData: data,
-          headers: {
-            ...request.headers(),
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        });
-      } else {
-        await request.continue();
-      }
-    });
-
-    let request = await page.waitForRequest((request) =>
-      request.url().includes(redirect_uri)
-    );
-    let url = new URL(request.url());
-    let code = url.searchParams.get("code");
-    expect(code).not.toBeNull;
-  });
-
   test("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
@@ -201,6 +162,14 @@ describe("Regression tests", () => {
 });
 
 const requestToken = async (page) => {
+  console.log("here")
+  console.log(`${authorization_url}/authorization?client_id=${
+    process.env.CLIENT_ID
+  }&scope=${defaultScope.join(
+    " "
+  )}&response_type=code&redirect_uri=${redirect_uri}&aud=default&state=${uuidv4()}&idp=${
+    process.env.IDP
+  }`)
   await page.goto(
     `${authorization_url}/authorization?client_id=${
       process.env.CLIENT_ID
@@ -210,7 +179,7 @@ const requestToken = async (page) => {
       process.env.IDP
     }`
   );
-
+  console.log("After request")
   await page.waitForNavigation({
     waitUntil: "networkidle0",
   });
