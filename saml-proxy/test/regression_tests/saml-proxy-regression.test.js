@@ -119,7 +119,7 @@ describe("Regression tests", () => {
 
   test("404", async () => {
     const page = await browser.newPage();
-    await page.goto(`${saml_proxy_url}/bad`);
+    await page.goto(`${saml_proxy_url}/samlproxy/bad`);
     await page.waitForSelector(".usa-alert-error");
     await isError(page, "Error", "Route Not Found");
   });
