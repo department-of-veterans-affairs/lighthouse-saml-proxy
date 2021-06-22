@@ -20,6 +20,9 @@ const defaultScope = [
 const authorization_url = "https://sandbox-api.va.gov/oauth2";
 const saml_proxy_url = process.env.SAML_PROXY_URL;
 const redirect_uri = "https://app/after-auth";
+const user_password = process.env.USER_PASSWORD;
+const valid_user = process.env.USER_EMAIL;
+const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
 
 describe("Regression tests", () => {
   jest.setTimeout(30000);
@@ -37,12 +40,7 @@ describe("Regression tests", () => {
     await page.setDefaultNavigationTimeout(30000);
     await requestToken(page);
 
-    let code = await login(
-      page,
-      "va.api.user+idme.001@gmail.com",
-      "Password1234!",
-      true
-    );
+    let code = await login(page, valid_user, user_password, true);
     expect(code).not.toBeNull();
   });
 
@@ -50,7 +48,7 @@ describe("Regression tests", () => {
     const page = await browser.newPage();
     await requestToken(page);
 
-    await login(page, "va.api.user+idme.043@gmail.com", "Password1234!");
+    await login(page, icn_error_user, user_password);
 
     await page.waitForRequest((request) => {
       return request.url().includes("/samlproxy/sp/saml/sso");
@@ -127,7 +125,7 @@ describe("Regression tests", () => {
   test("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
-    await authentication(page, "va.api.user+idme.001@gmail.com", true);
+    await authentication(page, valid_user, true);
 
     page.on("request", async (request) => {
       if (
@@ -191,15 +189,11 @@ const login = async (page, useremail, password, get_code = false) => {
   return code;
 };
 
-const authentication = async (
-  page,
-  email = "va.api.user+idme.001@gmail.com",
-  intercept = false
-) => {
+const authentication = async (page, email = valid_user, intercept = false) => {
   await page.click(".idme-signin");
   await page.waitForSelector("#user_email");
   await page.type("#user_email", email);
-  await page.type("#user_password", "Password1234!");
+  await page.type("#user_password", user_password);
   await page.click('[name="commit"]');
   await page.waitForSelector(".phone");
   await page.click("button.btn-primary");
