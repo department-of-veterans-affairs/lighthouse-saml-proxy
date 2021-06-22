@@ -132,6 +132,7 @@
   },
   "resolutions": {
     "xml-crypto": ">=2.0.0",
-    "trim-newlines": ">=3.0.1"
+    "trim-newlines": ">=3.0.1",
+    "normalize-url": "4.5.1"
   }
 }
