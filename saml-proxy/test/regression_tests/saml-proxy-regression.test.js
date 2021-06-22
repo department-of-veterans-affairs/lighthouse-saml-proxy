@@ -17,7 +17,7 @@ const defaultScope = [
   "address phone",
 ];
 
-const authorization_url = "https://sandbox-api.va.gov/oauth2";
+const authorization_url = process.env.AUTHORIZATION_URL;
 const saml_proxy_url = process.env.SAML_PROXY_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
