@@ -114,8 +114,12 @@ $RECYCLE.BIN/
 
 ### Project ###
 
-*.pem
-*.key
+idp*.pem
+sp*.pem
+okta*.pem
+
+okta*.key
+
 *.crt
 
 # Typescript build
