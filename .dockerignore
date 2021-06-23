@@ -1,4 +1,9 @@
-node_modules/*
-public/bower_components/*
-build/*
 .git
+.gitignore
+Dockerfile
+docker-compose.yml
+buildspec.yml
+
+node_modules
+cicd
+dist
