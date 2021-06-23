@@ -9,7 +9,12 @@ docker run \
   --rm vasdvp/lighthouse-saml-proxy-tests \
   --saml-proxy-url=$SAML_PROXY_URL \
   --client-id=$CLIENT_ID \
-  --idp=$IDP 
+  --idp=$IDP \
+  --authorization-url=$AUTHORIZATION_URL \
+  --user-password=$USER_PASSWORD \
+  --valid-user=$VALID_USER \
+  --icn-error-user=$ICN_ERROR_USER_EMAIL
+
 EOF
 }
 
@@ -31,6 +36,14 @@ case $i in
       export CLIENT_ID="${i#*=}"; shift ;;
     --idp=*)
       export IDP="${i#*=}"; shift ;;
+    --authorization-url=*)
+      export AUTHORIZATION_URL="${i#*=}"; shift ;;
+    --user-password=*)
+      export USER_PASSWORD="${i#*=}"; shift ;;
+    --valid-user=*)
+      export VALID_USER="${i#*=}"; shift ;;
+    --icn-error-user=*)
+      export ICN_ERROR_USER_EMAIL="${i#*=}"; shift ;;
 esac
 done
 
