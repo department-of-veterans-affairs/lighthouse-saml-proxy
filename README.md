@@ -8,7 +8,7 @@ Requires Docker and/or Node.js > 10.
 
 ### Config File
 
-You'll need to create a configuration JSON file with at the least the following minimum fields:
+You'll need to create a configuration JSON file with at the least the following minimum fields.
 
 dev-config.json
 
