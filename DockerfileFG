@@ -8,11 +8,11 @@ ARG BUILD_TOOL
 
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
-      org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/saml-proxy/DockerfileFG" \
-      org.opencontainers.image.documentation="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/saml-proxy/README.md" \
+      org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/DockerfileFG" \
+      org.opencontainers.image.documentation="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/README.md" \
       org.opencontainers.image.vendor="lighthouse" \
       org.opencontainers.image.title="saml-proxy" \
-      org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/saml-proxy" \
+      org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master" \
       org.opencontainers.image.description="SAML Proxy for Lighthouse APIs"
 
 # Dynamic Labels
