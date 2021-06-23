@@ -120,12 +120,12 @@ $RECYCLE.BIN/
 
 # Typescript build
 build/
-/test-report.xml
-/saml-proxy/public/core.css
-/saml-proxy/sp-metadata.xml
+test-report.xml
+public/core.css
+sp-metadata.xml
 
 # Local config
-/saml-proxy/dev-config.json
+dev-config.json
 
 ## Webstorm
 .idea/
