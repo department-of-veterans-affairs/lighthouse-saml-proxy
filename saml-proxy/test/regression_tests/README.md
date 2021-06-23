@@ -3,9 +3,13 @@
 ## Quick Start
 
 ```sh
-export SAML_PROXY_URL={ saml proxy url }
+export SAML_PROXY_URL={ ex. http://localhost:7000 }
 export IDP={ idp }
 export CLIENT_ID={ client id }
+export USER_PASSWORD={ user password }
+export AUTHORIZATION_URL={ ex. https://sandbox-api.va.gov/oauth2 }
+export VALID_USER={ ex. va.api.user+idme.001@gmail.com }
+export ICN_ERROR_USER_EMAIL={ ex. va.api.user+idme.043@gmail.com }
 export HEADLESS={ 0 (true) or 1 (false) } // note: this value only is important for local runs
 ```
 
@@ -23,11 +27,15 @@ docker build -f Dockerfile.test . -t vasdvp/lighthouse-saml-proxy-tests
 
 docker run \
     --rm \
-    --network="container:<container id>" \
+    --network="container:$CONTAINER_ID" \
     vasdvp/lighthouse-saml-proxy-tests \
     --saml-proxy-url=$SAML_PROXY_URL \
     --client-id=$CLIENT_ID \
-    --idp=$IDP
+    --idp=$IDP \
+    --authorization-url=$AUTHORIZATION_URL \
+    --user-password=$USER_PASSWORD \
+    --valid-user=$VALID_USER \
+    --icn-error-user=$ICN_ERROR_USER_EMAIL
 ```
 
 **Note**: the network option is only needed if you are running the test against a local saml proxy. Because our auth servers determine the saml-proxy url based on the idp, the docker version of the regression tests will only work against local instances of the saml proxy if they are running via docker. It is recommended to run the tests locally if possible.
