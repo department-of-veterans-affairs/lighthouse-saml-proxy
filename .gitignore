@@ -114,18 +114,22 @@ $RECYCLE.BIN/
 
 ### Project ###
 
-*.pem
-*.key
+idp*.pem
+sp*.pem
+okta*.pem
+
+okta*.key
+
 *.crt
 
 # Typescript build
 build/
-/test-report.xml
-/saml-proxy/public/core.css
-/saml-proxy/sp-metadata.xml
+test-report.xml
+public/core.css
+sp-metadata.xml
 
 # Local config
-/saml-proxy/dev-config.json
+dev-config.json
 
 ## Webstorm
 .idea/
