@@ -41,7 +41,7 @@ case $i in
     --user-password=*)
       export USER_PASSWORD="${i#*=}"; shift ;;
     --valid-user=*)
-      export USER_EMAIL="${i#*=}"; shift ;;
+      export VALID_USER_EMAIL="${i#*=}"; shift ;;
     --icn-error-user=*)
       export ICN_ERROR_USER_EMAIL="${i#*=}"; shift ;;
 esac

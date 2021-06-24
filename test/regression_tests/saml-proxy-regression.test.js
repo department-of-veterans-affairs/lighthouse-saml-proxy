@@ -21,7 +21,7 @@ const authorization_url = process.env.AUTHORIZATION_URL;
 const saml_proxy_url = process.env.SAML_PROXY_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
-const valid_user = process.env.USER_EMAIL;
+const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
 
 describe("Regression tests", () => {
