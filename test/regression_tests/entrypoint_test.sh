@@ -12,7 +12,7 @@ docker run \
   --idp=$IDP \
   --authorization-url=$AUTHORIZATION_URL \
   --user-password=$USER_PASSWORD \
-  --valid-user=$VALID_USER \
+  --valid-user=$VALID_USER_EMAIL \
   --icn-error-user=$ICN_ERROR_USER_EMAIL
 
 EOF
