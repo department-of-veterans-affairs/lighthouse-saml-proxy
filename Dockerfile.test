@@ -2,7 +2,9 @@ FROM vasdvp/lighthouse-node-application-base:node12
 
 USER root
 
-COPY --chown=node:node ./test/regression_tests/ .
+COPY --chown=node:node ./test/regression_tests/ ./opt/va
+
+WORKDIR opt/va
 
 RUN npm i
 
