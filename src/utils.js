@@ -47,7 +47,7 @@ export function logRelayState(req, logger, step) {
 let renderedCss = {};
 
 /**
- * Middleware to render CSS from SCSS using dart-sass.
+ * Middleware to lazily-render CSS from SCSS using dart-sass.
  *
  * Modeled after node-sass-middleware.
  *
@@ -59,6 +59,10 @@ export function sassMiddleware(options) {
   const dest = options.dest;
 
   return function middleware(req, res, next) {
+    if (!/\.css$/.test(req.path)) {
+      return next();
+    }
+
     if (renderedCss[src]) {
       return next();
     }
