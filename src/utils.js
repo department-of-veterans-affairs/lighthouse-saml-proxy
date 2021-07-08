@@ -1,3 +1,7 @@
+import sass from "sass";
+import tildeImporter from "node-sass-tilde-importer";
+import fs from "fs";
+
 export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }
@@ -35,4 +39,50 @@ export function logRelayState(req, logger, step) {
       session: req.sessionID,
     }
   );
+}
+
+/*
+ * Cache of previously rendered CSS files.
+ */
+let renderedCss = {};
+
+/**
+ * Middleware to render CSS from SCSS using dart-sass.
+ *
+ * Modeled after node-sass-middleware.
+ *
+ * @param {{src: string, dest: string}} options
+ * @returns {Function}
+ */
+export function sassMiddleware(options) {
+  const src = options.src;
+  const dest = options.dest;
+
+  return function middleware(req, res, next) {
+    if (renderedCss[src]) {
+      return next();
+    }
+
+    sass.render(
+      {
+        file: src,
+        importer: tildeImporter,
+        outputStyle: "expanded",
+      },
+      function (err, result) {
+        if (err) {
+          return next(err);
+        }
+
+        fs.writeFile(dest, result.css, "utf8", function (err) {
+          if (err) {
+            return next(err);
+          }
+
+          renderedCss[src] = result.stats.includedFiles;
+          return next();
+        });
+      }
+    );
+  };
 }

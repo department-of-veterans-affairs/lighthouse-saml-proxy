@@ -5,15 +5,12 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
-import sassMiddleware from "node-sass-middleware";
-import tildeImporter from "node-sass-tilde-importer";
 import { v4 as uuidv4 } from "uuid";
 import rTracer from "cls-rtracer";
 import { RedisCache } from "./types";
 import {
   loggingMiddleware as morganMiddleware,
   winstonMiddleware,
-  sassLogger,
   logger,
 } from "../logger";
 import createPassport from "./passport";
@@ -23,6 +20,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
+import { sassMiddleware } from "../utils";
 
 function filterProperty(object, property) {
   if (property in object) {
@@ -135,15 +133,8 @@ export default function configureExpress(
 
   app.use(
     sassMiddleware({
-      src: path.join(process.cwd(), "styles"),
-      dest: path.join(process.cwd(), "public"),
-      debug: true,
-      importer: tildeImporter,
-      outputStyle: "expanded",
-      prefix: "/samlproxy/idp",
-      log: (severity, key, value, message) => {
-        sassLogger.log(severity, { key, value, message });
-      },
+      src: path.join(process.cwd(), "styles", "core.scss"),
+      dest: path.join(process.cwd(), "public", "core.css"),
     })
   );
 

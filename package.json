@@ -93,7 +93,7 @@
     "lodash.template": "^4.5.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
-    "node-sass-middleware": "^0.11.0",
+    "sass": "1.35.2",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.4.1",
     "passport-wsfed-saml2": "^4.4.0",
