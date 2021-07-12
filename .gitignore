@@ -113,7 +113,6 @@ $RECYCLE.BIN/
 *.lnk
 
 ### Project ###
-
 idp*.pem
 sp*.pem
 okta*.pem
@@ -121,6 +120,8 @@ okta*.pem
 okta*.key
 
 *.crt
+
+test/test.css
 
 # Typescript build
 build/

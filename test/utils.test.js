@@ -1,7 +1,34 @@
 require("jest");
 
-import { getReqUrl, removeHeaders } from "../src/utils";
+import { getReqUrl, removeHeaders, sassMiddleware } from "../src/utils";
 import { idpCert } from "./testCerts";
+import path from "path";
+import util from "util";
+
+let sMiddlewareMockLog;
+let sMiddleware;
+
+function setupSassMiddleware() {
+  sMiddlewareMockLog = jest.fn();
+  const result = { css: "{}", stats: { includedFiles: "placeholder" } };
+  const mockSass = {
+    renderSync: function () {
+      return result;
+    },
+  };
+  const importer = function () {};
+
+  const src = "placeholder.scss";
+  const dest = path.join(process.cwd(), "test", "test.css");
+
+  sMiddleware = sassMiddleware({
+    src: src,
+    dest: dest,
+    log: sMiddlewareMockLog,
+    sass: mockSass,
+    importer: importer,
+  });
+}
 
 describe("Tests for utils.js", () => {
   test("Test for removeHeaders", () => {
@@ -11,6 +38,35 @@ describe("Tests for utils.js", () => {
     expect(cert).toBe(expectedCert);
     cert = removeHeaders(cert);
     expect(cert).toBe(expectedCert);
+  });
+
+  test("tests sassMiddleware skipping", () => {
+    setupSassMiddleware();
+    const middleware = util.promisify(sMiddleware);
+
+    return middleware({ path: "/file.png" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("skipping non-css path");
+    });
+  });
+
+  test("tests sassMiddleware rendering", () => {
+    setupSassMiddleware();
+    const middleware = util.promisify(sMiddleware);
+
+    return middleware({ path: "/file.css" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("rendering css");
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("writing to file");
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("caching src");
+    });
+  });
+
+  test("tests sassMiddleware caching", () => {
+    setupSassMiddleware();
+    const middleware = util.promisify(sMiddleware);
+
+    return middleware({ path: "/file.css" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("css already rendered");
+    });
   });
 
   test("Test for getReqUrl", () => {
