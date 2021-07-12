@@ -5,6 +5,31 @@ import { idpCert } from "./testCerts";
 import path from "path";
 import util from "util";
 
+let sMiddlewareMockLog;
+let sMiddleware;
+
+function setupSassMiddleware() {
+  sMiddlewareMockLog = jest.fn();
+  const result = { css: "{}", stats: { includedFiles: "placeholder" } };
+  const mockSass = {
+    renderSync: function () {
+      return result;
+    },
+  };
+  const importer = function () {};
+
+  const src = "placeholder.scss";
+  const dest = path.join(process.cwd(), "test", "test.css");
+
+  sMiddleware = sassMiddleware({
+    src: src,
+    dest: dest,
+    log: sMiddlewareMockLog,
+    sass: mockSass,
+    importer: importer,
+  });
+}
+
 describe("Tests for utils.js", () => {
   test("Test for removeHeaders", () => {
     let cert = removeHeaders(idpCert);
@@ -15,57 +40,33 @@ describe("Tests for utils.js", () => {
     expect(cert).toBe(expectedCert);
   });
 
-  test("Test for sassMiddleware", () => {
-    const mockLog = jest.fn();
-    const result = { css: "{}", stats: { includedFiles: "includedFiles" } };
-    const mockSass = {
-      renderSync: function () {
-        return result;
-      },
-    };
-    const importer = function () {};
-
-    const src = "placeholder.scss";
-    const dest = path.join(process.cwd(), "test", "test.css");
-
-    const sMiddleware = sassMiddleware({
-      src: src,
-      dest: dest,
-      log: mockLog,
-      sass: mockSass,
-      importer: importer,
-    });
-
+  test("tests sassMiddleware skipping", () => {
+    setupSassMiddleware();
     const middleware = util.promisify(sMiddleware);
 
-    // test - skip rendering
-    middleware({ path: "/file.png" }, undefined)
-      .then(() => {
-        expect(mockLog).toHaveBeenCalledWith("skipping non-css path");
-      })
-      .catch((error) => {
-        fail(error);
-      });
+    return middleware({ path: "/file.png" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("skipping non-css path");
+    });
+  });
 
-    // test - render
-    middleware({ path: "/file.css" }, undefined)
-      .then(() => {
-        expect(mockLog).toHaveBeenCalledWith("rendering css");
-        expect(mockLog).toHaveBeenCalledWith("writing to file");
-        expect(mockLog).toHaveBeenCalledWith("caching src");
-      })
-      .catch((error) => {
-        fail(error);
-      });
+  test("tests sassMiddleware rendering", () => {
+    setupSassMiddleware();
+    const middleware = util.promisify(sMiddleware);
 
-    // test - cached
-    middleware({ path: "/file.css" }, undefined)
-      .then(() => {
-        expect(mockLog).toHaveBeenCalledWith("css already rendered");
-      })
-      .catch((error) => {
-        fail(error);
-      });
+    return middleware({ path: "/file.css" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("rendering css");
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("writing to file");
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("caching src");
+    });
+  });
+
+  test("tests sassMiddleware caching", () => {
+    setupSassMiddleware();
+    const middleware = util.promisify(sMiddleware);
+
+    return middleware({ path: "/file.css" }, undefined).then(() => {
+      expect(sMiddlewareMockLog).toHaveBeenCalledWith("css already rendered");
+    });
   });
 
   test("Test for getReqUrl", () => {
