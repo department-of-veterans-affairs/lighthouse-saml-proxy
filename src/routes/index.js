@@ -5,6 +5,9 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
+import { sassMiddleware } from "../utils";
+import sass from "sass";
+import tildeImporter from "node-sass-tilde-importer";
 import { v4 as uuidv4 } from "uuid";
 import rTracer from "cls-rtracer";
 import { RedisCache } from "./types";
@@ -20,9 +23,6 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
-import { sassMiddleware } from "../utils";
-import sass from "sass";
-import tildeImporter from "node-sass-tilde-importer"
 
 function filterProperty(object, property) {
   if (property in object) {
