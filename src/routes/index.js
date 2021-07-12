@@ -21,6 +21,8 @@ import { getParticipant } from "./handlers";
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 import { sassMiddleware } from "../utils";
+import sass from "sass";
+import tildeImporter from "node-sass-tilde-importer"
 
 function filterProperty(object, property) {
   if (property in object) {
@@ -135,6 +137,9 @@ export default function configureExpress(
     sassMiddleware({
       src: path.join(process.cwd(), "styles", "core.scss"),
       dest: path.join(process.cwd(), "public", "core.css"),
+      importer: tildeImporter,
+      outputStyle: "expanded",
+      sass: sass,
     })
   );
 

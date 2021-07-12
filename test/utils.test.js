@@ -1,7 +1,9 @@
 require("jest");
 
-import { getReqUrl, removeHeaders } from "../src/utils";
+import { getReqUrl, removeHeaders, sassMiddleware } from "../src/utils";
 import { idpCert } from "./testCerts";
+import path from "path";
+import util from "util";
 
 describe("Tests for utils.js", () => {
   test("Test for removeHeaders", () => {
@@ -11,6 +13,59 @@ describe("Tests for utils.js", () => {
     expect(cert).toBe(expectedCert);
     cert = removeHeaders(cert);
     expect(cert).toBe(expectedCert);
+  });
+
+  test("Test for sassMiddleware", () => {
+    const mockLog = jest.fn();
+    const result = { css: "{}", stats: { includedFiles: "includedFiles" } };
+    const mockSass = {
+      renderSync: function () {
+        return result;
+      },
+    };
+    const importer = function () {};
+
+    const src = "placeholder.scss";
+    const dest = path.join(process.cwd(), "test", "test.css");
+
+    const sMiddleware = sassMiddleware({
+      src: src,
+      dest: dest,
+      log: mockLog,
+      sass: mockSass,
+      importer: importer,
+    });
+
+    const middleware = util.promisify(sMiddleware);
+
+    // test - skip rendering
+    middleware({ path: "/file.png" }, undefined)
+      .then(() => {
+        expect(mockLog).toHaveBeenCalledWith("skipping non-css path");
+      })
+      .catch((error) => {
+        fail(error);
+      });
+
+    // test - render
+    middleware({ path: "/file.css" }, undefined)
+      .then(() => {
+        expect(mockLog).toHaveBeenCalledWith("rendering css");
+        expect(mockLog).toHaveBeenCalledWith("writing to file");
+        expect(mockLog).toHaveBeenCalledWith("caching src");
+      })
+      .catch((error) => {
+        fail(error);
+      });
+
+    // test - cached
+    middleware({ path: "/file.css" }, undefined)
+      .then(() => {
+        expect(mockLog).toHaveBeenCalledWith("css already rendered");
+      })
+      .catch((error) => {
+        fail(error);
+      });
   });
 
   test("Test for getReqUrl", () => {
