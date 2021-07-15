@@ -59,6 +59,7 @@ export const samlLogin = function (template) {
       req.sp.options.getResponseParams(),
       new SAML.SAML(req.sp.options.getResponseParams())
     );
+    const authOptions = {};
     [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
@@ -68,41 +69,28 @@ export const samlLogin = function (template) {
         "http://idmanagement.gov/ns/assurance/loa/3",
         "&op=signup",
       ],
-    ]
-      .reduce((memo, [key, authnContext, exParams = null]) => {
-        const params = req.sp.options.getAuthnRequestParams(
-          acsUrl,
-          (authnRequest && authnRequest.forceAuthn) || "false",
-          relayState || "/",
-          authnContext,
-          rTracer.id()
-        );
-        return memo.then((m) => {
-          return new Promise((resolve, reject) => {
-            samlp.getSamlRequestUrl(params, (err, url) => {
-              if (err) {
-                reject(err);
-              }
+    ].reduce((authOpts, [key, authnContext, exParams = null]) => {
+      const params = req.sp.options.getAuthnRequestParams(
+        acsUrl,
+        (authnRequest && authnRequest.forceAuthn) || "false",
+        relayState || "/",
+        authnContext,
+        rTracer.id()
+      );
+      try {
+        authOpts[key] = getSamlRequestUrl(params, exParams);
+      } catch (err) {
+        logger.warn(err);
+      }
+      return authOpts;
+    }, authOptions);
 
-              if (exParams) {
-                m[key] = url + exParams;
-              } else {
-                m[key] = url;
-              }
-              resolve(m);
-            });
-          });
-        });
-      }, Promise.resolve({}))
-      .then((authOptions) => {
-        res.render(template, authOptions);
-        logger.info("User arrived from Okta. Rendering IDP login template.", {
-          action: "parseSamlRequest",
-          result: "success",
-          session: req.sessionID,
-        });
-      })
-      .catch(next);
+    res.render(template, authOptions);
+    logger.info("User arrived from Okta. Rendering IDP login template.", {
+      action: "parseSamlRequest",
+      result: "success",
+      session: req.sessionID,
+    });
   };
 };
 
