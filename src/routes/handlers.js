@@ -173,3 +173,17 @@ export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
+
+export const getSamlRequestUrl = async (params, exParams) => {
+  await samlp.getSamlRequestUrl(params, (err, url) => {
+    if (err) {
+      throw err;
+    }
+
+    if (exParams) {
+      return url + exParams;
+    } else {
+      return url;
+    }
+  });
+};
