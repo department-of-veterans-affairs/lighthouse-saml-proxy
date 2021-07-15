@@ -1,4 +1,4 @@
-FROM vasdvp/lighthouse-node-application-base:node16
+FROM vasdvp/lighthouse-node-application-base:node12
 
 # Build Args
 ARG BUILD_DATE_TIME
