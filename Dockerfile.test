@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.authors="Pivot!" \
       org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/blob/master/Dockerfile.test" \
       org.opencontainers.image.documentation="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/blob/master/test/regression_tests/README.md" \
       org.opencontainers.image.vendor="lighthouse" \
-      org.opencontainers.image.title="oauth-saml-tests" \
+      org.opencontainers.image.title="lighthouse-saml-tests" \
       org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy" \
       org.opencontainers.image.description="SAML Proxy Tests for Lighthouse APIs"
 
