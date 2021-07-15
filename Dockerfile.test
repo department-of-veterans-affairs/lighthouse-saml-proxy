@@ -1,3 +1,4 @@
+# For now any node image that used CentOS > 7 does not work with puppeteer. We will have to keep this image at Node12.
 FROM vasdvp/lighthouse-node-application-base:node12
 
 # Build Args
