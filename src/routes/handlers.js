@@ -78,7 +78,7 @@ export const samlLogin = function (template) {
         rTracer.id()
       );
       try {
-        authOpts[key] = getSamlRequestUrl(params, exParams);
+        authOpts[key] = getSamlRequestUrl(samlp, params, exParams);
       } catch (err) {
         logger.warn(err);
       }
@@ -162,8 +162,8 @@ export const handleError = (req, res) => {
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
 
-export const getSamlRequestUrl = async (params, exParams) => {
-  await samlp.getSamlRequestUrl(params, (err, url) => {
+export const getSamlRequestUrl = (samlp, params, exParams) => {
+  samlp.getSamlRequestUrl(params, (err, url) => {
     if (err) {
       throw err;
     }

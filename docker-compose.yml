@@ -14,4 +14,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - '7000:7000'
-    command: 'node build/app.js --config dev-config.json'
+      - "9228:9228"
+    command: 'node --inspect=0.0.0.0:9228 build/app.js --config dev-config.json'
