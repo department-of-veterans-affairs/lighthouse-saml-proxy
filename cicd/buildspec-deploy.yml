@@ -42,7 +42,6 @@ env:
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
     SLACK_WEBHOOK: "/dvp/devops/codebuild_slack_webhook_lighthouse"
     # Values for regression tests
-    SAML_PROXY_URL: "/dvp/common/ecs-saml-proxy/codebuild/saml_proxy_url"
     CLIENT_ID: "/dvp/common/ecs-saml-proxy/codebuild/client_id"
     DEV_IDP: "/dvp/common/ecs-saml-proxy/codebuild/dev_idp"
     SANDBOX_IDP: "/dvp/common/ecs-saml-proxy/codebuild/sandbox_idp"
