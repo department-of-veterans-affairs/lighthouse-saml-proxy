@@ -77,7 +77,7 @@ export const samlLogin = function (template) {
         .then((data) => {
           authOptions[key] = data;
         })
-        .catch((err) => logger.warn(err));
+        .catch(next);
       return authOpts;
     }, authOptions);
 
