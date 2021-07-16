@@ -26,12 +26,15 @@ version: 0.2
 env:
   shell: bash
   variables:
+   # Honor Docker ignore at folder level
+    DOCKER_BUILDKIT: 1
     # These are the default deploy environments
     ENVIRONMENTS: "dev staging"
     # These are the deployable environments
     DEPLOYABLE_ENVIRONMENTS: "dev staging sandbox prod"
     # Variables needed for ecs deployment
     AWS_APP_NAME: "ecs-saml-proxy"
+    IMAGE: "saml-proxy"
   parameter-store:
     # For pulling docker images
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
