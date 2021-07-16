@@ -77,11 +77,11 @@ export const samlLogin = function (template) {
         authnContext,
         rTracer.id()
       );
-      try {
-        authOpts[key] = getSamlRequestUrl(samlp, params, exParams);
-      } catch (err) {
-        logger.warn(err);
-      }
+      getSamlRequestUrl(samlp, params, exParams)
+        .then((data) => {
+          authOptions[key] = data;
+        })
+        .catch((err) => logger.warn(err));
       return authOpts;
     }, authOptions);
 
@@ -163,15 +163,17 @@ export const handleError = (req, res) => {
 };
 
 export const getSamlRequestUrl = (samlp, params, exParams) => {
-  samlp.getSamlRequestUrl(params, (err, url) => {
-    if (err) {
-      throw err;
-    }
+  return new Promise((resolve, reject) => {
+    samlp.getSamlRequestUrl(params, (err, url) => {
+      if (err) {
+        reject(err);
+      }
 
-    if (exParams) {
-      return url + exParams;
-    } else {
-      return url;
-    }
+      if (exParams) {
+        resolve(url + exParams);
+      } else {
+        resolve(url);
+      }
+    });
   });
 };
