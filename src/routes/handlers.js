@@ -67,31 +67,17 @@ export const samlLogin = function (template) {
       ],
     ]
       .reduce((memo, [key, authnContext, exParams = null]) => {
-        const params = req.sp.options.getAuthnRequestParams(
+        return determineAuthOptions(
+          req,
           acsUrl,
-          (authnRequest && authnRequest.forceAuthn) || "false",
-          relayState || "/",
+          authnRequest,
+          relayState,
           authnContext,
-          rTracer.id()
+          memo,
+          exParams,
+          key,
+          next
         );
-
-        return memo
-          .then((authOpts) => {
-            return new Promise((resolve, reject) => {
-              getSamlRequestUrl(req.sp.options, params, exParams)
-                .then((url) => {
-                  if (!authOpts) {
-                    authOpts = {};
-                  }
-                  if (url) {
-                    authOpts[key] = url;
-                    resolve(authOpts);
-                  }
-                })
-                .catch((err) => reject(err));
-            });
-          })
-          .catch(next);
       }, Promise.resolve({}))
       .then((authOptions) => {
         res.render(template, authOptions);
@@ -191,4 +177,39 @@ const getSamlRequestUrl = (options, params, exParams) => {
       }
     });
   });
+};
+
+const determineAuthOptions = (
+  req,
+  acsUrl,
+  authnRequest,
+  relayState,
+  authnContext,
+  memo,
+  exParams,
+  key,
+  next
+) => {
+  const params = req.sp.options.getAuthnRequestParams(
+    acsUrl,
+    (authnRequest && authnRequest.forceAuthn) || "false",
+    relayState || "/",
+    authnContext,
+    rTracer.id()
+  );
+
+  return memo
+    .then((authOpts) => {
+      return new Promise((resolve, reject) => {
+        getSamlRequestUrl(req.sp.options, params, exParams)
+          .then((url) => {
+            if (url) {
+              authOpts[key] = url;
+              resolve(authOpts);
+            }
+          })
+          .catch((err) => reject(err));
+      });
+    })
+    .catch(next);
 };
