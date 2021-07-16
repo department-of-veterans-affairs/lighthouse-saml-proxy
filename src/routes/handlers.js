@@ -77,7 +77,7 @@ export const samlLogin = function (template) {
 
         return memo
           .then((authOpts) => {
-            new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
               getSamlRequestUrl(req.sp.options, params, exParams)
                 .then((url) => {
                   if (!authOpts) {
