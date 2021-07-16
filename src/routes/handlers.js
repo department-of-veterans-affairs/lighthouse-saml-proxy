@@ -55,7 +55,8 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const authOptions = [
+
+    [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
@@ -64,28 +65,40 @@ export const samlLogin = function (template) {
         "http://idmanagement.gov/ns/assurance/loa/3",
         "&op=signup",
       ],
-    ].reduce((authOpts, [key, authnContext, exParams = null]) => {
-      const params = req.sp.options.getAuthnRequestParams(
-        acsUrl,
-        (authnRequest && authnRequest.forceAuthn) || "false",
-        relayState || "/",
-        authnContext,
-        rTracer.id()
-      );
-      try {
-        authOpts[key] = getSamlRequestUrl(req.sp.options, params, exParams);
-      } catch (err) {
-        logger.warn(err);
-      }
-      return authOpts;
-    }, {});
+    ]
+      .reduce((memo, [key, authnContext, exParams = null]) => {
+        const params = req.sp.options.getAuthnRequestParams(
+          acsUrl,
+          (authnRequest && authnRequest.forceAuthn) || "false",
+          relayState || "/",
+          authnContext,
+          rTracer.id()
+        );
 
-    res.render(template, authOptions);
-    logger.info("User arrived from Okta. Rendering IDP login template.", {
-      action: "parseSamlRequest",
-      result: "success",
-      session: req.sessionID,
-    });
+        return memo
+          .then((authOpts) => {
+            getSamlRequestUrl(req.sp.options, params, exParams)
+              .then((url) => {
+                if (exParams) {
+                  authOpts[key] = url + exParams;
+                } else {
+                  authOpts[key] = url;
+                }
+                return authOpts;
+              })
+              .catch(next);
+          })
+          .catch(next);
+      }, Promise.resolve({}))
+      .then((authOptions) => {
+        res.render(template, authOptions);
+        logger.info("User arrived from Okta. Rendering IDP login template.", {
+          action: "parseSamlRequest",
+          result: "success",
+          session: req.sessionID,
+        });
+      })
+      .catch(next);
   };
 };
 
@@ -157,12 +170,12 @@ export const handleError = (req, res) => {
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
 
-const getSamlRequestUrl = (options, params, exParams) => {
+const getSamlRequestUrl = async (options, params, exParams) => {
   const samlp = new _samlp(
     options.getResponseParams(),
     new SAML.SAML(options.getResponseParams())
   );
-  samlp.getSamlRequestUrl(params, (err, url) => {
+  await samlp.getSamlRequestUrl(params, (err, url) => {
     if (err) {
       logger.warn(err);
       throw err;
