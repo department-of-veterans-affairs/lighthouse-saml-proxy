@@ -55,8 +55,7 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const authOptions = {};
-    [
+    const authOptions = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
@@ -73,13 +72,13 @@ export const samlLogin = function (template) {
         authnContext,
         rTracer.id()
       );
-      getSamlRequestUrl(req.sp.options, params, exParams)
-        .then((data) => {
-          authOptions[key] = data;
-        })
-        .catch(next);
+      try {
+        authOpts[key] = getSamlRequestUrl(req.sp.options, params, exParams);
+      } catch (err) {
+        logger.warn(err);
+      }
       return authOpts;
-    }, authOptions);
+    }, {});
 
     res.render(template, authOptions);
     logger.info("User arrived from Okta. Rendering IDP login template.", {
@@ -163,17 +162,16 @@ const getSamlRequestUrl = (options, params, exParams) => {
     options.getResponseParams(),
     new SAML.SAML(options.getResponseParams())
   );
-  return new Promise((resolve, reject) => {
-    samlp.getSamlRequestUrl(params, (err, url) => {
-      if (err) {
-        reject(err);
-      }
-
+  samlp.getSamlRequestUrl(params, (err, url) => {
+    if (err) {
+      logger.warn(err);
+      throw err;
+    } else {
       if (exParams) {
-        resolve(url + exParams);
+        return url + exParams;
       } else {
-        resolve(url);
+        return url;
       }
-    });
+    }
   });
 };
