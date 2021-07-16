@@ -77,16 +77,19 @@ export const samlLogin = function (template) {
 
         return memo
           .then((authOpts) => {
-            getSamlRequestUrl(req.sp.options, params, exParams)
-              .then((url) => {
-                if (exParams) {
-                  authOpts[key] = url + exParams;
-                } else {
-                  authOpts[key] = url;
-                }
-                return authOpts;
-              })
-              .catch(next);
+            new Promise((resolve, reject) => {
+              getSamlRequestUrl(req.sp.options, params, exParams)
+                .then((url) => {
+                  if (!authOpts) {
+                    authOpts = {};
+                  }
+                  if (url) {
+                    authOpts[key] = url;
+                    resolve(authOpts);
+                  }
+                })
+                .catch((err) => reject(err));
+            });
           })
           .catch(next);
       }, Promise.resolve({}))
@@ -170,21 +173,22 @@ export const handleError = (req, res) => {
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
 
-const getSamlRequestUrl = async (options, params, exParams) => {
+const getSamlRequestUrl = (options, params, exParams) => {
   const samlp = new _samlp(
     options.getResponseParams(),
     new SAML.SAML(options.getResponseParams())
   );
-  await samlp.getSamlRequestUrl(params, (err, url) => {
-    if (err) {
-      logger.warn(err);
-      throw err;
-    } else {
-      if (exParams) {
-        return url + exParams;
+  return new Promise((resolve, reject) => {
+    samlp.getSamlRequestUrl(params, (err, url) => {
+      if (err) {
+        reject(err);
       } else {
-        return url;
+        if (exParams) {
+          resolve(url + exParams);
+        } else {
+          resolve(url);
+        }
       }
-    }
+    });
   });
 };
