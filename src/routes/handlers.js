@@ -55,10 +55,6 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const samlp = new _samlp(
-      req.sp.options.getResponseParams(),
-      new SAML.SAML(req.sp.options.getResponseParams())
-    );
     const authOptions = {};
     [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
@@ -77,7 +73,7 @@ export const samlLogin = function (template) {
         authnContext,
         rTracer.id()
       );
-      getSamlRequestUrl(samlp, params, exParams)
+      getSamlRequestUrl(req.sp.options, params, exParams)
         .then((data) => {
           authOptions[key] = data;
         })
@@ -162,7 +158,11 @@ export const handleError = (req, res) => {
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
 
-export const getSamlRequestUrl = (samlp, params, exParams) => {
+const getSamlRequestUrl = (options, params, exParams) => {
+  const samlp = new _samlp(
+    options.getResponseParams(),
+    new SAML.SAML(options.getResponseParams())
+  );
   return new Promise((resolve, reject) => {
     samlp.getSamlRequestUrl(params, (err, url) => {
       if (err) {
