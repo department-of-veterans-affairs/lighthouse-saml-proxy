@@ -45,7 +45,6 @@ env:
     CLIENT_ID: "/dvp/common/ecs-saml-proxy/codebuild/client_id"
     DEV_IDP: "/dvp/common/ecs-saml-proxy/codebuild/dev_idp"
     SANDBOX_IDP: "/dvp/common/ecs-saml-proxy/codebuild/sandbox_idp"
-    STAGING_IDP: "/dvp/common/ecs-saml-proxy/codebuild/staging_idp"
     AUTHORIZATION_URL: "/dvp/common/ecs-saml-proxy/codebuild/authorization_url"
     USER_PASSWORD: "/dvp/common/ecs-saml-proxy/codebuild/user_password"
     VALID_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/valid_user_email"
