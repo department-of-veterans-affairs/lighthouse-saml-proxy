@@ -182,7 +182,7 @@ describe("samlLogin", () => {
     };
     const expectedAuthOpts = {
       id_me_login_link:
-      "https://identityProviderUrl.com?SAMLRequest=fVDBDsFAED37i2bv1SoiJiohDiREQzm4rdqwSTtbO1Ph763lwMWc3mTeezNvRiSrsoZJwxfcqGujiIN7VSKBH6SisQhGkiZAWSkCLmA7WS0hacdQW8OmMKUIXLVmTqtRsjaYigtzTRBF%2BqSQNT8ya24O250t24WpvGIxS8UbEDVqgcQSORVJnHTCeBB2hnkSQ7cH3f7B07LPuqnGk8bz%2F9uObxLBPM%2BzMFtvcxHslSV%2FnSOI8eiVEPxu%2B5X5v60kUvYV0emjL4NP9%2FvJ8RM%3D&RelayState=",
+        "https://identityProviderUrl.com?SAMLRequest=fVDBDsFAED37i2bv1SoiJiohDiREQzm4rdqwSTtbO1Ph763lwMWc3mTeezNvRiSrsoZJwxfcqGujiIN7VSKBH6SisQhGkiZAWSkCLmA7WS0hacdQW8OmMKUIXLVmTqtRsjaYigtzTRBF%2BqSQNT8ya24O250t24WpvGIxS8UbEDVqgcQSORVJnHTCeBB2hnkSQ7cH3f7B07LPuqnGk8bz%2F9uObxLBPM%2BzMFtvcxHslSV%2FnSOI8eiVEPxu%2B5X5v60kUvYV0emjL4NP9%2FvJ8RM%3D&RelayState=",
       dslogon_login_link:
         "https://identityProviderUrl.com?SAMLRequest=fVDBbsIwDD3zF1XupW3QNMmiSJ04DImJCsoO3LI2GpFap8QuGn9PSDl0F3x6lt979vOSVNf2UAx8xr2%2BDJo4%2ButaJAiDXAwOwSoyBKg6TcA1HIqvLch5Cr2zbGvbisjXbO21BhUbi7k4M%2FcESWIajWz4Vjp79dgdXTuvbRcUm3UuRkA06A0SK%2BRcyFRmcSrj7L3KFvCWglycAq18rvsw2Bj8fX3bz0gi%2BKyqMi53h0pE39pRuM4TxGr5SAhht5tkfm2riLR7RPT6ZGLw7P5%2FcnUH&RelayState=",
       mhv_login_link:
