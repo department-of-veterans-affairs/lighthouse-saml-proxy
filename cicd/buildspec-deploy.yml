@@ -93,13 +93,11 @@ phases:
             --tag ${DEPLOY_TAG} \
             --timeout 1200 || exit 1
             slackpost.sh -t success "Deployed SAML Proxy to ${env}."
-          if [[ ${env} != prod ]]; then
+          if [[ ${env} != prod ]] && [[ ${env} != staging ]]; then
             if [[ ${env} = dev ]]; then
               IDP=${DEV_IDP}
             elif [[ ${env} = sandbox ]]; then
               IDP=${SANDBOX_IDP}
-            elif [[ ${env} = stagin ]]; then
-              IDP=${STAGING_IDP}
             fi
             echo Logging into ECR
             make login
