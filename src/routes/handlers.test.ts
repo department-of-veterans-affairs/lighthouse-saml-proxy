@@ -227,7 +227,7 @@ describe("samlLogin", () => {
     }
   });
 
-  it.only("samlp.getSamlRequestUrl errors", async () => {
+  it("samlp.getSamlRequestUrl errors", async () => {
     mockRequest.authnRequest = {
       relayState: "theRelayState",
     };
