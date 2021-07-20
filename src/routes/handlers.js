@@ -224,10 +224,8 @@ const determineAuthOptions = (
       return new Promise((resolve, reject) => {
         getSamlRequestUrl(req.sp.options, params, exParams)
           .then((url) => {
-            if (url) {
-              authOpts[key] = url;
-              resolve(authOpts);
-            }
+            authOpts[key] = url;
+            resolve(authOpts);
           })
           .catch((err) => reject(err));
       });
