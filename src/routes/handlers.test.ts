@@ -9,6 +9,9 @@ import {
 } from "./handlers.js";
 
 jest.mock("../logger");
+jest.mock("passport-wsfed-saml2");
+import { samlp } from "passport-wsfed-saml2";
+
 describe("getHashCode, getSessionIndex", () => {
   let mockReq: any;
   let mockRes: any;
@@ -198,6 +201,24 @@ describe("samlLogin", () => {
       });
     }
     mockResponse.render = render;
+    const mockGetSamlRequestUrl = jest
+      .fn()
+      .mockImplementation((opts, callback) => {
+        if (!opts) {
+          callback("empty options");
+        } else {
+          return callback(
+            null,
+            "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState="
+          );
+        }
+      });
+
+    samlp.mockImplementation(() => {
+      return {
+        getSamlRequestUrl: mockGetSamlRequestUrl,
+      };
+    });
     const doLogin = samlLogin("login_selection");
     try {
       doLogin(mockRequest, mockResponse, mockNext);
