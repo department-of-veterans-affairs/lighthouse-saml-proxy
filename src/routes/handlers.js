@@ -232,5 +232,7 @@ const determineAuthOptions = (
           .catch((err) => reject(err));
       });
     })
-    .catch(next);
+    .catch((next) => {
+      throw next;
+    });
 };
