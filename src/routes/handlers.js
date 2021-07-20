@@ -159,10 +159,17 @@ export const handleError = (req, res) => {
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
 
-const getSamlRequestUrl = (options, params, exParams) => {
+/**
+ * Used by determineAuthOptions to determine the full URL for the saml login request.
+ * @param {*} sp_options SP options that originate from the configuration
+ * @param {*} params Parameters used to build up the request URL
+ * @param {*} exParams Extra query params used to append to the full URL
+ * @returns A promise that will return a list of fully resolved URLs used for login for a given context, eg, ID.me vs dslogin
+ */
+const getSamlRequestUrl = (sp_options, params, exParams) => {
   const samlp = new _samlp(
-    options.getResponseParams(),
-    new SAML.SAML(options.getResponseParams())
+    sp_options.getResponseParams(),
+    new SAML.SAML(sp_options.getResponseParams())
   );
   return new Promise((resolve, reject) => {
     samlp.getSamlRequestUrl(params, (err, url) => {
@@ -179,6 +186,20 @@ const getSamlRequestUrl = (options, params, exParams) => {
   });
 };
 
+/**
+ * Determains a fully resolved URL used for login for a given context, eg, ID.me vs dslogin
+ *
+ * @param {} req  The original request
+ * @param {*} acsUrl Url used for ACS
+ * @param {*} authnRequest Auhentication requst
+ * @param {*} relayState Relay state associated with the request
+ * @param {*} authnContext A named context for the login, eg: dslogin, dslogon, or http://idmanagement.gov/ns/assurance/loa/3
+ * @param {*} memo Incoming promise used to accumlate values for a final list
+ * @param {*} exParams Extra query parameters used to append to the final full URL
+ * @param {*} key Key that aligns with the authContext
+ * @param {*} next Callback for error
+ * @returns A promise that will return a list of fully resolved URLs used for login for a given context, eg, ID.me vs dslogin
+ */
 const determineAuthOptions = (
   req,
   acsUrl,
