@@ -153,7 +153,7 @@ describe("samlLogin", () => {
     mockNext = jest.fn();
   });
   afterAll(() => {
-    console.log("The end");
+    // console.log("The end");
     // expect(mockResponse.render).toHaveBeenCalledWith("login_selection", {
     //   id_me_login_link:
     //     "https://identityProviderUrl.com?SAMLRequest=fVDBqsJADDz7F2Xvte2KCMEWFA8KiuXZ9w7e1rroQputm1T0711XD76LOU3IzCSTKam26WDW8xl%2F9KXXxNGtbZAgDHLROwSryBCgajUB17CbbdYghyl0zrKtbSMiX4OF1xpUbCzm4szcESSJOWpkw%2FfS2avH7tc1w9q2QbFa5OIFiHq9QmKFnAuZyixOZZxNqmwE4xRktg%2B08r1ubvBo8PT9tsOLRLCsqjIut7tKRH%2FaUbjOE0QxfSaEsNt9ZP5uq4i0e0b0%2BuTD4N39%2F2TxAA%3D%3D&RelayState=",
@@ -195,6 +195,16 @@ describe("samlLogin", () => {
         try {
           expect(template).toBe("login_selection");
           expect(authOptions.id_me_login_link).not.toBeNull();
+          expect(authOptions.id_me_login_link).toContain('https://identityProviderUrl.com?SAMLRequest=');
+          expect(authOptions.id_me_login_link).toContain('&RelayState=');
+          expect(authOptions.dslogon_login_link).toContain('https://identityProviderUrl.com?SAMLRequest=');
+          expect(authOptions.dslogon_login_link).toContain('&RelayState=');
+          expect(authOptions.mhv_login_link).toContain('https://identityProviderUrl.com?SAMLRequest=');
+          expect(authOptions.mhv_login_link).toContain('&RelayState=');
+          expect(authOptions.id_me_signup_link).toContain('https://identityProviderUrl.com?SAMLRequest=');
+          expect(authOptions.id_me_signup_link).toContain('&RelayState=');
+          expect(authOptions.id_me_signup_link).toContain('&op=signup');
+
           // expect(authOptions.id_me_login_link.toString().includes("FAED37")).toEqual(true);
           // expect(authOptions.id_me_login_link).toContain('https://identityProviderUrl.com?SAMLRequest=f');
           // expect(authOptions.id_me_login_link).toBe(
