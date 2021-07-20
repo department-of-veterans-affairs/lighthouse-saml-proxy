@@ -227,6 +227,33 @@ describe("samlLogin", () => {
     }
   });
 
+  it.only("samlp.getSamlRequestUrl errors", async () => {
+    mockRequest.authnRequest = {
+      relayState: "theRelayState",
+    };
+    const render = jest.fn();
+
+    mockResponse.render = render;
+    const mockGetSamlRequestUrl = jest
+      .fn()
+      .mockImplementation((opts, callback) => {
+        callback("falure");
+      });
+
+    samlp.mockImplementation(() => {
+      return {
+        getSamlRequestUrl: mockGetSamlRequestUrl,
+      };
+    });
+    const doLogin = samlLogin("login_selection");
+    try {
+      doLogin(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      fail("Should not reach here");
+    }
+    expect(render).not.toHaveBeenCalled();
+  });
+
   it("Happy Path, no authnRequest", async () => {
     mockRequest.authnRequest = null;
     mockRequest.query.RelayState = "theRelayState";
