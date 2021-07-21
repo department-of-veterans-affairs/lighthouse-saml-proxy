@@ -172,28 +172,24 @@ describe("samlLogin", () => {
     mockRequest.authnRequest = {
       relayState: "theRelayState",
     };
+
+    const expected_authoptions = {
+      id_me_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+      dslogon_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+      mhv_login_link:
+        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+      id_me_signup_link:
+        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
+    };
+
     function render(template, authOptions) {
       return new Promise((resolve, reject) => {
         try {
           expect(template).toBe("login_selection");
-          expect(authOptions.id_me_login_link).not.toBeNull();
-          expect(authOptions.id_me_login_link).toContain(
-            "https://identityProviderUrl.com?SAMLRequest="
-          );
-          expect(authOptions.id_me_login_link).toContain("&RelayState=");
-          expect(authOptions.dslogon_login_link).toContain(
-            "https://identityProviderUrl.com?SAMLRequest="
-          );
-          expect(authOptions.dslogon_login_link).toContain("&RelayState=");
-          expect(authOptions.mhv_login_link).toContain(
-            "https://identityProviderUrl.com?SAMLRequest="
-          );
-          expect(authOptions.mhv_login_link).toContain("&RelayState=");
-          expect(authOptions.id_me_signup_link).toContain(
-            "https://identityProviderUrl.com?SAMLRequest="
-          );
-          expect(authOptions.id_me_signup_link).toContain("&RelayState=");
-          expect(authOptions.id_me_signup_link).toContain("&op=signup");
+          expect(authOptions).toEqual(expected_authoptions);
+          expect(mockNext).not.toHaveBeenCalled();
           resolve(true);
         } catch (err) {
           reject(err);
