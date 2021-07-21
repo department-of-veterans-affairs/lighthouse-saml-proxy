@@ -168,47 +168,62 @@ describe("samlLogin", () => {
     // });
   });
 
+  const expected_authoptions = {
+    id_me_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    dslogon_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    mhv_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    id_me_signup_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
+  };
+
+  const mockGetSamlRequestUrl = jest
+    .fn()
+    .mockImplementation((opts, callback) => {
+      if (!opts) {
+        callback("empty options");
+      } else {
+        return callback(
+          null,
+          "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState="
+        );
+      }
+    });
+
+  const promise2check = (
+    expected_template,
+    expected_authoptions,
+    template,
+    auth_options
+  ) => {
+    return new Promise((resolve, reject) => {
+      try {
+        expect(template).toBe("login_selection");
+        expect(auth_options).toEqual(expected_authoptions);
+        expect(mockNext).not.toHaveBeenCalled();
+        resolve(true);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
   it("Happy Path", async () => {
     mockRequest.authnRequest = {
       relayState: "theRelayState",
     };
 
-    const expected_authoptions = {
-      id_me_login_link:
-        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
-      dslogon_login_link:
-        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
-      mhv_login_link:
-        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
-      id_me_signup_link:
-        "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
-    };
-
     function render(template, authOptions) {
-      return new Promise((resolve, reject) => {
-        try {
-          expect(template).toBe("login_selection");
-          expect(authOptions).toEqual(expected_authoptions);
-          expect(mockNext).not.toHaveBeenCalled();
-          resolve(true);
-        } catch (err) {
-          reject(err);
-        }
-      });
+      return promise2check(
+        "login_selection",
+        expected_authoptions,
+        template,
+        authOptions
+      );
     }
     mockResponse.render = render;
-    const mockGetSamlRequestUrl = jest
-      .fn()
-      .mockImplementation((opts, callback) => {
-        if (!opts) {
-          callback("empty options");
-        } else {
-          return callback(
-            null,
-            "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState="
-          );
-        }
-      });
 
     samlp.mockImplementation(() => {
       return {
