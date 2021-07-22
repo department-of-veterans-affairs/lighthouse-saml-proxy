@@ -25,7 +25,7 @@ const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
 
 describe("Regression tests", () => {
-  jest.setTimeout(30000);
+  jest.setTimeout(70000);
   let browser;
   beforeEach(async () => {
     browser = await puppeteer.launch(launchArgs);
@@ -37,7 +37,6 @@ describe("Regression tests", () => {
 
   test("Happy Path", async () => {
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(30000);
     await requestToken(page);
 
     let code = await login(page, valid_user, user_password, true);
