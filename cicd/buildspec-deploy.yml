@@ -74,6 +74,8 @@ phases:
           DEPLOY_TAG=${DEPLOY_TAG#*/}
         fi
       - echo "Deployment target set to ${DEPLOY_TAG}"
+      - echo "Verifying ${DEPLOY_TAG} exists..."
+      - make check_tag IMAGE=${IMAGE} TAG=${DEPLOY_TAG}
       - |
         for env in ${ENVIRONMENTS}; do
           if  [[ ! ${DEPLOYABLE_ENVIRONMENTS[@]} =~ ${env} ]]; then
