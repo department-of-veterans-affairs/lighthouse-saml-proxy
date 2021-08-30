@@ -22,6 +22,7 @@ BUILD_VERSION ?= $(shell git rev-parse --short HEAD)
 BUILD_NUMBER ?= $(shell echo $$RANDOM)
 TARGET ?= base
 
+
 # https://stackoverflow.com/questions/10858261/abort-makefile-if-variable-not-set
 # Fuction to check if variables are defined
 check_defined = \
