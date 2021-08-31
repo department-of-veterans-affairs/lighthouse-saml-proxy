@@ -128,6 +128,18 @@ get_labels:
 	@echo Getting labels from ECR  for $(NAMESPACE)/$(IMAGE):$(TAG)
 	@aws ecr batch-get-image --repository-name $(NAMESPACE)/$(IMAGE) --image-id imageTag=$(TAG) --accepted-media-types "application/vnd.docker.distribution.manifest.v1+json" --output json |jq -r '.images[].imageManifest' |jq -r '.history[0].v1Compatibility' |jq -r '.config.Labels'
 
+## check_tag: Verifies that the tag exists in the repository
+.PHONY: check_tag
+check_tag:
+	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
+	@{ \
+	CHECK_TAG=$$(aws ecr list-images  --repository-name $(NAMESPACE)/$(IMAGE) --query 'imageIds[?imageTag==`"$(TAG)"`]' --output text);\
+	if [[ -z $${CHECK_TAG} ]];then\
+	  echo "Image with $(TAG) tag was not found!";\
+	  exit 1;\
+	fi;\
+	}
+
 ## clean:	Removes a local image
 .PHONY: clean
 clean:
