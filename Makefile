@@ -134,7 +134,7 @@ check_tag:
 	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
 	@{ \
 	CHECK_TAG=$$(aws ecr list-images  --repository-name $(NAMESPACE)/$(IMAGE) --query 'imageIds[?imageTag==`"$(TAG)"`]' --output text);\
-	if [[ -z $${CHECK_TAG} ]];then\
+	if [[ -z "$${CHECK_TAG}" ]];then\
 	  echo "Image with $(TAG) tag was not found!";\
 	  exit 1;\
 	fi;\
