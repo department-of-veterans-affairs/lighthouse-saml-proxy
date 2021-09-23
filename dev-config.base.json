@@ -19,7 +19,7 @@
   "idpEncryptionPublicKey": "./idp-encryption-pub.key",
   "vetsAPIHost": "https://vets-api.example.com",
   "vetsAPIToken": "vets-api-token",
-  "sessionSecret": "session-secret",
+  "sessionSecret": "fake-session-secret",
   "cacheEnabled": true,
   "redisPort": "6379",
   "redisHost": "127.0.0.1",

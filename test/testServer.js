@@ -27,7 +27,7 @@ const defaultTestingConfig = {
   spCert: Buffer.from(spCert, "utf-8"),
   spKey: Buffer.from(spKey, "utf-8"),
   spIdpCert: certToPEM(idpCert),
-  sessionSecret: "test",
+  sessionSecret: "fake-session-secret",
   spSignatureAlgorithm: "rsa-sha256",
   spDigestAlgorithm: "sha256",
   spRequestNameIDFormat: true,
