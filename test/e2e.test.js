@@ -2,7 +2,7 @@ require("jest");
 
 import request from "request-promise-native";
 import { DOMParser } from "xmldom";
-import { buildSamlResponseFunction } from "./testUtils"
+import { buildSamlResponseFunction } from "./testUtils";
 import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";

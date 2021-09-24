@@ -14,5 +14,5 @@ export function buildSamlResponseFunction(sessionIndex) {
         resolve(btoa(samlResponse));
       });
     });
-  }
+  };
 }
