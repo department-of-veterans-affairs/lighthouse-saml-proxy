@@ -1,15 +1,13 @@
 require("jest");
 
 import request from "request-promise-native";
-import { getSamlResponse } from "samlp";
 import { DOMParser } from "xmldom";
-
+import { buildSamlResponseFunction } from "./testUtils"
 import { buildBackgroundServerModule } from "./backgroundServer";
-import { getTestExpressApp, idpConfig } from "./testServer";
-import { MHV_USER, DSLOGON_USER, IDME_USER, getUser } from "./testUsers";
+import { getTestExpressApp } from "./testServer";
+import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";
 import MockVetsApiClient from "./mockVetsApiClient";
 import atob from "atob";
-import btoa from "btoa";
 import zlib from "zlib";
 const {
   startServerInBackground,
@@ -35,17 +33,7 @@ const PORT = 1111;
 const vetsApiClient = new MockVetsApiClient();
 
 let sessionIndex = 1;
-function buildSamlResponse(type, level_of_assurance) {
-  const user = getUser(type, level_of_assurance);
-  let config = idpConfig;
-  config.sessionIndex = sessionIndex;
-  sessionIndex++;
-  return new Promise((resolve) => {
-    getSamlResponse(config, user, (_, samlResponse) => {
-      resolve(btoa(samlResponse));
-    });
-  });
-}
+let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
 
 function ssoRequest(samlResponse, state = "state") {
   const reqOpts = {
