@@ -425,3 +425,24 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     );
   });
 });
+
+describe("buildPassportLoginHandler", () => {
+  let req;
+  let mockResponse;
+  let mockNext;
+  beforeEach(async () => {
+    mockResponse = {
+      render: jest.fn(),
+    };
+    mockNext = jest.fn();
+  });
+  it("happy path", () => {
+    handlers.buildPassportLoginHandler("http://example.com/acs")(req, mockResponse, mockNext);
+  })
+
+  it("Invalid request method", () => {})
+
+  it("no request query", () => {})
+
+  it("no SAMLResponse", () => {})
+})
