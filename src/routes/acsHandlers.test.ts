@@ -4,7 +4,10 @@ import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
-import { buildSamlResponseFunction } from "../../test/testUtils";
+import {
+  buildSamlResponseFunction,
+  defaultMockRequest,
+} from "../../test/testUtils";
 import { IDME_USER } from "../../test/testUsers";
 jest.mock("../VetsAPIClient");
 
@@ -432,22 +435,46 @@ describe("buildPassportLoginHandler", () => {
   let req;
   let mockResponse;
   let mockNext;
-  let buildSamlResponse = buildSamlResponseFunction(1);
-  const samlResponse = buildSamlResponse(IDME_USER, "3");
+  const buildSamlResponse = buildSamlResponseFunction(1);
   beforeEach(async () => {
-    
+    req = defaultMockRequest;
     mockResponse = {
       render: jest.fn(),
     };
     mockNext = jest.fn();
   });
   it("happy path", () => {
-    // handlers.buildPassportLoginHandler("http://example.com/acs")(req, mockResponse, mockNext);
+    req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3");
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(req.passport.authenticate).toHaveBeenCalledTimes(1);
   });
 
-  it("Invalid request method", () => {});
+  it("Invalid request method", () => {
+    req.method = null;
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+      request_id: undefined,
+      message: "Invalid assertion response.",
+    });
+  });
 
-  it("no request query", () => {});
-
-  it("no SAMLResponse", () => {});
+  it("no SAMLResponse", () => {
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+      request_id: undefined,
+      message: "Invalid assertion response.",
+    });
+  });
 });

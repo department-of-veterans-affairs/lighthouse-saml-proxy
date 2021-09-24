@@ -18,6 +18,24 @@ export function buildSamlResponseFunction(sessionIndex) {
 }
 
 export let defaultMockRequest = {
+  method: "GET",
+  query: {
+    relayState: "relay",
+  },
+  body: {
+    relayState: "relay",
+  },
+  sp: {
+    options: {
+      getResponseParams: jest.fn(() => {}),
+    },
+  },
+  strategy: {
+    options: {},
+  },
+  passport: {
+    authenticate: jest.fn(() => jest.fn()),
+  },
   get: function (prop) {
     switch (prop) {
       case "host":
