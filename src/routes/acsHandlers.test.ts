@@ -4,6 +4,8 @@ import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
+import { buildSamlResponseFunction } from "../../test/testUtils";
+import { IDME_USER } from "../../test/testUsers";
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -430,7 +432,10 @@ describe("buildPassportLoginHandler", () => {
   let req;
   let mockResponse;
   let mockNext;
+  let buildSamlResponse = buildSamlResponseFunction(1);
+  const samlResponse = buildSamlResponse(IDME_USER, "3");
   beforeEach(async () => {
+    
     mockResponse = {
       render: jest.fn(),
     };

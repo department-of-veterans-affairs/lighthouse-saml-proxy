@@ -16,3 +16,19 @@ export function buildSamlResponseFunction(sessionIndex) {
     });
   };
 }
+
+export let defaultMockRequest = {
+  get: function (prop) {
+    switch (prop) {
+      case "host":
+        return this.host;
+      case "x-forwarded-host":
+        return this.x_fowarded_host;
+      default:
+        return "unexpected";
+    }
+  },
+  host: "example.com",
+  originalUrl: "http://original.example.com",
+  x_fowarded_host: "fowarded.example.com",
+};
