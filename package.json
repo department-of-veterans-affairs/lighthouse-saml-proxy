@@ -30,7 +30,8 @@
     "test:ci": "jest --ci --testPathIgnorePatterns saml-proxy-regression.test.js",
     "test:watch": "jest --watch",
     "start-dev": "npx eslint . && ts-node -r source-map-support/register src/app.js --config dev-config.json",
-    "dev": "./node_modules/nodemon/bin/nodemon.js"
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
+    "prepare": "husky install"
   },
   "jest": {
     "collectCoverage": true,
@@ -118,18 +119,19 @@
     "@types/xmldom": "^0.1.30",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
+    "atob": "^2.1.2",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.2.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "husky": "^7.0.2",
     "jest": "^27.0.4",
     "nodemon": "^2.0.7",
     "prettier": "2.2.1",
     "source-map-support": "^0.5.19",
     "ts-jest": "^27.0.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4",
-    "atob": "^2.1.2"
+    "typescript": "^4.2.4"
   },
   "resolutions": {
     "xml-crypto": ">=2.0.0",
