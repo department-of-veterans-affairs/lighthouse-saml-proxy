@@ -1,6 +1,7 @@
 require("jest");
 
 import { getReqUrl, removeHeaders, sassMiddleware } from "../src/utils";
+import { defaultMockRequest } from "./testUtils";
 import { idpCert } from "./testCerts";
 import path from "path";
 import util from "util";
@@ -70,21 +71,7 @@ describe("Tests for utils.js", () => {
   });
 
   test("Test for getReqUrl", () => {
-    let req = {
-      get: function (prop) {
-        switch (prop) {
-          case "host":
-            return this.host;
-          case "x-forwarded-host":
-            return this.x_fowarded_host;
-          default:
-            return "unexpected";
-        }
-      },
-      host: "example.com",
-      originalUrl: "http://original.example.com",
-      x_fowarded_host: "fowarded.example.com",
-    };
+    let req = defaultMockRequest;
     let result = getReqUrl(req, "test/path/1");
     expect(result).toBe("https://fowarded.example.com/test/path/1");
     req.host = "localhost:7000";

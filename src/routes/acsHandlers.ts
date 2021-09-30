@@ -1,4 +1,4 @@
-import { SP_VERIFY, SP_LOGIN_URL } from "./constants";
+import { SP_VERIFY } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 
@@ -73,7 +73,10 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       assignIn(req.strategy.options, params);
       req.passport.authenticate("wsfed-saml2", params)(req, res, next);
     } else {
-      res.redirect(SP_LOGIN_URL);
+      res.render("error.hbs", {
+        request_id: rTracer.id(),
+        message: "Invalid assertion response.",
+      });
     }
   };
 };

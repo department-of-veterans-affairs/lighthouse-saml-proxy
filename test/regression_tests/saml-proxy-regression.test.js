@@ -114,6 +114,13 @@ describe("Regression tests", () => {
     await isSensitiveError(page);
   });
 
+  test("Empty Assertion Response", async () => {
+    const page = await browser.newPage();
+    await page.goto(`${saml_proxy_url}/samlproxy/sp/saml/sso`);
+    await page.waitForSelector(".usa-alert-error");
+    await isError(page, "Error", "Invalid assertion response.");
+  });
+
   test("404", async () => {
     const page = await browser.newPage();
     await page.goto(`${saml_proxy_url}/samlproxy/bad`);
