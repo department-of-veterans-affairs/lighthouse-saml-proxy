@@ -1,7 +1,7 @@
 require("jest");
 
 import request from "request-promise-native";
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 import { buildSamlResponseFunction } from "./testUtils";
 import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";

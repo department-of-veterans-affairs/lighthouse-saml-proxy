@@ -1,6 +1,6 @@
 import { createProfileMapper } from "./IDMeProfileMapper";
 import { IDP_SSO } from "./routes/constants";
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp";
 import { Response, Request, NextFunction } from "express";
 import logger from "./logger";
