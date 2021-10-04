@@ -4,6 +4,11 @@ import * as handlers from "./acsHandlers";
 import { VetsAPIClient } from "../VetsAPIClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
+import {
+  buildSamlResponseFunction,
+  defaultMockRequest,
+} from "../../test/testUtils";
+import { IDME_USER } from "../../test/testUsers";
 jest.mock("../VetsAPIClient");
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
@@ -423,5 +428,53 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     expect(errMessage).toBe(
       "Error: Empty relay state during loa test. Invalid request."
     );
+  });
+});
+
+describe("buildPassportLoginHandler", () => {
+  let req;
+  let mockResponse;
+  let mockNext;
+  const buildSamlResponse = buildSamlResponseFunction(1);
+  beforeEach(async () => {
+    req = defaultMockRequest;
+    mockResponse = {
+      render: jest.fn(),
+    };
+    mockNext = jest.fn();
+  });
+  it("happy path", () => {
+    req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3");
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(req.passport.authenticate).toHaveBeenCalledTimes(1);
+  });
+
+  it("Invalid request method", () => {
+    req.method = null;
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+      request_id: undefined,
+      message: "Invalid assertion response.",
+    });
+  });
+
+  it("no SAMLResponse", () => {
+    handlers.buildPassportLoginHandler("http://example.com/acs")(
+      req,
+      mockResponse,
+      mockNext
+    );
+    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+      request_id: undefined,
+      message: "Invalid assertion response.",
+    });
   });
 });
