@@ -66,10 +66,8 @@ export const samlLogin = function (template) {
     } else {
       login_gov_enabled = false;
     }
-    console.log("login_gov_enabled==" + login_gov_enabled);
-    [
+    const authnSelection = [
       ["id_me_login_link", req.sp.options.idpLoginLink],
-      ["login_gov_login_link", req.sp.options.idpLoginLink],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
       [
@@ -77,7 +75,15 @@ export const samlLogin = function (template) {
         "http://idmanagement.gov/ns/assurance/loa/3",
         "&op=signup",
       ],
-    ]
+    ];
+    if (login_gov_enabled) {
+      authnSelection.push([
+        "login_gov_login_link",
+        req.sp.options.idpLoginLink,
+      ]);
+    }
+
+    authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
         const params = req.sp.options.getAuthnRequestParams(
           acsUrl,
