@@ -58,7 +58,16 @@ function runServer(argv) {
     .then(() => {
       const app = express();
       const httpServer = http.createServer(app);
-      const spConfig = new SPConfig(argv);
+      const spConfigs = { id_me: new SPConfig(argv) };
+      if (argv.otherLogins) {
+        Object.entries(argv.otherLogins).forEach((entry) => {
+          entry[1].idpspIdpCert = argv.spIdpCert;
+          if (!entry[1].spDigestAlgorithm) {
+            entry[1].spDigestAlgorithm = argv.spDigestAlgorithm;
+          }
+          spConfigs[entry[0]] = new SPConfig(entry[1]);
+        });
+      }
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
       const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
@@ -71,7 +80,7 @@ function runServer(argv) {
         app,
         argv,
         idpConfig,
-        spConfig,
+        spConfigs,
         vetsApiClient,
         cache,
         cacheEnabled

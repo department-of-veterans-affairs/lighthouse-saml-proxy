@@ -121,6 +121,7 @@ okta*.key
 
 *.crt
 
+saml-proxy*.key
 test/test.css
 
 # Typescript build
