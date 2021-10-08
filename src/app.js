@@ -61,7 +61,7 @@ function runServer(argv) {
       const spConfigs = { id_me: new SPConfig(argv) };
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((entry) => {
-          entry[1].idpspIdpCert = argv.spIdpCert;
+          entry[1].spIdpCert = argv.spIdpCert;
           if (!entry[1].spDigestAlgorithm) {
             entry[1].spDigestAlgorithm = argv.spDigestAlgorithm;
           }
