@@ -59,9 +59,17 @@ export const samlLogin = function (template) {
       req.sp.options.getResponseParams(),
       new SAML.SAML(req.sp.options.getResponseParams())
     );
+
+    let login_gov_enabled;
+    if (req.sp.options.otherLogins?.login_gov) {
+      login_gov_enabled = true;
+    } else {
+      login_gov_enabled = false;
+    }
+    console.log("login_gov_enabled==" + login_gov_enabled);
     [
       ["id_me_login_link", req.sp.options.idpLoginLink],
-      ["login_gov_login_link", "dslogon"],
+      ["login_gov_login_link", req.sp.options.idpLoginLink],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
       [
@@ -96,6 +104,7 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
+        authOptions.login_gov_enabled = login_gov_enabled;
         res.render(template, authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",

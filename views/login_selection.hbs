@@ -9,7 +9,9 @@
     <a class="no-external-icon usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon" src="/samlproxy/idp/img/dslogon-icon.svg" />Sign in with DSLogon</a>
     <a class="no-external-icon usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet" src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
     <a class="no-external-icon usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
+    {{#if login_gov_enabled}}
     <a class="no-external-icon usa-button mhv" href="{{ login_gov_login_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/icon-dot-gov.svg" />Sign in with Login.gov</a>
+    {{/if}}
   </div>
   <div class="usa-width-one-half login-help">
     <h4>Having trouble signing in?</h4>
