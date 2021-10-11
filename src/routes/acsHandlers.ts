@@ -14,7 +14,7 @@ import {
   IdpLoginMetrics,
 } from "../metrics";
 import rTracer from "cls-rtracer";
-// make changes
+
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
