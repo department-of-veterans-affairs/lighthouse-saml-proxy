@@ -46,7 +46,7 @@ export default function addRoutes(
   });
 
   app.get(SP_METADATA_URL, function (req, res, next) {
-    const xml = METADATA_TEMPLATE(spConfig.getMetadataParams(req));
+    const xml = METADATA_TEMPLATE(spConfigs.id_me.getMetadataParams(req));
     res.set("Content-Type", "text/xml");
     res.send(xml);
   });
