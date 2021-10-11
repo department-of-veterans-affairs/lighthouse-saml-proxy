@@ -55,13 +55,16 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const samlp = new _samlp(
-      req.sp.options.getResponseParams(),
-      new SAML.SAML(req.sp.options.getResponseParams())
-    );
+    const samlp = {};
+    Object.keys(req.sps.options).forEach((idpKey) => {
+      samlp[idpKey] = new _samlp(
+        req.sps.options[idpKey].getResponseParams(),
+        new SAML.SAML(req.sps.options[idpKey].getResponseParams())
+      );
+    });
 
     let login_gov_enabled;
-    if (req.sp.options.otherLogins?.login_gov) {
+    if (req.sps.options.login_gov) {
       login_gov_enabled = true;
     } else {
       login_gov_enabled = false;
@@ -79,7 +82,7 @@ export const samlLogin = function (template) {
     if (login_gov_enabled) {
       authnSelection.push([
         "login_gov_login_link",
-        req.sp.options.idpLoginLink,
+        req.sps.options.login_gov.idpLoginLink,
       ]);
     }
 
@@ -94,7 +97,11 @@ export const samlLogin = function (template) {
         );
         return memo.then((m) => {
           return new Promise((resolve, reject) => {
-            samlp.getSamlRequestUrl(params, (err, url) => {
+            let idpKey = "id_me";
+            if (key === "login_gov_login_link") {
+              idpKey = "login_gov";
+            }
+            samlp[idpKey].getSamlRequestUrl(params, (err, url) => {
               if (err) {
                 reject(err);
               }

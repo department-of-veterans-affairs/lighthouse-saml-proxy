@@ -151,7 +151,8 @@ export default function configureExpress(
     req.passport = passport;
     req.strategy = strategy;
     req.vetsAPIClient = vetsApiClient;
-    req.sp = { options: spOptions };
+    req.sp = { options: spOptions["id_me"] };
+    req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);
     next();
