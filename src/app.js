@@ -61,11 +61,11 @@ function runServer(argv) {
       const spConfigs = { id_me: new SPConfig(argv) };
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((entry) => {
-          entry[1].spIdpCert = argv.spIdpCert;
-          if (!entry[1].spDigestAlgorithm) {
-            entry[1].spDigestAlgorithm = argv.spDigestAlgorithm;
-          }
-          spConfigs[entry[0]] = new SPConfig(entry[1]);
+          IdPMetadata.fetch(entry[1].spIdpMetaUrl)
+            .then(handleMetadata(entry[1]))
+            .then(() => {
+              spConfigs[entry[0]] = new SPConfig(entry[1]);
+            });
         });
       }
       const idpConfig = new IDPConfig(argv);
