@@ -53,8 +53,7 @@ export default function addRoutes(
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  let configVals = Object.values(spConfigs);
-  configVals.forEach((spConfig) => {
+  Object.values(spConfigs).forEach((spConfig) => {
     spConfig.acsUrls.forEach((url) =>
       acsFactory(app, url, cache, cacheEnabled)
     );
