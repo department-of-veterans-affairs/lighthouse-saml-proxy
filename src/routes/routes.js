@@ -26,7 +26,7 @@ const METADATA_TEMPLATE = template(
 export default function addRoutes(
   app,
   idpConfig,
-  spConfig,
+  spConfigs,
   cache,
   cacheEnabled
 ) {
@@ -53,8 +53,12 @@ export default function addRoutes(
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  spConfig.acsUrls.forEach((url) => acsFactory(app, url, cache, cacheEnabled));
-
+  let configVals = Object.values(spConfigs);
+  configVals.forEach((spConfig) => {
+    spConfig.acsUrls.forEach((url) =>
+      acsFactory(app, url, cache, cacheEnabled)
+    );
+  });
   app.get(SP_ERROR_URL, handleError);
 
   return app;

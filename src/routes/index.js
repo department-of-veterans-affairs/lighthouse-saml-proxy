@@ -67,7 +67,7 @@ export default function configureExpress(
     });
   }
 
-  const [passport, strategy] = createPassport(spOptions);
+  const [passport, strategy] = createPassport(spOptions["id_me"]);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
     includeMethod: true,
