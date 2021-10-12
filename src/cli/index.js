@@ -291,17 +291,17 @@ export function processArgs() {
         default:
           "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       },
-      // spCert: {
-      //   description: "SP/RP Public Key Signature Certificate (PEM)",
-      //   string: true,
-      //   required: false,
-      //   default: path.resolve(cwd(), "./sp-cert.pem"),
-      //   coerce: makeCertFileCoercer(
-      //     "certificate",
-      //     "SP Signing Public Key Certificate (PEM)",
-      //     KEY_CERT_HELP_TEXT
-      //   ),
-      // },
+      spCert: {
+        description: "SP/RP Public Key Signature Certificate (PEM)",
+        string: true,
+        required: false,
+        default: path.resolve(cwd(), "./sp-cert.pem"),
+        coerce: makeCertFileCoercer(
+          "certificate",
+          "SP Signing Public Key Certificate (PEM)",
+          KEY_CERT_HELP_TEXT
+        ),
+      },
       spKey: {
         description: "SP/RP Private Key Signature Certificate(PEM)",
         string: true,
