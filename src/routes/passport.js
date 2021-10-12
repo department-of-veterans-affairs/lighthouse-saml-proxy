@@ -3,7 +3,12 @@ import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
 import { IDMeProfileMapper } from "../IDMeProfileMapper";
 
-export default function createPassport(spConfig) {
+/**
+ * Creates the passport strategy using the spConfig
+ * @param {*} spConfig
+ * @returns Strategy
+ */
+export default function createPassportStrategy(spConfig) {
   const responseParams = spConfig.getResponseParams();
   const strategy = new Strategy(responseParams, (profile, done) => {
     return done(null, {
@@ -29,6 +34,15 @@ export default function createPassport(spConfig) {
       }).getMappedClaims(),
     });
   });
+
+  return strategy;
+}
+
+/**
+ * Called before handling the SAML response
+ * @param {} strategy The stategy to use
+ */
+export function preparePassport(strategy) {
   passport.use(strategy);
 
   passport.serializeUser(function (user, done) {
@@ -39,5 +53,6 @@ export default function createPassport(spConfig) {
     done(null, user);
   });
 
-  return [passport, strategy];
+  passport.initialize();
+  return passport;
 }

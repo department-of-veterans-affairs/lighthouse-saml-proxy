@@ -1,6 +1,7 @@
 import { SP_VERIFY } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
+import { preparePassport } from "./passport";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
@@ -69,13 +70,11 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         req.session.ssoResponse = ssoResponse;
       }
 
-      const params = req.sp.options.getResponseParams(ssoResponse.url);
-      assignIn(req.passports.id_me.strategy.options, params);
-      req.passports.id_me.passport.authenticate("wsfed-saml2", params)(
-        req,
-        res,
-        next
-      );
+      const params = req.sps.options.id_me.getResponseParams(ssoResponse.url);
+      // Passport strategy selection will have to be here. defaults to id_me for now.
+      assignIn(req.strategies.id_me.options, params);
+      const passport = preparePassport(req.strategies.id_me);
+      passport.authenticate("wsfed-saml2", params)(req, res, next);
     } else {
       res.render("error.hbs", {
         request_id: rTracer.id(),

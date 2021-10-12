@@ -29,9 +29,9 @@ export const samlLogin = function (template) {
   return function (req, res, next) {
     const acsUrl = req.query.acsUrl
       ? getReqUrl(req, req.query.acsUrl)
-      : getReqUrl(req, req.sp.options.requestAcsUrl);
+      : getReqUrl(req, req.sps.options.id_me.requestAcsUrl);
     const authnRequest = req.authnRequest
-      ? req.authnRequest
+      ? req.authnRequests
       : req.session
       ? req.session.authnRequest
       : null;
@@ -70,7 +70,7 @@ export const samlLogin = function (template) {
       login_gov_enabled = false;
     }
     const authnSelection = [
-      ["id_me_login_link", req.sp.options.idpLoginLink],
+      ["id_me_login_link", req.sps.options.id_me.idpLoginLink],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
       [
@@ -88,7 +88,11 @@ export const samlLogin = function (template) {
 
     authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
-        const params = req.sp.options.getAuthnRequestParams(
+        let idpKey = "id_me";
+        if (key === "login_gov_login_link") {
+          idpKey = "login_gov";
+        }
+        const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
           (authnRequest && authnRequest.forceAuthn) || "false",
           relayState || "/",
@@ -97,10 +101,6 @@ export const samlLogin = function (template) {
         );
         return memo.then((m) => {
           return new Promise((resolve, reject) => {
-            let idpKey = "id_me";
-            if (key === "login_gov_login_link") {
-              idpKey = "login_gov";
-            }
             samlp[idpKey].getSamlRequestUrl(params, (err, url) => {
               if (err) {
                 reject(err);

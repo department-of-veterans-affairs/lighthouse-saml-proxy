@@ -34,7 +34,7 @@ export default function configureExpress(
   argv,
   idpOptions,
   spOptions,
-  passports,
+  strategies,
   vetsApiClient,
   cache = new RedisCache(),
   cacheEnabled = true
@@ -146,11 +146,8 @@ export default function configureExpress(
 
   app.use(function (req, res, next) {
     req.metadata = idpOptions.profileMapper.metadata;
-    req.passport = passports.id_me.passport;
-    req.strategy = passports.id_me.strategy;
-    req.passports = passports;
+    req.strategies = strategies;
     req.vetsAPIClient = vetsApiClient;
-    req.sp = { options: spOptions["id_me"] };
     req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);

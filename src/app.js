@@ -13,7 +13,8 @@ import configureExpress from "./routes";
 import logger from "./logger";
 import { VetsAPIClient } from "./VetsAPIClient";
 import { RedisCache } from "./routes/types";
-import createPassport from "./routes/passport";
+import createPassportStrategy from "./routes/passport";
+import passport from "passport";
 
 /**
  * Globals
@@ -57,25 +58,24 @@ const handleMetadata = (argv) => {
 };
 
 function runServer(argv) {
-  const passports = {};
+  const strategies = {};
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
-      let [passport, strategy] = createPassport(spConfigs.id_me);
+      strategies.id_me = createPassportStrategy(spConfigs.id_me);
       app.use(passport.initialize());
-      passports.id_me = { passport: passport, strategy: strategy };
       if (argv.otherLogins) {
-        Object.entries(argv.otherLogins).forEach((entry) => {
-          IdPMetadata.fetch(entry[1].spIdpMetaUrl)
-            .then(handleMetadata(entry[1]))
+        Object.entries(argv.otherLogins).forEach((spIdpEntry) => {
+          IdPMetadata.fetch(spIdpEntry[1].spIdpMetaUrl)
+            .then(handleMetadata(spIdpEntry[1]))
             .then(() => {
-              spConfigs[entry[0]] = new SPConfig(entry[1]);
-              [passport, strategy] = createPassport(spConfigs[entry[0]]);
-              passports[entry[0]] = { passport: passport, strategy: strategy };
-              app.use(passport.initialize());
+              spConfigs[spIdpEntry[0]] = new SPConfig(spIdpEntry[1]);
+              strategies[spIdpEntry[0]] = createPassportStrategy(
+                spConfigs[spIdpEntry[0]]
+              );
             });
         });
       }
@@ -92,7 +92,7 @@ function runServer(argv) {
         argv,
         idpConfig,
         spConfigs,
-        passports,
+        strategies,
         vetsApiClient,
         cache
       );
