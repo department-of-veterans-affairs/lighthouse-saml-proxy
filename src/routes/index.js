@@ -101,9 +101,6 @@ export default function configureExpress(
     );
   }
   app.use(metricsMiddleware);
-  Object.keys(passports).forEach((idpKey) => {
-    app.use(passports[idpKey].passport.initialize());
-  });
 
   /**
    * Middleware

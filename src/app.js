@@ -65,6 +65,7 @@ function runServer(argv) {
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
       let [passport, strategy] = createPassport(spConfigs.id_me);
+      app.use(passport.initialize());
       passports.id_me = { passport: passport, strategy: strategy };
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((entry) => {
@@ -74,6 +75,7 @@ function runServer(argv) {
               spConfigs[entry[0]] = new SPConfig(entry[1]);
               [passport, strategy] = createPassport(spConfigs[entry[0]]);
               passports[entry[0]] = { passport: passport, strategy: strategy };
+              app.use(passport.initialize());
             });
         });
       }
