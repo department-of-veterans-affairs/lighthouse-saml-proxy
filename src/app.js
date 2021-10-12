@@ -13,6 +13,7 @@ import configureExpress from "./routes";
 import logger from "./logger";
 import { VetsAPIClient } from "./VetsAPIClient";
 import { RedisCache } from "./routes/types";
+import createPassport from "./routes/passport";
 
 /**
  * Globals
@@ -56,18 +57,23 @@ const handleMetadata = (argv) => {
 };
 
 function runServer(argv) {
+  const passports = {};
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
+      let [passport, strategy] = createPassport(spConfigs.id_me);
+      passports.id_me = { passport: passport, strategy: strategy };
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((entry) => {
           IdPMetadata.fetch(entry[1].spIdpMetaUrl)
             .then(handleMetadata(entry[1]))
             .then(() => {
               spConfigs[entry[0]] = new SPConfig(entry[1]);
+              [passport, strategy] = createPassport(spConfigs[entry[0]]);
+              passports[entry[0]] = { passport: passport, strategy: strategy };
             });
         });
       }
@@ -84,9 +90,9 @@ function runServer(argv) {
         argv,
         idpConfig,
         spConfigs,
+        passports,
         vetsApiClient,
-        cache,
-        cacheEnabled
+        cache
       );
 
       const env = app.get("env"),

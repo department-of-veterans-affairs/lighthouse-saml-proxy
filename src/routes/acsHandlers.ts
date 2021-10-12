@@ -70,8 +70,12 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       }
 
       const params = req.sp.options.getResponseParams(ssoResponse.url);
-      assignIn(req.strategy.options, params);
-      req.passport.authenticate("wsfed-saml2", params)(req, res, next);
+      assignIn(req.passports.id_me.strategy.options, params);
+      req.passports.id_me.passport.authenticate("wsfed-saml2", params)(
+        req,
+        res,
+        next
+      );
     } else {
       res.render("error.hbs", {
         request_id: rTracer.id(),

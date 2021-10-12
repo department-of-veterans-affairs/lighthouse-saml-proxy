@@ -16,7 +16,6 @@ import {
   winstonMiddleware,
   logger,
 } from "../logger";
-import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
@@ -35,6 +34,7 @@ export default function configureExpress(
   argv,
   idpOptions,
   spOptions,
+  passports,
   vetsApiClient,
   cache = new RedisCache(),
   cacheEnabled = true
@@ -67,7 +67,6 @@ export default function configureExpress(
     });
   }
 
-  const [passport, strategy] = createPassport(spOptions["id_me"]);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
     includeMethod: true,
@@ -102,7 +101,9 @@ export default function configureExpress(
     );
   }
   app.use(metricsMiddleware);
-  app.use(passport.initialize());
+  Object.keys(passports).forEach((idpKey) => {
+    app.use(passports[idpKey].passport.initialize());
+  });
 
   /**
    * Middleware
@@ -148,8 +149,9 @@ export default function configureExpress(
 
   app.use(function (req, res, next) {
     req.metadata = idpOptions.profileMapper.metadata;
-    req.passport = passport;
-    req.strategy = strategy;
+    req.passport = passports.id_me.passport;
+    req.strategy = passports.id_me.strategy;
+    req.passports = passports;
     req.vetsAPIClient = vetsApiClient;
     req.sp = { options: spOptions["id_me"] };
     req.sps = { options: spOptions };

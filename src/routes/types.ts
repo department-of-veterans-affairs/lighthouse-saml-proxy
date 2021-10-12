@@ -16,9 +16,15 @@ export interface IConfiguredRequest extends Request {
   vetsAPIClient: VetsAPIClient;
   passport: PassportStatic;
   strategy: IExtendedStrategy;
+  passports: any;
   sp: any;
   idp: any;
   user: User;
+}
+
+export interface IPassport {
+  passport: PassportStatic;
+  strategy: IExtendedStrategy;
 }
 
 /**
