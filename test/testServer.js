@@ -5,6 +5,7 @@ import IDPConfig from "../src/IDPConfig";
 import configureExpress from "../src/routes";
 import { TestCache } from "../src/routes/types";
 import SPConfig from "../src/SPConfig";
+import createPassportStrategy from "../src/routes/passport";
 
 import { idpCert, idpKey, spCert, spKey } from "./testCerts";
 
@@ -40,12 +41,14 @@ export const idpConfig = new IDPConfig(defaultTestingConfig);
 
 export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
-  const spConfig = new SPConfig(defaultTestingConfig);
+  const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
+  const strategies = {id_me : createPassportStrategy(spConfigs.id_me)};
   configureExpress(
     app,
     defaultTestingConfig,
     idpConfig,
-    spConfig,
+    spConfigs,
+    strategies,
     vetsApiClient,
     cache
   );
