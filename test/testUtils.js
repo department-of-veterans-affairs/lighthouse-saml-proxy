@@ -25,16 +25,17 @@ export let defaultMockRequest = {
   body: {
     relayState: "relay",
   },
-  sp: {
+  sps: {
     options: {
-      getResponseParams: jest.fn(() => {}),
+      id_me: {
+        getResponseParams: jest.fn(() => {}),
+      },
     },
   },
-  strategy: {
-    options: {},
-  },
-  passport: {
-    authenticate: jest.fn(() => jest.fn()),
+  strategies: {
+    id_me: {
+      options: {},
+    },
   },
   get: function (prop) {
     switch (prop) {

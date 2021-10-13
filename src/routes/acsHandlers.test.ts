@@ -9,7 +9,9 @@ import {
   defaultMockRequest,
 } from "../../test/testUtils";
 import { IDME_USER } from "../../test/testUsers";
+jest.mock("passport");
 jest.mock("../VetsAPIClient");
+import passport from "passport";
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
 
@@ -356,6 +358,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     mockResponse = {
       render: jest.fn(),
     };
+    passport.mockImplementation(() => jest.fn());
   });
 
   it("testLevelOfAssuranceOrRedirect, sufficient loa", async () => {
@@ -443,6 +446,7 @@ describe("buildPassportLoginHandler", () => {
     };
     mockNext = jest.fn();
   });
+
   it("happy path", () => {
     req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3");
     handlers.buildPassportLoginHandler("http://example.com/acs")(
@@ -450,7 +454,7 @@ describe("buildPassportLoginHandler", () => {
       mockResponse,
       mockNext
     );
-    expect(req.passport.authenticate).toHaveBeenCalledTimes(1);
+    expect(passport.authenticate).toHaveBeenCalledTimes(1);
   });
 
   it("Invalid request method", () => {
