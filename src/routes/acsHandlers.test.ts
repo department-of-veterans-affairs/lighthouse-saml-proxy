@@ -358,7 +358,6 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     mockResponse = {
       render: jest.fn(),
     };
-    passport.mockImplementation(() => jest.fn());
   });
 
   it("testLevelOfAssuranceOrRedirect, sufficient loa", async () => {
@@ -445,6 +444,10 @@ describe("buildPassportLoginHandler", () => {
       render: jest.fn(),
     };
     mockNext = jest.fn();
+    passport.authenticate.mockImplementation((args) => {
+      expect(args).toBe("wsfed-saml2");
+      return jest.fn;
+    });
   });
 
   it("happy path", () => {
