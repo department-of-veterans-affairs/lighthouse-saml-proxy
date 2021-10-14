@@ -58,14 +58,14 @@ const handleMetadata = (argv) => {
 };
 
 function runServer(argv) {
-  const strategies = {};
+  const strategies = new Map();
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
-      strategies.id_me = createPassportStrategy(spConfigs.id_me);
+      strategies.set("id_me ", createPassportStrategy(spConfigs.id_me));
       app.use(passport.initialize());
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((spIdpEntry) => {
@@ -73,8 +73,9 @@ function runServer(argv) {
             .then(handleMetadata(spIdpEntry[1]))
             .then(() => {
               spConfigs[spIdpEntry[0]] = new SPConfig(spIdpEntry[1]);
-              strategies[spIdpEntry[0]] = createPassportStrategy(
-                spConfigs[spIdpEntry[0]]
+              strategies.set(
+                spIdpEntry[0],
+                createPassportStrategy(spConfigs[spIdpEntry[0]])
               );
             });
         });
