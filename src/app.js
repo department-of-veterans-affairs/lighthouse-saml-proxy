@@ -65,7 +65,7 @@ function runServer(argv) {
       const app = express();
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
-      strategies.set("id_me ", createPassportStrategy(spConfigs.id_me));
+      strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
       app.use(passport.initialize());
       if (argv.otherLogins) {
         Object.entries(argv.otherLogins).forEach((spIdpEntry) => {
