@@ -8,6 +8,7 @@ import SPConfig from "../src/SPConfig";
 import createPassportStrategy from "../src/routes/passport";
 
 import { idpCert, idpKey, spCert, spKey } from "./testCerts";
+import passport from "passport";
 
 const defaultTestingConfig = {
   idpAcsUrl: "https://localhost:1111/samlproxy/sp/saml/sso",
@@ -42,7 +43,8 @@ export const idpConfig = new IDPConfig(defaultTestingConfig);
 export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
   const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
-  const strategies = {id_me : createPassportStrategy(spConfigs.id_me)};
+  const strategies = { id_me: createPassportStrategy(spConfigs.id_me) };
+  app.use(passport.initialize());
   configureExpress(
     app,
     defaultTestingConfig,
