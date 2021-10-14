@@ -94,7 +94,8 @@ function runServer(argv) {
         spConfigs,
         strategies,
         vetsApiClient,
-        cache
+        cache,
+        cacheEnabled
       );
 
       const env = app.get("env"),
