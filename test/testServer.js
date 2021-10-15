@@ -43,7 +43,8 @@ export const idpConfig = new IDPConfig(defaultTestingConfig);
 export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
   const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
-  const strategies = { id_me: createPassportStrategy(spConfigs.id_me) };
+  const strategies = new Map();
+  strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
   app.use(passport.initialize());
   configureExpress(
     app,
