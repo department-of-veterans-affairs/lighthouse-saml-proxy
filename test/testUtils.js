@@ -17,6 +17,10 @@ export function buildSamlResponseFunction(sessionIndex) {
   };
 }
 
+const strategies = new Map();
+strategies.set("id_me", {
+  getResponseParams: jest.fn(() => {}),
+});
 export let defaultMockRequest = {
   method: "GET",
   query: {
@@ -32,11 +36,7 @@ export let defaultMockRequest = {
       },
     },
   },
-  strategies: {
-    id_me: {
-      options: {},
-    },
-  },
+  strategies: strategies,
   get: function (prop) {
     switch (prop) {
       case "host":
