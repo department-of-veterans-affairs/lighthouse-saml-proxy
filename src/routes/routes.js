@@ -27,6 +27,7 @@ export default function addRoutes(
   app,
   idpConfig,
   spConfigs,
+  acsUrl,
   cache,
   cacheEnabled
 ) {
@@ -53,11 +54,8 @@ export default function addRoutes(
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  Object.values(spConfigs).forEach((spConfig) => {
-    spConfig.acsUrls.forEach((url) =>
-      acsFactory(app, url, cache, cacheEnabled)
-    );
-  });
+  acsFactory(app, acsUrl, cache, cacheEnabled);
+
   app.get(SP_ERROR_URL, handleError);
 
   return app;

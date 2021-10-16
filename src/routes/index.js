@@ -164,7 +164,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions, cache, cacheEnabled);
+  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {
