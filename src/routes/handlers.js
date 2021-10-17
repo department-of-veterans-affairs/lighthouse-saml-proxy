@@ -29,7 +29,7 @@ export const samlLogin = function (template) {
   return function (req, res, next) {
     const acsUrl = req.query.acsUrl
       ? getReqUrl(req, req.query.acsUrl)
-      : getReqUrl(req, req.sps.options.id_me.requestAcsUrl);
+      : getReqUrl(req, req.requestAcsUrl);
     const authnRequest = req.authnRequest
       ? req.authnRequest
       : req.session

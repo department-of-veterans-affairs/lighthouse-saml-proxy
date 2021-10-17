@@ -18,6 +18,7 @@ export interface IConfiguredRequest extends Request {
   sps: any;
   idp: any;
   user: User;
+  requestAcsUrl: string;
 }
 
 /**
