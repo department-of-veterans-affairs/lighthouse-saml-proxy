@@ -70,7 +70,7 @@ export const samlLogin = function (template) {
       login_gov_enabled = false;
     }
     const authnSelection = [
-      ["id_me_login_link", req.sps.options.id_me.idpLoginLink],
+      ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
       [
@@ -82,7 +82,7 @@ export const samlLogin = function (template) {
     if (login_gov_enabled) {
       authnSelection.push([
         "login_gov_login_link",
-        req.sps.options.login_gov.idpLoginLink,
+        "http://idmanagement.gov/ns/assurance/loa/3",
       ]);
     }
 
