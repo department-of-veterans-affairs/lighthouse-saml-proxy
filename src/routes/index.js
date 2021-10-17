@@ -151,7 +151,7 @@ export default function configureExpress(
     req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);
-    req.requestAcsUrl = argv.spAcsUrls[0];
+    req.requestAcsUrl = argv.spAcsUrl;
     next();
   });
 
@@ -165,7 +165,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions, argv.spAcsUrls[0], cache, cacheEnabled);
+  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

@@ -236,11 +236,11 @@ export function processArgs() {
         string: true,
         default: "Simple SAML Service Provider",
       },
-      spAcsUrls: {
-        description: "SP Assertion Consumer Service (ACS) URLs (Relative URL)",
+      spAcsUrl: {
+        description: "SP Assertion Consumer Service (ACS) URL (Relative URL)",
         required: true,
-        array: true,
-        default: ["/saml/sso"],
+        string: true,
+        default: "/samlproxy/sp/saml/sso",
       },
       spSignAuthnRequests: {
         description: "Sign AuthnRequest Messages (SAMLP)",
