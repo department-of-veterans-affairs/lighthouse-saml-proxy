@@ -55,7 +55,7 @@ export default class SPConfig {
       realm: this.audience,
       cert: removeHeaders(this.spCert),
       encryptionCert: removeHeaders(this.spEncryptionCert),
-      acsUrls: this.acsUrls.map((url) => getReqUrl(req, url)),
+      acsUrls: [getReqUrl(req, req.requestAcsUrl)],
       sloUrl: getReqUrl(req, SP_SLO_URL),
       nameIDFormat: this.nameIDFormat,
     };
