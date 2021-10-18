@@ -32,7 +32,7 @@
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       "spAudience": "https://saml-idp.example2.com",
       "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
-      "spCert": ".saml-proxy-public.crt",
+      "spCert": "./saml-proxy-public.crt",
       "spKey": "./saml-proxy-private.key"
    }
   ]
