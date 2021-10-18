@@ -383,6 +383,11 @@ export function processArgs() {
         required: true,
         string: true,
       },
+      otherLogins: {
+        description: "An object used to describe other IDP options for login",
+        required: false,
+        
+      }
     })
     .example(
       "\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV",
