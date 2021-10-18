@@ -23,5 +23,18 @@
   "cacheEnabled": true,
   "redisPort": "6379",
   "redisHost": "127.0.0.1",
-  "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+  "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+  "otherLogins": 
+  [
+    {
+      "category": "login_gov",
+      "spIdpMetaUrl": "https://idp.int.identitysandbox.gov/api/saml/metadata2021",
+      "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "spAudience": "urn:gov:gsa:SAML:2.0.profiles:sp:sso:va_lighthouse:saml_proxy_local",
+      "spAuthnContextClassRef": "http://idmanagement.gov/ns/assurance/loa/3",
+      "spCert": ".saml-proxy-public-local-login-gov.crt",
+      "spKey": "./saml-proxy-private-local-login-gov.key"
+   }
+  ]
 }
+
