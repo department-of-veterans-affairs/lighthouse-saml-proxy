@@ -386,8 +386,79 @@ export function processArgs() {
       otherLogins: {
         description: "An object used to describe other IDP options for login",
         required: false,
-        
-      }
+        Object: true,
+        other_saml_idp: {
+          description:
+            "An object used to describe other IDP options for other_saml_idp. Note that the name of this object is used and a key for the SP IDP config items.",
+          spProtocol: {
+            description: "Federation Protocol",
+            required: true,
+            string: true,
+            default: "samlp",
+          },
+          spIdpIssuer: {
+            description: "IdP Issuer URI",
+            required: false,
+            string: true,
+            default: "urn:example:idp",
+          },
+          spIdpSsoUrl: {
+            description: "IdP Single Sign-On Service URL (SSO URL)",
+            required: false,
+            string: true,
+          },
+          spIdpSsoBinding: {
+            description: "IdP Single Sign-On AuthnRequest Binding",
+            required: true,
+            string: true,
+            default: BINDINGS.REDIRECT,
+          },
+          spIdpSloUrl: {
+            description: "IdP Single Logout Service URL (SLO URL) (SAMLP)",
+            required: false,
+            string: true,
+          },
+          spIdpSloBinding: {
+            description: "IdP Single Logout Request Binding (SAMLP)",
+            required: true,
+            string: true,
+            default: BINDINGS.REDIRECT,
+          },
+          spIdpCert: {
+            description: "IdP Public Key Signing Certificate (PEM)",
+            required: false,
+            string: true,
+            coerce: () => {
+              return certToPEM(
+                makeCertFileCoercer(
+                  "certificate",
+                  "IdP Public Key Signing Certificate (PEM)",
+                  KEY_CERT_HELP_TEXT
+                )
+              );
+            },
+          },
+          spIdpThumbprint: {
+            description: "IdP Public Key Signing Certificate SHA1 Thumbprint",
+            required: false,
+            string: true,
+            coerce: (value) => {
+              return value ? value.replace(/:/g, "") : value;
+            },
+          },
+          spIdpMetaUrl: {
+            description: "IdP SAML Metadata URL",
+            required: false,
+            string: true,
+          },
+          spAudience: {
+            description: "SP Audience URI / RP Realm",
+            required: false,
+            string: true,
+            default: "urn:example:sp",
+          },
+        },
+      },
     })
     .example(
       "\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV",
