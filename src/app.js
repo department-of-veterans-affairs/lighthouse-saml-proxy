@@ -72,10 +72,10 @@ function runServer(argv) {
           IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
             .then(handleMetadata(spIdpEntry))
             .then(() => {
-              spConfigs[spIdpEntry.idp_category] = new SPConfig(spIdpEntry);
+              spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
               strategies.set(
-                spIdpEntry.idp_category,
-                createPassportStrategy(spConfigs[spIdpEntry.idp_category])
+                spIdpEntry.category,
+                createPassportStrategy(spConfigs[spIdpEntry.category])
               );
             });
         });
