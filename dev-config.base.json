@@ -27,13 +27,13 @@
   "otherLogins": 
   [
     {
-      "category": "login_gov",
-      "spIdpMetaUrl": "https://idp.int.identitysandbox.gov/api/saml/metadata2021",
+      "category": "example2_saml_idp",
+      "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-      "spAudience": "urn:gov:gsa:SAML:2.0.profiles:sp:sso:va_lighthouse:saml_proxy_local",
-      "spAuthnContextClassRef": "http://idmanagement.gov/ns/assurance/loa/3",
-      "spCert": ".saml-proxy-public-local-login-gov.crt",
-      "spKey": "./saml-proxy-private-local-login-gov.key"
+      "spAudience": "https://saml-idp.example2.com",
+      "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
+      "spCert": ".saml-proxy-public.crt",
+      "spKey": "./saml-proxy-private.key"
    }
   ]
 }
