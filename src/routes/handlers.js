@@ -82,7 +82,7 @@ export const samlLogin = function (template) {
     if (login_gov_enabled) {
       authnSelection.push([
         "login_gov_login_link",
-        "http://idmanagement.gov/ns/assurance/loa/3",
+        "http://idmanagement.gov/ns/assurance/ial/2",
       ]);
     }
 
