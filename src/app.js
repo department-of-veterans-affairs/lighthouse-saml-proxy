@@ -68,14 +68,14 @@ function runServer(argv) {
       strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
       app.use(passport.initialize());
       if (argv.otherLogins) {
-        Object.entries(argv.otherLogins).forEach((spIdpEntry) => {
-          IdPMetadata.fetch(spIdpEntry[1].spIdpMetaUrl)
-            .then(handleMetadata(spIdpEntry[1]))
+        argv.otherLogins.forEach((spIdpEntry) => {
+          IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
+            .then(handleMetadata(spIdpEntry))
             .then(() => {
-              spConfigs[spIdpEntry[0]] = new SPConfig(spIdpEntry[1]);
+              spConfigs[spIdpEntry.idp_category] = new SPConfig(spIdpEntry);
               strategies.set(
-                spIdpEntry[0],
-                createPassportStrategy(spConfigs[spIdpEntry[0]])
+                spIdpEntry.idp_category,
+                createPassportStrategy(spConfigs[spIdpEntry.idp_category])
               );
             });
         });
