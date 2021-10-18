@@ -8,7 +8,7 @@
   "spAudience": "sp-audience.example.com",
   "spIdpIssuer": "sp-idp-issuer.example.com",
   "spAuthnContextClassRef": "http://sp.example.com/authn/context/class/ref",
-  "spAcsUrls": "/samlproxy/sp/saml/sso",
+  "spAcsUrl": "/samlproxy/sp/saml/sso",
   "idpCert": "./idp-public-cert.pem",
   "idpKey": "./idp-private-key.pem",
   "spCert": "./sp-cert.pem",
