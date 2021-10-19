@@ -74,7 +74,6 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       const params = req.sps.options[spIdpKey].getResponseParams(
         ssoResponse.url
       );
-      // Passport strategy selection will have to be here. defaults to id_me for now.
       const strategyOptions = req.strategies.get(spIdpKey)?.options;
       assignIn(strategyOptions, params);
       const passport = preparePassport(req.strategies.get(spIdpKey));
