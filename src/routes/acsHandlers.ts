@@ -69,12 +69,14 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       if (req.session) {
         req.session.ssoResponse = ssoResponse;
       }
-
-      const params = req.sps.options.id_me.getResponseParams(ssoResponse.url);
+      const spIdpKey: string = selectPassportStrategyKey(req);
+      const params = req.sps.options[spIdpKey].getResponseParams(
+        ssoResponse.url
+      );
       // Passport strategy selection will have to be here. defaults to id_me for now.
-      const strategyOptions = req.strategies.get("id_me")?.options;
+      const strategyOptions = req.strategies.get(spIdpKey)?.options;
       assignIn(strategyOptions, params);
-      const passport = preparePassport(req.strategies.get("id_me"));
+      const passport = preparePassport(req.strategies.get(spIdpKey));
       passport.authenticate("wsfed-saml2", params)(req, res, next);
     } else {
       res.render("error.hbs", {
@@ -270,3 +272,13 @@ export async function requestWithMetrics(
     throw err;
   }
 }
+
+const selectPassportStrategyKey = (req: IConfiguredRequest): string => {
+  const origin = req.headers.origin;
+  Object.entries(req.sps.options).forEach((spIdpEntry) => {
+    if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
+      return spIdpEntry[0];
+    }
+  });
+  return "id_me";
+};
