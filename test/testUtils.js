@@ -26,6 +26,9 @@ export let defaultMockRequest = {
   query: {
     relayState: "relay",
   },
+  headers: {
+    origin: "https://idp.example.com",
+  },
   body: {
     relayState: "relay",
   },
@@ -33,6 +36,7 @@ export let defaultMockRequest = {
     options: {
       id_me: {
         getResponseParams: jest.fn(() => {}),
+        idpSsoUrl: "https://idp.example.com/saml/sso",
       },
     },
   },
