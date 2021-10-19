@@ -57,6 +57,14 @@ export function preparePassport(strategy) {
   return passport;
 }
 
+/**
+ * Uses the request to select a key which will be used
+ * for selecting the appropriate passport stategy when
+ * handing a SAML response
+ *
+ * @param {*} req The instance of IConfiguredRequest
+ * @returns A string with the correct spIdp key
+ */
 export const selectPassportStrategyKey = (req) => {
   const origin = req.headers.origin;
   let passportKey = "id_me";
