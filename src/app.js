@@ -23,7 +23,7 @@ import passport from "passport";
 const handleMetadata = (argv) => {
   return (metadata) => {
     if (metadata.protocol) {
-      argv.protocol = metadata.protocol;
+      argv.spProtocol = metadata.protocol;
       if (metadata.signingKeys[0]) {
         argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
       }
