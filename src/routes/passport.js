@@ -56,3 +56,14 @@ export function preparePassport(strategy) {
   passport.initialize();
   return passport;
 }
+
+export const selectPassportStrategyKey = (req) => {
+  const origin = req.headers.origin;
+  let passportKey = "id_me";
+  Object.entries(req.sps.options).forEach((spIdpEntry) => {
+    if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
+      passportKey = spIdpEntry[0];
+    }
+  });
+  return passportKey;
+};

@@ -15,6 +15,7 @@ import {
   IdpLoginMetrics,
 } from "../metrics";
 import rTracer from "cls-rtracer";
+import { selectPassportStrategyKey } from "./passport";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -272,13 +273,3 @@ export async function requestWithMetrics(
     throw err;
   }
 }
-
-const selectPassportStrategyKey = (req: IConfiguredRequest): string => {
-  const origin = req.headers.origin;
-  Object.entries(req.sps.options).forEach((spIdpEntry) => {
-    if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
-      return spIdpEntry[0];
-    }
-  });
-  return "id_me";
-};
