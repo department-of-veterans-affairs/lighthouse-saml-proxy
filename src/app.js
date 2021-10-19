@@ -43,9 +43,6 @@ const handleMetadata = (argv) => {
           if (metadata.signRequest) {
             argv.spSignAuthnRequests = metadata.signRequest;
           }
-          if (metadata.NameIDFormat) {
-            argv.spNameIDFormat = metadata.NameIDFormat;
-          }
           break;
         case "wsfed":
           if (metadata.sso.redirectUrl) {
