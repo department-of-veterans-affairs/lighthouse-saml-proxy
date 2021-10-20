@@ -44,7 +44,7 @@
       ".(js|ts|tsx)": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "testPathIgnorePatterns": [
+    "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/build/"
     ],
