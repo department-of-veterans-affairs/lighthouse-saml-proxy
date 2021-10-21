@@ -1,5 +1,5 @@
 import "jest";
-import { createProfileMapper } from "./IDMeProfileMapper";
+import { createProfileMapper } from "./IDPProfileMapper";
 
 const idmeAssertions = {
   issuer: "api.idmelabs.com",
@@ -54,6 +54,24 @@ const dslogonAssertions = {
   },
 };
 
+const loginGovAssertions = {
+  issuer: "api.idmelabs.com",
+  userName: "ae9ff5f4e4b741389904087d94cd19b2",
+  nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+  claims: {
+    dob: "1998-01-23",
+    email: "vets.gov.user+20@gmail.com",
+    first_name: "CARROLL",
+    last_name: "KELLY",
+    uuid: "ae9ff5f4e4b741389904087d94cd19b2",
+    ssn: "123-45-6789",
+    phone: "+12345678901",
+    aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+    ial: "http://idmanagement.gov/ns/assurance/ial/2",
+    verified_at: "2021-10-12T15:12:15Z",
+  },
+};
+
 const basicInfoCheck = expect.objectContaining({
   email: "vets.gov.user+20@gmail.com",
   uuid: "ae9ff5f4e4b741389904087d94cd19b2",
@@ -69,11 +87,17 @@ const biographicInfo = expect.objectContaining({
   middleName: "D",
 });
 
-describe("IDMeProfileMapper", () => {
+describe("IDPProfileMapper", () => {
   it("should map basic info the same for all providers", () => {
-    [idmeAssertions, mhvAssertions, dslogonAssertions].forEach((assertion) => {
+    [
+      idmeAssertions,
+      mhvAssertions,
+      dslogonAssertions,
+      loginGovAssertions,
+    ].forEach((assertion) => {
       const profile = createProfileMapper(assertion);
-      expect(profile.getMappedClaims()).toEqual(basicInfoCheck);
+      const basicInfo = profile.getMappedClaims();
+      expect(basicInfo).toEqual(basicInfoCheck);
     });
   });
 
@@ -119,6 +143,29 @@ describe("IDMeProfileMapper", () => {
     it("should map account type from mhv profile", () => {
       const profile = createProfileMapper(mhvAssertions);
       expect(profile.getMappedClaims().mhv_account_type).toEqual("Premium");
+    });
+  });
+
+  describe("loginGovAssertion", () => {
+    it("should map loa", () => {
+      const profile = createProfileMapper(loginGovAssertions);
+      expect(profile.getMappedClaims().ial).toEqual(2);
+    });
+
+    it("should map biographical info specific to loginGov provider", () => {
+      const profile = createProfileMapper(loginGovAssertions);
+      expect(profile.getMappedClaims()).toEqual(
+        expect.objectContaining({
+          firstName: "CARROLL",
+          lastName: "KELLY",
+          ssn: "123-45-6789",
+          dateOfBirth: "1998-01-23",
+          phone: "+12345678901",
+          verifiedAt: "2021-10-12T15:12:15Z",
+          aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+          ial: 2,
+        })
+      );
     });
   });
 });

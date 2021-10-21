@@ -4,7 +4,7 @@ interface IClaimField {
   displayName: string;
   description: string;
   multiValue: boolean;
-  transformer?: (claim: any) => string;
+  transformer?: (claim: any) => any;
 }
 
 interface IClaimDescriptions {
@@ -42,6 +42,93 @@ const commonConfiguration: IClaimDescriptions = {
     description: "IdP-generated UUID of the user",
     multiValue: false,
   },
+};
+
+const logonGovConfiguration: IClaimDescriptions = {
+  firstName: {
+    id: "first_name",
+    optional: true,
+    displayName: "First Name",
+    description: "The given name of the user",
+    multiValue: false,
+  },
+  lastName: {
+    id: "last_name",
+    optional: true,
+    displayName: "Last Name",
+    description: "The surname of the user",
+    multiValue: false,
+  },
+  ssn: {
+    id: "ssn",
+    optional: true,
+    displayName: "SSN",
+    description: "The SSN of the user",
+    multiValue: false,
+  },
+  dateOfBirth: {
+    id: "dob",
+    optional: true,
+    displayName: "Birth Date",
+    description: "The birth date of the user",
+    multiValue: false,
+  },
+  phone: {
+    id: "phone",
+    optional: true,
+    displayName: "Phone Number",
+    description: "User's phone number",
+    multiValue: false,
+  },
+  aal: {
+    id: "aal",
+    optional: true,
+    displayName: "Authentication Assurence Level",
+    description: "Method in which user should be authenticated",
+    multiValue: false,
+  },
+  ial: {
+    id: "ial",
+    optional: false,
+    displayName: "Identity Assurence Level",
+    description: "Level that user's identity was verified",
+    multiValue: false,
+    transformer: (claims: { ial?: String }) => {
+      if (claims && claims.ial) {
+        const parsedIal = claims.ial.split("/").pop();
+        if (parsedIal) {
+          return parseInt(parsedIal);
+        }
+      }
+      return undefined;
+    },
+  },
+  multifactor: {
+    id: "ial",
+    optional: false,
+    displayName: "Multifactor",
+    description: "If the user has two factor auth enabled",
+    multiValue: false,
+    transformer: (claims: { ial?: String }) => {
+      if (claims && claims.ial) {
+        const parsedIal = claims.ial.split("/").pop();
+        if (parsedIal) {
+          return parseInt(parsedIal) >= 2 ? "true" : "false";
+        }
+      }
+      return "false";
+    },
+  },
+  verifiedAt: {
+    id: "verified_at",
+    optional: true,
+    displayName: "Verification Time",
+    description: "Time at which user's identity was verified",
+    multiValue: false,
+  },
+};
+
+const idmeConfiguration: IClaimDescriptions = {
   level_of_assurance: {
     id: "level_of_assurance",
     optional: false,
@@ -49,9 +136,6 @@ const commonConfiguration: IClaimDescriptions = {
     description: "Level of identify proofing available for the user",
     multiValue: false,
   },
-};
-
-const idmeConfiguration: IClaimDescriptions = {
   firstName: {
     id: "fname",
     optional: true,
@@ -205,7 +289,7 @@ interface ISamlpProfileMapper {
 // provider is ID.me, which is fairly leaky. ID.me will give us a wide variety of field names, based
 // on which upstream credential provider was chosen by the user. Some fields with a different name
 // serve an identical purpose. This class maps those attributes to a canonical set of fields.
-export class IDMeProfileMapper implements ISamlpProfileMapper {
+export class IDPProfileMapper implements ISamlpProfileMapper {
   samlAssertions: ISamlAssertions;
 
   constructor(assertions: ISamlAssertions) {
@@ -227,6 +311,8 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
       this.getClaimFields(mhvConfiguration, claims);
     } else if (this.samlAssertions.claims.dslogon_uuid) {
       this.getClaimFields(dsLogonConfiguration, claims);
+    } else if (this.samlAssertions.claims.ial) {
+      this.getClaimFields(logonGovConfiguration, claims);
     } else {
       this.getClaimFields(idmeConfiguration, claims);
     }
@@ -265,7 +351,7 @@ export class IDMeProfileMapper implements ISamlpProfileMapper {
 }
 
 export const createProfileMapper = (assertions: ISamlAssertions) => {
-  return new IDMeProfileMapper(assertions);
+  return new IDPProfileMapper(assertions);
 };
 
 // This represents the fields we expose as an identity provider.
