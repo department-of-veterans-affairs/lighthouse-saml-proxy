@@ -26,7 +26,7 @@ export default class SPConfig {
     this.idpThumbprint = argv.spIdpThumbprint;
     this.idpMetaUrl = argv.spIdpMetaUrl;
     this.audience = argv.spAudience;
-    (this.providerName = argv.spProviderName), (this.acsUrls = argv.spAcsUrls);
+    this.providerName = argv.spProviderName;
     this.signAuthnRequests = argv.spSignAuthnRequests;
     this.signatureAlgorithm = argv.spSignatureAlgorithm;
     this.digestAlgorithm = argv.spDigestAlgorithm;
@@ -43,8 +43,6 @@ export default class SPConfig {
     this.httpsCert = argv.spHttpsCert;
     this.https = argv.spHttps;
     this.relayState = argv.spRelayState;
-
-    this.requestAcsUrl = argv.spAcsUrls[0];
     this.failureRedirect = SP_ERROR_URL;
     this.failureFlash = true;
   }
@@ -56,7 +54,7 @@ export default class SPConfig {
       realm: this.audience,
       cert: removeHeaders(this.spCert),
       encryptionCert: removeHeaders(this.spEncryptionCert),
-      acsUrls: this.acsUrls.map((url) => getReqUrl(req, url)),
+      acsUrls: [getReqUrl(req, req.requestAcsUrl)],
       sloUrl: getReqUrl(req, SP_SLO_URL),
       nameIDFormat: this.nameIDFormat,
     };

@@ -5,8 +5,10 @@ import IDPConfig from "../src/IDPConfig";
 import configureExpress from "../src/routes";
 import { TestCache } from "../src/routes/types";
 import SPConfig from "../src/SPConfig";
+import createPassportStrategy from "../src/routes/passport";
 
 import { idpCert, idpKey, spCert, spKey } from "./testCerts";
+import passport from "passport";
 
 const defaultTestingConfig = {
   idpAcsUrl: "https://localhost:1111/samlproxy/sp/saml/sso",
@@ -21,7 +23,7 @@ const defaultTestingConfig = {
   spSignAuthnRequests: true,
   spIdpIssuer: "api.idmelabs.com",
   spAuthnContextClassRef: "http://idmanagement.gov/ns/assurance/loa/3",
-  spAcsUrls: ["/samlproxy/sp/saml/sso"],
+  spAcsUrl: "/samlproxy/sp/saml/sso",
   idpCert: idpCert,
   idpKey: Buffer.from(idpKey, "utf-8"),
   spCert: Buffer.from(spCert, "utf-8"),
@@ -40,12 +42,16 @@ export const idpConfig = new IDPConfig(defaultTestingConfig);
 
 export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
-  const spConfig = new SPConfig(defaultTestingConfig);
+  const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
+  const strategies = new Map();
+  strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
+  app.use(passport.initialize());
   configureExpress(
     app,
     defaultTestingConfig,
     idpConfig,
-    spConfig,
+    spConfigs,
+    strategies,
     vetsApiClient,
     cache
   );

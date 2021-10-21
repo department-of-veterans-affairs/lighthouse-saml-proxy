@@ -17,25 +17,30 @@ export function buildSamlResponseFunction(sessionIndex) {
   };
 }
 
+const strategies = new Map();
+strategies.set("id_me", {
+  getResponseParams: jest.fn(() => {}),
+});
 export let defaultMockRequest = {
   method: "GET",
   query: {
     relayState: "relay",
   },
+  headers: {
+    origin: "https://idp.example.com",
+  },
   body: {
     relayState: "relay",
   },
-  sp: {
+  sps: {
     options: {
-      getResponseParams: jest.fn(() => {}),
+      id_me: {
+        getResponseParams: jest.fn(() => {}),
+        idpSsoUrl: "https://idp.example.com/saml/sso",
+      },
     },
   },
-  strategy: {
-    options: {},
-  },
-  passport: {
-    authenticate: jest.fn(() => jest.fn()),
-  },
+  strategies: strategies,
   get: function (prop) {
     switch (prop) {
       case "host":

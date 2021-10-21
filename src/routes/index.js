@@ -16,7 +16,6 @@ import {
   winstonMiddleware,
   logger,
 } from "../logger";
-import createPassport from "./passport";
 import addRoutes from "./routes";
 import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
@@ -35,6 +34,7 @@ export default function configureExpress(
   argv,
   idpOptions,
   spOptions,
+  strategies,
   vetsApiClient,
   cache = new RedisCache(),
   cacheEnabled = true
@@ -67,7 +67,6 @@ export default function configureExpress(
     });
   }
 
-  const [passport, strategy] = createPassport(spOptions);
   const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
     includeMethod: true,
@@ -102,7 +101,6 @@ export default function configureExpress(
     );
   }
   app.use(metricsMiddleware);
-  app.use(passport.initialize());
 
   /**
    * Middleware
@@ -148,12 +146,12 @@ export default function configureExpress(
 
   app.use(function (req, res, next) {
     req.metadata = idpOptions.profileMapper.metadata;
-    req.passport = passport;
-    req.strategy = strategy;
+    req.strategies = strategies;
     req.vetsAPIClient = vetsApiClient;
-    req.sp = { options: spOptions };
+    req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);
+    req.requestAcsUrl = argv.spAcsUrl;
     next();
   });
 
@@ -167,7 +165,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions, cache, cacheEnabled);
+  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

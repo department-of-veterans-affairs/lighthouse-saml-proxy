@@ -13,6 +13,8 @@ import configureExpress from "./routes";
 import logger from "./logger";
 import { VetsAPIClient } from "./VetsAPIClient";
 import { RedisCache } from "./routes/types";
+import createPassportStrategy from "./routes/passport";
+import passport from "passport";
 
 /**
  * Globals
@@ -21,7 +23,7 @@ import { RedisCache } from "./routes/types";
 const handleMetadata = (argv) => {
   return (metadata) => {
     if (metadata.protocol) {
-      argv.protocol = metadata.protocol;
+      argv.spProtocol = metadata.protocol;
       if (metadata.signingKeys[0]) {
         argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
       }
@@ -53,12 +55,28 @@ const handleMetadata = (argv) => {
 };
 
 function runServer(argv) {
+  const strategies = new Map();
   IdPMetadata.fetch(argv.spIdpMetaUrl)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
       const httpServer = http.createServer(app);
-      const spConfig = new SPConfig(argv);
+      const spConfigs = { id_me: new SPConfig(argv) };
+      strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
+      app.use(passport.initialize());
+      if (argv.idpSamlLoginsEnabled) {
+        argv.idpSamlLogins.forEach((spIdpEntry) => {
+          IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
+            .then(handleMetadata(spIdpEntry))
+            .then(() => {
+              spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
+              strategies.set(
+                spIdpEntry.category,
+                createPassportStrategy(spConfigs[spIdpEntry.category])
+              );
+            });
+        });
+      }
       const idpConfig = new IDPConfig(argv);
       const vaConfig = new VetsAPIConfig(argv);
       const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
@@ -71,7 +89,8 @@ function runServer(argv) {
         app,
         argv,
         idpConfig,
-        spConfig,
+        spConfigs,
+        strategies,
         vetsApiClient,
         cache,
         cacheEnabled

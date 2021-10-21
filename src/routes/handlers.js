@@ -29,7 +29,7 @@ export const samlLogin = function (template) {
   return function (req, res, next) {
     const acsUrl = req.query.acsUrl
       ? getReqUrl(req, req.query.acsUrl)
-      : getReqUrl(req, req.sp.options.requestAcsUrl);
+      : getReqUrl(req, req.requestAcsUrl);
     const authnRequest = req.authnRequest
       ? req.authnRequest
       : req.session
@@ -55,11 +55,21 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const samlp = new _samlp(
-      req.sp.options.getResponseParams(),
-      new SAML.SAML(req.sp.options.getResponseParams())
-    );
-    [
+    const samlp = {};
+    Object.keys(req.sps.options).forEach((idpKey) => {
+      samlp[idpKey] = new _samlp(
+        req.sps.options[idpKey].getResponseParams(),
+        new SAML.SAML(req.sps.options[idpKey].getResponseParams())
+      );
+    });
+
+    let login_gov_enabled;
+    if (req.sps.options.login_gov) {
+      login_gov_enabled = true;
+    } else {
+      login_gov_enabled = false;
+    }
+    const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
       ["mhv_login_link", "myhealthevet"],
@@ -68,9 +78,21 @@ export const samlLogin = function (template) {
         "http://idmanagement.gov/ns/assurance/loa/3",
         "&op=signup",
       ],
-    ]
+    ];
+    if (login_gov_enabled) {
+      authnSelection.push([
+        "login_gov_login_link",
+        "http://idmanagement.gov/ns/assurance/ial/2",
+      ]);
+    }
+
+    authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
-        const params = req.sp.options.getAuthnRequestParams(
+        let idpKey = "id_me";
+        if (key === "login_gov_login_link") {
+          idpKey = "login_gov";
+        }
+        const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
           (authnRequest && authnRequest.forceAuthn) || "false",
           relayState || "/",
@@ -79,7 +101,7 @@ export const samlLogin = function (template) {
         );
         return memo.then((m) => {
           return new Promise((resolve, reject) => {
-            samlp.getSamlRequestUrl(params, (err, url) => {
+            samlp[idpKey].getSamlRequestUrl(params, (err, url) => {
               if (err) {
                 reject(err);
               }
@@ -95,6 +117,7 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
+        authOptions.login_gov_enabled = login_gov_enabled;
         res.render(template, authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",

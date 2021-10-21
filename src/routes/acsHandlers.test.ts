@@ -9,7 +9,9 @@ import {
   defaultMockRequest,
 } from "../../test/testUtils";
 import { IDME_USER } from "../../test/testUsers";
+jest.mock("passport");
 jest.mock("../VetsAPIClient");
+import passport from "passport";
 
 const client = new VetsAPIClient("fakeToken", "https://example.gov");
 
@@ -442,7 +444,12 @@ describe("buildPassportLoginHandler", () => {
       render: jest.fn(),
     };
     mockNext = jest.fn();
+    passport.authenticate.mockImplementation((args) => {
+      expect(args).toBe("wsfed-saml2");
+      return jest.fn;
+    });
   });
+
   it("happy path", () => {
     req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3");
     handlers.buildPassportLoginHandler("http://example.com/acs")(
@@ -450,7 +457,7 @@ describe("buildPassportLoginHandler", () => {
       mockResponse,
       mockNext
     );
-    expect(req.passport.authenticate).toHaveBeenCalledTimes(1);
+    expect(passport.authenticate).toHaveBeenCalledTimes(1);
   });
 
   it("Invalid request method", () => {

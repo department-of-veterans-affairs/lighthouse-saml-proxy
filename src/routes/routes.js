@@ -26,7 +26,8 @@ const METADATA_TEMPLATE = template(
 export default function addRoutes(
   app,
   idpConfig,
-  spConfig,
+  spConfigs,
+  acsUrl,
   cache,
   cacheEnabled
 ) {
@@ -46,14 +47,14 @@ export default function addRoutes(
   });
 
   app.get(SP_METADATA_URL, function (req, res, next) {
-    const xml = METADATA_TEMPLATE(spConfig.getMetadataParams(req));
+    const xml = METADATA_TEMPLATE(spConfigs.id_me.getMetadataParams(req));
     res.set("Content-Type", "text/xml");
     res.send(xml);
   });
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  spConfig.acsUrls.forEach((url) => acsFactory(app, url, cache, cacheEnabled));
+  acsFactory(app, acsUrl, cache, cacheEnabled);
 
   app.get(SP_ERROR_URL, handleError);
 

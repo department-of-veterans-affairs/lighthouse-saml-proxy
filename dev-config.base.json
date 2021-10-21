@@ -8,7 +8,7 @@
   "spAudience": "sp-audience.example.com",
   "spIdpIssuer": "sp-idp-issuer.example.com",
   "spAuthnContextClassRef": "http://sp.example.com/authn/context/class/ref",
-  "spAcsUrls": "/samlproxy/sp/saml/sso",
+  "spAcsUrl": "/samlproxy/sp/saml/sso",
   "idpCert": "./idp-public-cert.pem",
   "idpKey": "./idp-private-key.pem",
   "spCert": "./sp-cert.pem",
@@ -23,5 +23,19 @@
   "cacheEnabled": true,
   "redisPort": "6379",
   "redisHost": "127.0.0.1",
-  "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+  "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+  "idpSamlLoginsEnabled": true,
+  "idpSamlLogins": 
+  [
+    {
+      "category": "example2_saml_idp",
+      "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
+      "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "spAudience": "https://saml-idp.example2.com",
+      "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
+      "spCert": "./saml-proxy-public.crt",
+      "spKey": "./saml-proxy-private.key"
+   }
+  ]
 }
+

@@ -1,6 +1,7 @@
 import { SP_VERIFY } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
+import { preparePassport } from "./passport";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
@@ -14,6 +15,7 @@ import {
   IdpLoginMetrics,
 } from "../metrics";
 import rTracer from "cls-rtracer";
+import { selectPassportStrategyKey } from "./passport";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -68,10 +70,14 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       if (req.session) {
         req.session.ssoResponse = ssoResponse;
       }
-
-      const params = req.sp.options.getResponseParams(ssoResponse.url);
-      assignIn(req.strategy.options, params);
-      req.passport.authenticate("wsfed-saml2", params)(req, res, next);
+      const spIdpKey: string = selectPassportStrategyKey(req);
+      const params = req.sps.options[spIdpKey].getResponseParams(
+        ssoResponse.url
+      );
+      const strategyOptions = req.strategies.get(spIdpKey)?.options;
+      assignIn(strategyOptions, params);
+      const passport = preparePassport(req.strategies.get(spIdpKey));
+      passport.authenticate("wsfed-saml2", params)(req, res, next);
     } else {
       res.render("error.hbs", {
         request_id: rTracer.id(),

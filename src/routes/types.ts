@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { PassportStatic, Strategy } from "passport";
+import { Strategy } from "passport";
 import Redis, { RedisClient } from "redis";
 import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
@@ -14,11 +14,11 @@ interface IExtendedStrategy extends Strategy {
 export interface IConfiguredRequest extends Request {
   session: any;
   vetsAPIClient: VetsAPIClient;
-  passport: PassportStatic;
-  strategy: IExtendedStrategy;
-  sp: any;
+  strategies: Map<String, IExtendedStrategy>;
+  sps: any;
   idp: any;
   user: User;
+  requestAcsUrl: string;
 }
 
 /**

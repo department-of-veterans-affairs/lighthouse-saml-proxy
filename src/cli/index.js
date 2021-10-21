@@ -236,11 +236,11 @@ export function processArgs() {
         string: true,
         default: "Simple SAML Service Provider",
       },
-      spAcsUrls: {
-        description: "SP Assertion Consumer Service (ACS) URLs (Relative URL)",
+      spAcsUrl: {
+        description: "SP Assertion Consumer Service (ACS) URL (Relative URL)",
         required: true,
-        array: true,
-        default: ["/saml/sso"],
+        string: true,
+        default: "/samlproxy/sp/saml/sso",
       },
       spSignAuthnRequests: {
         description: "Sign AuthnRequest Messages (SAMLP)",
@@ -382,6 +382,90 @@ export function processArgs() {
           "Token used to authorize calls to vets-api while performing MVI lookups.",
         required: true,
         string: true,
+      },
+      idpSamlLoginsEnabled: {
+        description: "Flag on enabling IDP logins such as login.gov",
+        requied: false,
+        default: false,
+      },
+      idpSamlLogins: {
+        description:
+          "An array of objects used to describe SP IDP options for login",
+        required: false,
+        type: "array",
+        category: {
+          description:
+            "SP IDP category, For instance 'login_gov' for login.gov",
+          required: true,
+          string: true,
+        },
+        spProtocol: {
+          description: "Federation Protocol",
+          required: true,
+          string: true,
+          default: "samlp",
+        },
+        spIdpIssuer: {
+          description: "IdP Issuer URI",
+          required: false,
+          string: true,
+          default: "urn:example:idp",
+        },
+        spIdpSsoUrl: {
+          description: "IdP Single Sign-On Service URL (SSO URL)",
+          required: false,
+          string: true,
+        },
+        spIdpSsoBinding: {
+          description: "IdP Single Sign-On AuthnRequest Binding",
+          required: true,
+          string: true,
+          default: BINDINGS.REDIRECT,
+        },
+        spIdpSloUrl: {
+          description: "IdP Single Logout Service URL (SLO URL) (SAMLP)",
+          required: false,
+          string: true,
+        },
+        spIdpSloBinding: {
+          description: "IdP Single Logout Request Binding (SAMLP)",
+          required: true,
+          string: true,
+          default: BINDINGS.REDIRECT,
+        },
+        spIdpCert: {
+          description: "IdP Public Key Signing Certificate (PEM)",
+          required: false,
+          string: true,
+          coerce: () => {
+            return certToPEM(
+              makeCertFileCoercer(
+                "certificate",
+                "IdP Public Key Signing Certificate (PEM)",
+                KEY_CERT_HELP_TEXT
+              )
+            );
+          },
+        },
+        spIdpThumbprint: {
+          description: "IdP Public Key Signing Certificate SHA1 Thumbprint",
+          required: false,
+          string: true,
+          coerce: (value) => {
+            return value ? value.replace(/:/g, "") : value;
+          },
+        },
+        spIdpMetaUrl: {
+          description: "IdP SAML Metadata URL",
+          required: false,
+          string: true,
+        },
+        spAudience: {
+          description: "SP Audience URI / RP Realm",
+          required: false,
+          string: true,
+          default: "urn:example:sp",
+        },
       },
     })
     .example(
