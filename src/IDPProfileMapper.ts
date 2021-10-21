@@ -67,7 +67,7 @@ const logonGovConfiguration: IClaimDescriptions = {
     multiValue: false,
     transformer: (claims: { ssn?: String }) => {
       if (claims && claims.ssn) {
-        const social = claims.ssn.replace(/-/g,"");
+        const social = claims.ssn.replace(/-/g, "");
         return social;
       }
       return "";
