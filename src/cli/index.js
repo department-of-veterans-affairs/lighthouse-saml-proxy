@@ -383,14 +383,14 @@ export function processArgs() {
         required: true,
         string: true,
       },
-      otherLoginsEnabled: {
-        description: "Flag on enableding other IDP logins such as login.gov",
+      idpSamlLoginsEnabled: {
+        description: "Flag on enabling IDP logins such as login.gov",
         requied: false,
         default: false,
       },
       idpSamlLogins: {
         description:
-          "An array of object used to describe other SP IDP options for login",
+          "An array of objects used to describe SP IDP options for login",
         required: false,
         type: "array",
         category: {

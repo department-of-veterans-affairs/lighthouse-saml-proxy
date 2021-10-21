@@ -24,7 +24,8 @@
   "redisPort": "6379",
   "redisHost": "127.0.0.1",
   "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-  "otherLogins": 
+  "idpSamlLoginsEnabled": true,
+  "idpSamlLogins": 
   [
     {
       "category": "example2_saml_idp",

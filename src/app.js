@@ -64,7 +64,7 @@ function runServer(argv) {
       const spConfigs = { id_me: new SPConfig(argv) };
       strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
       app.use(passport.initialize());
-      if (argv.otherLoginsEnabled) {
+      if (argv.idpSamlLoginsEnabled) {
         argv.idpSamlLogins.forEach((spIdpEntry) => {
           IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
             .then(handleMetadata(spIdpEntry))
