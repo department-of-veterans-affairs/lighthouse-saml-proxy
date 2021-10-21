@@ -158,7 +158,7 @@ describe("IDPProfileMapper", () => {
         expect.objectContaining({
           firstName: "CARROLL",
           lastName: "KELLY",
-          ssn: "123-45-6789",
+          ssn: "123456789",
           dateOfBirth: "1998-01-23",
           phone: "+12345678901",
           verifiedAt: "2021-10-12T15:12:15Z",

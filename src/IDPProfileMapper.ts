@@ -65,6 +65,13 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "SSN",
     description: "The SSN of the user",
     multiValue: false,
+    transformer: (claims: { ssn?: String }) => {
+      if (claims && claims.ssn) {
+        const social = claims.ssn.replace(/-/g,"");
+        return social;
+      }
+      return "";
+    },
   },
   dateOfBirth: {
     id: "dob",
