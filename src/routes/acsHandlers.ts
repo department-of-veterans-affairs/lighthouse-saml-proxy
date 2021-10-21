@@ -47,9 +47,9 @@ const sufficientLevelOfAssurance = (claims: any) => {
     logger.info("Checking DsLogon LOA.");
     IdpLoginMetrics.dsLogonLoginCounter.inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
-  } else if (claims.iat) {
+  } else if (claims.ial) {
       logger.info("Checking LogonGov LOA.");
-      return claims.iat >= 2;
+      return claims.ial >= 2;
   } else {
     logger.info("Checking ID.me LOA.");
     IdpLoginMetrics.idMeLoginCounter.inc();
