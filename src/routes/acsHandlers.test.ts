@@ -26,7 +26,6 @@ const claimsWithICN = {
   mhv_account_type: "Premium",
 };
 
-
 const claimsWithEDIPI = {
   dateOfBirth: "1990-01-01",
   edipi: "asdfasdfasdf",
@@ -383,8 +382,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     const req = {
       vetsAPIClient: client,
       user: {
-        claims: { 
-          ial: 2
+        claims: {
+          ial: 2,
         },
         authnContext: {
           sessionIndex: testSessionIndex,
