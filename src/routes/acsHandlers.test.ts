@@ -384,6 +384,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       user: {
         claims: {
           ial: 2,
+          aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
         },
         authnContext: {
           sessionIndex: testSessionIndex,

@@ -5,4 +5,6 @@ export const BINDINGS = {
 
 export const PASSWORDPROTOCOL = {
   MULTIFACTOR: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+  CRYPTOGRAPHICALLYSECURE: "http://idmanagement.gov/ns/assurance/aal/3",
+  HSPD12: "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true",
 };
