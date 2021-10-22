@@ -4,5 +4,5 @@ export const BINDINGS = {
 };
 
 export const PASSWORDPROTOCOL = {
-  MULTIFACTOR: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo"
-}
+  MULTIFACTOR: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+};
