@@ -1,3 +1,5 @@
+import { PASSWORDPROTOCOL } from "./samlConstants";
+
 interface IClaimField {
   id: string;
   optional: boolean;
@@ -116,12 +118,9 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Multifactor",
     description: "If the user has two factor auth enabled",
     multiValue: false,
-    transformer: (claims: { ial?: String }) => {
-      if (claims && claims.ial) {
-        const parsedIal = claims.ial.split("/").pop();
-        if (parsedIal) {
-          return parseInt(parsedIal) >= 2 ? "true" : "false";
-        }
+    transformer: (claims: { aal?: String }) => {
+      if (claims && claims.aal) {
+        return PASSWORDPROTOCOL.MULTIFACTOR === claims.aal ? "true" : "false";
       }
       return "false";
     },
