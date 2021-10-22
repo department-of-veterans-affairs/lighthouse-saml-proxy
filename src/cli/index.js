@@ -433,27 +433,25 @@ export function processArgs() {
           string: true,
           default: BINDINGS.REDIRECT,
         },
+        spCert: {
+          description: "SP/RP Public Key Signature Certificate (PEM)",
+          string: true,
+          required: false,
+        },
+        spKey: {
+          description: "SP/RP Private Key Signature Certificate(PEM)",
+          string: true,
+          required: false,
+        },
         spIdpCert: {
           description: "IdP Public Key Signing Certificate (PEM)",
           required: false,
           string: true,
-          coerce: () => {
-            return certToPEM(
-              makeCertFileCoercer(
-                "certificate",
-                "IdP Public Key Signing Certificate (PEM)",
-                KEY_CERT_HELP_TEXT
-              )
-            );
-          },
         },
         spIdpThumbprint: {
           description: "IdP Public Key Signing Certificate SHA1 Thumbprint",
           required: false,
           string: true,
-          coerce: (value) => {
-            return value ? value.replace(/:/g, "") : value;
-          },
         },
         spIdpMetaUrl: {
           description: "IdP SAML Metadata URL",
@@ -467,6 +465,24 @@ export function processArgs() {
           default: "urn:example:sp",
         },
       },
+    })
+    .coerce("idpSamlLogins", (logins) => {
+      logins.forEach((login) => {
+        login.spKey = makeCertFileCoercer(
+          "private key",
+          "SP Signing Private Key (PEM)",
+          KEY_CERT_HELP_TEXT
+        )(login.spKey);
+        login.spCert = makeCertFileCoercer(
+          "certificate",
+          "SP Signing Public Key Certificate (PEM)",
+          KEY_CERT_HELP_TEXT
+        )(login.spCert);
+        login.spIdpThumbprint = login.spIdpThumbprint
+          ? login.spIdpThumbprint.replace(/:/g, "")
+          : login.spIdpThumbprint;
+      });
+      return logins;
     })
     .example(
       "\t$0 --acs http://acme.okta.com/auth/saml20/exampleidp --aud https://www.okta.com/saml2/service-provider/spf5aFRRXFGIMAYXQPNV",
