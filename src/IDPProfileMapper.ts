@@ -113,7 +113,7 @@ const logonGovConfiguration: IClaimDescriptions = {
     },
   },
   multifactor: {
-    id: "ial",
+    id: "aal",
     optional: false,
     displayName: "Multifactor",
     description: "If the user has two factor auth enabled",
