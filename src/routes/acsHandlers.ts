@@ -41,19 +41,19 @@ export const urlUserErrorTemplate = () => {
 const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
-    IdpLoginCounter.labels({ idp: "my_healthe_vet"}).inc();
+    IdpLoginCounter.labels({ idp: "my_healthe_vet" }).inc();
     return claims.mhv_account_type === "Premium";
   } else if (claims.dslogon_assurance) {
     logger.info("Checking DsLogon LOA.");
-    IdpLoginCounter.labels({ idp: "ds_logon"}).inc();
+    IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
   } else if (claims.ial) {
     logger.info("Checking LoginGov LOA.");
-    IdpLoginCounter.labels({ idp: "login_gov"}).inc();
+    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
     return claims.ial >= 2 && claims.aal >= 2;
   } else {
     logger.info("Checking ID.me LOA.");
-    IdpLoginCounter.labels({ idp: "id_me"}).inc();
+    IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
   }
 };

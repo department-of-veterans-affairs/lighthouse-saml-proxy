@@ -47,7 +47,7 @@ const VSOFailure = new client.Counter({
 export const IdpLoginCounter = new client.Counter({
   name: "idp_login_counter",
   help: "counter of number of logins per idp",
-  labelNames: ["idp"]
+  labelNames: ["idp"],
 });
 
 export const MVIRequestMetrics = {
