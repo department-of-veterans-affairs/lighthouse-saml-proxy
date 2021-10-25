@@ -1,4 +1,4 @@
-import { PASSWORDPROTOCOL } from "./samlConstants";
+import { StringNullableChain } from "lodash";
 
 interface IClaimField {
   id: string;
@@ -95,6 +95,12 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Authentication Assurence Level",
     description: "Method in which user should be authenticated",
     multiValue: false,
+    transformer: (claims: { aal?: String }) => {
+      if (claims && claims.aal) {
+        return parseAal(claims.aal);
+      }
+      return undefined;
+    },
   },
   ial: {
     id: "ial",
@@ -120,7 +126,10 @@ const logonGovConfiguration: IClaimDescriptions = {
     multiValue: false,
     transformer: (claims: { aal?: String }) => {
       if (claims && claims.aal) {
-        return PASSWORDPROTOCOL.MULTIFACTOR === claims.aal ? "true" : "false";
+        const aal = parseAal(claims.aal);
+        if (aal && aal >= 2) {
+          return "true";
+        }
       }
       return "false";
     },
@@ -426,3 +435,12 @@ createProfileMapper.prototype.metadata = [
     multiValue: false,
   },
 ];
+
+const parseAal = (aal: String) => {
+  let parsedAal = aal.split("/").pop();
+  parsedAal = parsedAal?.split("?")[0];
+  if (parsedAal) {
+    return parseInt(parsedAal);
+  }
+  return undefined;
+};
