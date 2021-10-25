@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
-import { IDMeProfileMapper } from "../IDMeProfileMapper";
+import { IDPProfileMapper } from "../IDPProfileMapper";
 
 /**
  * Creates the passport strategy using the spConfig
@@ -22,7 +22,7 @@ export default function createPassportStrategy(spConfig) {
             "http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod"
           ],
       },
-      claims: new IDMeProfileMapper({
+      claims: new IDPProfileMapper({
         claims: omit(
           profile,
           "issuer",

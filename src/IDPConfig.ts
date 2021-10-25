@@ -1,4 +1,4 @@
-import { createProfileMapper } from "./IDMeProfileMapper";
+import { createProfileMapper } from "./IDPProfileMapper";
 import { IDP_SSO } from "./routes/constants";
 import { DOMParser } from "@xmldom/xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp";

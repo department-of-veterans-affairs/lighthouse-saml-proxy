@@ -360,13 +360,32 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     };
   });
 
-  it("testLevelOfAssuranceOrRedirect, sufficient loa", async () => {
+  it("testLevelOfAssuranceOrRedirect, sufficient loa.", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const req = {
       vetsAPIClient: client,
       user: {
         claims: { ...claimsWithEDIPI },
+        authnContext: {
+          sessionIndex: testSessionIndex,
+        },
+      },
+    };
+    handlers.testLevelOfAssuranceOrRedirect(req, mockResponse, nextFn);
+    expect(nextFn).toHaveBeenCalled();
+  });
+
+  it("testLevelOfAssuranceOrRedirect, sufficient loa. loginGov", async () => {
+    const nextFn = jest.fn();
+    const testSessionIndex = "test";
+    const req = {
+      vetsAPIClient: client,
+      user: {
+        claims: {
+          ial: 2,
+          aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+        },
         authnContext: {
           sessionIndex: testSessionIndex,
         },
