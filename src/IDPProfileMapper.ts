@@ -1,5 +1,3 @@
-import { StringNullableChain } from "lodash";
-
 interface IClaimField {
   id: string;
   optional: boolean;
