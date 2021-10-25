@@ -70,7 +70,6 @@ function runServer(argv) {
             .then(handleMetadata(spIdpEntry))
             .then(() => {
               spIdpEntry.spKey = argv.spKey;
-              spIdpEntry.spCert = argv.spCert;
               spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
               strategies.set(
                 spIdpEntry.category,
