@@ -16,6 +16,7 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
+import { PASSWORDPROTOCOL } from "../samlConstants";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -39,6 +40,11 @@ export const urlUserErrorTemplate = () => {
 // This depends on being called after buildPassportLoginHandler because it uses
 // the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
+  const sufficientAals = [
+    PASSWORDPROTOCOL.MULTIFACTOR,
+    PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE,
+    PASSWORDPROTOCOL.HSPD12,
+  ];
   if (claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
     IdpLoginMetrics.myHealtheVetLoginCount.inc();
@@ -47,6 +53,9 @@ const sufficientLevelOfAssurance = (claims: any) => {
     logger.info("Checking DsLogon LOA.");
     IdpLoginMetrics.dsLogonLoginCounter.inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
+  } else if (claims.ial) {
+    logger.info("Checking LogonGov LOA.");
+    return claims.ial >= 2 && sufficientAals.includes(claims.aal);
   } else {
     logger.info("Checking ID.me LOA.");
     IdpLoginMetrics.idMeLoginCounter.inc();
