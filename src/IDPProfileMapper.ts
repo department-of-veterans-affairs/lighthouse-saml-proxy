@@ -47,16 +47,6 @@ const commonConfiguration: IClaimDescriptions = {
 };
 
 const logonGovConfiguration: IClaimDescriptions = {
-  idp: {
-    id: "first_name",
-    optional: false,
-    displayName: "Identity Provider",
-    description: "The identity provider used.",
-    multiValue: false,
-    transformer: () => {
-      return "login_gov";
-    },
-  },
   firstName: {
     id: "first_name",
     optional: true,

@@ -385,7 +385,6 @@ describe("testLevelOfAssuranceOrRedirect", () => {
         claims: {
           ial: 2,
           aal: "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true",
-          idp: "login_gov",
         },
         authnContext: {
           sessionIndex: testSessionIndex,
