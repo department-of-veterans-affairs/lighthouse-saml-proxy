@@ -1,3 +1,5 @@
+import { SUFFICIENT_AAL } from "./samlConstants";
+
 interface IClaimField {
   id: string;
   optional: boolean;
@@ -92,13 +94,7 @@ const logonGovConfiguration: IClaimDescriptions = {
     optional: true,
     displayName: "Authentication Assurence Level",
     description: "Method in which user should be authenticated",
-    multiValue: false,
-    transformer: (claims: { aal?: String }) => {
-      if (claims && claims.aal) {
-        return parseAal(claims.aal);
-      }
-      return undefined;
-    },
+    multiValue: false
   },
   ial: {
     id: "ial",
@@ -122,10 +118,9 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Multifactor",
     description: "If the user has two factor auth enabled",
     multiValue: false,
-    transformer: (claims: { aal?: String }) => {
+    transformer: (claims: { aal?: string }) => {
       if (claims && claims.aal) {
-        const aal = parseAal(claims.aal);
-        if (aal && aal >= 2) {
+        if(SUFFICIENT_AAL.includes(claims.aal)) {
           return "true";
         }
       }
@@ -433,12 +428,3 @@ createProfileMapper.prototype.metadata = [
     multiValue: false,
   },
 ];
-
-const parseAal = (aal: String) => {
-  let parsedAal = aal.split("/").pop();
-  parsedAal = parsedAal?.split("?")[0];
-  if (parsedAal) {
-    return parseInt(parsedAal);
-  }
-  return undefined;
-};

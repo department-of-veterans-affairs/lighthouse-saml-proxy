@@ -162,18 +162,10 @@ describe("IDPProfileMapper", () => {
           dateOfBirth: "1998-01-23",
           phone: "+12345678901",
           verifiedAt: "2021-10-12T15:12:15Z",
-          aal: 2,
+          aal: "http://idmanagement.gov/ns/assurance/aal/2",
           ial: 2,
         })
       );
-    });
-
-    it("Parse hspd12 aal", () => {
-      loginGovAssertions.claims.aal =
-        "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true";
-      const profile = createProfileMapper(loginGovAssertions);
-      const claims = profile.getMappedClaims();
-      expect(claims.aal).toEqual(3);
     });
   });
 });
