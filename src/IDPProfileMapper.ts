@@ -1,4 +1,4 @@
-import { PASSWORDPROTOCOL } from "./samlConstants";
+import { SUFFICIENT_AAL } from "./samlConstants";
 
 interface IClaimField {
   id: string;
@@ -118,9 +118,11 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Multifactor",
     description: "If the user has two factor auth enabled",
     multiValue: false,
-    transformer: (claims: { aal?: String }) => {
+    transformer: (claims: { aal?: string }) => {
       if (claims && claims.aal) {
-        return PASSWORDPROTOCOL.MULTIFACTOR === claims.aal ? "true" : "false";
+        if (SUFFICIENT_AAL.includes(claims.aal)) {
+          return "true";
+        }
       }
       return "false";
     },

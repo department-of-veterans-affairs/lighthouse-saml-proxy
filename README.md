@@ -53,6 +53,15 @@ npm install
 npm run-script start-dev
 ```
 
+### Using LoginGov with Local Saml-Proxy
+
+Login.Gov does not support http ACS endpoints. Run the following command to set up an https proxy for the saml-proxy.
+
+```sh
+npm install -g local-ssl-proxy
+local-ssl-proxy --source 9001 --target 7000
+```
+
 ### Generating IdP Signing Certificate
 
 **This key will not work with ID.me without further configuration.**

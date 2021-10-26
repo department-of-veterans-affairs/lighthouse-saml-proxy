@@ -69,6 +69,7 @@ function runServer(argv) {
           IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
             .then(handleMetadata(spIdpEntry))
             .then(() => {
+              spIdpEntry.spKey = argv.spKey;
               spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
               strategies.set(
                 spIdpEntry.category,

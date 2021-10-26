@@ -66,7 +66,7 @@ const loginGovAssertions = {
     uuid: "ae9ff5f4e4b741389904087d94cd19b2",
     ssn: "123-45-6789",
     phone: "+12345678901",
-    aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+    aal: "http://idmanagement.gov/ns/assurance/aal/2",
     ial: "http://idmanagement.gov/ns/assurance/ial/2",
     verified_at: "2021-10-12T15:12:15Z",
   },
@@ -162,7 +162,7 @@ describe("IDPProfileMapper", () => {
           dateOfBirth: "1998-01-23",
           phone: "+12345678901",
           verifiedAt: "2021-10-12T15:12:15Z",
-          aal: "urn:gov:gsa:ac:classes:sp:PasswordProtectedTransport:duo",
+          aal: "http://idmanagement.gov/ns/assurance/aal/2",
           ial: 2,
         })
       );
