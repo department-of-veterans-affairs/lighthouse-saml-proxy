@@ -94,7 +94,7 @@ const logonGovConfiguration: IClaimDescriptions = {
     optional: true,
     displayName: "Authentication Assurence Level",
     description: "Method in which user should be authenticated",
-    multiValue: false
+    multiValue: false,
   },
   ial: {
     id: "ial",
@@ -120,7 +120,7 @@ const logonGovConfiguration: IClaimDescriptions = {
     multiValue: false,
     transformer: (claims: { aal?: string }) => {
       if (claims && claims.aal) {
-        if(SUFFICIENT_AAL.includes(claims.aal)) {
+        if (SUFFICIENT_AAL.includes(claims.aal)) {
           return "true";
         }
       }
