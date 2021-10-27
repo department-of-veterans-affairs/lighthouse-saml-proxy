@@ -155,6 +155,10 @@ export const scrubUserClaims = (
 ) => {
   // Makes sure we're only serializing user claims as SAML Assertions
   // that are safe to pass to Okta
+  if (req.user.claims.idp === "login_gov") {
+    req.user.authnContext.authnMethod = "logingov";
+  }
+
   req.user.claims = {
     firstName: req.user.claims.firstName,
     lastName: req.user.claims.lastName,
