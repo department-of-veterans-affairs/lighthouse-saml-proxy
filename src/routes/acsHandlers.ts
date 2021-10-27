@@ -50,6 +50,7 @@ const sufficientLevelOfAssurance = (claims: any) => {
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
   } else if (claims.ial && claims.aal) {
     logger.info("Checking LogonGov LOA.");
+    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
     return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
   } else {
     logger.info("Checking ID.me LOA.");
