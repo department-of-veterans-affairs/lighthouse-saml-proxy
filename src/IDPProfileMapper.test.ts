@@ -167,13 +167,5 @@ describe("IDPProfileMapper", () => {
         })
       );
     });
-
-    it("Parse hspd12 aal", () => {
-      loginGovAssertions.claims.aal =
-        "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true";
-      const profile = createProfileMapper(loginGovAssertions);
-      const claims = profile.getMappedClaims();
-      expect(claims.aal).toEqual(3);
-    });
   });
 });
