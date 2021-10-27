@@ -40,22 +40,22 @@ export const urlUserErrorTemplate = () => {
 // This depends on being called after buildPassportLoginHandler because it uses
 // the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
-  if (claims.mhv_account_type) {
+  if (claims.idp === "id_me" && claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
     IdpLoginCounter.labels({ idp: "my_healthe_vet" }).inc();
     return claims.mhv_account_type === "Premium";
-  } else if (claims.dslogon_assurance) {
+  } else if (claims.idp === "id_me" && claims.dslogon_assurance) {
     logger.info("Checking DsLogon LOA.");
     IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
-  } else if (claims.ial && claims.aal) {
-    logger.info("Checking LogonGov LOA.");
-    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
-    return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
-  } else {
+  } else if (claims.idp === "id_me") {
     logger.info("Checking ID.me LOA.");
     IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
+  } else if (claims.idp === "login_gov" && claims.ial && claims.aal) {
+    logger.info("Checking LogonGov LOA.");
+    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
+    return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
   }
 };
 

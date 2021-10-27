@@ -27,6 +27,7 @@ const claimsWithICN = {
 };
 
 const claimsWithEDIPI = {
+  idp: "id_me",
   dateOfBirth: "1990-01-01",
   edipi: "asdfasdfasdf",
   firstName: "Edward",
@@ -383,6 +384,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       vetsAPIClient: client,
       user: {
         claims: {
+          idp: "login_gov",
           ial: 2,
           aal: "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true",
         },

@@ -45,6 +45,7 @@ export default class SPConfig {
     this.relayState = argv.spRelayState;
     this.failureRedirect = SP_ERROR_URL;
     this.failureFlash = true;
+    this.category = argv.category || "id_me";
   }
 
   getMetadataParams(req) {
@@ -123,6 +124,7 @@ export default class SPConfig {
       checkSPNameQualifier: true,
       failureRedirect: this.failureRedirect,
       failureFlash: this.failureFlash,
+      category: this.category,
     };
   }
 

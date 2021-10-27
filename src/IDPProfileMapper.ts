@@ -23,6 +23,13 @@ interface ISamlAssertions {
 }
 
 const commonConfiguration: IClaimDescriptions = {
+  idp: {
+    id: "category",
+    optional: false,
+    displayName: "Identity provider name",
+    description: "Name of authorizatitive IDP",
+    multiValue: false,
+  },
   email: {
     id: "email",
     optional: false,
@@ -315,14 +322,23 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
   public getMappedClaims(): object {
     const claims = {};
     this.getClaimFields(commonConfiguration, claims);
-    if (this.samlAssertions.claims.mhv_uuid) {
+    if (
+      this.samlAssertions.claims.category === "id_me" &&
+      this.samlAssertions.claims.mhv_uuid
+    ) {
       this.getClaimFields(mhvConfiguration, claims);
-    } else if (this.samlAssertions.claims.dslogon_uuid) {
+    } else if (
+      this.samlAssertions.claims.category === "id_me" &&
+      this.samlAssertions.claims.dslogon_uuid
+    ) {
       this.getClaimFields(dsLogonConfiguration, claims);
-    } else if (this.samlAssertions.claims.ial) {
-      this.getClaimFields(logonGovConfiguration, claims);
-    } else {
+    } else if (this.samlAssertions.claims.category === "id_me") {
       this.getClaimFields(idmeConfiguration, claims);
+    } else if (
+      this.samlAssertions.claims.category === "login_gov" &&
+      this.samlAssertions.claims.ial
+    ) {
+      this.getClaimFields(logonGovConfiguration, claims);
     }
     return claims;
   }
