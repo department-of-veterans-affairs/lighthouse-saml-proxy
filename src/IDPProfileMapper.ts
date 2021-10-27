@@ -1,3 +1,5 @@
+import { SUFFICIENT_AAL } from "./samlConstants";
+
 interface IClaimField {
   id: string;
   optional: boolean;
@@ -122,10 +124,9 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Multifactor",
     description: "If the user has two factor auth enabled",
     multiValue: false,
-    transformer: (claims: { aal?: String }) => {
+    transformer: (claims: { aal?: string }) => {
       if (claims && claims.aal) {
-        const aal = parseAal(claims.aal);
-        if (aal && aal >= 2) {
+        if (SUFFICIENT_AAL.includes(claims.aal)) {
           return "true";
         }
       }

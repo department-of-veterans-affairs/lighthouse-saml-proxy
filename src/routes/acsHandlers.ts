@@ -16,6 +16,7 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
+import { SUFFICIENT_AAL } from "../samlConstants";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -47,10 +48,9 @@ const sufficientLevelOfAssurance = (claims: any) => {
     logger.info("Checking DsLogon LOA.");
     IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
-  } else if (claims.ial) {
-    logger.info("Checking LoginGov LOA.");
-    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
-    return claims.ial >= 2 && claims.aal >= 2;
+  } else if (claims.ial && claims.aal) {
+    logger.info("Checking LogonGov LOA.");
+    return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
   } else {
     logger.info("Checking ID.me LOA.");
     IdpLoginCounter.labels({ idp: "id_me" }).inc();
