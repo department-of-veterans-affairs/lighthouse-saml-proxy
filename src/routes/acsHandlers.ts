@@ -12,7 +12,7 @@ import {
   MVIRequestMetrics,
   VSORequestMetrics,
   IRequestMetrics,
-  IdpLoginMetrics,
+  IdpLoginCounter,
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
@@ -42,18 +42,19 @@ export const urlUserErrorTemplate = () => {
 const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
-    IdpLoginMetrics.myHealtheVetLoginCount.inc();
+    IdpLoginCounter.labels({ idp: "my_healthe_vet" }).inc();
     return claims.mhv_account_type === "Premium";
   } else if (claims.dslogon_assurance) {
     logger.info("Checking DsLogon LOA.");
-    IdpLoginMetrics.dsLogonLoginCounter.inc();
+    IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
   } else if (claims.ial && claims.aal) {
     logger.info("Checking LogonGov LOA.");
+    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
     return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
   } else {
     logger.info("Checking ID.me LOA.");
-    IdpLoginMetrics.idMeLoginCounter.inc();
+    IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
   }
 };
