@@ -1,4 +1,4 @@
-import { SUFFICIENT_AAL } from "./samlConstants";
+import { PASSWORDPROTOCOL } from "./samlConstants";
 
 interface IClaimField {
   id: string;
@@ -102,6 +102,18 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Authentication Assurence Level",
     description: "Method in which user should be authenticated",
     multiValue: false,
+    transformer: (claims: {aal?: String}) => {
+      if(claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
+        throw {
+          error: "Unsupported_AAL",
+          error_description: "AAL given is too low."
+        }
+      }
+      if(claims.aal) {
+        return parseAal(claims.aal);
+      }
+      return 0;
+    }
   },
   ial: {
     id: "ial",
@@ -126,12 +138,19 @@ const logonGovConfiguration: IClaimDescriptions = {
     description: "If the user has two factor auth enabled",
     multiValue: false,
     transformer: (claims: { aal?: string }) => {
-      if (claims && claims.aal) {
-        if (SUFFICIENT_AAL.includes(claims.aal)) {
-          return "true";
+        if(claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
+          throw {
+            error: "Unsupported_AAL",
+            error_description: "AAL given is too low."
+          }
         }
-      }
-      return "false";
+        if(claims.aal) {
+          let aal =  parseAal(claims.aal);
+          if(aal && aal >= 2) {
+            return "true";
+          }
+        }
+        return "false";
     },
   },
   verifiedAt: {
@@ -444,3 +463,12 @@ createProfileMapper.prototype.metadata = [
     multiValue: false,
   },
 ];
+
+const parseAal = (aal: String) => {
+  let parsedAal = aal.split("/").pop();
+  parsedAal = parsedAal?.split("?")[0];
+  if (parsedAal) {
+    return parseInt(parsedAal);
+  }
+  return undefined;
+};

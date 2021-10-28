@@ -9,9 +9,3 @@ export const PASSWORDPROTOCOL = {
   CRYPTOGRAPHICALLYSECURE: "http://idmanagement.gov/ns/assurance/aal/3",
   HSPD12: "http://idmanagement.gov/ns/assurance/aal/3?hspd12=true",
 };
-
-export const SUFFICIENT_AAL = [
-  PASSWORDPROTOCOL.MULTIFACTOR,
-  PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE,
-  PASSWORDPROTOCOL.HSPD12,
-];

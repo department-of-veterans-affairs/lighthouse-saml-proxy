@@ -166,7 +166,7 @@ describe("IDPProfileMapper", () => {
           dateOfBirth: "1998-01-23",
           phone: "+12345678901",
           verifiedAt: "2021-10-12T15:12:15Z",
-          aal: "http://idmanagement.gov/ns/assurance/aal/2",
+          aal: 2,
           ial: 2,
         })
       );
