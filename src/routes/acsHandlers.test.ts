@@ -8,6 +8,7 @@ import {
   buildSamlResponseFunction,
   defaultMockRequest,
 } from "../../test/testUtils";
+import { idpConfig } from "../../test/testServer";
 import { IDME_USER } from "../../test/testUsers";
 jest.mock("passport");
 jest.mock("../VetsAPIClient");
@@ -519,7 +520,7 @@ describe("buildPassportLoginHandler", () => {
   });
 
   it("happy path", () => {
-    req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3");
+    req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3", idpConfig);
     handlers.buildPassportLoginHandler("http://example.com/acs")(
       req,
       mockResponse,

@@ -5,8 +5,10 @@ import { DOMParser } from "@xmldom/xmldom";
 import { buildSamlResponseFunction } from "./testUtils";
 import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";
+import { idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";
 import MockVetsApiClient from "./mockVetsApiClient";
+import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
 const {
@@ -24,6 +26,7 @@ const LOA_REDIRECT = "loa_redirect";
 const USER_NOT_FOUND = "user_not_found";
 const SAML_RESPONSE = "saml_response";
 const UNKNOWN = "unknown";
+const SP_ERROR = "Found. Redirecting to /samlproxy/sp/error";
 
 // Setting the mimetype when parsing html prevents the parser from complaining
 // about unclosed <input> tags (side note didn't know the closing slash is optional,
@@ -155,6 +158,10 @@ function responseResultType(response) {
     return LOA_REDIRECT;
   }
 
+  if (status === 302 && body === SP_ERROR) {
+    return SP_ERROR;
+  }
+
   if (isUserNotFound(body)) {
     return USER_NOT_FOUND;
   }
@@ -228,7 +235,11 @@ describe("Logins for idp", () => {
 
   it("uses the RelayState from the request", async () => {
     const expectedState = "expectedState";
-    const requestSamlResponse = await buildSamlResponse(IDME_USER, "3");
+    const requestSamlResponse = await buildSamlResponse(
+      IDME_USER,
+      "3",
+      idpConfig
+    );
     vetsApiClient.findUserInMVI = true;
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
@@ -241,17 +252,37 @@ describe("Logins for idp", () => {
     expect(state).toEqual(expectedState);
   });
 
+  it("Rejects invalid signature", async () => {
+    const expectedState = "expectedState";
+    let config = { ...idpConfig };
+    config.cert = idpBadCert;
+    config.key = Buffer.from(idpBadKey, "utf-8");
+    const requestSamlResponse = await buildSamlResponse(IDME_USER, "3", config);
+    vetsApiClient.findUserInMVI = true;
+    const response = await ssoRequest(requestSamlResponse, expectedState);
+
+    expect(responseResultType(response)).toEqual(SP_ERROR);
+  });
+
   for (const idp of [IDME_USER, MHV_USER, DSLOGON_USER]) {
     describe(idp, () => {
       it("redirects to the verify identity page the if user is not loa3 verified", async () => {
-        const requestSamlResponse = await buildSamlResponse(idp, "2");
+        const requestSamlResponse = await buildSamlResponse(
+          idp,
+          "2",
+          idpConfig
+        );
         vetsApiClient.findUserInMVI = true;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(LOA_REDIRECT);
       });
 
       it("looks up the user from mvi, responding with their ICN in the SAMLResponse", async () => {
-        const requestSamlResponse = await buildSamlResponse(idp, "3");
+        const requestSamlResponse = await buildSamlResponse(
+          idp,
+          "3",
+          idpConfig
+        );
         vetsApiClient.findUserInMVI = true;
         const response = await ssoRequest(requestSamlResponse);
 
@@ -263,7 +294,11 @@ describe("Logins for idp", () => {
       });
 
       it("treats the user as a VSO if the lookup from mvi fails", async () => {
-        const requestSamlResponse = await buildSamlResponse(idp, "3");
+        const requestSamlResponse = await buildSamlResponse(
+          idp,
+          "3",
+          idpConfig
+        );
         vetsApiClient.findUserInMVI = false;
         vetsApiClient.userIsVSO = true;
         const response = await ssoRequest(requestSamlResponse);
@@ -276,7 +311,11 @@ describe("Logins for idp", () => {
       });
 
       it("returns a user not found page when the user is not found in mvi or is not a VSO", async () => {
-        const requestSamlResponse = await buildSamlResponse(idp, "3");
+        const requestSamlResponse = await buildSamlResponse(
+          idp,
+          "3",
+          idpConfig
+        );
         vetsApiClient.findUserInMVI = false;
         vetsApiClient.userIsVSO = false;
         const response = await ssoRequest(requestSamlResponse);
