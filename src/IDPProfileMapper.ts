@@ -102,18 +102,18 @@ const logonGovConfiguration: IClaimDescriptions = {
     displayName: "Authentication Assurence Level",
     description: "Method in which user should be authenticated",
     multiValue: false,
-    transformer: (claims: {aal?: String}) => {
-      if(claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
+    transformer: (claims: { aal?: String }) => {
+      if (claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
         throw {
           error: "Unsupported_AAL",
-          error_description: "AAL given is too low."
-        }
+          error_description: "AAL given is too low.",
+        };
       }
-      if(claims.aal) {
+      if (claims.aal) {
         return parseAal(claims.aal);
       }
       return 0;
-    }
+    },
   },
   ial: {
     id: "ial",
@@ -138,19 +138,19 @@ const logonGovConfiguration: IClaimDescriptions = {
     description: "If the user has two factor auth enabled",
     multiValue: false,
     transformer: (claims: { aal?: string }) => {
-        if(claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
-          throw {
-            error: "Unsupported_AAL",
-            error_description: "AAL given is too low."
-          }
+      if (claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
+        throw {
+          error: "Unsupported_AAL",
+          error_description: "AAL given is too low.",
+        };
+      }
+      if (claims.aal) {
+        const aal = parseAal(claims.aal);
+        if (aal && aal >= 2) {
+          return "true";
         }
-        if(claims.aal) {
-          let aal =  parseAal(claims.aal);
-          if(aal && aal >= 2) {
-            return "true";
-          }
-        }
-        return "false";
+      }
+      return "false";
     },
   },
   verifiedAt: {

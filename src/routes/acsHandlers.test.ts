@@ -51,6 +51,20 @@ const claimsWithNoEDIPI = {
   uuid: "totally-uniq",
   level_of_assurance: "3",
 };
+
+const claimsLoginGov = {
+  dateOfBirth: "1990-01-01",
+  firstName: "Edward",
+  gender: "male",
+  lastName: "Paget",
+  middleName: "John",
+  ssn: "333-99-8988",
+  email: "ed@example.gov",
+  uuid: "totally-uniq",
+  ial: 3,
+  aal: 2,
+};
+
 const claimsBasicAccount = {
   icn: "asdfasdf",
   email: "ed@example.gov",
@@ -133,6 +147,39 @@ describe("scrubUserClaims", () => {
         dslogon_assurance: undefined,
         mhv_account_type: expect.any(String),
         uuid: expect.any(String),
+      })
+    );
+    expect(req.user.claims).toEqual(
+      expect.not.objectContaining({
+        ssn: expect.any(String),
+        gender: expect.any(String),
+        dateOfBirth: expect.any(String),
+      })
+    );
+  });
+
+  it("should return a user claims object with only permitted keys for login.gov logins", () => {
+    // First and Last Name are looked up in MVI before this function runs
+    const req = {
+      user: {
+        claims: { ...claimsLoginGov },
+      },
+    };
+    const nextFn = jest.fn();
+    handlers.scrubUserClaims(req, {}, nextFn);
+    expect(req.user.claims).toEqual(
+      expect.objectContaining({
+        firstName: expect.any(String),
+        lastName: expect.any(String),
+        email: expect.any(String),
+        middleName: expect.any(String),
+        level_of_assurance: undefined,
+        icn: undefined,
+        dslogon_assurance: undefined,
+        mhv_account_type: undefined,
+        uuid: expect.any(String),
+        ial: expect.any(Number),
+        aal: expect.any(Number),
       })
     );
     expect(req.user.claims).toEqual(

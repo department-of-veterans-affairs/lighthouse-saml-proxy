@@ -168,6 +168,8 @@ export const scrubUserClaims = (
     dslogon_assurance: req.user.claims.dslogon_assurance,
     mhv_account_type: req.user.claims.mhv_account_type,
     level_of_assurance: req.user.claims.level_of_assurance,
+    ial: req.user.claims.ial,
+    aal: req.user.claims.aal,
   };
   next();
 };
