@@ -161,7 +161,7 @@ describe("samlLogin", () => {
         };
       },
     },
-    login_gov: {
+    logingov: {
       idpLoginLink:
         "https://idp.int.identitysandbox.gov/api/saml/metadata2021?SAMLRequest=fVJNTwIxED37Lza9s13BaGxYAoGYkOBHQD14G8sITfqxdmYR%2F73dZSEc1GQP3c57M%2B%2B96ZDA2UpNat76JX7WSJztnfWk2kIp6uhVADKkPDgkxVqtJvcL1c8LVcXAQQcrzij%2FM4AII5vgRTaflWI8ns%2FG43QmqnHuicFzKfpFv%2BgVt71i8Hx5ra7Sd%2FsmsovJkTsNnmqHcYVxZzS%2BLBel2DJXSkobNNhtIFY3RVHI1kMM%2B29JVfsjiYK4mCWXxkPT68CkRIXK5Gbt0MI75Tq4A35l%2FMbiymz8o%2B%2FmiewVI7XcZElkdyFqbAMsBccaxWjYUFVrKo5OGvIdbMIuX%2BNuKM8Bw8MKHlJY89lTsEZ%2FNz0d8P9ZNjdm3ftooapqNBGjZ5FNrA1f04jA2EmSxyndjnHdCk5JMu45mwZXQTTUeMI9aD56OEdNbdreEj9GXdYpLPCwQZdm5smZ9CQToo7gNaZNgBx0Rn%2Ftcqj9oehUPX%2BYox8%3D&RelayState=%2F&SigAlg=http%3A%2F%2Fwww.w3.org%2F2001%2F04%2Fxmldsig-more%23rsa-sha256&Signature=crqsP27LiAeJpKx7%2Bjshr4OeqHvFnp1rYmkP4rHTYXdEIjp6iIo7Zu3uwzXfkm%2BJp0ShXPAy7R6855y1dMBmOz3eVjdvdm8rQ7%2B044hTw3Cxmcuf836up4rsKLeT4vIHc3%2FA3qtDK3ut%2FXiArNLZJ%2FwOrC6KNWAuhJQ8fZIPv18uiCw1eNBJA2iCUD6KKtI%2FDgwA%2B1MtpRCsHNcpX23XQryIPkH8l6MsRDw1ZM3vttF7UZa6OkIsxFEXFJ4VZMal%2BciNZV%2FiB0%2FK3QvmbbKX8k%2BuJKL8rmIJr0XhNw%2BYLcMTNnpL%2FTQloi0xS18gu3J6GY%2BTEsG1CeJRNHkuJyF3LQ%3D%3D",
       getResponseParams: () => {
