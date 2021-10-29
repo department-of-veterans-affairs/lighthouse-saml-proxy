@@ -27,7 +27,7 @@ const commonConfiguration: IClaimDescriptions = {
     id: "category",
     optional: false,
     displayName: "Identity provider name",
-    description: "Name of authorizatitive IDP",
+    description: "Name of authoritative IDP",
     multiValue: false,
   },
   email: {
