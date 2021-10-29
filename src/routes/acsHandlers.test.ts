@@ -432,7 +432,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       vetsAPIClient: client,
       user: {
         claims: {
-          idp: "login_gov",
+          idp: "logingov",
           ial: 2,
           aal: 2,
         },

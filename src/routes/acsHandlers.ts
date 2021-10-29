@@ -51,7 +51,7 @@ const sufficientLevelOfAssurance = (claims: any) => {
     logger.info("Checking ID.me LOA.");
     IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
-  } else if (claims.idp === "login_gov" && claims.ial && claims.aal) {
+  } else if (claims.idp === "logingov" && claims.ial && claims.aal) {
     logger.info("Checking LogonGov LOA.");
     IdpLoginCounter.labels({ idp: "login_gov" }).inc();
     return claims.aal >= 2 && claims.ial >= 2;
@@ -154,7 +154,7 @@ export const scrubUserClaims = (
 ) => {
   // Makes sure we're only serializing user claims as SAML Assertions
   // that are safe to pass to Okta
-  if (req.user.claims.idp === "login_gov") {
+  if (req.user.claims.idp === "logingov") {
     req.user.authnContext.authnMethod = "logingov";
   }
 

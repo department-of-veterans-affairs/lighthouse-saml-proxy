@@ -62,7 +62,7 @@ const loginGovAssertions = {
   userName: "ae9ff5f4e4b741389904087d94cd19b2",
   nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   claims: {
-    category: "login_gov",
+    category: "logingov",
     dob: "1998-01-23",
     email: "vets.gov.user+20@gmail.com",
     first_name: "CARROLL",
