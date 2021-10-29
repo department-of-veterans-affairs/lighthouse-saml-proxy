@@ -103,14 +103,15 @@ const logonGovConfiguration: IClaimDescriptions = {
     description: "Method in which user should be authenticated",
     multiValue: false,
     transformer: (claims: { aal?: String }) => {
-      if (claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
-        throw {
-          error: "Unsupported_AAL",
-          error_description: "AAL given is too low.",
-        };
-      }
-      if (claims.aal) {
-        return parseAal(claims.aal);
+      if (claims && claims.aal) {
+        switch (claims.aal) {
+          case PASSWORDPROTOCOL.MULTIFACTOR_TWELVE:
+            return 2;
+          case PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE:
+            return 3;
+          case PASSWORDPROTOCOL.HSPD12:
+            return 3;
+        }
       }
       return 0;
     },
@@ -128,7 +129,7 @@ const logonGovConfiguration: IClaimDescriptions = {
           return parseInt(parsedIal);
         }
       }
-      return undefined;
+      return 0;
     },
   },
   multifactor: {
@@ -138,15 +139,14 @@ const logonGovConfiguration: IClaimDescriptions = {
     description: "If the user has two factor auth enabled",
     multiValue: false,
     transformer: (claims: { aal?: string }) => {
-      if (claims.aal && claims.aal === PASSWORDPROTOCOL.DEFAULT) {
-        throw {
-          error: "Unsupported_AAL",
-          error_description: "AAL given is too low.",
-        };
-      }
-      if (claims.aal) {
-        const aal = parseAal(claims.aal);
-        if (aal && aal >= 2) {
+      const multifactor = [
+        PASSWORDPROTOCOL.DEFAULT,
+        PASSWORDPROTOCOL.MULTIFACTOR_TWELVE,
+        PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE,
+        PASSWORDPROTOCOL.HSPD12,
+      ];
+      if (claims.aal && claims.aal) {
+        if (multifactor.includes(claims.aal)) {
           return "true";
         }
       }
@@ -463,12 +463,3 @@ createProfileMapper.prototype.metadata = [
     multiValue: false,
   },
 ];
-
-const parseAal = (aal: String) => {
-  let parsedAal = aal.split("/").pop();
-  parsedAal = parsedAal?.split("?")[0];
-  if (parsedAal) {
-    return parseInt(parsedAal);
-  }
-  return undefined;
-};
