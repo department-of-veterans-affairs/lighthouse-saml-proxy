@@ -1,4 +1,4 @@
-import { PASSWORDPROTOCOL } from "./samlConstants";
+import { IDENTITYPROTOCOL, PASSWORDPROTOCOL } from "./samlConstants";
 
 interface IClaimField {
   id: string;
@@ -119,14 +119,18 @@ const logonGovConfiguration: IClaimDescriptions = {
   ial: {
     id: "ial",
     optional: false,
-    displayName: "Identity Assurence Level",
+    displayName: "Identity Assurance Level",
     description: "Level that user's identity was verified",
     multiValue: false,
     transformer: (claims: { ial?: String }) => {
       if (claims && claims.ial) {
-        const parsedIal = claims.ial.split("/").pop();
-        if (parsedIal) {
-          return parseInt(parsedIal);
+        switch (claims.ial) {
+          case IDENTITYPROTOCOL.BASIC:
+            return 1;
+          case IDENTITYPROTOCOL.IDENTITY_VERIFIED:
+            return 2;
+          case IDENTITYPROTOCOL.IDENTITY_VERIFIED_LIVENESS:
+            return 2;
         }
       }
       return 0;
@@ -145,7 +149,7 @@ const logonGovConfiguration: IClaimDescriptions = {
         PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE,
         PASSWORDPROTOCOL.HSPD12,
       ];
-      if (claims.aal && claims.aal) {
+      if (claims && claims.aal) {
         if (multifactor.includes(claims.aal)) {
           return "true";
         }
@@ -353,10 +357,7 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
       this.getClaimFields(dsLogonConfiguration, claims);
     } else if (this.samlAssertions.claims.category === "id_me") {
       this.getClaimFields(idmeConfiguration, claims);
-    } else if (
-      this.samlAssertions.claims.category === "logingov" &&
-      this.samlAssertions.claims.ial
-    ) {
+    } else if (this.samlAssertions.claims.category === "logingov") {
       this.getClaimFields(logonGovConfiguration, claims);
     }
     return claims;
