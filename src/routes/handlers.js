@@ -64,7 +64,7 @@ export const samlLogin = function (template) {
     });
 
     let login_gov_enabled;
-    if (req.sps.options.login_gov) {
+    if (req.sps.options.logingov) {
       login_gov_enabled = true;
     } else {
       login_gov_enabled = false;
@@ -90,7 +90,7 @@ export const samlLogin = function (template) {
       .reduce((memo, [key, authnContext, exParams = null]) => {
         let idpKey = "id_me";
         if (key === "login_gov_login_link") {
-          idpKey = "login_gov";
+          idpKey = "logingov";
         }
         const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,

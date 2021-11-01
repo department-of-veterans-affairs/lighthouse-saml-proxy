@@ -6,6 +6,7 @@ const idmeAssertions = {
   userName: "ae9ff5f4e4b741389904087d94cd19b2",
   nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   claims: {
+    category: "id_me",
     birth_date: "1998-01-23",
     email: "vets.gov.user+20@gmail.com",
     fname: "KELLY",
@@ -24,6 +25,7 @@ const mhvAssertions = {
   userName: "ae9ff5f4e4b741389904087d94cd19b2",
   nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   claims: {
+    category: "id_me",
     email: "vets.gov.user+20@gmail.com",
     mhv_icn: "anICN",
     mhv_profile:
@@ -40,6 +42,7 @@ const dslogonAssertions = {
   userName: "ae9ff5f4e4b741389904087d94cd19b2",
   nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   claims: {
+    category: "id_me",
     dslogon_birth_date: "1998-01-23",
     email: "vets.gov.user+20@gmail.com",
     dslogon_fname: "KELLY",
@@ -59,6 +62,7 @@ const loginGovAssertions = {
   userName: "ae9ff5f4e4b741389904087d94cd19b2",
   nameIdFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   claims: {
+    category: "logingov",
     dob: "1998-01-23",
     email: "vets.gov.user+20@gmail.com",
     first_name: "CARROLL",
@@ -162,7 +166,7 @@ describe("IDPProfileMapper", () => {
           dateOfBirth: "1998-01-23",
           phone: "+12345678901",
           verifiedAt: "2021-10-12T15:12:15Z",
-          aal: "http://idmanagement.gov/ns/assurance/aal/2",
+          aal: 2,
           ial: 2,
         })
       );

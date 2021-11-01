@@ -16,7 +16,6 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
-import { SUFFICIENT_AAL } from "../samlConstants";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -40,22 +39,22 @@ export const urlUserErrorTemplate = () => {
 // This depends on being called after buildPassportLoginHandler because it uses
 // the mapped claim mhv_account_type.
 const sufficientLevelOfAssurance = (claims: any) => {
-  if (claims.mhv_account_type) {
+  if (claims.idp === "id_me" && claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
     IdpLoginCounter.labels({ idp: "my_healthe_vet" }).inc();
     return claims.mhv_account_type === "Premium";
-  } else if (claims.dslogon_assurance) {
+  } else if (claims.idp === "id_me" && claims.dslogon_assurance) {
     logger.info("Checking DsLogon LOA.");
     IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
-  } else if (claims.ial && claims.aal) {
-    logger.info("Checking LogonGov LOA.");
-    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
-    return SUFFICIENT_AAL.includes(claims.aal) && claims.ial >= 2;
-  } else {
+  } else if (claims.idp === "id_me") {
     logger.info("Checking ID.me LOA.");
     IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
+  } else if (claims.idp === "logingov" && claims.ial && claims.aal) {
+    logger.info("Checking LogonGov LOA.");
+    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
+    return claims.aal >= 2 && claims.ial >= 2;
   }
 };
 
@@ -155,6 +154,10 @@ export const scrubUserClaims = (
 ) => {
   // Makes sure we're only serializing user claims as SAML Assertions
   // that are safe to pass to Okta
+  if (req.user.claims.idp === "logingov") {
+    req.user.authnContext.authnMethod = "logingov";
+  }
+
   req.user.claims = {
     firstName: req.user.claims.firstName,
     lastName: req.user.claims.lastName,
@@ -165,6 +168,8 @@ export const scrubUserClaims = (
     dslogon_assurance: req.user.claims.dslogon_assurance,
     mhv_account_type: req.user.claims.mhv_account_type,
     level_of_assurance: req.user.claims.level_of_assurance,
+    ial: req.user.claims.ial,
+    aal: req.user.claims.aal,
   };
   next();
 };

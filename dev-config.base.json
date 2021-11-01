@@ -28,7 +28,7 @@
   "idpSamlLogins": 
   [
     {
-      "category": "example2_saml_idp",
+      "category": "example2SamlIdp",
       "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       "spAudience": "https://saml-idp.example2.com",

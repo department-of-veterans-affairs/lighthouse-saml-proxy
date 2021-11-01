@@ -1,4 +1,4 @@
-import { SUFFICIENT_AAL } from "./samlConstants";
+import { IDENTITYPROTOCOL, PASSWORDPROTOCOL } from "./samlConstants";
 
 interface IClaimField {
   id: string;
@@ -23,6 +23,13 @@ interface ISamlAssertions {
 }
 
 const commonConfiguration: IClaimDescriptions = {
+  idp: {
+    id: "category",
+    optional: false,
+    displayName: "Identity provider name",
+    description: "Name of authoritative IDP",
+    multiValue: false,
+  },
   email: {
     id: "email",
     optional: false,
@@ -92,24 +99,41 @@ const logonGovConfiguration: IClaimDescriptions = {
   aal: {
     id: "aal",
     optional: true,
-    displayName: "Authentication Assurence Level",
+    displayName: "Authentication Assurance Level",
     description: "Method in which user should be authenticated",
     multiValue: false,
+    transformer: (claims: { aal?: String }) => {
+      if (claims && claims.aal) {
+        switch (claims.aal) {
+          case PASSWORDPROTOCOL.MULTIFACTOR_TWELVE:
+            return 2;
+          case PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE:
+            return 3;
+          case PASSWORDPROTOCOL.HSPD12:
+            return 3;
+        }
+      }
+      return 0;
+    },
   },
   ial: {
     id: "ial",
     optional: false,
-    displayName: "Identity Assurence Level",
+    displayName: "Identity Assurance Level",
     description: "Level that user's identity was verified",
     multiValue: false,
     transformer: (claims: { ial?: String }) => {
       if (claims && claims.ial) {
-        const parsedIal = claims.ial.split("/").pop();
-        if (parsedIal) {
-          return parseInt(parsedIal);
+        switch (claims.ial) {
+          case IDENTITYPROTOCOL.BASIC:
+            return 1;
+          case IDENTITYPROTOCOL.IDENTITY_VERIFIED:
+            return 2;
+          case IDENTITYPROTOCOL.IDENTITY_VERIFIED_LIVENESS:
+            return 2;
         }
       }
-      return undefined;
+      return 0;
     },
   },
   multifactor: {
@@ -119,8 +143,14 @@ const logonGovConfiguration: IClaimDescriptions = {
     description: "If the user has two factor auth enabled",
     multiValue: false,
     transformer: (claims: { aal?: string }) => {
+      const multifactor = [
+        PASSWORDPROTOCOL.DEFAULT,
+        PASSWORDPROTOCOL.MULTIFACTOR_TWELVE,
+        PASSWORDPROTOCOL.CRYPTOGRAPHICALLYSECURE,
+        PASSWORDPROTOCOL.HSPD12,
+      ];
       if (claims && claims.aal) {
-        if (SUFFICIENT_AAL.includes(claims.aal)) {
+        if (multifactor.includes(claims.aal)) {
           return "true";
         }
       }
@@ -315,14 +345,20 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
   public getMappedClaims(): object {
     const claims = {};
     this.getClaimFields(commonConfiguration, claims);
-    if (this.samlAssertions.claims.mhv_uuid) {
+    if (
+      this.samlAssertions.claims.category === "id_me" &&
+      this.samlAssertions.claims.mhv_uuid
+    ) {
       this.getClaimFields(mhvConfiguration, claims);
-    } else if (this.samlAssertions.claims.dslogon_uuid) {
+    } else if (
+      this.samlAssertions.claims.category === "id_me" &&
+      this.samlAssertions.claims.dslogon_uuid
+    ) {
       this.getClaimFields(dsLogonConfiguration, claims);
-    } else if (this.samlAssertions.claims.ial) {
-      this.getClaimFields(logonGovConfiguration, claims);
-    } else {
+    } else if (this.samlAssertions.claims.category === "id_me") {
       this.getClaimFields(idmeConfiguration, claims);
+    } else if (this.samlAssertions.claims.category === "logingov") {
+      this.getClaimFields(logonGovConfiguration, claims);
     }
     return claims;
   }
