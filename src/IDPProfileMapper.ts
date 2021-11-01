@@ -99,7 +99,7 @@ const logonGovConfiguration: IClaimDescriptions = {
   aal: {
     id: "aal",
     optional: true,
-    displayName: "Authentication Assurence Level",
+    displayName: "Authentication Assurance Level",
     description: "Method in which user should be authenticated",
     multiValue: false,
     transformer: (claims: { aal?: String }) => {
