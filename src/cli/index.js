@@ -466,6 +466,18 @@ export function processArgs() {
           string: true,
           default: "urn:example:sp",
         },
+        spRequestNameIDFormat: {
+          description: "Request Subject NameID Format (SAMLP)",
+          required: false,
+          boolean: true,
+          default: true,
+        },
+        spRequestAuthnContext: {
+          description: "Request Authentication Context (SAMLP)",
+          required: false,
+          boolean: true,
+          default: true,
+        },
       },
     })
     .example(
