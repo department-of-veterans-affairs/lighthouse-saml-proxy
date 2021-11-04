@@ -25,6 +25,11 @@ export function processArgs() {
         required: true,
         default: 7000,
       },
+      legacyConfigActivated: {
+        description: "Activates the legacy config format",
+        required: false,
+        default: true,
+      },
       idpCert: {
         description: "IdP Signature PublicKey Certificate",
         required: true,
