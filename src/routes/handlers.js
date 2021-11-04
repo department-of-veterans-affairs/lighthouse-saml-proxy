@@ -63,12 +63,6 @@ export const samlLogin = function (template) {
       );
     });
 
-    let login_gov_enabled;
-    if (req.sps.options.logingov) {
-      login_gov_enabled = true;
-    } else {
-      login_gov_enabled = false;
-    }
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
@@ -79,18 +73,33 @@ export const samlLogin = function (template) {
         "&op=signup",
       ],
     ];
-    if (login_gov_enabled) {
-      authnSelection.push([
-        "login_gov_login_link",
-        "http://idmanagement.gov/ns/assurance/ial/2",
-      ]);
-    }
+    const idpsEnabled = [];
+    Object.values(req.sps.options).forEach((spConfig) => {
+      if (spConfig.category != "id_me") {
+        authnSelection.push([
+          spConfig.category + "_login_link",
+          spConfig.assurance,
+        ]);
+        const enabledIdp = {};
+        idpsEnabled.push(enabledIdp);
+        enabledIdp.category = spConfig.category;
+        if (spConfig.signupLink) {
+          enabledIdp.signupLink = spConfig.signupLink;
+        }
+      }
+    });
 
     authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
         let idpKey = "id_me";
-        if (key === "login_gov_login_link") {
-          idpKey = "logingov";
+        if (
+          key.startsWith("id_me") ||
+          key === "dslogon_login_link" ||
+          key === "mhv_login_link"
+        ) {
+          idpKey = "id_me";
+        } else {
+          idpKey = key.substring(0, key.lastIndexOf("_login_link"));
         }
         const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
@@ -117,7 +126,13 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
-        authOptions.login_gov_enabled = login_gov_enabled;
+        idpsEnabled.forEach((enabledIdp) => {
+          authOptions[enabledIdp.category + "_enabled"] = true;
+          if (enabledIdp.signupLink) {
+            authOptions[enabledIdp.category + "_signup_link"] =
+              enabledIdp.signupLink;
+          }
+        });
         res.render(template, authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
