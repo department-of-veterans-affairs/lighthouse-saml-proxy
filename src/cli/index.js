@@ -478,6 +478,11 @@ export function processArgs() {
           boolean: true,
           default: true,
         },
+        spIdpSignupLink: {
+          description: "Link to the Signup Page for the IDP",
+          required: false,
+          string: true,
+        },
       },
     })
     .example(
