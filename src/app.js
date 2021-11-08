@@ -62,7 +62,9 @@ function runServer(argv) {
       const app = express();
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
-      strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
+      if (argv.spIdpIssuer) {
+        strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
+      }
       app.use(passport.initialize());
       if (argv.idpSamlLoginsEnabled) {
         argv.idpSamlLogins.forEach((spIdpEntry) => {
