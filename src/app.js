@@ -55,60 +55,51 @@ const handleMetadata = (argv) => {
 };
 
 function runServer(argv) {
+  const app = express();
+  const httpServer = http.createServer(app);
+  const idpConfig = new IDPConfig(argv);
+  const vaConfig = new VetsAPIConfig(argv);
+  const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
+  let cache = null;
+  const cacheEnabled = argv.cacheEnabled;
+  if (cacheEnabled) {
+    cache = new RedisCache(argv.redisPort, argv.redisHost);
+  }
   const strategies = new Map();
-  IdPMetadata.fetch(argv.spIdpMetaUrl)
-    .then(handleMetadata(argv))
-    .then(() => {
-      const app = express();
-      const httpServer = http.createServer(app);
-      const spConfigs = { id_me: new SPConfig(argv) };
-      if (argv.spIdpIssuer) {
-        strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
-      }
-      app.use(passport.initialize());
-      if (argv.idpSamlLoginsEnabled) {
-        argv.idpSamlLogins.forEach((spIdpEntry) => {
-          IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
-            .then(handleMetadata(spIdpEntry))
-            .then(() => {
-              spIdpEntry.spKey = argv.spKey;
-              spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
-              strategies.set(
-                spIdpEntry.category,
-                createPassportStrategy(spConfigs[spIdpEntry.category])
-              );
-            });
-        });
-      }
-      const idpConfig = new IDPConfig(argv);
-      const vaConfig = new VetsAPIConfig(argv);
-      const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
-      let cache = null;
-      const cacheEnabled = argv.cacheEnabled;
-      if (cacheEnabled) {
-        cache = new RedisCache(argv.redisPort, argv.redisHost);
-      }
-      configureExpress(
-        app,
-        argv,
-        idpConfig,
-        spConfigs,
-        strategies,
-        vetsApiClient,
-        cache,
-        cacheEnabled
-      );
-
-      const env = app.get("env"),
-        port = app.get("port");
-      logger.info(`Starting proxy server on port ${port} in ${env} mode`, {
-        env,
-        port,
+  const spConfigs = {};
+  argv.idpSamlLogins.forEach((spIdpEntry) => {
+    IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
+      .then(handleMetadata(spIdpEntry))
+      .then(() => {
+        spIdpEntry.spKey = argv.spKey;
+        spConfigs[spIdpEntry.category] = new SPConfig(spIdpEntry);
+        strategies.set(
+          spIdpEntry.category,
+          createPassportStrategy(spConfigs[spIdpEntry.category])
+        );
       });
-      httpServer.keepAliveTimeout = 75000;
-      httpServer.headersTimeout = 75000;
-      httpServer.listen(app.get("port"));
-    });
+  });
+  app.use(passport.initialize());
+  configureExpress(
+    app,
+    argv,
+    idpConfig,
+    spConfigs,
+    strategies,
+    vetsApiClient,
+    cache,
+    cacheEnabled
+  );
+
+  const env = app.get("env"),
+    port = app.get("port");
+  logger.info(`Starting proxy server on port ${port} in ${env} mode`, {
+    env,
+    port,
+  });
+  httpServer.keepAliveTimeout = 75000;
+  httpServer.headersTimeout = 75000;
+  httpServer.listen(app.get("port"));
 }
 
 function main() {

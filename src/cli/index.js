@@ -173,7 +173,6 @@ export function processArgs() {
         description: "IdP Issuer URI",
         required: false,
         string: true,
-        default: "urn:example:idp",
       },
       spIdpSsoUrl: {
         description: "IdP Single Sign-On Service URL (SSO URL)",

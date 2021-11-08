@@ -86,11 +86,10 @@ export const samlLogin = function (template) {
 
     authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
-        const lastIndexOf =
-          key.lastIndexOf("_login_link") < 0
-            ? key.lastIndexOf("_login_link")
-            : key.lastIndexOf("_signup_link");
-
+        const lastIndexOf = Math.max(
+          key.lastIndexOf("_login_link"),
+          key.lastIndexOf("_signup_link")
+        );
         const idpKey = key.substring(0, lastIndexOf);
 
         const params = req.sps.options[idpKey].getAuthnRequestParams(
