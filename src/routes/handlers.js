@@ -63,44 +63,36 @@ export const samlLogin = function (template) {
       );
     });
 
-    const authnSelection = [
-      ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
-      ["dslogon_login_link", "dslogon"],
-      ["mhv_login_link", "myhealthevet"],
-      [
-        "id_me_signup_link",
-        "http://idmanagement.gov/ns/assurance/loa/3",
-        "&op=signup",
-      ],
-    ];
+    const authnSelection = [];
     const idpsEnabled = [];
     Object.values(req.sps.options).forEach((spConfig) => {
-      if (spConfig.category != "id_me") {
+      authnSelection.push([
+        spConfig.category + "_login_link",
+        spConfig.authnContextClassRef,
+      ]);
+      const enabledIdp = {};
+      idpsEnabled.push(enabledIdp);
+      enabledIdp.category = spConfig.category;
+      if (spConfig.signupLink) {
+        enabledIdp.signupLink = spConfig.signupLink;
+      } else if (spConfig.signupOp) {
         authnSelection.push([
-          spConfig.category + "_login_link",
-          spConfig.assurance,
+          spConfig.category + "_signup_link",
+          spConfig.authnContextClassRef,
+          spConfig.signupOp,
         ]);
-        const enabledIdp = {};
-        idpsEnabled.push(enabledIdp);
-        enabledIdp.category = spConfig.category;
-        if (spConfig.signupLink) {
-          enabledIdp.signupLink = spConfig.signupLink;
-        }
       }
     });
 
     authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
-        let idpKey = "id_me";
-        if (
-          key.startsWith("id_me") ||
-          key === "dslogon_login_link" ||
-          key === "mhv_login_link"
-        ) {
-          idpKey = "id_me";
-        } else {
-          idpKey = key.substring(0, key.lastIndexOf("_login_link"));
-        }
+        const lastIndexOf =
+          key.lastIndexOf("_login_link") < 0
+            ? key.lastIndexOf("_login_link")
+            : key.lastIndexOf("_signup_link");
+
+        const idpKey = key.substring(0, lastIndexOf);
+
         const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
           (authnRequest && authnRequest.forceAuthn) || "false",
