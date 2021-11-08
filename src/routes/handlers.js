@@ -131,6 +131,7 @@ export const samlLogin = function (template) {
           if (enabledIdp.signupLink) {
             authOptions[enabledIdp.category + "_signup_link"] =
               enabledIdp.signupLink;
+            authOptions[enabledIdp.category + "_signup_link_enabled"] = true;
           }
         });
         res.render(template, authOptions);
