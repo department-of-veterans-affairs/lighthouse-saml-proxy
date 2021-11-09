@@ -211,7 +211,7 @@ describe("samlLogin", () => {
     id_me_signup_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
     login_gov_enabled: false,
-    login_gov_signup_link: false,
+    login_gov_signup_link_enabled: false,
   };
 
   const expected_authoptions_login_gov_enabled = {
