@@ -84,10 +84,12 @@ export const samlLogin = function (template) {
         "login_gov_login_link",
         "http://idmanagement.gov/ns/assurance/ial/2",
       ]);
-      authnSelection.push([
-        "login_gov_signup_link",
-        "http://idmanagement.gov/ns/assurance/ial/2",
-      ]);
+      if (req.sps.options.logingov.signupLinkEnabled) {
+        authnSelection.push([
+          "login_gov_signup_link",
+          "http://idmanagement.gov/ns/assurance/ial/2",
+        ]);
+      }
     }
 
     authnSelection
@@ -122,6 +124,8 @@ export const samlLogin = function (template) {
       }, Promise.resolve({}))
       .then((authOptions) => {
         authOptions.login_gov_enabled = login_gov_enabled;
+        authOptions.login_gov_signup_link_enabled =
+          req.sps.options.logingov.signupLinkEnabled;
         res.render(template, authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",

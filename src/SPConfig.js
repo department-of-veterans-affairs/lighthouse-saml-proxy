@@ -47,6 +47,7 @@ export default class SPConfig {
     this.failureFlash = true;
     this.category = argv.category || "id_me";
     this.signupLink = argv.spIdpSignupLink;
+    this.signupLinkEnabled = argv.spIdpSignupLinkEnabled;
   }
 
   getMetadataParams(req) {
