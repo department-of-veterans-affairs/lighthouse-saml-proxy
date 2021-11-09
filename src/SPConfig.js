@@ -46,6 +46,7 @@ export default class SPConfig {
     this.failureRedirect = SP_ERROR_URL;
     this.failureFlash = true;
     this.category = argv.category || "id_me";
+    this.signupLinkEnabled = argv.spIdpSignupLinkEnabled;
   }
 
   getMetadataParams(req) {

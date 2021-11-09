@@ -169,6 +169,7 @@ describe("samlLogin", () => {
           thumbprint: "thumbprint",
         };
       },
+      signupLinkEnabled: true,
       getAuthnRequestParams: () => {
         return {
           identityProviderUrl: "https://idp.int.identitysandbox.gov/api/saml",
@@ -210,6 +211,7 @@ describe("samlLogin", () => {
     id_me_signup_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
     login_gov_enabled: false,
+    login_gov_signup_link_enabled: false,
   };
 
   const expected_authoptions_login_gov_enabled = {
@@ -224,6 +226,9 @@ describe("samlLogin", () => {
     login_gov_login_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
     login_gov_enabled: true,
+    login_gov_signup_link_enabled: true,
+    login_gov_signup_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
   };
 
   const mockGetSamlRequestUrl = jest
