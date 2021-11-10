@@ -75,6 +75,12 @@ $dslogon-blue: #003e73;
             background-color: $dslogon-blue;
         }
 
+        &.signup {
+          background-color: white;
+          box-shadow: inset 0 0 0 2px $dslogon-blue;
+          color: $dslogon-blue;
+        }
+
         &.idme-signin {
             background-color: $idme-green;
         }
@@ -243,7 +249,7 @@ span.sidelines {
           background: $color-primary-darkest;
         }
       }
-  
+      
       &.idme-create {
         box-shadow: inset 0 0 0 2px $color-green;
         color: $color-green;
