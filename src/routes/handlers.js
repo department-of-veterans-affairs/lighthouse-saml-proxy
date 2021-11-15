@@ -64,17 +64,16 @@ export const samlLogin = function (template) {
     });
 
     const authnSelection = [];
-    const idpsEnabled = [];
     Object.values(req.sps.options).forEach((spConfig) => {
       authnSelection.push([
         spConfig.category + "_login_link",
         spConfig.authnContextClassRef,
       ]);
-      const enabledIdp = {};
-      idpsEnabled.push(enabledIdp);
-      enabledIdp.category = spConfig.category;
-      if (spConfig.signupLink) {
-        enabledIdp.signupLink = spConfig.signupLink;
+      if (spConfig.signupLinkEnabled) {
+        authnSelection.push([
+          spConfig.category + "_signup_link",
+          spConfig.authnContextClassRef,
+        ]);
       } else if (spConfig.signupOp) {
         authnSelection.push([
           spConfig.category + "_signup_link",
@@ -117,14 +116,6 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
-        idpsEnabled.forEach((enabledIdp) => {
-          authOptions[enabledIdp.category + "_enabled"] = true;
-          if (enabledIdp.signupLink) {
-            authOptions[enabledIdp.category + "_signup_link"] =
-              enabledIdp.signupLink;
-            authOptions[enabledIdp.category + "_signup_link_enabled"] = true;
-          }
-        });
         res.render(template, authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
