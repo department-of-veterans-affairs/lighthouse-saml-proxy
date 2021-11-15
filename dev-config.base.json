@@ -35,7 +35,8 @@
       "spAudience": "https://saml-idp.example2.com",
       "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
       "spRequestAuthnContext": true,
-      "spRequestNameIDFormat": true
+      "spRequestNameIDFormat": true,
+      "spIdpSignupLinkEnabled": true
    }
   ]
 }
