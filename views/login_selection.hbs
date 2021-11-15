@@ -9,7 +9,7 @@
     <a class="no-external-icon usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon" src="/samlproxy/idp/img/dslogon-icon.svg" />Sign in with DSLogon</a>
     <a class="no-external-icon usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet" src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
     <a class="no-external-icon usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
-    {{#if logingov_enabled}}
+    {{#if logingov_login_link}}
     <a class="no-external-icon usa-button login-gov" href="{{ logingov_login_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/icon-dot-gov.svg" />Sign in with Login.gov</a>
     {{/if}}
   </div>
@@ -23,7 +23,7 @@
     <div class="usa-width-one-half">
       <h4>Don't have these accounts?</h4>
       <a class="no-external-icon usa-button idme-signup" href="{{ id_me_signup_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-dark.svg" />Create an ID.me account</a>
-      {{#if logingov_signup_link_enabled}}
+      {{#if logingov_signup_link}}
       <a class="no-external-icon usa-button logingov-signup" href="{{ logingov_signup_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/icon-dot-gov.svg" />Create an login.gov account</a>
       {{/if}}
       <p>Use your email, Google, or Facebook</p>
