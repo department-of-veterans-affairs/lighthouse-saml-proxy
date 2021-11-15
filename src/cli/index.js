@@ -173,6 +173,7 @@ export function processArgs() {
         description: "IdP Issuer URI",
         required: false,
         string: true,
+        default: "urn:example:idp",
       },
       spIdpSsoUrl: {
         description: "IdP Single Sign-On Service URL (SSO URL)",
@@ -477,10 +478,11 @@ export function processArgs() {
           boolean: true,
           default: true,
         },
-        spIdpSignupLink: {
-          description: "Link to the Signup Page for the IDP",
+        spIdpSignupLinkEnabled: {
+          description: "Enables a link to the Signup Page for the IDP",
           required: false,
-          string: true,
+          boolean: true,
+          default: false,
         },
       },
     })
