@@ -68,7 +68,7 @@ function runServer(argv) {
   const strategies = new Map();
   const spConfigs = {};
   if (!argv.idpConfigDrivenRefactor) {
-    legacyConfigSetup(argv, spConfigs);
+    legacyConfigSetup(argv);
   }
   argv.idpSamlLogins.forEach((spIdpEntry) => {
     IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
