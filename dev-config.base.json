@@ -24,6 +24,7 @@
   "redisPort": "6379",
   "redisHost": "127.0.0.1",
   "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+  "idpSelectionRefactor" : true,
   "idpSamlLoginsEnabled": true,
   "idpSamlLogins": 
   [
@@ -35,8 +36,7 @@
       "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
       "spRequestAuthnContext": true,
       "spRequestNameIDFormat": true,
-      "spIdpAssurance": "http://saml-idp.example2.com/assurance/ial/2",
-      "spIdpSignupLink": "http://saml-idp.example2.com/sign_up/enter_email"
+      "spIdpSignupLinkEnabled": true
    }
   ]
 }
