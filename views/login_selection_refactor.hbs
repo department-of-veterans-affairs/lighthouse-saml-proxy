@@ -25,8 +25,10 @@
                 src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
             <a class="no-external-icon usa-button dslogon" href="{{ id_me_login_link }}"><img alt="ID.me"
                 src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
+            {{#if login_gov_enabled}}
             <a class="no-external-icon usa-button dslogon" href="{{ login_gov_login_link }}"><img alt="Login.gov"
                 src="/samlproxy/idp/img/login-gov-logo.svg" />Sign in with Login.gov</a>
+            {{/if}}
             <div>
               <span class="sidelines">OR</span>
               <div class="alternate-signin">
