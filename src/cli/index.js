@@ -410,7 +410,8 @@ export function processArgs() {
         ],
       },
       spIdpSignupOp: {
-        description: "Legacy mode setting for unrefactored config handling, signup opt",
+        description:
+          "Legacy mode setting for unrefactored config handling, signup opt",
         type: "string",
         requied: false,
         default: "&op=signup",
