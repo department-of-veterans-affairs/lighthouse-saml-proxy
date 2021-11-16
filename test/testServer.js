@@ -36,15 +36,72 @@ const defaultTestingConfig = {
   spValidateNameIDFormat: true,
   spNameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
   spRequestAuthnContext: true,
+  idpSamlLogins: [
+    {
+      category: "id_me",
+      spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
+      spNameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      spIdpSsoUrl: "https://api.idmelabs.com/saml/SingleSignOnService",
+      spAudience: "test",
+      spSignAuthnRequests: true,
+      spIdpIssuer: "api.idmelabs.com",
+      spAuthnContextClassRef: "http://idmanagement.gov/ns/assurance/loa/3",
+      spRequestAuthnContext: true,
+      spRequestNameIDFormat: true,
+      spCert: Buffer.from(spCert, "utf-8"),
+      spKey: Buffer.from(spKey, "utf-8"),
+      spIdpCert: certToPEM(idpCert),
+      spProtocol: "samlp",
+      spIdpSignupOp: "&op=signup",
+    },
+    {
+      category: "dslogon",
+      spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
+      spNameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      spIdpSsoUrl: "https://api.idmelabs.com/saml/SingleSignOnService",
+      spAudience: "test",
+      spSignAuthnRequests: true,
+      spIdpIssuer: "api.idmelabs.com",
+      spAuthnContextClassRef: "dslogon",
+      spRequestAuthnContext: true,
+      spRequestNameIDFormat: true,
+      spCert: Buffer.from(spCert, "utf-8"),
+      spKey: Buffer.from(spKey, "utf-8"),
+      spIdpCert: certToPEM(idpCert),
+      spProtocol: "samlp",
+    },
+    {
+      category: "mhv",
+      spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
+      spNameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      spIdpSsoUrl: "https://api.idmelabs.com/saml/SingleSignOnService",
+      spAudience: "test",
+      spSignAuthnRequests: true,
+      spIdpIssuer: "api.idmelabs.com",
+      spAuthnContextClassRef: "myhealthevet",
+      spRequestAuthnContext: true,
+      spRequestNameIDFormat: true,
+      spCert: Buffer.from(spCert, "utf-8"),
+      spKey: Buffer.from(spKey, "utf-8"),
+      spIdpCert: certToPEM(idpCert),
+      spProtocol: "samlp",
+    },
+  ],
 };
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
 export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
   const app = express();
-  const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
+  const spConfigs = {};
   const strategies = new Map();
-  strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
+  defaultTestingConfig.idpSamlLogins.forEach((spIdpConfig) => {
+    spConfigs[spIdpConfig.category] = new SPConfig(spIdpConfig);
+    strategies.set(
+      spIdpConfig.category,
+      createPassportStrategy(spConfigs[spIdpConfig.category])
+    );
+  });
   app.use(passport.initialize());
   configureExpress(
     app,
