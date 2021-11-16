@@ -1,4 +1,4 @@
-# VA.gov SAML Proxy
+# VA Lighthouse SAML Proxy
 
 This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and ID.me which VA.gov currently uses a authentication service. 
 
