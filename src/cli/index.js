@@ -404,9 +404,14 @@ export function processArgs() {
         type: "array",
         require: false,
         default: [
-          "http://idmanagement.gov/ns/assurance/loa/3",
-          "dslogon",
-          "myhealthevet",
+          {
+            category: "id_me",
+            spAuthnContextClassRef:
+              "http://idmanagement.gov/ns/assurance/loa/3",
+            spIdpSignupOp: "&op=signup",
+          },
+          { category: "dslogon", spAuthnContextClassRef: "dslogon" },
+          { category: "myhealthevet", spAuthnContextClassRef: "myhealthevet" },
         ],
       },
       spIdpSignupOp: {

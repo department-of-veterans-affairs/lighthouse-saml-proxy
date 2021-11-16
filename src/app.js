@@ -67,6 +67,9 @@ function runServer(argv) {
   }
   const strategies = new Map();
   const spConfigs = {};
+  if (!argv.idpConfigDrivenRefactor) {
+    legacyConfigSetup(argv, spConfigs);
+  }
   argv.idpSamlLogins.forEach((spIdpEntry) => {
     IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
       .then(handleMetadata(spIdpEntry))
@@ -101,6 +104,24 @@ function runServer(argv) {
   httpServer.headersTimeout = 75000;
   httpServer.listen(app.get("port"));
 }
+
+const legacyConfigSetup = (argv) => {
+  argv.legacySpAuthnContextClassRef.forEach((legacyConfigSetup) => {
+    argv.idpSamlLogins.push({
+      category: legacyConfigSetup.category,
+      spAuthnContextClassRef: legacyConfigSetup.spAuthnContextClassRef,
+      spIdpSignupOp: legacyConfigSetup.spIdpSignupOp,
+      spIdpMetaUrl: argv.spIdpMetaUrl,
+      spNameIDFormat: argv.spNameIDFormat,
+      spAudience: argv.spAudience,
+      spRequestAuthnContext: argv.spRequestAuthnContext,
+      spRequestNameIDFormat: argv.spRequestNameIDFormat,
+      spCert: argv.spCert,
+      spKey: argv.spKey,
+      spProtocol: argv.spProtocol,
+    });
+  });
+};
 
 function main() {
   runServer(cli.processArgs());
