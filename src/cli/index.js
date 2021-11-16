@@ -388,6 +388,12 @@ export function processArgs() {
         requied: false,
         default: false,
       },
+      idpConfigDrivenRefactor: {
+        description:
+          "Flag on enabling the refactoring which moves all IDP behaviors into the config.",
+        requied: false,
+        default: false,
+      },
       idpSamlLoginsEnabled: {
         description: "Flag on enabling IDP logins such as login.gov",
         requied: false,
