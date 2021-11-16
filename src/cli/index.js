@@ -399,6 +399,22 @@ export function processArgs() {
         requied: false,
         default: false,
       },
+      legacySpAuthnContextClassRef: {
+        description: "Legacy mode setting for unrefactored config handling",
+        type: "array",
+        require: false,
+        default: [
+          "http://idmanagement.gov/ns/assurance/loa/3",
+          "dslogon",
+          "myhealthevet",
+        ],
+      },
+      spIdpSignupOp: {
+        description: "Legacy mode setting for unrefactored config handling, signup opt",
+        type: "string",
+        requied: false,
+        default: "&op=signup",
+      },
       idpSamlLogins: {
         description:
           "An array of objects used to describe SP IDP options for login",
