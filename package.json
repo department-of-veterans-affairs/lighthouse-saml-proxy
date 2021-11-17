@@ -76,6 +76,7 @@
     "@types/request": "^2.48.5",
     "@types/request-promise-native": "^1.0.17",
     "@types/xml2js": "^0.4.8",
+    "@xmldom/xmldom": "^0.7.5",
     "acorn": "^8.1.1",
     "body-parser": "^1.19.0",
     "btoa": "^1.2.1",
@@ -87,7 +88,7 @@
     "express-session": "^1.17.1",
     "extend": "^3.0.2",
     "font-awesome": "^4.7.0",
-    "hbs": "^4.1.2",
+    "hbs": "^4.2.0",
     "lodash.assignin": "^4.2.0",
     "lodash.isstring": "^4.0.1",
     "lodash.omit": "^4.5.0",
@@ -107,7 +108,6 @@
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "xml2js": "^0.4.23",
-    "@xmldom/xmldom": "^0.7.5",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
