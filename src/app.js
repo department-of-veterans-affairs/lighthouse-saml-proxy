@@ -20,33 +20,33 @@ import passport from "passport";
  * Globals
  */
 
-const handleMetadata = (argv) => {
+const handleMetadata = (spIdpConfig) => {
   return (metadata) => {
     if (metadata.protocol) {
-      argv.spProtocol = metadata.protocol;
+      spIdpConfig.spProtocol = metadata.protocol;
       if (metadata.signingKeys[0]) {
-        argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
+        spIdpConfig.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
       }
 
       switch (metadata.protocol) {
         case "samlp":
           if (metadata.sso.redirectUrl) {
-            argv.spIdpSsoUrl = metadata.sso.redirectUrl;
+            spIdpConfig.spIdpSsoUrl = metadata.sso.redirectUrl;
           } else if (metadata.sso.postUrl) {
-            argv.spIdpSsoUrl = metadata.sso.postUrl;
+            spIdpConfig.spIdpSsoUrl = metadata.sso.postUrl;
           }
           if (metadata.slo.redirectUrl) {
-            argv.spIdpSloUrl = metadata.slo.redirectUrl;
+            spIdpConfig.spIdpSloUrl = metadata.slo.redirectUrl;
           } else if (metadata.slo.postUrl) {
-            argv.spIdpSloUrl = metadata.slo.postUrl;
+            spIdpConfig.spIdpSloUrl = metadata.slo.postUrl;
           }
           if (metadata.signRequest) {
-            argv.spSignAuthnRequests = metadata.signRequest;
+            spIdpConfig.spSignAuthnRequests = metadata.signRequest;
           }
           break;
         case "wsfed":
           if (metadata.sso.redirectUrl) {
-            argv.spIdpSsoUrl = metadata.sso.redirectUrl;
+            spIdpConfig.spIdpSsoUrl = metadata.sso.redirectUrl;
           }
           break;
       }
