@@ -6,8 +6,6 @@
   "spAcsUrl": "/samlproxy/sp/saml/sso",
   "idpCert": "./idp-public-cert.pem",
   "idpKey": "./idp-private-key.pem",
-  "spCert": "./sp-cert.pem",
-  "spKey": "./sp-key.pem",
   "idpEncryptAssertion": true,
   "spButtonText": "Sign in",
   "idpEncryptionCert": "./idp-encryption-cert.pem",
@@ -32,7 +30,9 @@
       "spAuthnContextClassRef": "http://sp.example1.com/authn/context/class/ref",
       "spRequestAuthnContext": true,
       "spRequestNameIDFormat": true,
-      "spIdpSignupOp": "&op=signup"
+      "spIdpSignupOp": "&op=signup",
+      "spCert": "./sp-cert.pem",
+      "spKey": "./sp-key.pem"
     },
     {
     "category": "example2SamlIdp",
