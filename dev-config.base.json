@@ -30,14 +30,24 @@
   "idpSamlLogins": 
   [
     {
-      "category": "example2SamlIdp",
+      "category": "example1SamlIdp",
       "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-      "spAudience": "https://saml-idp.example2.com",
-      "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
+      "spAudience": "https://saml-idp.example1.com",
+      "spAuthnContextClassRef": "http://sp.example1.com/authn/context/class/ref",
       "spRequestAuthnContext": true,
       "spRequestNameIDFormat": true,
-      "spIdpSignupLinkEnabled": true
+      "spIdpSignupOp": "&op=signup"
+    },
+    {
+    "category": "example2SamlIdp",
+    "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
+    "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+    "spAudience": "https://saml-idp.example2.com",
+    "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
+    "spRequestAuthnContext": true,
+    "spRequestNameIDFormat": true,
+    "spIdpSignupLinkEnabled": true
    }
   ]
 }
