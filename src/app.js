@@ -106,6 +106,9 @@ function runServer(argv) {
 }
 
 const legacyConfigSetup = (argv) => {
+  if (!argv.idpSamlLogins) {
+    argv.idpSamlLogins = {};
+  }
   argv.legacySpAuthnContextClassRef.forEach((legacyConfigSetup) => {
     argv.idpSamlLogins.push({
       category: legacyConfigSetup.category,
