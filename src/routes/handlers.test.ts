@@ -372,6 +372,32 @@ describe("samlLogin", () => {
     }
   });
 
+  it("Happy Path, no authnRequest, login.gov failureToProof", async () => {
+    mockResponse.render = function render(template, authOptions) {
+      return promise2check(
+        "failureToProof",
+        expected_authoptions,
+        template,
+        authOptions
+      );
+    };
+
+    samlp.mockImplementation(() => {
+      return {
+        getSamlRequestUrl: mockGetSamlRequestUrl,
+      };
+    });
+    mockRequest.authnRequest = null;
+    mockRequest.query.RelayState = "theRelayState"; //this really comes from the session, not a query param
+    const verify = samlLogin("failureToProof");
+    try {
+      verify(mockRequest, mockResponse, mockNext);
+      expect(mockNext).not.toHaveBeenCalled();
+    } catch (err) {
+      fail("Should not reach here");
+    }
+  });
+
   it("Login requests with a null relay state should throw an error", async () => {
     let thrownError;
     mockRequest.authnRequest = {
@@ -398,6 +424,20 @@ describe("samlLogin", () => {
     }
     expect(thrownError.message).toEqual(
       "Error: Empty relay state during verify. Invalid request."
+    );
+  });
+  it("Redirect request to the failure-to-proof request with a null relay state should throw an error", async () => {
+    let thrownError;
+    mockRequest.authnRequest = {
+      relayState: null,
+    };
+    try {
+      samlLogin("failureToProof")(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError.message).toEqual(
+      "Error: Empty relay state. Invalid request."
     );
   });
   it("Login requests with an empty relay state should throw an error", async () => {

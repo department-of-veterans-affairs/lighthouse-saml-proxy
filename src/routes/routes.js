@@ -4,6 +4,7 @@ import {
   SP_METADATA_URL,
   SP_VERIFY,
   SP_ERROR_URL,
+  SP_FAILURE_TO_PROOF,
 } from "./constants";
 
 import {
@@ -49,6 +50,8 @@ export default function addRoutes(
   });
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
+
+  app.get(SP_FAILURE_TO_PROOF, parseSamlRequest, samlLogin("failureToProof"));
 
   acsFactory(app, acsUrl, cache, cacheEnabled);
 
