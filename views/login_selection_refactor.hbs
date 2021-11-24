@@ -19,17 +19,17 @@
             <h2 class="vads-u-font-size--sm vads-u-margin-top--0">
               Sign in with an existing account
             </h2>
-            <a class="no-external-icon usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon"
-                src="/samlproxy/idp/img/dslogon-icon.svg" />Sign in with DSLogon</a>
-            <a class="no-external-icon usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet"
-                src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
-            <a class="no-external-icon usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me"
-                src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
             {{#if login_gov_enabled}}
             <a class="no-external-icon usa-button login-gov" href="{{ login_gov_login_link }}"><img alt="Login.gov"
                 src="/samlproxy/idp/img/login-gov-logo.svg" />Sign in with Login.gov</a>
             {{/if}}
+            <a class="no-external-icon usa-button idme-signin" href="{{ id_me_login_link }}"><img alt="ID.me"
+                src="/samlproxy/idp/img/idme-icon-white.svg" />Sign in with ID.me</a>
             <div>
+            <a class="no-external-icon usa-button dslogon" href="{{ dslogon_login_link }}"><img alt="DS Logon"
+                src="/samlproxy/idp/img/dslogon-icon.svg" />Sign in with DSLogon</a>
+            <a class="no-external-icon usa-button mhv" href="{{ mhv_login_link }}"><img alt="My HealtheVet"
+                src="/samlproxy/idp/img/mhv-icon.svg" />Sign in with My HealtheVet</a>
               <span class="sidelines">OR</span>
               <div class="alternate-signin">
                 <h2 class="vads-u-font-size--sm vads-u-margin-top--0">
