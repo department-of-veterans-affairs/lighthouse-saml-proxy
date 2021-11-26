@@ -358,6 +358,18 @@ span.sidelines {
         margin: 0.5em 0;
       }
     }
+
+    .vads-u-margin-top--1p5, .vads-u-margin-y--1p5 {
+      margin-top: 12px !important;
+    }
+    
+    .vads-u-margin-y--1p5 {
+      margin-bottom: 12px !important;
+    }
+
+    .vads-u-padding-y--2 {
+      padding-bottom: 16px !important;
+    }
   
     .signin-actions-container {
       text-align: center;
