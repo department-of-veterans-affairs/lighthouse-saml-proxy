@@ -24,14 +24,14 @@
           <div>
           <a class="no-external-icon usa-button dslogon vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ dslogon_login_link }}">DSLogon</a>
           <a class="no-external-icon usa-button mhv vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ mhv_login_link }}">My HealtheVet</a>
-            <div class="alternate-signin">
+            <div id="create-account" class="vads-u-display--flex vads-u-flex-direction--column">
               <h2 class="vads-u-margin-top--3">
                 Or create an account
               </h2>
               {{#if login_gov_signup_link_enabled}}
-                <a class="no-external-icon usa-button signup" href="{{ login_gov_signup_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/login-gov-dark-logo.svg" />Create a Login.gov account</a>
+                <a class="vads-c-action-link--blue" href="{{ login_gov_signup_link }}">Create a Login.gov account</a>
               {{/if}}
-              <a class="no-external-icon usa-button signup" href="{{ id_me_signup_link }}"><img alt="ID.me" src="/samlproxy/idp/img/idme-icon-dark.svg" />Create an ID.me account</a>
+              <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">Create an ID.me account</a>
             </div>
           </div>
         </div>

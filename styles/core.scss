@@ -359,6 +359,19 @@ span.sidelines {
       }
     }
 
+    .vads-u-flex-direction--column {
+      flex-direction: column !important;
+    }
+
+    .vads-u-display--flex {
+      display: flex !important;
+    }
+
+    a.vads-c-action-link--blue, a.vads-c-action-link--green, a.vads-c-action-link--white {
+      font-weight: 700;
+      padding: 8px 0;
+    }
+    
     .vads-u-margin-top--1p5, .vads-u-margin-y--1p5 {
       margin-top: 12px !important;
     }
