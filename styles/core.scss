@@ -182,6 +182,16 @@ $dslogon-blue: #003e73;
         font-size: .9em;
         margin-bottom: 2em;
     }
+
+    .vads-u-padding-bottom--2p5 {
+      padding-bottom: 20px !important;
+    }
+    
+    .login .fed-warning--v2 {
+      font-size: unset;
+      margin-bottom: unset;
+      max-width: 81ch;
+    }
 }
 
 span.sidelines {
