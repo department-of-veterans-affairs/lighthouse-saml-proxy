@@ -370,7 +370,7 @@ span.sidelines {
     a.vads-c-action-link--blue::before {
       color: #004795;
     }
-    
+
     a.vads-c-action-link--blue::before, a.vads-c-action-link--green::before, a.vads-c-action-link--white::before {
       content: "\F138";
       display: inline-block;
@@ -386,7 +386,9 @@ span.sidelines {
       font-weight: 700;
       padding: 8px 0;
     }
-
+    .vads-u-margin-top--0, .vads-u-margin-y--0 {
+      margin-top: 0 !important;
+    }
     .vads-u-margin-top--1p5, .vads-u-margin-y--1p5 {
       margin-top: 12px !important;
     }
@@ -488,7 +490,15 @@ span.sidelines {
     color: $color-white;
     margin: 0 0.6em;
   }
-  
+
+  .login .help-info, .verify .help-info {
+	  padding: 2em 0;
+  }
+
+  .vads-u-margin-top--0, .vads-u-margin-y--0 {
+    margin-top: 0 !important;
+  }
+
   #help-menu {
     width: 21rem;
   }
