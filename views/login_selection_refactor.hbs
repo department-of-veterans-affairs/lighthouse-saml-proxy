@@ -5,15 +5,6 @@
     </div>
   <div
   <div class="container">
-    <div class="row">
-    </div>
-    <div class="row medium-screen:vads-u-display--none mobile-explanation">
-      <div class="columns small-12">
-        <h2>
-          One site. A lifetime of benefits and services at your fingertips.
-        </h2>
-      </div>
-    </div>
     <div>
       <div class="usa-width-one-half">
         <div "signin-wrapper" class="columns small-12">
@@ -26,18 +17,21 @@
           <div>
           <a class="no-external-icon usa-button dslogon vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ dslogon_login_link }}">DSLogon</a>
           <a class="no-external-icon usa-button mhv vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ mhv_login_link }}">My HealtheVet</a>
-            <div id="create-account" class="vads-u-display--flex vads-u-flex-direction--column">
               <h2 class="vads-u-margin-top--3">
                 Or create an account
               </h2>
-              {{#if login_gov_signup_link_enabled}}
-                <a class="vads-c-action-link--blue" href="{{ login_gov_signup_link }}">
-                  Create a Login.gov account
-                </a>
-              {{/if}}
-              <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">
-                Create an ID.me account
-              </a>
+                {{#if login_gov_signup_link_enabled}}
+                <div>
+                  <a class="vads-c-action-link--green" href="{{ login_gov_signup_link }}">
+                    Create a Login.gov account
+                  </a>
+                </div>  
+                {{/if}}
+                <div>
+                  <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">
+                    Create an ID.me account
+                  </a>
+                </div>
             </div>
           </div>
         </div>
