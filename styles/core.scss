@@ -61,6 +61,17 @@ $dslogon-blue: #003e73;
         }
     }
 
+    .small-12 {
+      width: 100%;
+    }
+    
+    .column, .columns {
+      float: left;
+      padding-left: .9375rem;
+      padding-right: .9375rem;
+      position: relative;
+    }
+
     .usa-button {
         width: 100%;
         font-size: 16px;
@@ -72,6 +83,7 @@ $dslogon-blue: #003e73;
           margin-left: 0px;
           margin-right: 0px;
         }
+        white-space: normal !important;
 
         @media screen and (max-width: $medium-screen - 1) {
             height: 50px;
