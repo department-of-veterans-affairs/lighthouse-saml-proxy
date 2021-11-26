@@ -186,7 +186,7 @@ $dslogon-blue: #003e73;
     .vads-u-padding-bottom--2p5 {
       padding-bottom: 20px !important;
     }
-    
+
     .login .fed-warning--v2 {
       font-size: unset;
       margin-bottom: unset;
@@ -306,6 +306,7 @@ span.sidelines {
     .container {
       padding: 2em 0;
       color: $color-base;
+      width: 100%;
     }
   
     .logo {
@@ -500,7 +501,9 @@ span.sidelines {
     color: $color-white;
     margin: 0 0.6em;
   }
-
+  .login {
+    background: #fff;
+  }
   .login .help-info, .verify .help-info {
 	  padding: 2em 0;
   }
