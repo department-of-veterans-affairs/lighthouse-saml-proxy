@@ -1,10 +1,10 @@
 # VA Lighthouse SAML Proxy
 
-This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and ID.me which VA.gov currently uses a authentication service. 
+This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and external IdP's, such as ID.me and Login.gov which VA.gov currently uses for authentication services. 
 
 ## Installation
 
-Requires Docker and/or Node.js > 10.
+Requires Docker and/or Node.js > 16.
 
 ### Config File
 
