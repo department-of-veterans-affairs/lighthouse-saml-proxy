@@ -136,7 +136,8 @@ $dslogon-blue: #003e73;
       border-radius: 5px;
       color: #fff;
       cursor: pointer;
-      display: inline-block;
+      display: flex;
+      justify-content: center;
       font-family: Source Sans Pro,Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
@@ -253,7 +254,7 @@ $dslogon-blue: #003e73;
     }
 
     .vads-u-padding-bottom--2p5 {
-      padding-bottom: 20px !important;
+      padding-bottom: 12px !important;
     }
 
     .login .fed-warning--v2 {
