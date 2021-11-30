@@ -125,7 +125,7 @@ $dslogon-blue: #003e73;
             padding: 0 0.25em;
         }
     }
-    
+
     .usa-button-2 {
       -moz-osx-font-smoothing: grayscale;
       -webkit-font-smoothing: antialiased;
@@ -141,7 +141,7 @@ $dslogon-blue: #003e73;
       font-family: Source Sans Pro,Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;
       font-size: 16px;
       font-weight: 700;
-      line-height: 1;
+      line-height: 16px;
       margin-bottom: .5em;
       margin-right: .5em;
       margin-top: .5em;
@@ -150,6 +150,7 @@ $dslogon-blue: #003e73;
       text-decoration: none;
       width: 100%;
       white-space: normal !important;
+      z-index: auto;
 
       @media screen and (max-width: $medium-screen - 1) {
           height: 50px;
