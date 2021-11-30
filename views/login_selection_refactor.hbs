@@ -7,7 +7,7 @@
   <div class="container">
     <div>
       <div class="usa-width-one-half">
-        <div "signin-wrapper" class="columns small-12">
+        <div id="signin-wrapper" class="columns small-12">
           {{#if login_gov_enabled}}
           <a class="no-external-icon usa-button-2 logingov-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ login_gov_login_link }}"><img alt="login.gov"
               src="/samlproxy/idp/img/login-gov-logo.svg" />LOGIN.GOV</a>
@@ -25,7 +25,7 @@
             </div>  
             {{/if}}
             <div>
-              <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">Create an accoutn with ID.me</a>
+              <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">Create an account with ID.me</a>
             </div>
             <hr>
           </div>
