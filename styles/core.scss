@@ -158,6 +158,9 @@ $dslogon-blue: #003e73;
 
       &.dslogon {
           background-color: $dslogon-blue;
+          &:hover {
+            background: $color-primary-darkest;
+          }
       }
 
       &.signup {
@@ -168,10 +171,9 @@ $dslogon-blue: #003e73;
 
       &.idme-signin {
           background-color: $idme-green;
-      }
-
-      &.idme-signin:hover {
-        background-color: #195c27;
+          &:hover {
+            background: #195c27;
+          }
       }
 
       &.idme-signup {
@@ -182,10 +184,9 @@ $dslogon-blue: #003e73;
 
       &.logingov-signin {
         background-color: $logingov-red;
-      }
-
-      &.logingov-signin:hover{
-        background:#981b1e;
+        &:hover {
+          background: #981b1e;
+        }
       }
 
       &.logingov-signup {
@@ -194,10 +195,9 @@ $dslogon-blue: #003e73;
 
       &.mhv {
         background: #0071bb;
-      }
-
-      &.mhv:hover {
-        background: #003e73;
+        &:hover {
+          background: #003e73;
+        }
       }
 
       img {
