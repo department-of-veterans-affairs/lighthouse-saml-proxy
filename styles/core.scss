@@ -72,6 +72,10 @@ $dslogon-blue: #003e73;
       position: relative;
     }
 
+    #sign-in-wrapper {
+      max-width: 330px;
+    }
+        
     .usa-button {
         width: 100%;
         font-size: 16px;
@@ -125,7 +129,7 @@ $dslogon-blue: #003e73;
             padding: 0 0.25em;
         }
     }
-   
+
     .usa-button-2 {
       -moz-osx-font-smoothing: grayscale;
       -webkit-font-smoothing: antialiased;
@@ -399,7 +403,26 @@ span.sidelines {
       color: $color-base;
       width: 100%;
     }
-  
+
+    .row .row::after {
+      clear: both;
+    }
+
+    .row .row::after, .row .row::before {
+      content: " ";
+      display: table;
+    }
+    .row .row {
+      margin: 0 -.9375rem;
+      max-width: none;
+      width: auto;
+    }
+
+    .container-2 {
+      color: #212121;
+      padding: 2em 0;
+    }
+    
     .logo {
       text-align: center;
       border-bottom: solid 2px $color-gray-light-alt;
