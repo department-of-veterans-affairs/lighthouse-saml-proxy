@@ -130,6 +130,22 @@ $dslogon-blue: #003e73;
         }
     }
 
+    .h1-font {
+      font-size: 30px;
+    }
+
+    @media screen and (max-width: 370px) {
+      .h1-font {
+        font-size: 30px;
+      }
+    }
+
+    @media screen and (min-width: 480px) {
+      .h1-font {
+        font-size: 4rem;
+      }
+    }
+
     .usa-button-2 {
       -moz-osx-font-smoothing: grayscale;
       -webkit-font-smoothing: antialiased;
