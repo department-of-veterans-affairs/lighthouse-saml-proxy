@@ -130,18 +130,18 @@ $dslogon-blue: #003e73;
         }
     }
 
-    .h1-font {
+    .h1-style {
       font-size: 30px;
     }
 
     @media screen and (max-width: 370px) {
-      .h1-font {
+      .h1-style {
         font-size: 30px;
       }
     }
 
     @media screen and (min-width: 480px) {
-      .h1-font {
+      .h1-style {
         font-size: 4rem;
       }
     }
@@ -436,7 +436,10 @@ span.sidelines {
 
     .container-2 {
       color: #212121;
-      padding: 2em 0;
+
+      .login {
+        padding: 0;
+      }
     }
     
     .logo {
