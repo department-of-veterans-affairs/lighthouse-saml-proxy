@@ -134,15 +134,28 @@ $dslogon-blue: #003e73;
       font-size: 30px;
     }
 
+    .h2-style {
+      font-size: 24px;
+      margin-top: 0px;
+    }
+
     @media screen and (max-width: 370px) {
       .h1-style {
         font-size: 30px;
+      }
+
+      .h2-style {
+        font-size: 24px;
       }
     }
 
     @media screen and (min-width: 480px) {
       .h1-style {
         font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
       }
     }
 
