@@ -134,6 +134,10 @@ $dslogon-blue: #003e73;
       margin-top: 16px !important;
     }
     
+    .login-style {
+      padding: inherit;
+    }
+
     .h1-style {
       font-size: 30px;
     }
@@ -160,6 +164,10 @@ $dslogon-blue: #003e73;
 
       .h2-style {
         font-size: 3rem;
+      }
+
+      .login-style {
+        padding: 0 9em;
       }
     }
 
