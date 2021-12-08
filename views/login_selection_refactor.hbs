@@ -1,9 +1,10 @@
-<main class="login" style="padding: 0 9em;">
-  <div class="columns small-12">
-    <h1 style="font-size: 4rem;">Sign in</h1>
-  </div>
-  <div class="container-2">
-      <div class="usa-width-one-half">
+<main class="login login-style">
+  <div class="container-2"
+        style="position: relative;
+              padding-left: .9375rem;
+              padding-right: .9375rem;
+              float: left;">
+        <h1 class="vads-u-margin-top--2 columns small-12 h1-style">Sign in</h1>
         <div id="signin-wrapper" class="columns small-12" style="max-width: 330px;">
           {{#if login_gov_enabled}}
           <a class="usa-button-2 logingov-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ login_gov_login_link }}">
@@ -77,7 +78,7 @@
           <a class="usa-button-2 dslogon vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ dslogon_login_link }}">DS Logon</a>
           <a class="usa-button-2 mhv vads-u-margin-y--1p5 vads-u-padding-y--2" href="{{ mhv_login_link }}">My HealtheVet</a>
           <div id="create-account">
-            <h2 class="vads-u-margin-top--3">Or create an account</h2>
+            <h2 class="h2-style">Or create an account</h2>
             <hr>
             {{#if login_gov_signup_link_enabled}}
             <div>
@@ -90,11 +91,11 @@
             <hr>
           </div>
         </div>
-      </div>
+
     <div>
       <div class="columns small-12">
         <div class="help-info">
-          <h2 class="vads-u-margin-top--0">
+          <h2 class="h2-style">
             Having trouble signing in?
           </h2><p>
                 Get answers to common questions about 
@@ -116,7 +117,7 @@
               </p>
         </div>
         <div class="vads-u-padding-bottom--2p5 fed-warning--v2">
-          <h2 class="vads-u-margin-top--0">
+          <h2 class="h2-style">
             Terms of use
           </h2>
           <p>

@@ -130,6 +130,47 @@ $dslogon-blue: #003e73;
         }
     }
 
+    .vads-u-margin-top--2 {
+      margin-top: 16px !important;
+    }
+    
+    .login-style {
+      padding: inherit;
+    }
+
+    .h1-style {
+      font-size: 30px;
+    }
+
+    .h2-style {
+      font-size: 24px;
+      margin-top: 0px;
+    }
+
+    @media screen and (max-width: 370px) {
+      .h1-style {
+        font-size: 30px;
+      }
+
+      .h2-style {
+        font-size: 24px;
+      }
+    }
+
+    @media screen and (min-width: 480px) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .login-style {
+        padding: 0 9em;
+      }
+    }
+
     .usa-button-2 {
       -moz-osx-font-smoothing: grayscale;
       -webkit-font-smoothing: antialiased;
@@ -420,7 +461,10 @@ span.sidelines {
 
     .container-2 {
       color: #212121;
-      padding: 2em 0;
+
+      .login {
+        padding: 0;
+      }
     }
     
     .logo {
