@@ -457,19 +457,6 @@ span.sidelines {
       width: 100%;
     }
 
-    .row .row::after {
-      clear: both;
-    }
-
-    .row .row::after, .row .row::before {
-      content: " ";
-      display: table;
-    }
-    .row .row {
-      margin: 0 -.9375rem;
-      max-width: none;
-      width: auto;
-    }
 
     .container-2 {
       color: #212121;
