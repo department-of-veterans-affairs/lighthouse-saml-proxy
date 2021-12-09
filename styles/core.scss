@@ -225,7 +225,7 @@ $dslogon-blue: #003e73;
         padding-bottom: 16px !important;
       }
   
-      &.vads-u-margin-top--1p5, .vads-u-margin-y--1p5 {
+      &.vads-u-margin-y--1p5 {
         margin-top: 12px !important;
         margin-bottom: 12px !important;
       }
@@ -566,7 +566,7 @@ span.sidelines {
       color: #004795;
     }
 
-    a.vads-c-action-link--blue::before, a.vads-c-action-link--green::before, a.vads-c-action-link--white::before {
+    a.vads-c-action-link--blue::before {
       content: "\F138";
       display: inline-block;
       font-family: Font Awesome\ 5 Free;
@@ -577,7 +577,7 @@ span.sidelines {
       transform: translateY(5px);
     }
 
-    a.vads-c-action-link--blue, a.vads-c-action-link--green, a.vads-c-action-link--white {
+    a.vads-c-action-link--blue {
       font-weight: 700;
       padding: 8px 0;
     }
