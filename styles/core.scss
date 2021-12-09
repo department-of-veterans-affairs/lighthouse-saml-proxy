@@ -71,23 +71,13 @@ $dslogon-blue: #003e73;
       padding-right: .9375rem;
       position: relative;
     }
-
-    #sign-in-wrapper {
-      max-width: 330px;
-    }
         
     .usa-button {
         width: 100%;
-        font-size: 16px;
         font-weight: 700;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: {
-          margin-left: 0px;
-          margin-right: 0px;
-        }
-        white-space: normal !important;
 
         @media screen and (max-width: $medium-screen - 1) {
             height: 50px;
@@ -113,14 +103,6 @@ $dslogon-blue: #003e73;
             color: $idme-green;
         }
 
-        &.logingov-signin {
-          background-color: $logingov-red;
-        }
-
-        &.logingov-signup {
-          background-color: $logingov-red;
-        }
-
         img {
             display: inline-block;
             vertical-align: middle;
@@ -135,7 +117,11 @@ $dslogon-blue: #003e73;
     }
     
     .login-style {
-      padding: inherit;
+      padding: 0 0 0 0;
+    }
+
+    .signin-wrapper-style {
+      max-width: 300px;
     }
 
     .h1-style {
@@ -155,9 +141,31 @@ $dslogon-blue: #003e73;
       .h2-style {
         font-size: 24px;
       }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }
     }
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $small-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }  
+
+      .login-style {
+        padding: 0 0 0 0;
+      }
+    }
+
+    @media screen and (min-width: $medium-screen) {
       .h1-style {
         font-size: 4rem;
       }
@@ -168,6 +176,10 @@ $dslogon-blue: #003e73;
 
       .login-style {
         padding: 0 9em;
+      }
+
+      .signin-wrapper-style {
+        max-width: 330px;
       }
     }
 
@@ -199,7 +211,7 @@ $dslogon-blue: #003e73;
         padding-bottom: 16px !important;
       }
   
-      &.vads-u-margin-top--1p5, .vads-u-margin-y--1p5 {
+      &.vads-u-margin-y--1p5 {
         margin-top: 12px !important;
         margin-bottom: 12px !important;
       }
@@ -442,22 +454,8 @@ span.sidelines {
     .container {
       padding: 2em 0;
       color: $color-base;
-      width: 100%;
     }
 
-    .row .row::after {
-      clear: both;
-    }
-
-    .row .row::after, .row .row::before {
-      content: " ";
-      display: table;
-    }
-    .row .row {
-      margin: 0 -.9375rem;
-      max-width: none;
-      width: auto;
-    }
 
     .container-2 {
       color: #212121;
@@ -528,19 +526,11 @@ span.sidelines {
       }
     }
 
-    .vads-u-flex-direction--column {
-      flex-direction: column !important;
-    }
-
-    .vads-u-display--flex {
-      display: flex !important;
-    }
-
     a.vads-c-action-link--blue::before {
       color: #004795;
     }
 
-    a.vads-c-action-link--blue::before, a.vads-c-action-link--green::before, a.vads-c-action-link--white::before {
+    a.vads-c-action-link--blue::before {
       content: "\F138";
       display: inline-block;
       font-family: Font Awesome\ 5 Free;
@@ -551,16 +541,9 @@ span.sidelines {
       transform: translateY(5px);
     }
 
-    a.vads-c-action-link--blue, a.vads-c-action-link--green, a.vads-c-action-link--white {
+    a.vads-c-action-link--blue {
       font-weight: 700;
       padding: 8px 0;
-    }
-    .vads-u-margin-top--0, .vads-u-margin-y--0 {
-      margin-top: 0 !important;
-    }
-
-    .vads-u-margin-top--3, .vads-u-margin-y--3 {
-      margin-top: 24px !important;
     }
 
     .vads-u-margin-y--1p5 {
@@ -653,6 +636,7 @@ span.sidelines {
     color: $color-white;
     margin: 0 0.6em;
   }
+
   .login {
     background: #fff;
   }
@@ -660,9 +644,6 @@ span.sidelines {
 	  padding: 2em 0;
   }
 
-  .vads-u-margin-top--0, .vads-u-margin-y--0 {
-    margin-top: 0 !important;
-  }
 
   #help-menu {
     width: 21rem;
