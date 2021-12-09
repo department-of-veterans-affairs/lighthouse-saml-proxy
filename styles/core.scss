@@ -71,10 +71,6 @@ $dslogon-blue: #003e73;
       padding-right: .9375rem;
       position: relative;
     }
-
-    #sign-in-wrapper {
-      max-width: 330px;
-    }
         
     .usa-button {
         width: 100%;
@@ -135,7 +131,11 @@ $dslogon-blue: #003e73;
     }
     
     .login-style {
-      padding: inherit;
+      padding: 0 0 0 0;
+    }
+
+    .signin-wrapper-style {
+      max-width: 300px;
     }
 
     .h1-style {
@@ -155,9 +155,31 @@ $dslogon-blue: #003e73;
       .h2-style {
         font-size: 24px;
       }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }
     }
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $small-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }  
+
+      .login-style {
+        padding: 0 0 0 0;
+      }
+    }
+
+    @media screen and (min-width: $medium-screen) {
       .h1-style {
         font-size: 4rem;
       }
@@ -168,6 +190,10 @@ $dslogon-blue: #003e73;
 
       .login-style {
         padding: 0 9em;
+      }
+
+      .signin-wrapper-style {
+        max-width: 330px;
       }
     }
 
