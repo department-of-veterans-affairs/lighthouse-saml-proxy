@@ -339,7 +339,7 @@ span.sidelines {
     }
   
     .signin-actions-container {
-      text-align: center;
+      text-align: left;
   
       @include media-maxwidth($small-screen) {
         margin-right: 0;
