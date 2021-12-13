@@ -1,6 +1,6 @@
 <main class="login">
   <div class="columns small-12">
-    <h1>Sign in to VA.gov</h1>
+    <h1>Sign in</h1>
   </div>
   <div class="container">
     <div class="row">
@@ -16,9 +16,6 @@
       <div class="usa-width-one-half">
         <div class="signin-actions-container">
           <div class="signin-actions">
-            <h2 class="vads-u-font-size--sm vads-u-margin-top--0">
-              Sign in with an existing account
-            </h2>
             {{#if login_gov_enabled}}
             <a class="no-external-icon usa-button logingov-signin" href="{{ login_gov_login_link }}">
               <svg
@@ -93,9 +90,6 @@
             <div>
               <span class="sidelines">Or create an account</span>
               <div class="alternate-signin">
-                <h2 class="vads-u-font-size--sm vads-u-margin-top--0">
-                  Don't have those accounts?
-                </h2>
                 {{#if login_gov_signup_link_enabled}}
                   <a class="no-external-icon usa-button signup" href="{{ login_gov_signup_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/login-gov-dark-logo.svg" />Create a Login.gov account</a>
                 {{/if}}
