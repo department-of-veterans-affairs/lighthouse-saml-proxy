@@ -38,6 +38,22 @@ $dslogon-blue: #003e73;
         }
     }
 
+    .logo-banner-2 {
+      width: 66%;
+      max-width: 313px;
+      margin: 0 0;
+
+      a {
+          display: inline-block;
+          width: 100%;
+      }
+
+      img {
+          height: auto;
+          width: 100%
+      }
+    }
+
     .usa-grid > hr {
         border-color: $color-gray-light-alt;
         margin: 1em 0;
