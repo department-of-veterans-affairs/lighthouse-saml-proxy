@@ -92,6 +92,16 @@ $dslogon-blue: #003e73;
             color: $idme-green;
         }
 
+        &.logingov-signin {
+          background-color: $logingov-red;
+        }
+  
+        &.logingov-signup {
+          background-color: white;
+          box-shadow: inset 0 0 0 2px $logingov-red;
+          color: $logingov-red;
+        }
+
         img {
             display: inline-block;
             vertical-align: middle;
