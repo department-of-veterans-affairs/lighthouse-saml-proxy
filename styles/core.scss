@@ -121,6 +121,64 @@ $dslogon-blue: #003e73;
         }
     }
 
+   .h1-style {
+      font-size: 30px;
+    }
+
+    .h2-style {
+      font-size: 24px;
+      margin-top: 0px;
+    }
+
+    @media screen and (max-width: 370px) {
+      .h1-style {
+        font-size: 30px;
+      }
+
+      .h2-style {
+        font-size: 24px;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }
+    }
+
+    @media screen and (min-width: $small-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }  
+
+      .login-style {
+        padding: 0 0 0 0;
+      }
+    }
+
+    @media screen and (min-width: $medium-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .login-style {
+        padding: 0 20%;
+      }
+
+      .signin-wrapper-style {
+        max-width: 330px;
+      }
+    }
     .login-selection {
         display: flex;
         flex-flow: column;
@@ -292,7 +350,16 @@ span.sidelines {
       padding: 2em 0;
       color: $color-base;
     }
-  
+
+
+    .container-2 {
+      color: #212121;
+
+      .login {
+        padding: 0;
+      }
+    }
+    
     .logo {
       text-align: center;
       border-bottom: solid 2px $color-gray-light-alt;
@@ -391,14 +458,14 @@ span.sidelines {
       }
   
       .signin-actions {
-        padding: 2em 2em 1em;
+        // padding: 2em 2em 1em;
   
         h5 {
           margin-top: 0;
         }
   
         @include media-maxwidth($small-screen) {
-          padding: 2em 1em 1em;
+          // padding: 2em 1em 1em;
         }
   
         .alternate-signin {
