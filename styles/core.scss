@@ -126,7 +126,17 @@ $dslogon-blue: #003e73;
         }
     }
 
-   .h1-style {
+    .signin-item {
+      margin-top: 0.5em;
+      margin-right: 0.5em;
+      margin-bottom: 0.5em;
+
+      @include media($medium-large-screen) {
+        margin-left: auto;
+      }
+    }
+
+    .h1-style {
       font-size: 30px;
       padding-left: 0%;
     }
