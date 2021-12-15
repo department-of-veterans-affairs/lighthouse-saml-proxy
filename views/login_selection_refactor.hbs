@@ -79,10 +79,9 @@
             </a>
             <a class="no-external-icon usa-button dslogon" href="{{ dslogon_login_link }}">DS Logon</a>
             <a class="no-external-icon usa-button mhv" href="{{ mhv_login_link }}">My HealtheVet</a>
-            <div>
+            <div id="create-account">
               <h2>Or create an account</h2>
               <div class="alternate-signin">
-                <hr>
                 {{#if login_gov_signup_link_enabled}}
                 <div>
                   <a class="vads-c-action-link--blue" href="{{ login_gov_signup_link }}">Create an account with Login.gov</a>
@@ -91,7 +90,6 @@
                 <div>
                   <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">Create an account with ID.me</a>
                 </div>
-                <hr>
               </div>
             </div>
           </div>
