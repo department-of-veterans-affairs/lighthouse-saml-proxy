@@ -88,6 +88,11 @@ $dslogon-blue: #003e73;
             height: 50px;
         }
 
+        @media screen and (min-width: $medium-large-screen - 1) {
+          height: 50px;
+          max-width: 330px;
+        }
+
         &.dslogon {
             background-color: $dslogon-blue;
         }
