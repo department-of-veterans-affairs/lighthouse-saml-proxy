@@ -476,7 +476,9 @@ span.sidelines {
   
         .alternate-signin {
           padding-top: 1em;
-  
+          border-top: 1px solid #aeb0b5;
+          border-bottom: 1px solid #aeb0b5;
+          
           p:first-of-type {
             margin-top: 0.5em;
             color: $color-gray-dark;
