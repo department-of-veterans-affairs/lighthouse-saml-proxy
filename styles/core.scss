@@ -458,16 +458,11 @@ span.sidelines {
       }
   
       .signin-actions {
-        // padding: 2em 2em 1em;
-  
+
         h5 {
           margin-top: 0;
         }
-  
-        @include media-maxwidth($small-screen) {
-          // padding: 2em 1em 1em;
-        }
-  
+    
         .alternate-signin {
           padding-top: 1em;
           padding-bottom: 1.16em;
