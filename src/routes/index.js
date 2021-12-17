@@ -91,8 +91,7 @@ export default function configureExpress(
    */
 
   app.set("view engine", "hbs");
-  let layout = argv.idpSelectionRefactor ? "layout-2" : "layout";
-  app.set("view options", { layout: layout });
+  app.set("view options", { layout: "layout" });
   app.engine("handlebars", hbs.__express);
   if (useSentry) {
     app.use(
