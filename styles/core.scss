@@ -41,7 +41,10 @@ $dslogon-blue: #003e73;
     .logo-banner-2 {
       width: 66%;
       max-width: 313px;
-      margin: 0 0;
+      margin: 0 auto;
+      flex-basis: 6rem;
+      flex: 1 0 164px;
+      background: #112e51;
 
       a {
           display: inline-block;
