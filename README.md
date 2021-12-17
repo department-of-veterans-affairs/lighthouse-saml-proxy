@@ -171,35 +171,36 @@ Flow of the SAML login process:
 +---v---------------+     +-------------------------------+     +-------------------------+
 |                   |     |                               |     |                         |
 |  GET /authorize   |     |  POST /samlproxy/idp/saml/sso |     |  User is presented      |
-|  Okta starts SAML +----->  Proxy receives AuthNRequest  +-----+  with DSLogon, Id.me, & |
-|  IdP flow         |     |  From Okta                    |     |  MHV login options      |
-|                   |     |                               |     |                         |
-+-------------------+     +-------------------------------+     +----|-----|---|----------+
-                                                                     |     |   |
-         +-----------------------------------------------------------+     |   |
-         |                                                                 |   |
-         |                                +--------------------------------+   |
-         |                                |                                    |
-   +-----v--------+                 +-----v--------+               +-----------v--+
-   |              |                 |              |               |              |
-   | User selects |                 | User selects |               | User selects |
-   | DSLogon      |                 | MHV          |               | Id.me        |
-   |              |                 |              |               |              |
-   +-----|--------+                 +-------|------+               +-------|------+
-         |                                  |                              |
-         |                                  |                              |
-+--------v----------------+    +------------v------------+    +------------v------------+
-|                         |    |                         |    |                         |
-| Id.me gets AuthNRequest |    | Id.me gets AuthNRequest |    | Id.me gets AuthNRequest |
-| with AuthNContext of    |    | with AuthNContext of    |    | with AuthNContext of    |
-| 'dslogon'               |    | 'mhv'                   |    | 'loa3'                  |
-|                         |    |                         |    |                         |
-+--|----------------------+    +-------------|-----------+    +------------|------------+
-   |                                         |                             |
-   |    +------------------------------------+                             |
-   |    |                                                                  |
-   |    |    +-------------------------------------------------------------+
-   |    |    |
+|  Okta starts SAML +----->  Proxy receives AuthNRequest  +-----+  with a list of IDP     |
+|                   |     |                               |     |  login options          |
++-------------------+     +-------------------------------+     |                         |
+                                                                +----|--------------------+
+                                                                     | 
+         +-----------------------------------------------------------+ 
+         | 
+         |
+         | 
+   +-----v----------+
+   |                |
+   | User selects   |
+   | one of the IDP |
+   | options        |
+   |                |
+   +-----|----------+
+         |
+         | 
++--------v----------------+
+|                         |
+| Id.me gets AuthNRequest |
+| with AuthNContext of    |
+| 'dslogon'               |
+|                         |
++--|----------------------+
+   |
+   |
+   |
+   |
+   |
    |    |    |       +-------------------------------+    +---------------------------+
  +-v----v----v--+    |                               |    |                           |
  |              |    | GET /samlproxy/sp/saml/sso    |    |  Proxy POSTS SAMLResponse |
