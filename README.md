@@ -152,9 +152,10 @@ To create an error run one of the following cases:
 
 The proxy fills both roles typically seen in a SAML interaction:
 - It acts as an Identity Provider (IDP) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
-- It acts as a Service Provider (SP) relative to ID.me. It sends a SAML request to ID.me, and receives a SAML response. 
+- It acts as a Service Provider (SP) relative to selected IDP services eg. Login.gov and ID.me. It sends a SAML request to the user-selected IDP, and receives a SAML response. 
 
-These two interactions are interleaved, - the request received from Okta is re-signed and passed along to ID.me. Then the respone from ID.me is validated, transformed, re-signed, and passed along to Okta. 
+These two interactions are interleaved,
+- the request received from Okta is re-signed and passed along to the coresponding IDP service. Then the respone from the IDP service is validated, transformed, re-signed, and passed along to Okta. 
 
 Flow of the SAML login process: 
 
