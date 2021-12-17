@@ -189,24 +189,25 @@ Flow of the SAML login process:
    +-----|----------+
          |
          | 
-+--------v----------------+
-|                         |
-| Id.me gets AuthNRequest |
-| with AuthNContext of    |
-| 'dslogon'               |
-|                         |
-+--|----------------------+
++--------v-------------------+
+|                            |
+| The IDP service gets the   | 
+| AuthNRequest with the      |
+| corresponding AuthNContext |
+|                            |
++--|-------------------------+
    |
    |
    |
    |
    |
-   |    |    |       +-------------------------------+    +---------------------------+
- +-v----v----v--+    |                               |    |                           |
+   |                 +-------------------------------+    +---------------------------+
+ +-v------------+    |                               |    |                           |
  |              |    | GET /samlproxy/sp/saml/sso    |    |  Proxy POSTS SAMLResponse |
  | User logs in +----> Proxy receives redirect from  +---->  To Okta                  |
- |              |    | Id.me with SAMLResponse       |    |                           |
- +--------------+    |                               |    +---------------------------+
+ |              |    | the IDP service with the      |    |                           |
+ +--------------+    | SAMLResponse                  |    +---------------------------+
+                     |                               |
                      +-------------------------------+
 
 ```
