@@ -1,6 +1,6 @@
 # VA Lighthouse SAML Proxy
 
-This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and external IdP's, such as ID.me and Login.gov which VA.gov currently uses for authentication services. 
+This app provides a [SAML SP](https://en.wikipedia.org/wiki/Service_provider_(SAML)) and a [SAML IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) that allows it to proxy SAML requests from Okta, which VA.gov uses as an OpenID Connect provider, and external IDP's, such as [ID.me](https://www.id.me/) and [Login.gov](https://login.gov/)  which VA.gov currently uses for authentication services. 
 
 ## Installation
 
@@ -72,7 +72,11 @@ docker run -p 7000:7000 saml-idp --config dev-config.json
 
 Node:
 
-Redis must be running locally.
+Redis must be running locally. If docker is avaiable it can be run locally with
+
+```bash
+docker-compose up -d redis
+```
 
 Make sure the following config value is set properly: `redisHost: 127.0.0.1`.
 
@@ -83,7 +87,7 @@ npm run-script start-dev
 
 ### Using LoginGov with Local Saml-Proxy
 
-Login.Gov does not support http ACS endpoints. Run the following command to set up an https proxy for the saml-proxy.
+Login.Gov only supports `https` ACS endpoints. Run the following command to set up an https proxy for the saml-proxy.
 
 ```sh
 npm install -g local-ssl-proxy
@@ -151,11 +155,11 @@ To create an error run one of the following cases:
 ## SAML Flow
 
 The proxy fills both roles typically seen in a SAML interaction:
-- It acts as an Identity Provider (IDP) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
-- It acts as a Service Provider (SP) relative to selected IDP services eg. Login.gov and ID.me. It sends a SAML request to the user-selected IDP, and receives a SAML response. 
+- It acts as an [Identity Provider (IDP)](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
+- It acts as a [Service Provider (SP)](https://en.wikipedia.org/wiki/Service_provider_(SAML)) relative to selected [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) eg. Login.gov and ID.me. It sends a SAML request to the user-selected [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)), and receives a SAML response. 
 
 These two interactions are interleaved,
-- the request received from Okta is re-signed and passed along to the coresponding IDP service. Then the respone from the IDP service is validated, transformed, re-signed, and passed along to Okta. 
+- the request received from Okta is re-signed and passed along to the coresponding IDP service. Then the respone from the [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) is validated, transformed, re-signed, and passed along to Okta. 
 
 Flow of the SAML login process: 
 
