@@ -1,4 +1,5 @@
-import * as request from "request-promise-native";
+import axios from "axios";
+import qs from "qs";
 
 export interface SAMLUser {
   uuid: string;
@@ -46,30 +47,31 @@ export class VetsAPIClient {
       level_of_assurance: "3",
     };
 
-    const response = await request.post({
+    const response = await axios({
+      method: "post",
       url: `${this.apiHost}${MVI_PATH}`,
-      json: true,
       headers: this.headers,
-      body,
+      data: body,
     });
-    return response.data.attributes;
+
+    return response.data.data.attributes;
   }
 
   public async getVSOSearch(
     firstName: string,
     lastName: string
   ): Promise<{ poa: string }> {
-    const qs = {
+    const qsPayload = qs.stringify({
       first_name: firstName,
       last_name: lastName,
-    };
-
-    const response = await request.get({
-      url: `${this.apiHost}${VSO_SEARCH_PATH}`,
-      json: true,
-      headers: this.headers,
-      qs,
     });
-    return response.data.attributes;
+
+    const response = await axios({
+      method: "get",
+      url: `${this.apiHost}${VSO_SEARCH_PATH}`,
+      headers: this.headers,
+      data: qsPayload,
+    });
+    return response.data.data.attributes;
   }
 }
