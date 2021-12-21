@@ -36,83 +36,86 @@ export function fetch(url) {
       return resolve(metadata);
     }
 
-    axios.get(url).then((resp) => {
-      const parserConfig = {
-          explicitRoot: true,
-          explicitCharkey: true,
-          tagNameProcessors: [xml2js.processors.stripPrefix],
-        },
-        parser = new xml2js.Parser(parserConfig);
+    axios
+      .get(url)
+      .then((resp) => {
+        const parserConfig = {
+            explicitRoot: true,
+            explicitCharkey: true,
+            tagNameProcessors: [xml2js.processors.stripPrefix],
+          },
+          parser = new xml2js.Parser(parserConfig);
 
-      parser.parseString(resp.data, (err, docEl) => {
-        if (err) {
-          return reject(err);
-        }
+        parser.parseString(resp.data, (err, docEl) => {
+          if (err) {
+            return reject(err);
+          }
 
-        if (docEl.EntityDescriptor) {
-          metadata.issuer = docEl.EntityDescriptor.$.entityID;
+          if (docEl.EntityDescriptor) {
+            metadata.issuer = docEl.EntityDescriptor.$.entityID;
 
-          if (
-            docEl.EntityDescriptor.IDPSSODescriptor &&
-            docEl.EntityDescriptor.IDPSSODescriptor.length === 1
-          ) {
-            metadata.protocol = "samlp";
+            if (
+              docEl.EntityDescriptor.IDPSSODescriptor &&
+              docEl.EntityDescriptor.IDPSSODescriptor.length === 1
+            ) {
+              metadata.protocol = "samlp";
 
-            let ssoEl = docEl.EntityDescriptor.IDPSSODescriptor[0];
-            metadata.signRequest = ssoEl.$.WantAuthnRequestsSigned;
+              let ssoEl = docEl.EntityDescriptor.IDPSSODescriptor[0];
+              metadata.signRequest = ssoEl.$.WantAuthnRequestsSigned;
 
-            ssoEl.KeyDescriptor.forEach((keyEl) => {
-              if (keyEl.$.use && keyEl.$.use.toLowerCase() !== "encryption") {
-                metadata.signingKeys.push(getFirstCert(keyEl));
-              }
-            });
-
-            if (ssoEl.NameIDFormat) {
-              ssoEl.NameIDFormat.forEach((element) => {
-                if (element._) {
-                  metadata.nameIdFormats.push(element._);
+              ssoEl.KeyDescriptor.forEach((keyEl) => {
+                if (keyEl.$.use && keyEl.$.use.toLowerCase() !== "encryption") {
+                  metadata.signingKeys.push(getFirstCert(keyEl));
                 }
               });
+
+              if (ssoEl.NameIDFormat) {
+                ssoEl.NameIDFormat.forEach((element) => {
+                  if (element._) {
+                    metadata.nameIdFormats.push(element._);
+                  }
+                });
+              }
+
+              metadata.sso.redirectUrl = getBindingLocation(
+                ssoEl.SingleSignOnService,
+                "urn:oasis:names:tc:saml:2.0:bindings:http-redirect"
+              );
+              metadata.sso.postUrl = getBindingLocation(
+                ssoEl.SingleSignOnService,
+                "urn:oasis:names:tc:saml:2.0:bindings:http-post"
+              );
+
+              metadata.slo.redirectUrl = getBindingLocation(
+                ssoEl.SingleLogoutService,
+                "urn:oasis:names:tc:saml:2.0:bindings:http-redirect"
+              );
+              metadata.slo.postUrl = getBindingLocation(
+                ssoEl.SingleLogoutService,
+                "urn:oasis:names:tc:saml:2.0:bindings:http-post"
+              );
             }
-
-            metadata.sso.redirectUrl = getBindingLocation(
-              ssoEl.SingleSignOnService,
-              "urn:oasis:names:tc:saml:2.0:bindings:http-redirect"
-            );
-            metadata.sso.postUrl = getBindingLocation(
-              ssoEl.SingleSignOnService,
-              "urn:oasis:names:tc:saml:2.0:bindings:http-post"
-            );
-
-            metadata.slo.redirectUrl = getBindingLocation(
-              ssoEl.SingleLogoutService,
-              "urn:oasis:names:tc:saml:2.0:bindings:http-redirect"
-            );
-            metadata.slo.postUrl = getBindingLocation(
-              ssoEl.SingleLogoutService,
-              "urn:oasis:names:tc:saml:2.0:bindings:http-post"
-            );
           }
-        }
 
-        if (docEl.EntityDescriptor.RoleDescriptor) {
-          metadata.protocol = "wsfed";
-          try {
-            let roleEl = docEl.EntityDescriptor.RoleDescriptor.find((el) => {
-              return el.$["xsi:type"].endsWith(":SecurityTokenServiceType");
-            });
-            metadata.sso.redirectUrl =
-              roleEl.PassiveRequestorEndpoint[0].EndpointReference[0].Address[0]._;
+          if (docEl.EntityDescriptor.RoleDescriptor) {
+            metadata.protocol = "wsfed";
+            try {
+              let roleEl = docEl.EntityDescriptor.RoleDescriptor.find((el) => {
+                return el.$["xsi:type"].endsWith(":SecurityTokenServiceType");
+              });
+              metadata.sso.redirectUrl =
+                roleEl.PassiveRequestorEndpoint[0].EndpointReference[0].Address[0]._;
 
-            roleEl.KeyDescriptor.forEach((keyEl) => {
-              metadata.signingKeys.push(getFirstCert(keyEl));
-            });
-          } catch (e) {
-            logger.error("unable to parse RoleDescriptor metadata", e);
+              roleEl.KeyDescriptor.forEach((keyEl) => {
+                metadata.signingKeys.push(getFirstCert(keyEl));
+              });
+            } catch (e) {
+              logger.error("unable to parse RoleDescriptor metadata", e);
+            }
           }
-        }
-        return resolve(metadata);
-      });
-    });
+          return resolve(metadata);
+        });
+      })
+      .catch((err) => reject(err));
   });
 }
