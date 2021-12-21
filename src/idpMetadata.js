@@ -1,6 +1,6 @@
 "use strict";
 
-const request = require("request");
+const axios = require("axios");
 const xml2js = require("xml2js");
 const logger = require("./logger");
 
@@ -36,11 +36,7 @@ export function fetch(url) {
       return resolve(metadata);
     }
 
-    request.get(url, (err, resp, body) => {
-      if (err) {
-        return reject(err);
-      }
-
+    axios.get(url).then((resp) => {
       const parserConfig = {
           explicitRoot: true,
           explicitCharkey: true,
@@ -48,7 +44,7 @@ export function fetch(url) {
         },
         parser = new xml2js.Parser(parserConfig);
 
-      parser.parseString(body, (err, docEl) => {
+      parser.parseString(resp.data, (err, docEl) => {
         if (err) {
           return reject(err);
         }
