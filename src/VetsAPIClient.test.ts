@@ -143,6 +143,27 @@ describe("getMVITraitsForLoa3User", () => {
   });
 
   it("should return the Veteran's ICN if the request is successful", async () => {
+    const expectedBody = {
+      idp_uuid: "fakeuuid",
+      user_email: "user@example.com",
+      dslogon_edipi: null,
+      mhv_icn: null,
+      ssn: "333-99-8988",
+      first_name: "Edward",
+      middle_name: "John",
+      last_name: "Paget",
+      dob: "1990-01-01",
+      gender: "male",
+      level_of_assurance: "3",
+    };
+    mock
+      .onPost(
+        "https://example.gov/internal/auth/v0/mvi-user",
+        expectedBody,
+        expectedHeader
+      )
+      .reply(200, mockRespData);
+
     const client = new VetsAPIClient("faketoken", "https://example.gov");
     const { icn } = await client.getMVITraitsForLoa3User(samlTraits);
     expect(icn).toEqual("fakeICN");
