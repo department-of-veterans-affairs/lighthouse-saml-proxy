@@ -120,25 +120,33 @@ describe("getMVITraitsForLoa3User", () => {
   });
 
   it("should call the mvi-user endpoint with the Veteran's PII in request body", async () => {
+    const expectedBody = {
+      idp_uuid: "fakeuuid",
+      user_email: "user@example.com",
+      dslogon_edipi: null,
+      mhv_icn: null,
+      ssn: "333-99-8988",
+      first_name: "Edward",
+      middle_name: "John",
+      last_name: "Paget",
+      dob: "1990-01-01",
+      gender: "male",
+      level_of_assurance: "3",
+    };
+    mock
+      .onPost(
+        "https://example.gov/internal/auth/v0/mvi-user",
+        expectedBody,
+        expectedHeader
+      )
+      .reply(200, mockRespData);
+
     const client = new VetsAPIClient("faketoken", "https://example.gov");
-    await client.getMVITraitsForLoa3User(samlTraits);
-    expect(axios).toHaveBeenCalledWith({
-      method: "post",
-      url: "https://example.gov/internal/auth/v0/mvi-user",
-      headers: expect.objectContaining({
-        apiKey: "faketoken",
-      }),
-      data: expect.objectContaining({
-        idp_uuid: samlTraits.uuid,
-        user_email: samlTraits.email,
-        ssn: samlTraits.ssn,
-        first_name: samlTraits.firstName,
-        middle_name: samlTraits.middleName,
-        last_name: samlTraits.lastName,
-        dob: samlTraits.dateOfBirth,
-        gender: samlTraits.gender,
-        level_of_assurance: "3",
-      }),
+    const result = await client.getMVITraitsForLoa3User(samlTraits);
+    expect(result).toStrictEqual({
+      icn: "fakeICN",
+      first_name: "Edward",
+      last_name: "Paget",
     });
   });
 
