@@ -1,5 +1,4 @@
 import axios from "axios";
-import qs from "qs";
 
 export interface SAMLUser {
   uuid: string;
@@ -46,32 +45,43 @@ export class VetsAPIClient {
       gender: user.gender || null,
       level_of_assurance: "3",
     };
+    const out = { icn: "-1", first_name: "first_name", last_name: "last_name" };
 
-    const response = await axios({
-      method: "post",
-      url: `${this.apiHost}${MVI_PATH}`,
-      headers: this.headers,
-      data: body,
-    });
+    try {
+      const response = await axios({
+        method: "post",
+        url: `${this.apiHost}${MVI_PATH}`,
+        headers: this.headers,
+        data: body,
+      });
 
-    return response.data.data.attributes;
+      Object.assign(out, response.data.data.attributes);
+    } catch (err) {
+      console.error(err);
+    }
+    return out;
   }
 
   public async getVSOSearch(
     firstName: string,
     lastName: string
   ): Promise<{ poa: string }> {
-    const qsPayload = qs.stringify({
+    const qsPayload = {
       first_name: firstName,
       last_name: lastName,
-    });
+    };
 
-    const response = await axios({
-      method: "get",
-      url: `${this.apiHost}${VSO_SEARCH_PATH}`,
-      headers: this.headers,
-      data: qsPayload,
-    });
-    return response.data.data.attributes;
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${this.apiHost}${VSO_SEARCH_PATH}`,
+        headers: this.headers,
+        data: qsPayload,
+      });
+      return response.data.data.attributes;
+    } catch (err) {
+      console.error(err);
+    }
+    return { poa: "poa" };
   }
 }
