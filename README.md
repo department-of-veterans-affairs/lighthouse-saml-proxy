@@ -190,7 +190,9 @@ Flow of the SAML login process:
    | User selects           |
    | one of the IDP options |
    |                        |
-   | Eg: Login.gov or ID.me |
+   | Eg: Login.gov, ID.me,  |
+   | DSLogon, or            |
+   | My Healthy Vet         |
    +-----|------------------+
          |
          | 
