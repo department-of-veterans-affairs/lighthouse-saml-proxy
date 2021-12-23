@@ -1,5 +1,6 @@
 import axios from "axios";
-import * as request from "request-promise-native";
+import { stringify } from "querystring";
+// import * as request from "request-promise-native";
 
 export interface SAMLUser {
   uuid: string;
@@ -47,13 +48,22 @@ export class VetsAPIClient {
       level_of_assurance: "3",
     };
 
-    const response = await request.post({
-      url: `${this.apiHost}${MVI_PATH}`,
-      json: true,
-      headers: this.headers,
-      body,
-    });
-    return response.data.attributes;
+    try {
+      const response = await axios({
+        method: "post",
+        url: `${this.apiHost}${MVI_PATH}`,
+        headers: this.headers,
+        data: body,
+      });
+      return response.data.attributes;
+    } catch (err) {
+      throw {
+        name: "StatusCodeError",
+        statusCode: stringify(err.response.status),
+        response: err.response,
+        message: err.message,
+      };
+    }
   }
 
   public async getVSOSearch(
@@ -71,6 +81,6 @@ export class VetsAPIClient {
       headers: this.headers,
       data: qs,
     });
-    return response.data.attributes;
+    return response.data.data.attributes;
   }
 }
