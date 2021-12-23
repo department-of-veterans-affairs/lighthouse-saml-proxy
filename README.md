@@ -185,13 +185,13 @@ Flow of the SAML login process:
          | 
          |
          | 
-   +-----v----------+
-   |                |
-   | User selects   |
-   | one of the IDP |
-   | options        |
-   |                |
-   +-----|----------+
+   +-----v------------------+
+   |                        |
+   | User selects           |
+   | one of the IDP options |
+   |                        |
+   | Eg: Login.gov or ID.me |
+   +-----|------------------+
          |
          | 
 +--------v-------------------+
