@@ -1,6 +1,4 @@
 import axios from "axios";
-import { stringify } from "querystring";
-// import * as request from "request-promise-native";
 
 export interface SAMLUser {
   uuid: string;
@@ -93,7 +91,7 @@ export class VetsAPIClient {
 
     let statusCode;
     if (response && response.status) {
-      statusCode = stringify(err.response.status);
+      statusCode = String(response.status);
     } else {
       statusCode = "500";
     }
