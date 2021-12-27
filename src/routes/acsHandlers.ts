@@ -21,8 +21,8 @@ const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
   if (
-    error.name == "StatusCodeError" &&
-    error.statusCode.toString() === "404"
+    error?.name == "StatusCodeError" &&
+    error?.statusCode.toString() === "404"
   ) {
     return "internalFailure.hbs";
   } else {

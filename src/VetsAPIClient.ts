@@ -57,12 +57,8 @@ export class VetsAPIClient {
       });
       return response.data.attributes;
     } catch (err) {
-      throw {
-        name: "StatusCodeError",
-        statusCode: stringify(err.response.status),
-        response: err.response,
-        message: err.message,
-      };
+      const statusCodeError = this.createStatusCodeError(err);
+      throw statusCodeError;
     }
   }
 
@@ -75,12 +71,46 @@ export class VetsAPIClient {
       last_name: lastName,
     };
 
-    const response = await axios({
-      method: "get",
-      url: `${this.apiHost}${VSO_SEARCH_PATH}`,
-      headers: this.headers,
-      data: qs,
-    });
-    return response.data.data.attributes;
+    try {
+      const response = await axios({
+        method: "get",
+        url: `${this.apiHost}${VSO_SEARCH_PATH}`,
+        headers: this.headers,
+        data: qs,
+      });
+      return response.data.data.attributes;
+    } catch (err) {
+      const statusCodeError = this.createStatusCodeError(err);
+      throw statusCodeError;
+    }
+  }
+
+  private createStatusCodeError(err: any) {
+    let response;
+    if (err.response) {
+      response = err.response;
+    }
+
+    let statusCode;
+    if (response && response.status) {
+      statusCode = stringify(err.response.status);
+    } else {
+      statusCode = "500";
+    }
+
+    let message;
+    if (err.message) {
+      message = err.message;
+    } else {
+      message = "Internal error";
+    }
+
+    const statusCodeError = {
+      name: "StatusCodeError",
+      statusCode: statusCode,
+      response: response,
+      message: message,
+    };
+    return statusCodeError;
   }
 }
