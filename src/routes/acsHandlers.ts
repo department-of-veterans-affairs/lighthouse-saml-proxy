@@ -18,8 +18,6 @@ import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
 
 const unknownUsersErrorTemplate = (error: any) => {
-  // `error` comes from:
-  // https://github.com/request/promise-core/blob/master/lib/errors.js
   if (
     error?.name == "StatusCodeError" &&
     error?.statusCode.toString() === "404"
@@ -31,8 +29,6 @@ const unknownUsersErrorTemplate = (error: any) => {
 };
 
 export const urlUserErrorTemplate = () => {
-  // `error` comes from:
-  // https://github.com/request/promise-core/blob/master/lib/errors.js
   return "sensitiveError.hbs";
 };
 
