@@ -1,5 +1,4 @@
 import axios from "axios";
-import querysting from "querystring";
 
 export interface SAMLUser {
   uuid: string;
@@ -67,32 +66,22 @@ export class VetsAPIClient {
       last_name: lastName,
     };
 
-    // const body = JSON.stringify(payload);
     const headers = { "Content-Type": "application/json" };
-    const params = querysting.stringify(payload);
-    // const headers = {};
     Object.assign(headers, this.headers);
-    let poa;
-    let error;
-    const uri = `${this.apiHost}${VSO_SEARCH_PATH}?` + params;
+    const uri = `${this.apiHost}${VSO_SEARCH_PATH}?`;
     axios
       .get(uri, {
         headers: headers,
+        params: payload,
       })
       .then((response) => {
-        poa = response.data.data.attributes;
+        const poa = response.data.data.attributes;
         return poa;
       })
       .catch((err) => {
         const statusCodeError = this.createStatusCodeError(err);
-        error = statusCodeError;
+        throw statusCodeError;
       });
-
-    if (poa) {
-      return poa;
-    } else {
-      throw error;
-    }
   }
 
   private createStatusCodeError(err: any) {
