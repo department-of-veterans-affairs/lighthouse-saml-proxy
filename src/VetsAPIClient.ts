@@ -1,4 +1,5 @@
 import axios from "axios";
+import querysting from "querystring";
 
 export interface SAMLUser {
   uuid: string;
@@ -60,26 +61,37 @@ export class VetsAPIClient {
     }
   }
 
-  public async getVSOSearch(
-    firstName: string,
-    lastName: string
-  ): Promise<{ poa: string }> {
-    const qs = {
+  public async getVSOSearch(firstName: string, lastName: string): Promise<any> {
+    const payload = {
       first_name: firstName,
       last_name: lastName,
     };
 
-    try {
-      const response = await axios({
-        method: "get",
-        url: `${this.apiHost}${VSO_SEARCH_PATH}`,
-        headers: this.headers,
-        data: qs,
+    // const body = JSON.stringify(payload);
+    const headers = { "Content-Type": "application/json" };
+    const params = querysting.stringify(payload);
+    // const headers = {};
+    Object.assign(headers, this.headers);
+    let poa;
+    let error;
+    const uri = `${this.apiHost}${VSO_SEARCH_PATH}?` + params;
+    axios
+      .get(uri, {
+        headers: headers,
+      })
+      .then((response) => {
+        poa = response.data.data.attributes;
+        return poa;
+      })
+      .catch((err) => {
+        const statusCodeError = this.createStatusCodeError(err);
+        error = statusCodeError;
       });
-      return response.data.data.attributes;
-    } catch (err) {
-      const statusCodeError = this.createStatusCodeError(err);
-      throw statusCodeError;
+
+    if (poa) {
+      return poa;
+    } else {
+      throw error;
     }
   }
 
