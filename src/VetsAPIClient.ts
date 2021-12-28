@@ -69,19 +69,28 @@ export class VetsAPIClient {
     const headers = { "Content-Type": "application/json" };
     Object.assign(headers, this.headers);
     const uri = `${this.apiHost}${VSO_SEARCH_PATH}?`;
-    axios
-      .get(uri, {
-        headers: headers,
-        params: payload,
-      })
-      .then((response) => {
-        const poa = response.data.data.attributes;
-        return poa;
-      })
-      .catch((err) => {
-        const statusCodeError = this.createStatusCodeError(err);
-        throw statusCodeError;
-      });
+    let poa = {};
+    let statusCodeError = {};
+    try {
+      await axios
+        .get(uri, {
+          headers: headers,
+          params: payload,
+        })
+        .then((response) => {
+          poa = response.data.data.attributes;
+        })
+        .catch((err) => {
+          statusCodeError = this.createStatusCodeError(err);
+        });
+    } catch (err) {
+      statusCodeError = this.createStatusCodeError(err);
+    }
+    if (poa) {
+      return poa;
+    } else {
+      throw statusCodeError;
+    }
   }
 
   private createStatusCodeError(err: any) {
