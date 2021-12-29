@@ -1,6 +1,7 @@
 require("jest");
 
-import request from "request-promise-native";
+import axios from "axios";
+import querystring from "querystring";
 import { DOMParser } from "@xmldom/xmldom";
 import { buildSamlResponseFunction } from "./testUtils";
 import { buildBackgroundServerModule } from "./backgroundServer";
@@ -39,18 +40,17 @@ let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
 
 function ssoRequest(samlResponse, state = "state") {
+  const payload = querystring.stringify({
+    SAMLResponse: samlResponse,
+    RelayState: state,
+  });
   const reqOpts = {
     method: "POST",
-    resolveWithFullResponse: true,
-    simple: false,
     uri: `http://localhost:${PORT}/samlproxy/sp/saml/sso`,
-    form: {
-      SAMLResponse: samlResponse,
-      RelayState: state,
-    },
+    data: payload,
   };
 
-  return request(reqOpts);
+  return axios(reqOpts);
 }
 
 async function ssoIdpRequest() {
