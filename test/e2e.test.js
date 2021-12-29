@@ -39,19 +39,19 @@ const vetsApiClient = new MockVetsApiClient();
 let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
 
-function ssoRequest(samlResponse, state = "state") {
+async function ssoRequest(samlResponse, state = "state") {
   const payload = querystring.stringify({
     SAMLResponse: samlResponse,
     RelayState: state,
   });
   const reqOpts = {
     method: "POST",
-    uri: `http://localhost:${PORT}/samlproxy/sp/saml/sso`,
+    url: `http://localhost:${PORT}/samlproxy/sp/saml/sso`,
     data: payload,
   };
 
   try {
-    const resp = axios(reqOpts);
+    const resp = await axios(reqOpts);
     return resp;
   } catch (err) {
     console.error(err);
