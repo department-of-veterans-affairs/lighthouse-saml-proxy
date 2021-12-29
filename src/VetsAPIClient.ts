@@ -53,7 +53,7 @@ export class VetsAPIClient {
         headers: this.headers,
         data: body,
       });
-      return response.data.attributes;
+      return response.data.data.attributes;
     } catch (err) {
       const statusCodeError = this.createStatusCodeError(err);
       throw statusCodeError;

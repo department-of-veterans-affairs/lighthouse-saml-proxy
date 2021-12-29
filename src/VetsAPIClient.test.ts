@@ -79,6 +79,7 @@ describe("getMVITraitsForLoa3User", () => {
       gender: "male",
       level_of_assurance: "3",
     };
+
     mock
       .onPost(
         "https://example.gov/internal/auth/v0/mvi-user",
