@@ -91,7 +91,11 @@ export default function configureExpress(
    */
 
   app.set("view engine", "hbs");
-  app.set("view options", { layout: "layout" });
+  if (argv.idpSelectionRefactor) {
+    app.set("view options", { layout: "layout_v2" });
+  } else {
+    app.set("view options", { layout: "layout" });
+  }
   app.engine("handlebars", hbs.__express);
   if (useSentry) {
     app.use(
@@ -131,10 +135,19 @@ export default function configureExpress(
   );
   app.use(flash());
 
+  let styles_scss;
+  let styles_css;
+  if (argv.idpSelectionRefactor) {
+    styles_scss = "core_v2.scss";
+    styles_css = "core_v2.css";
+  } else {
+    styles_scss = "core.scss";
+    styles_css = "core.css";
+  }
   app.use(
     sassMiddleware({
-      src: path.join(process.cwd(), "styles", "core.scss"),
-      dest: path.join(process.cwd(), "public", "core.css"),
+      src: path.join(process.cwd(), "styles", styles_scss),
+      dest: path.join(process.cwd(), "public", styles_css),
       importer: tildeImporter,
       outputStyle: "expanded",
       sass: sass,
