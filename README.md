@@ -1,6 +1,6 @@
 # VA Lighthouse SAML Proxy
 
-This app provides a [SAML SP](https://en.wikipedia.org/wiki/Service_provider_(SAML)) and a [SAML IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) that allows it to proxy SAML requests from Okta, which VA.gov uses as an OpenID Connect provider, and external IDP's, such as [ID.me](https://www.id.me/) and [Login.gov](https://login.gov/)  which VA.gov currently uses for authentication services. 
+This app provides a [SAML SP](https://en.wikipedia.org/wiki/Service_provider_(SAML)) and a [SAML IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) that allows it to proxy SAML requests.
 
 ## Installation
 
@@ -44,10 +44,10 @@ dev-config.json
   [
     {
       "category": "example2SamlIdp",
-      "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
+      "spIdpMetaUrl": "https://saml-idp-2.example.com/metadata",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-      "spAudience": "https://saml-idp.example2.com",
-      "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
+      "spAudience": "https://saml-idp-2.example.com",
+      "spAuthnContextClassRef": "http://sp-2.example.com/authn/context/class/ref",
       "spRequestAuthnContext": true,
       "spRequestNameIDFormat": true,
       "spIdpSignupLinkEnabled": true
@@ -55,7 +55,7 @@ dev-config.json
   ]
 ```
 
-`idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided from id.me.
+`idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided by the IDP.
 
 A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with real values.
 
