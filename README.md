@@ -1,10 +1,10 @@
 # VA Lighthouse SAML Proxy
 
-This app provides a SAML SP and a SAML IdP that allows it to proxy SAML requests from Okta, which VA.gov will use as an OpenID Connect provider, and ID.me which VA.gov currently uses a authentication service. 
+This app provides a [SAML SP](https://en.wikipedia.org/wiki/Service_provider_(SAML)) and a [SAML IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) that allows it to proxy SAML requests.
 
 ## Installation
 
-Requires Docker and/or Node.js > 10.
+Requires Docker and/or Node.js > 16.
 
 ### Config File
 
@@ -14,20 +14,49 @@ dev-config.json
 
 ```json
 {
-  "idpAcsUrl": "",
-  "idpIssuer": "",
-  "idpAudience": "",
-  "idpBaseUrl": "",
-  "spIdpMetaUrl": "https://api.idmelabs.com/saml/metadata/provider",
+  "idpAcsUrl": "https://idp.example.com/acs/url",
+  "idpIssuer": "idp-issuer.example.com",
+  "idpAudience": "https://idp.example.com/audience",
+  "idpBaseUrl": "https://idp.example.com/base/url",
+  "spIdpMetaUrl": "https://sp.example.com/idp/meta/url",
   "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-  "spAudience": "",
-  "spIdpIssuer": "api.idmelabs.com",
-  "spAuthnContextClassRef": "",
-  "spAcsUrls": "/samlproxy/sp/saml/sso"
+  "spAudience": "sp-audience.example.com",
+  "spIdpIssuer": "sp-idp-issuer.example.com",
+  "spAuthnContextClassRef": "http://sp.example.com/authn/context/class/ref",
+  "spAcsUrl": "/samlproxy/sp/saml/sso",
+  "idpCert": "./idp-public-cert.pem",
+  "idpKey": "./idp-private-key.pem",
+  "spCert": "./sp-cert.pem",
+  "spKey": "./sp-key.pem",
+  "idpEncryptAssertion": true,
+  "idpEncryptionCert": "./idp-encryption-cert.pem",
+  "idpEncryptionPublicKey": "./idp-encryption-pub.key",
+  "vetsAPIHost": "https://vets-api.example.com",
+  "vetsAPIToken": "vets-api-token",
+  "sessionSecret": "fake-session-secret",
+  "cacheEnabled": true,
+  "redisPort": "6379",
+  "redisHost": "127.0.0.1",
+  "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+  "idpSelectionRefactor" : true,
+  "idpSamlLoginsEnabled": true,
+  "idpSamlLogins": 
+  [
+    {
+      "category": "example2SamlIdp",
+      "spIdpMetaUrl": "https://saml-idp-2.example.com/metadata",
+      "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "spAudience": "https://saml-idp-2.example.com",
+      "spAuthnContextClassRef": "http://sp-2.example.com/authn/context/class/ref",
+      "spRequestAuthnContext": true,
+      "spRequestNameIDFormat": true,
+      "spIdpSignupLinkEnabled": true
+   }
+  ]
 }
 ```
 
-`idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided from id.me.
+`idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided by the IDP.
 
 A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with real values.
 
@@ -44,7 +73,11 @@ docker run -p 7000:7000 saml-idp --config dev-config.json
 
 Node:
 
-Redis must be running locally.
+Redis must be running locally. If docker is avaiable it can be run locally with
+
+```bash
+docker-compose up -d redis
+```
 
 Make sure the following config value is set properly: `redisHost: 127.0.0.1`.
 
@@ -55,7 +88,7 @@ npm run-script start-dev
 
 ### Using LoginGov with Local Saml-Proxy
 
-Login.Gov does not support http ACS endpoints. Run the following command to set up an https proxy for the saml-proxy.
+Login.Gov only supports `https` ACS endpoints. Run the following command to set up an https proxy for the saml-proxy.
 
 ```sh
 npm install -g local-ssl-proxy
@@ -123,10 +156,11 @@ To create an error run one of the following cases:
 ## SAML Flow
 
 The proxy fills both roles typically seen in a SAML interaction:
-- It acts as an Identity Provider (IDP) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
-- It acts as a Service Provider (SP) relative to ID.me. It sends a SAML request to ID.me, and receives a SAML response. 
+- It acts as an [Identity Provider (IDP)](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) relative to Okta. It receives a SAML request from Okta, and returns a SAML response.
+- It acts as a [Service Provider (SP)](https://en.wikipedia.org/wiki/Service_provider_(SAML)) relative to selected [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) eg. Login.gov and ID.me. It sends a SAML request to the user-selected [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)), and receives a SAML response. 
 
-These two interactions are interleaved, - the request received from Okta is re-signed and passed along to ID.me. Then the respone from ID.me is validated, transformed, re-signed, and passed along to Okta. 
+These two interactions are interleaved,
+- the request received from Okta is re-signed and passed along to the coresponding IDP service. Then the respone from the [IDP](https://en.wikipedia.org/wiki/Identity_provider_(SAML)) is validated, transformed, re-signed, and passed along to Okta. 
 
 Flow of the SAML login process: 
 
@@ -143,41 +177,45 @@ Flow of the SAML login process:
 +---v---------------+     +-------------------------------+     +-------------------------+
 |                   |     |                               |     |                         |
 |  GET /authorize   |     |  POST /samlproxy/idp/saml/sso |     |  User is presented      |
-|  Okta starts SAML +----->  Proxy receives AuthNRequest  +-----+  with DSLogon, Id.me, & |
-|  IdP flow         |     |  From Okta                    |     |  MHV login options      |
-|                   |     |                               |     |                         |
-+-------------------+     +-------------------------------+     +----|-----|---|----------+
-                                                                     |     |   |
-         +-----------------------------------------------------------+     |   |
-         |                                                                 |   |
-         |                                +--------------------------------+   |
-         |                                |                                    |
-   +-----v--------+                 +-----v--------+               +-----------v--+
-   |              |                 |              |               |              |
-   | User selects |                 | User selects |               | User selects |
-   | DSLogon      |                 | MHV          |               | Id.me        |
-   |              |                 |              |               |              |
-   +-----|--------+                 +-------|------+               +-------|------+
-         |                                  |                              |
-         |                                  |                              |
-+--------v----------------+    +------------v------------+    +------------v------------+
-|                         |    |                         |    |                         |
-| Id.me gets AuthNRequest |    | Id.me gets AuthNRequest |    | Id.me gets AuthNRequest |
-| with AuthNContext of    |    | with AuthNContext of    |    | with AuthNContext of    |
-| 'dslogon'               |    | 'mhv'                   |    | 'loa3'                  |
-|                         |    |                         |    |                         |
-+--|----------------------+    +-------------|-----------+    +------------|------------+
-   |                                         |                             |
-   |    +------------------------------------+                             |
-   |    |                                                                  |
-   |    |    +-------------------------------------------------------------+
-   |    |    |
-   |    |    |       +-------------------------------+    +---------------------------+
- +-v----v----v--+    |                               |    |                           |
+|  Okta starts SAML +----->  Proxy receives AuthNRequest  +-----+  with a list of IDP     |
+|                   |     |                               |     |  login options          |
++-------------------+     +-------------------------------+     |                         |
+                                                                +----|--------------------+
+                                                                     | 
+         +-----------------------------------------------------------+ 
+         | 
+         |
+         | 
+   +-----v------------------+
+   |                        |
+   | User selects           |
+   | one of the IDP options |
+   |                        |
+   | Eg: Login.gov, ID.me,  |
+   | DS Logon, or           |
+   | My HealtheVet          |
+   +-----|------------------+
+         |
+         | 
++--------v-------------------+
+|                            |
+| The IDP service gets the   | 
+| AuthNRequest with the      |
+| corresponding AuthNContext |
+|                            |
++--|-------------------------+
+   |
+   |
+   |
+   |
+   |
+   |                 +-------------------------------+    +---------------------------+
+ +-v------------+    |                               |    |                           |
  |              |    | GET /samlproxy/sp/saml/sso    |    |  Proxy POSTS SAMLResponse |
  | User logs in +----> Proxy receives redirect from  +---->  To Okta                  |
- |              |    | Id.me with SAMLResponse       |    |                           |
- +--------------+    |                               |    +---------------------------+
+ |              |    | the IDP service with the      |    |                           |
+ +--------------+    | SAMLResponse                  |    +---------------------------+
+                     |                               |
                      +-------------------------------+
 
 ```
