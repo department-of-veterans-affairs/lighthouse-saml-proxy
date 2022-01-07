@@ -1,0 +1,573 @@
+$font-path: "/samlproxy/idp/fonts";
+$formation-asset-path: "/samlproxy/idp";
+$formation-image-path: "#{$formation-asset-path}/img";
+$formation-font-path: "#{$formation-asset-path}/fonts";
+$fa-font-path: "/samlproxy/idp/fonts";
+
+$image-path: "img";
+$logingov-red: #e31c3d;
+$idme-green: #2e8540;
+$dslogon-blue: #003e73;
+
+@import "~@department-of-veterans-affairs/formation/sass/core";
+@import "~@department-of-veterans-affairs/formation/sass/modules/m-alert";
+
+.saml-proxy {
+    margin: 18px;
+
+    .row {
+      margin: 0 0;
+      width: 100%;
+
+      @media screen and (min-width: $large-screen ) {
+       margin: 0 auto;
+       max-width: 62.5em;
+      }
+    }
+    
+    .usa-grid {
+        @media screen and (max-width: $medium-screen - 1) {
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .logo-banner {
+        width: 66%;
+        max-width: 313px;
+        margin: 0 auto;
+
+        a {
+            display: inline-block;
+            width: 100%;
+        }
+
+        img {
+            height: auto;
+            width: 100%
+        }
+    }
+
+    .usa-grid > hr {
+        border-color: $color-gray-light-alt;
+        margin: 1em 0;
+    }
+
+    .idme-signup-footer {
+        text-align: center;
+
+        @include media($medium-screen) {
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    .login-selection-header {
+        text-align: center;
+        margin-bottom: 1em;
+
+        h2 {
+            margin-top: 0;
+        }
+    }
+
+    .usa-button {
+        width: 100%;
+        font-weight: 700;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        @media screen and (max-width: $medium-screen - 1) {
+            height: 50px;
+        }
+
+        @media screen and (min-width: $medium-large-screen - 1) {
+          height: 50px;
+          max-width: 330px;
+        }
+
+        &.dslogon {
+            background-color: $dslogon-blue;
+        }
+
+        &.signup {
+          background-color: white;
+          box-shadow: inset 0 0 0 2px $dslogon-blue;
+          color: $dslogon-blue;
+        }
+
+        &.idme-signin {
+            background-color: $idme-green;
+        }
+
+        &.idme-signup {
+            background-color: white;
+            box-shadow: inset 0 0 0 2px $idme-green;
+            color: $idme-green;
+        }
+
+        &.logingov-signin {
+          background-color: $logingov-red;
+        }
+  
+        img {
+            display: inline-block;
+            vertical-align: middle;
+            height: 1em;
+            max-width: 100%;
+            padding: 0 0.25em;
+        }
+    }
+
+    .h1-style {
+      font-size: 30px;
+      padding-left: 0%;
+    }
+
+    .h2-style {
+      font-size: 24px;
+      margin-top: 0px;
+    }
+
+    @media screen and (max-width: 370px) {
+      .h1-style {
+        font-size: 30px;
+      }
+
+      .h2-style {
+        font-size: 24px;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }
+    }
+
+    @media screen and (min-width: $small-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .signin-wrapper-style {
+        max-width: 100%;
+      }  
+
+      .login-style {
+        padding: 0 0 0 0;
+      }
+    }
+
+    @media screen and (min-width: $medium-screen) {
+      .h1-style {
+        font-size: 4rem;
+      }
+
+      .h2-style {
+        font-size: 3rem;
+      }
+
+      .login-style {
+        padding: 0 20%;
+      }
+
+      .signin-wrapper-style {
+        max-width: 330px;
+      }
+    }
+    .login-selection {
+        display: flex;
+        flex-flow: column;
+
+        @include media($medium-screen) {
+            display: block;
+        }
+    }
+
+    .login-help {
+        text-align: center;
+        order: 1;
+        margin-top: 1em;
+
+        @include media($medium-screen) {
+            margin: 0;
+            text-align: left;
+            order: 0;
+        }
+    }
+
+    .usa-grid > span.sidelines {
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+        display: inline-block;
+        font-size: 1.15em;
+        font-weight: bold;
+        margin: 1em 0;
+
+        &:before, &:after {
+            position: absolute;
+            top: 51%;
+            overflow: hidden;
+            width: 50%;
+            height: 2px;
+            content: "\a0";
+            background-color: $color-gray-light-alt;
+        }
+
+        &:before {
+            margin-left: -52%;
+            text-align: right;
+        }
+
+        &:after {
+            margin-left: 2%;
+        }
+    }
+
+    .fed-warning {
+        font-size: .9em;
+        margin-bottom: 2em;
+    }
+}
+
+span.sidelines {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+  
+    font-size: 1.15em;
+    font-weight: bold;
+  
+    &:before,
+    &:after {
+      position: absolute;
+      top: 51%;
+      overflow: hidden;
+      width: 50%;
+      height: 2px;
+      content: "\a0";
+      background-color: $color-gray-light-alt;
+    }
+  
+    &:before {
+      margin-left: -52%;
+      text-align: right;
+    }
+  
+    &:after {
+      margin-left: 2%;
+    }
+  }
+  
+  #signin-signup-modal {
+    .va-modal-body {
+      // Overwrite white header color.
+      color: $color-gray-dark;
+      padding-top: 0;
+    }
+  
+    .va-modal-inner {
+      max-width: 62.5em;
+      width: 95vw;
+    }
+  }
+  
+  #login-root {
+    .sitewide-search-drop-down-panel-button,
+    .sign-in-drop-down-panel-button {
+      border-top: none;
+      margin-right: 0;
+      padding: 8px 30px 8px 8px;
+      width: auto;
+    }
+  
+    .login {
+      .explanation-content {
+        @include media($medium-large-screen) {
+          margin-left: 2em;
+        }
+  
+        ul {
+          list-style: square;
+          padding-left: 1.5em;
+        }
+  
+        p {
+          margin: 1em 0;
+        }
+      }
+    }
+  }
+  
+  .verify,
+  .login {
+    button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 0.75em;
+      font-size: 16px;
+      margin: 1em 0;
+      white-space: normal !important;
+  
+      &.dslogon {
+        background: $color-primary-darker;
+  
+        &:hover {
+          background: $color-primary-darkest;
+        }
+      }
+      
+      &.idme-create {
+        box-shadow: inset 0 0 0 2px $color-green;
+        color: $color-green;
+        margin-bottom: 0;
+  
+        &:hover {
+          box-shadow: inset 0 0 0 2px $color-green-darker;
+          color: $color-green-darker;
+        }
+      }
+  
+      img {
+        height: 1em;
+        padding: 0 0.25em;
+      }
+    }
+  
+    .container {
+      padding: 2em 0;
+      color: $color-base;
+    }
+
+
+    .container-2 {
+      color: #212121;
+
+      .login {
+        padding: 0;
+      }
+    }
+    
+    .logo {
+      text-align: center;
+      border-bottom: solid 2px $color-gray-light-alt;
+      padding: 1em 0;
+  
+      a {
+        &:hover {
+          background-color: transparent;
+        }
+  
+        display: inline-block;
+      }
+    }
+  
+    .help-info {
+      padding: 2em 0;
+  
+      p:first-of-type {
+        margin-top: 0;
+      }
+    }
+  }
+  
+  .verify {
+    button {
+      width: auto;
+  
+      &.dslogon {
+        margin-bottom: 0.25em;
+      }
+    }
+  
+    h4 + p {
+      margin-top: 0;
+    }
+  }
+  
+  .login {
+    background: $color-white;
+  
+    hr {
+      border-color: $color-gray-lighter;
+    }
+  
+    .mobile-explanation {
+      padding: 1em 0;
+  
+      p {
+        margin-top: 0;
+      }
+    }
+  
+    .fed-warning {
+      font-size: 0.9em;
+      margin-bottom: 2em;
+  
+      p {
+        margin: 0.5em 0;
+      }
+    }
+  
+    a.vads-c-action-link--blue::before {
+      color: #004795;
+    }
+    
+    a.vads-c-action-link--blue::before, a.vads-c-action-link--green::before, a.vads-c-action-link--white::before {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      font-size: 175%;
+      display: inline-block;
+      content: "\f138";
+      padding-right: 1rem;
+      transform: translateY(5px);
+      height: 0px;
+    }
+
+    .signin-actions-container {
+      text-align: left;
+  
+      @include media-maxwidth($small-screen) {
+        margin-right: 0;
+      }
+  
+      .top-banner {
+        text-align: center;
+        display: flex;
+        align-items: center;
+        padding: 0.25em 0;
+        font-style: italic;
+  
+        img {
+          height: inherit;
+          vertical-align: baseline;
+          padding: 0 0.25em;
+        }
+      }
+  
+      .signin-actions {
+
+        h5 {
+          margin-top: 0;
+        }
+    
+        .alternate-signin {
+          padding-top: 1em;
+          padding-bottom: 1.16em;
+          border-top: 1px solid #aeb0b5;
+          border-bottom: 1px solid #aeb0b5;
+          
+          p:first-of-type {
+            margin-top: 0.5em;
+            color: $color-gray-dark;
+          }
+        }
+      }
+    }
+  }
+  
+  .sign-in-nav {
+    color: $color-white;
+    white-space: nowrap;
+  
+    a {
+      color: inherit;
+      text-decoration: none;
+  
+      &:visited {
+        color: inherit;
+      }
+    }
+  
+    button {
+      &:disabled {
+        background-color: inherit;
+        opacity: 0.7;
+      }
+    }
+  }
+  
+  .sign-in-links {
+    margin-left: 1rem;
+  }
+  
+  .sign-in-link {
+    color: inherit !important;
+    text-decoration: none;
+  
+    &:hover {
+      color: $color-gold !important;
+      text-decoration: underline;
+    }
+  }
+  
+  .sign-in-spacer {
+    color: $color-white;
+    margin: 0 0.6em;
+  }
+  
+  #help-menu {
+    width: 21rem;
+  }
+  .search-header-dropdown-component {
+    position: relative;
+  
+    .search-dropdown-container {
+      padding: 8px 0 8px 8px;
+      max-width: 75%;
+    }
+  
+    .search-dropdown-options {
+      position: absolute;
+      top: 58px;
+      background-color: $color-white;
+      width: 100%;
+      box-shadow: 0px 1px 5px 1px rgba(155, 155, 155, 0.5);
+  
+      .suggestion {
+        width: 100%;
+        margin: 0;
+        padding: 8px 12px;
+        line-height: 24px;
+        cursor: pointer;
+  
+        strong {
+          font-weight: 700;
+        }
+  
+        &.highlighted {
+          background-color: $color-primary;
+          color: $color-white;
+        }
+  
+        &.regular {
+          color: $color-gray-dark;
+        }
+      }
+    }
+  
+    .search-dropdown-input-field {
+      height: 42px;
+      display: block;
+      margin: 0;
+      max-width: 46rem;
+    }
+  
+    .search-dropdown-submit-button {
+      height: 42px;
+      margin: 8px 8px 8px 8px;
+    }
+  }
+  
