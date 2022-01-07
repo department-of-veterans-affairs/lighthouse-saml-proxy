@@ -53,6 +53,7 @@ dev-config.json
       "spIdpSignupLinkEnabled": true
    }
   ]
+}
 ```
 
 `idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided by the IDP.
