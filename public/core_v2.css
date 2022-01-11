@@ -25226,7 +25226,7 @@ p.usa-alert-heading {
 }
 .saml-proxy .h1-style {
   font-size: 30px;
-  padding-left: 0%;
+  padding: 1rem 2rem;
 }
 .saml-proxy .h2-style {
   font-size: 24px;
@@ -25423,6 +25423,7 @@ span.sidelines:after {
 .verify .container-2,
 .login .container-2 {
   color: #212121;
+  padding: 1rem 2rem;
 }
 .verify .container-2 .login,
 .login .container-2 .login {
