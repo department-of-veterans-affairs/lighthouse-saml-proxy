@@ -25135,7 +25135,7 @@ p.usa-alert-heading {
   margin: 0 0;
   width: 100%;
 }
-@media screen and (min-width: 1201px) {
+@media screen and (min-width: 768px) {
   .saml-proxy .row {
     margin: 0 auto;
     max-width: 62.5em;

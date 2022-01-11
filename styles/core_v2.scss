@@ -19,7 +19,7 @@ $dslogon-blue: #003e73;
       margin: 0 0;
       width: 100%;
 
-      @media screen and (min-width: $large-screen ) {
+      @media screen and (min-width: $medium-large-screen ) {
        margin: 0 auto;
        max-width: 62.5em;
       }
@@ -82,7 +82,7 @@ $dslogon-blue: #003e73;
             height: 50px;
         }
 
-        @media screen and (min-width: $medium-large-screen - 1) {
+        @media screen and (min-width: $medium-screen - 1) {
           height: 50px;
           max-width: 330px;
         }
