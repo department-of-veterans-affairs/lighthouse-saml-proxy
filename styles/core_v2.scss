@@ -497,76 +497,9 @@ span.sidelines {
       }
     }
   }
-  
-  .sign-in-links {
-    margin-left: 1rem;
-  }
-  
-  .sign-in-link {
-    color: inherit !important;
-    text-decoration: none;
-  
-    &:hover {
-      color: $color-gold !important;
-      text-decoration: underline;
-    }
-  }
-  
-  .sign-in-spacer {
-    color: $color-white;
-    margin: 0 0.6em;
-  }
-  
+    
   #help-menu {
     width: 21rem;
   }
-  .search-header-dropdown-component {
-    position: relative;
   
-    .search-dropdown-container {
-      padding: 8px 0 8px 8px;
-      max-width: 75%;
-    }
-  
-    .search-dropdown-options {
-      position: absolute;
-      top: 58px;
-      background-color: $color-white;
-      width: 100%;
-      box-shadow: 0px 1px 5px 1px rgba(155, 155, 155, 0.5);
-  
-      .suggestion {
-        width: 100%;
-        margin: 0;
-        padding: 8px 12px;
-        line-height: 24px;
-        cursor: pointer;
-  
-        strong {
-          font-weight: 700;
-        }
-  
-        &.highlighted {
-          background-color: $color-primary;
-          color: $color-white;
-        }
-  
-        &.regular {
-          color: $color-gray-dark;
-        }
-      }
-    }
-  
-    .search-dropdown-input-field {
-      height: 42px;
-      display: block;
-      margin: 0;
-      max-width: 46rem;
-    }
-  
-    .search-dropdown-submit-button {
-      height: 42px;
-      margin: 8px 8px 8px 8px;
-    }
-  }
   
