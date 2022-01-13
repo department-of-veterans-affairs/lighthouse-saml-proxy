@@ -34,7 +34,7 @@ export default function addRoutes(
   idpSelectionRefactor
 ) {
   let idpSelection = idpSelectionRefactor
-    ? "login_selection_refactor"
+    ? "login_selection_v2"
     : "login_selection";
   app.get(["/", "/idp", IDP_SSO], parseSamlRequest, samlLogin(idpSelection));
   app.post(["/", "/idp", IDP_SSO], parseSamlRequest, samlLogin(idpSelection));
