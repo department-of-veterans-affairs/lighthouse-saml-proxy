@@ -127,7 +127,7 @@ test/test.css
 # Typescript build
 build/
 test-report.xml
-public/core.css
+public/core*.css
 sp-metadata.xml
 
 # Local config
