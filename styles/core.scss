@@ -476,4 +476,18 @@ span.sidelines {
       margin: 8px 8px 8px 8px;
     }
   }
+
+  a.vads-c-action-link--blue::before {
+    color: #004795;
+  }
   
+  a.vads-c-action-link--blue::before, a.vads-c-action-link--green::before, a.vads-c-action-link--white::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 175%;
+    display: inline-block;
+    content: "\f138";
+    padding-right: 1rem;
+    transform: translateY(5px);
+    height: 0px;
+  }
