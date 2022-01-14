@@ -70,13 +70,6 @@ export const samlLogin = function (template) {
       login_gov_enabled = false;
     }
 
-    let login_selector_v2;
-    if (req.options.login_selector_v2) {
-      login_selector_v2 = true;
-    } else {
-      login_selector_v2 = false;
-    }
-
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
@@ -87,7 +80,7 @@ export const samlLogin = function (template) {
         "&op=signup",
       ],
     ];
-    if (login_selector_v2) {
+    if (req.options?.login_selector_v2) {
       authnSelection.push(["login_selector_v2", true]);
     }
     if (login_gov_enabled) {
