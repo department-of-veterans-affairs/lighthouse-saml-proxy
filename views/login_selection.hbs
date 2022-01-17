@@ -98,11 +98,11 @@
       <h4>Don't have these accounts?</h4>
       {{#if login_selector_v2}}
         {{#if login_gov_signup_link_enabled}}
-      <div style="text-align: start;">
+      <div style="text-align: center;">
         <a class="vads-c-action-link--blue" href="{{ login_gov_signup_link }}">Create an account with Login.gov</a>
       </div>  
         {{/if}}
-      <div style="text-align: start;">
+      <div style="text-align: center;">
         <a class="vads-c-action-link--blue" href="{{ id_me_signup_link }}">Create an account with ID.me</a>
       </div>
       {{else}}
@@ -111,7 +111,6 @@
       <a class="no-external-icon usa-button logingov-signup" href="{{ login_gov_signup_link }}"><img alt="Login.gov" src="/samlproxy/idp/img/icon-dot-gov.svg" />Create a Login.gov account</a>
         {{/if}}
       {{/if}}
-      <p>Use your email, Google, or Facebook</p>
     </div>
   </div>
 </div>
