@@ -30,14 +30,18 @@ export default function addRoutes(
   spConfigs,
   acsUrl,
   cache,
-  cacheEnabled,
-  idpSelectionRefactor
+  cacheEnabled
 ) {
-  let idpSelection = idpSelectionRefactor
-    ? "login_selection_refactor"
-    : "login_selection";
-  app.get(["/", "/idp", IDP_SSO], parseSamlRequest, samlLogin(idpSelection));
-  app.post(["/", "/idp", IDP_SSO], parseSamlRequest, samlLogin(idpSelection));
+  app.get(
+    ["/", "/idp", IDP_SSO],
+    parseSamlRequest,
+    samlLogin("login_selection")
+  );
+  app.post(
+    ["/", "/idp", IDP_SSO],
+    parseSamlRequest,
+    samlLogin("login_selection")
+  );
 
   app.get(IDP_METADATA, function (req, res, next) {
     samlp.metadata(req.idp.options)(req, res);
