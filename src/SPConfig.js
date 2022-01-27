@@ -50,6 +50,9 @@ export default class SPConfig {
     if (argv.disabled) {
       this.disabled = argv.disabled;
     }
+    if (argv.relayStateActivation) {
+      this.relayStateActivation = argv.relayStateActivation;
+    }
   }
 
   getMetadataParams(req) {
