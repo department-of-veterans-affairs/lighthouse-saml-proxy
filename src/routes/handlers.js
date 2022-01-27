@@ -63,14 +63,11 @@ export const samlLogin = function (template) {
       );
     });
 
-    let login_gov_enabled;
-    if (
-      (req.sps.options.logingov && !req.sps.options.logingov.disabled) ||
-      authnRequest.forceAuthn
-    ) {
-      login_gov_enabled = true;
-    } else {
-      login_gov_enabled = false;
+    let login_gov_enabled = false;
+    if (req.sps.options.logingov) {
+      if (!req.sps.options.logingov.disabled || authnRequest.forceAuthn) {
+        login_gov_enabled = true;
+      }
     }
 
     const authnSelection = [
