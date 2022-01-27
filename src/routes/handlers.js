@@ -64,7 +64,10 @@ export const samlLogin = function (template) {
     });
 
     let login_gov_enabled;
-    if (req.sps.options.logingov && !req.sps.options.logingov.disabled) {
+    if (
+      (req.sps.options.logingov && !req.sps.options.logingov.disabled) ||
+      authnRequest.forceAuthn
+    ) {
       login_gov_enabled = true;
     } else {
       login_gov_enabled = false;
