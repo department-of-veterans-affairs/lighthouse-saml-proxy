@@ -50,8 +50,8 @@ export default class SPConfig {
     if (argv.disabled) {
       this.disabled = argv.disabled;
     }
-    if (argv.relayStateActivation) {
-      this.relayStateActivation = argv.relayStateActivation;
+    if (argv.idpActivationCookie) {
+      this.idpActivationCookie = argv.idpActivationCookie;
     }
   }
 

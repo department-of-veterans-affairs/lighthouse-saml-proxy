@@ -63,16 +63,7 @@ export const samlLogin = function (template) {
       );
     });
 
-    let login_gov_enabled = false;
-    if (req.sps.options.logingov) {
-      if (
-        !req.sps.options.logingov.disabled ||
-        (req.sps.options.logingov.relayStateActivation &&
-          relayState.includes(req.sps.options.logingov.relayStateActivation))
-      ) {
-        login_gov_enabled = true;
-      }
-    }
+    let login_gov_enabled = enabled_logingov(req, relayState);
 
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
@@ -212,3 +203,21 @@ export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
   res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
 };
+
+function enabled_logingov(req) {
+  let login_gov_enabled = false;
+  req.cookies;
+  if (req.sps.options.logingov) {
+    if (
+      !req.sps.options.logingov.disabled ||
+      (req.sps.options.logingov.idpActivationCookie &&
+        req.cookies[req.sps.options.logingov.idpActivationCookie] &&
+        req.cookies[req.sps.options.logingov.idpActivationCookie].includes(
+          req.sps.options.logingov.category
+        ))
+    ) {
+      login_gov_enabled = true;
+    }
+  }
+  return login_gov_enabled;
+}
