@@ -222,4 +222,4 @@ Flow of the SAML login process:
 
 ## Contributing
 
-This is a hybrid JavaScript/Typescript application. Our goal is eventually have it be completely written in Typescript, therefore all new features should be written in TypeScript and have accompanying test written using Jest. 
+This is a hybrid JavaScript/Typescript application. Our former goal is eventually have it be completely written in Typescript, therefore all new features should be written in TypeScript and have accompanying test written using Jest. 
