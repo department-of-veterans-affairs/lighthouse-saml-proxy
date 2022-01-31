@@ -211,10 +211,7 @@ function enabled_logingov(req) {
     if (
       !req.sps.options.logingov.idpTemporarilyDisabled ||
       (req.sps.options.logingov.idpActivationCookie &&
-        req.cookies[req.sps.options.logingov.idpActivationCookie] &&
-        req.cookies[req.sps.options.logingov.idpActivationCookie].includes(
-          req.sps.options.logingov.category
-        ))
+        req.cookies[req.sps.options.logingov.idpActivationCookie])
     ) {
       login_gov_enabled = true;
     }
