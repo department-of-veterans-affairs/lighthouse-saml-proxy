@@ -209,7 +209,7 @@ function enabled_logingov(req) {
   req.cookies;
   if (req.sps.options.logingov) {
     if (
-      !req.sps.options.logingov.disabled ||
+      !req.sps.options.logingov.idpTemporarilyDisabled ||
       (req.sps.options.logingov.idpActivationCookie &&
         req.cookies[req.sps.options.logingov.idpActivationCookie] &&
         req.cookies[req.sps.options.logingov.idpActivationCookie].includes(

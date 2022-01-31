@@ -47,8 +47,11 @@ export default class SPConfig {
     this.failureFlash = true;
     this.category = argv.category || "id_me";
     this.signupLinkEnabled = argv.spIdpSignupLinkEnabled;
-    if (argv.disabled) {
-      this.disabled = argv.disabled;
+    if (argv.idpTemporarilyDisabled) {
+      // Disables the idpConfig as an IPP login option
+      // This is needed to provide an option for using a runtime flag,
+      //  eg: cookie in order to activate for testing
+      this.idpTemporarilyDisabled = argv.idpTemporarilyDisabled;
     }
     if (argv.idpActivationCookie) {
       this.idpActivationCookie = argv.idpActivationCookie;
