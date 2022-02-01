@@ -63,7 +63,7 @@ export const samlLogin = function (template) {
       );
     });
 
-    let login_gov_enabled = enabled_logingov(req, relayState);
+    let login_gov_enabled = enabled_logingov(req);
 
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
@@ -206,7 +206,6 @@ export const handleError = (req, res) => {
 
 function enabled_logingov(req) {
   let login_gov_enabled = false;
-  req.cookies;
   if (req.sps.options.logingov) {
     if (
       !req.sps.options.logingov.idpTemporarilyDisabled ||
