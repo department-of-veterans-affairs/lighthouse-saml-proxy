@@ -55,13 +55,6 @@ phases:
          VERSION=${COMMIT_HASH} \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
-      - |
-        make build/saml_tests  \
-         TAG=${COMMIT_HASH} \
-         IMAGE=${IMAGE}-tests \
-         BUILD_VERSION=${COMMIT_HASH} \
-         BUILD_TOOL=CodeBuild \
-         BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       # run linter
       - make lint IMAGE=${IMAGE} TAG=${COMMIT_HASH}
       # run unit tests
@@ -73,5 +66,3 @@ phases:
       - echo Pushing image to ECR
       - time="${time}\nPush - $(date +%r) - started"
       - make push IMAGE=${IMAGE} TAG=${COMMIT_HASH}
-      - echo Pushing tests image to ECR
-      - make push IMAGE=${IMAGE}-tests TAG=${COMMIT_HASH}
