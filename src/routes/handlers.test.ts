@@ -272,6 +272,19 @@ describe("samlLogin", () => {
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
   };
 
+  const expected_authoptions_login_gov_disabled = {
+    id_me_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    dslogon_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    mhv_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    id_me_signup_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
+    login_gov_enabled: false,
+    login_gov_signup_link_enabled: false,
+  };
+
   const mockGetSamlRequestUrl = jest
     .fn()
     .mockImplementation((opts, callback) => {
@@ -371,6 +384,34 @@ describe("samlLogin", () => {
       return promise2check(
         "login_selection",
         expected_authoptions_login_gov_enabled,
+        template,
+        authOptions
+      );
+    };
+
+    samlp.mockImplementation(() => {
+      return {
+        getSamlRequestUrl: mockGetSamlRequestUrl,
+      };
+    });
+    const doLogin = samlLogin("login_selection");
+    try {
+      doLogin(mockRequest, mockResponse, mockNext);
+    } catch (err) {
+      fail("Should not reach here");
+    }
+  });
+
+  it("Happy Path login_gov_cookie_disabled", async () => {
+    mockRequest.authnRequest = {
+      relayState: "theRelayState",
+    };
+
+    mockRequest.sps.options = spOptionsJustwithLoginGovCookie;
+    mockResponse.render = function render(template, authOptions) {
+      return promise2check(
+        "login_selection",
+        expected_authoptions_login_gov_disabled,
         template,
         authOptions
       );
