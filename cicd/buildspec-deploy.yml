@@ -113,7 +113,7 @@ phases:
             echo Running regression tests.
             make regression \
               TAG=${DEPLOY_TAG} \
-              IMAGE=${IMAGE}-tests:1.0.138 \
+              IMAGE=${IMAGE}-tests \
               SAML_PROXY_URL=https://${env}-api.va.gov \
               CLIENT_ID=${CLIENT_ID} \
               IDP=${IDP} \
