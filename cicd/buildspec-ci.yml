@@ -30,7 +30,7 @@ phases:
     commands:
       # There is considerable slow down in the provisioning phase when using Amazon provided images.
       # Therefore we use our own Alpine based image. In order to activate the Docker Daemon these lines are needed.
-      - /usr/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - /usr/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 &
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
   pre_build:
     commands:
