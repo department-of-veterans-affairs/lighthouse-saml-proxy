@@ -24,10 +24,17 @@ const handleMetadata = (argv) => {
   return (metadata) => {
     if (metadata.protocol) {
       argv.spProtocol = metadata.protocol;
-      if (metadata.signingKeys[0]) {
-        argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0]);
+      if (metadata.signingKeys) {
+        var signingKeyCert;
+        signingKeyCert = metadata.signingKeys.find(
+          (sKeyCert) => sKeyCert.active === true
+        );
+        if (signingKeyCert) {
+          argv.spIdpCert = cli.certToPEM(signingKeyCert.cert);
+        } else if (metadata.signingKeys[0]) {
+          argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0].cert);
+        }
       }
-
       switch (metadata.protocol) {
         case "samlp":
           if (metadata.sso.redirectUrl) {
