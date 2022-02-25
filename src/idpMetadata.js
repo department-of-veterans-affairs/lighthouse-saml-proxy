@@ -67,7 +67,12 @@ export function fetch(url) {
 
             ssoEl.KeyDescriptor.forEach((keyEl) => {
               if (keyEl.$.use && keyEl.$.use.toLowerCase() !== "encryption") {
-                metadata.signingKeys.push(getFirstCert(keyEl));
+                const signingKey = {};
+                signingKey.cert = getFirstCert(keyEl);
+                if (keyEl.$.active && keyEl.$.active === "true") {
+                  signingKey.active = true;
+                }
+                metadata.signingKeys.push(signingKey);
               }
             });
 
