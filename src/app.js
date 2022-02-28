@@ -25,7 +25,7 @@ const handleMetadata = (argv) => {
     if (metadata.protocol) {
       argv.spProtocol = metadata.protocol;
       if (metadata.signingKeys) {
-        var signingKeyCert;
+        let signingKeyCert;
         signingKeyCert = metadata.signingKeys.find(
           (sKeyCert) => sKeyCert.active === true
         );
