@@ -14,4 +14,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - '7000:7000'
-    command: 'node build/app.js --config dev-config.json'
+    volumes:
+      - ./dev-config.json:/etc/saml-proxy/config.json
+    command: "node build/app.js --config /etc/saml-proxy/config.json"
