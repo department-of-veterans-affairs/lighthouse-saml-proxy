@@ -4,6 +4,7 @@
   "description": "Saml Proxy regression tests.",
   "main": "saml-proxy-regression.test.js",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "test": "jest -- saml-proxy-regression.test.js"
   },
   "keywords": [
@@ -18,5 +19,8 @@
     "saml-attacks": "github:department-of-veterans-affairs/lighthouse-saml-utils",
     "saml-encoder-decoder-js": "^1.0.1",
     "uuid": "^8.3.2"
+  },
+  "resolutions": {
+    "node-forge": ">=1.0.0"
   }
 }
