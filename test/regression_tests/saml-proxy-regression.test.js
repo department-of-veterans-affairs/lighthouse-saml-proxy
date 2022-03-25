@@ -23,6 +23,7 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
+const test_modify = process.env.SAML_PROXY_TEST_MODIFY;
 
 describe("Regression tests", () => {
   jest.setTimeout(70000);
@@ -129,39 +130,43 @@ describe("Regression tests", () => {
   });
 
   test("modify", async () => {
-    const page = await browser.newPage();
-    await requestToken(page);
-    await authentication(page, valid_user, true);
+    if (test_modify) {
+      const page = await browser.newPage();
+      await requestToken(page);
+      await authentication(page, valid_user, true);
 
-    page.on("request", async (request) => {
-      if (
-        request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
-        request.method() == "POST"
-      ) {
-        let post_data = await decode(request);
-        let modify = await ModifyAttack(
-          post_data.SAMLResponse,
-          "uuid",
-          "modify"
-        );
-        post_data.SAMLResponse = modify;
-        let data = await encode(post_data);
-        await request.continue({
-          method: "POST",
-          postData: data,
-          headers: {
-            ...request.headers(),
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        });
-      } else {
-        await request.continue();
-      }
-    });
+      page.on("request", async (request) => {
+        if (
+          request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
+          request.method() == "POST"
+        ) {
+          let post_data = await decode(request);
+          let modify = await ModifyAttack(
+            post_data.SAMLResponse,
+            "uuid",
+            "modify"
+          );
+          post_data.SAMLResponse = modify;
+          let data = await encode(post_data);
+          await request.continue({
+            method: "POST",
+            postData: data,
+            headers: {
+              ...request.headers(),
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          });
+        } else {
+          await request.continue();
+        }
+      });
 
-    await page.waitForSelector(".usa-alert-error");
+      await page.waitForSelector(".usa-alert-error");
 
-    await isSensitiveError(page);
+      await isSensitiveError(page);
+    } else {
+      console.info("modify test is skipped");
+    }
   });
 });
 
