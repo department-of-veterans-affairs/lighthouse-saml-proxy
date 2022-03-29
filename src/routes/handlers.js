@@ -75,9 +75,6 @@ export const samlLogin = function (template) {
         "&op=signup",
       ],
     ];
-    if (req.options?.login_selector_v2) {
-      authnSelection.push(["login_selector_v2", true]);
-    }
     if (login_gov_enabled) {
       authnSelection.push([
         "login_gov_login_link",

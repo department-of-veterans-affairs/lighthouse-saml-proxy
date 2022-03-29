@@ -38,7 +38,6 @@ dev-config.json
   "redisPort": "6379",
   "redisHost": "127.0.0.1",
   "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-  "idpSelectionRefactor" : true,
   "idpSamlLoginsEnabled": true,
   "idpSamlLogins": 
   [
