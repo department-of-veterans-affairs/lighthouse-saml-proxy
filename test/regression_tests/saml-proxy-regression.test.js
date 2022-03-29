@@ -1,9 +1,6 @@
 require("jest");
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
-const qs = require("querystring");
-const { ModifyAttack } = require("saml-attacks");
-const SAML = require("saml-encoder-decoder-js");
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
@@ -23,7 +20,6 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
-const test_modify = process.env.SAML_PROXY_TEST_MODIFY;
 
 describe("Regression tests", () => {
   jest.setTimeout(70000);
@@ -128,46 +124,6 @@ describe("Regression tests", () => {
     await page.waitForSelector(".usa-alert-error");
     await isError(page, "Error", "Route Not Found");
   });
-
-  test("modify", async () => {
-    if (test_modify) {
-      const page = await browser.newPage();
-      await requestToken(page);
-      await authentication(page, valid_user, true);
-
-      page.on("request", async (request) => {
-        if (
-          request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
-          request.method() == "POST"
-        ) {
-          let post_data = await decode(request);
-          let modify = await ModifyAttack(
-            post_data.SAMLResponse,
-            "uuid",
-            "modify"
-          );
-          post_data.SAMLResponse = modify;
-          let data = await encode(post_data);
-          await request.continue({
-            method: "POST",
-            postData: data,
-            headers: {
-              ...request.headers(),
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          });
-        } else {
-          await request.continue();
-        }
-      });
-
-      await page.waitForSelector(".usa-alert-error");
-
-      await isSensitiveError(page);
-    } else {
-      console.info("modify test is skipped");
-    }
-  });
 });
 
 const requestToken = async (page) => {
@@ -213,28 +169,6 @@ const authentication = async (page, email = valid_user, intercept = false) => {
   await page.setRequestInterception(intercept);
 
   await page.click("button.btn-primary");
-};
-
-const encode = async (data) => {
-  await SAML.encodeSamlPost(data.SAMLResponse, function (err, encoded) {
-    if (!err) {
-      data.SAMLResponse = encoded;
-    }
-  });
-
-  return qs.stringify(data);
-};
-
-const decode = async (request) => {
-  let post_string = request.postData();
-  let post_data = qs.parse(post_string);
-  await SAML.decodeSamlPost(post_data.SAMLResponse, function (err, result) {
-    if (!err) {
-      post_data.SAMLResponse = result;
-    }
-  });
-
-  return post_data;
 };
 
 const isError = async (page, header, errorMessage) => {
