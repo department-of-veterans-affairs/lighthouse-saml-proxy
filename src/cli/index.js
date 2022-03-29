@@ -383,11 +383,6 @@ export function processArgs() {
         required: true,
         string: true,
       },
-      idpSelectionRefactor: {
-        description: "Flag on enabling the refactored IDP login selection page",
-        requied: false,
-        default: false,
-      },
       idpSamlLoginsEnabled: {
         description: "Flag on enabling IDP logins such as login.gov",
         requied: false,

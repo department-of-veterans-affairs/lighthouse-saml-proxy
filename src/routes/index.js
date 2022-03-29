@@ -150,9 +150,6 @@ export default function configureExpress(
     req.vetsAPIClient = vetsApiClient;
     req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
-    if (argv.idpSelectionRefactor) {
-      req.options = { login_selector_v2: true };
-    }
     req.participant = getParticipant(req);
     req.requestAcsUrl = argv.spAcsUrl;
     next();
