@@ -202,16 +202,8 @@ export const handleError = (req, res) => {
 };
 
 function enabled_logingov(req) {
-  let login_gov_enabled = false;
   if (req.sps.options.logingov) {
-    if (
-      !req.sps.options.logingov.idpTemporarilyDisabled ||
-      (req.sps.options.logingov.idpActivationCookie &&
-        req.cookies &&
-        req.cookies[req.sps.options.logingov.idpActivationCookie])
-    ) {
-      login_gov_enabled = true;
-    }
+    return true;
   }
-  return login_gov_enabled;
+  return false;
 }
