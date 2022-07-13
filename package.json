@@ -96,7 +96,7 @@
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "node-sass-tilde-importer": "^1.0.2",
-    "passport": "^0.4.1",
+    "passport": "^0.6.0",
     "passport-wsfed-saml2": "^4.4.0",
     "prom-client": "^13.1.0",
     "redis": "^3.0.2",
