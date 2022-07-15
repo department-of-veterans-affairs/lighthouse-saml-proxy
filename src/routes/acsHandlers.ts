@@ -71,8 +71,10 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         state: req.query.RelayState || req.body.RelayState,
         url: getReqUrl(req, acsURL),
       };
-      if (req.session) {
-        req.session.ssoResponse = ssoResponse;
+      if (req.options) {
+        req.options.ssoResponse = ssoResponse;
+      } else {
+        req.options = { ssoResponse: ssoResponse };
       }
       const spIdpKey: string = selectPassportStrategyKey(req);
       const params = req.sps.options[spIdpKey].getResponseParams(
@@ -246,7 +248,7 @@ export const serializeAssertions = (
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
-    authOptions.RelayState = req.session.ssoResponse.state;
+    authOptions.RelayState = req.options.ssoResponse.state;
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
