@@ -57,8 +57,8 @@ build/saml:
 
 ## build/saml:	Build interim saml-proxy unit test and lint image
 .PHONY: build/saml_utlint
-build/saml : IMAGE = saml-proxy-utlint
-build/saml:
+build/saml_utlint : IMAGE = saml-proxy-utlint
+build/saml_utlint:
 	## build:	Build Docker image
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f Dockerfile.utlint \
