@@ -55,6 +55,20 @@ build/saml:
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
 
+## build/saml:	Build interim saml-proxy unit test and lint image
+.PHONY: build/saml_utlint
+build/saml : IMAGE = saml-proxy-utlint
+build/saml:
+	## build:	Build Docker image
+	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
+		-f Dockerfile.lint \
+		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
+		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
+		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
+		--build-arg VERSION=$(BUILD_VERSION) \
+		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
+		--no-cache .
+
 ## build/saml_tests:	Build saml-proxy image
 .PHONY: build/saml_tests
 build/saml_tests : IMAGE = saml-proxy-tests
