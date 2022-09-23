@@ -58,7 +58,7 @@ phases:
       - |
         make build/saml_utlint  \
          TAG=${COMMIT_HASH} \
-         IMAGE=${IMAGE}-tests \
+         IMAGE=${IMAGE}-utlint \
          BUILD_VERSION=${COMMIT_HASH} \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
