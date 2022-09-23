@@ -18,10 +18,13 @@ FROM npminstall as testandlint
 
 COPY --chown=node:node bin/ bin/
 COPY --chown=node:node src/ src/
+COPY --chown=node:node test/ test/
 COPY --chown=node:node public/ public/
 COPY --chown=node:node styles/ styles/
 COPY --chown=node:node templates/ templates/
 COPY --chown=node:node views/ views/
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node .eslintrc.yml ./
 COPY --chown=node:node tsconfig.json ./
 
 USER node
