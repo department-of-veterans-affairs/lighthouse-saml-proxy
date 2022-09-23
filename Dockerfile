@@ -1,4 +1,3 @@
-
 # Build Args
 ARG BUILD_DATE_TIME
 ARG VERSION
