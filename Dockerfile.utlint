@@ -1,4 +1,7 @@
 
+# This dockerfile is only used during ci/cd to run unit test and eslint during the ci build.
+# This image does not get published for reuse
+
 # Build Args
 ARG BUILD_DATE_TIME
 ARG VERSION
@@ -24,7 +27,7 @@ COPY --chown=node:node styles/ styles/
 COPY --chown=node:node templates/ templates/
 COPY --chown=node:node views/ views/
 COPY --chown=node:node tsconfig.json ./
-COPY --chown=node:node .eslintrc.yml ./
+COPY --chown=node:node .eslint* ./
 COPY --chown=node:node tsconfig.json ./
 
 USER node

@@ -46,6 +46,9 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
 
 USER node
 
+ENTRYPOINT ["/usr/local/bin/tini", "--"]
+CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
+
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
       org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/Dockerfile" \
@@ -61,5 +64,3 @@ LABEL org.opencontainers.image.created=${BUILD_DATE_TIME} \
       gov.va.build.number=${BUILD_NUMBER} \
       gov.va.build.tool=${BUILD_TOOL}
 
-ENTRYPOINT ["/usr/local/bin/tini", "--"]
-CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
