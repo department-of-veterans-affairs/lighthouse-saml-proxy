@@ -196,18 +196,18 @@ const login = async (page, useremail, password, get_code = false) => {
 };
 
 const authentication = async (page, email = valid_user, intercept = false) => {
-  await page.click(".idme-signin");
+  await page.$eval(".idme-signin", elem => elem.click()),
   await page.waitForSelector("#user_email");
   await page.type("#user_email", email);
   await page.type("#user_password", user_password);
-  await page.click('[name="commit"]');
+  await page.$eval('[name="commit"]', elem => elem.click());
   await page.waitForSelector(".phone");
-  await page.click("button.btn-primary");
+  await page.$eval("button.btn-primary", elem => elem.click());
   await page.waitForSelector("#multifactor_code");
 
   await page.setRequestInterception(intercept);
 
-  await page.click("button.btn-primary");
+  await page.$eval("button.btn-primary", elem => elem.click());
 };
 
 const encode = async (data) => {
