@@ -15,5 +15,5 @@ services:
     ports:
       - '7000:7000'
     volumes:
-      - ./dev-config.json:/etc/saml-proxy/config.json
+      - ./dev-config.json:/etc/saml-proxy/config.json:z
     command: "node build/app.js --config /etc/saml-proxy/config.json"
