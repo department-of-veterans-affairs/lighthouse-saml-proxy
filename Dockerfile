@@ -49,6 +49,21 @@ USER node
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
 
+FROM npminstall as testandlint
+
+COPY --chown=node:node bin/ bin/
+COPY --chown=node:node src/ src/
+COPY --chown=node:node test/ test/
+COPY --chown=node:node public/ public/
+COPY --chown=node:node styles/ styles/
+COPY --chown=node:node templates/ templates/
+COPY --chown=node:node views/ views/
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node .eslint* ./
+COPY --chown=node:node tsconfig.json ./
+
+USER node
+
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
       org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/Dockerfile" \

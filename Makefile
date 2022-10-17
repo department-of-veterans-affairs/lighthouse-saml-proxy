@@ -48,6 +48,7 @@ build/saml:
 	## build:	Build Docker image
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		-f Dockerfile \
+		--target deploy \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
 		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
 		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
@@ -61,7 +62,8 @@ build/saml_utlint : IMAGE = saml-proxy-utlint
 build/saml_utlint:
 	## build:	Build Docker image
 	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
-		-f Dockerfile.utlint \
+		-f Dockerfile \
+		--target testandlint \
 		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
 		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
 		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
