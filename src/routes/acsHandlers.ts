@@ -60,6 +60,12 @@ const sufficientLevelOfAssurance = (claims: any) => {
 
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+    const handleError = (arg1: any, arg2: any, err: any, status: any) => {
+      logger.error(err.message);
+      logger.error(status);
+      // logger.warn(arg4);
+      return res.redirect("/samlproxy/sp/error");
+    };
     logRelayState(req, logger, "from IDP");
     if (
       ((req.method === "GET" || req.method === "POST") &&
@@ -83,7 +89,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       const strategyOptions = req.strategies.get(spIdpKey)?.options;
       assignIn(strategyOptions, params);
       const passport = preparePassport(req.strategies.get(spIdpKey));
-      passport.authenticate("wsfed-saml2", params)(req, res, next);
+      passport.authenticate("wsfed-saml2", params, handleError)(req, res, next);
     } else {
       res.render("error.hbs", {
         request_id: rTracer.id(),
