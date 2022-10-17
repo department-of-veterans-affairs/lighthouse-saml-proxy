@@ -28,12 +28,16 @@ const handleMetadata = (argv) => {
         // different provider metadata notation requires look up by an active key or falling back to the first entry by default
         let signingKeyCert;
         signingKeyCert = metadata.signingKeys.find(
-          (sKeyCert) => sKeyCert.active === true
+          (sKeyCert) => !sKeyCert.active
         );
         if (signingKeyCert) {
+          //id.me
           argv.spIdpCert = cli.certToPEM(signingKeyCert.cert);
-        } else if (metadata.signingKeys[0]) {
-          argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0].cert);
+        } else if (metadata.signingKeys[1]) {
+          // normally login.gov
+          argv.spIdpCert = cli.certToPEM(metadata.signingKeys[1].cert);
+          logger.info("Cert misalignment error");
+          logger.info(`Metadata protocol ${metadata.protocol}`);
         }
       }
       switch (metadata.protocol) {
@@ -118,6 +122,10 @@ function runServer(argv) {
 }
 
 function main() {
+  // let argv = cli.processArgs();
+  // setInterval(() => {
+  //   runServer(cli.processArgs());
+  // }, 3000);
   runServer(cli.processArgs());
 }
 
