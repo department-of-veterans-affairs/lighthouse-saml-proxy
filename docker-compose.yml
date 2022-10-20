@@ -12,8 +12,9 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+      target: deploy
     ports:
       - '7000:7000'
     volumes:
-      - ./dev-config.json:/etc/saml-proxy/config.json
+      - ./dev-config.json:/etc/saml-proxy/config.json:Z
     command: "node build/app.js --config /etc/saml-proxy/config.json"
