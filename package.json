@@ -76,7 +76,7 @@
     "@types/request": "^2.48.5",
     "@types/request-promise-native": "^1.0.17",
     "@types/xml2js": "^0.4.8",
-    "@xmldom/xmldom": "^0.7.5",
+    "@xmldom/xmldom": "^0.7.6",
     "acorn": "^8.1.1",
     "body-parser": "^1.19.0",
     "btoa": "^1.2.1",
