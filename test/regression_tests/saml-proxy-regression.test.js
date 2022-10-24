@@ -234,7 +234,7 @@ const decode = async (request) => {
 
 const isError = async (page, header, errorMessage) => {
   const heading = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading",
+    ".usa-alert-body > .usa-alert__heading",
     (elem) => elem.innerText
   );
   expect(heading).toEqual(header);
@@ -246,7 +246,7 @@ const isError = async (page, header, errorMessage) => {
   expect(errorText).toEqual(errorMessage);
 
   const errorIdHeadding = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading:nth-of-type(2)",
+    ".usa-alert-body > .usa-alert__heading:nth-of-type(2)",
     (elem) => elem.innerText
   );
   expect(errorIdHeadding).toEqual("Error ID");
@@ -260,7 +260,7 @@ const isError = async (page, header, errorMessage) => {
 
 const isSensitiveError = async (page) => {
   const heading = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading",
+    ".usa-alert-body > .usa-alert__heading",
     (elem) => elem.innerText
   );
   expect(heading).toEqual("Error");
@@ -272,7 +272,7 @@ const isSensitiveError = async (page) => {
   expect(errorText).toEqual("Your request could not be processed.");
 
   const errorIdHeadding = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading:nth-of-type(2)",
+    ".usa-alert-body > .usa-alert__heading:nth-of-type(2)",
     (elem) => elem.innerText
   );
   expect(errorIdHeadding).toEqual("Error ID");
