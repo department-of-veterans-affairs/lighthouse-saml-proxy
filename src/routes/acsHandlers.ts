@@ -5,7 +5,7 @@ import { preparePassport } from "./passport";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
-import samlp from "samlp";
+import samlp, { auth } from "samlp";
 import * as url from "url";
 import logger from "../logger";
 import {
