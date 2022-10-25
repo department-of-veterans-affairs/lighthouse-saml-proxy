@@ -110,21 +110,21 @@ describe("Regression tests", () => {
   test("Empty SSO", async () => {
     const page = await browser.newPage();
     await page.goto(`${saml_proxy_url}/samlproxy/idp/saml/sso`);
-    await page.waitForSelector(".usa-alert-error");
+    await page.waitForSelector(".usa-alert--error");
     await isSensitiveError(page);
   });
 
   test("Empty Assertion Response", async () => {
     const page = await browser.newPage();
     await page.goto(`${saml_proxy_url}/samlproxy/sp/saml/sso`);
-    await page.waitForSelector(".usa-alert-error");
+    await page.waitForSelector(".usa-alert--error");
     await isError(page, "Error", "Invalid assertion response.");
   });
 
   test("404", async () => {
     const page = await browser.newPage();
     await page.goto(`${saml_proxy_url}/samlproxy/bad`);
-    await page.waitForSelector(".usa-alert-error");
+    await page.waitForSelector(".usa-alert--error");
     await isError(page, "Error", "Route Not Found");
   });
 
@@ -159,7 +159,7 @@ describe("Regression tests", () => {
       }
     });
 
-    await page.waitForSelector(".usa-alert-error");
+    await page.waitForSelector(".usa-alert--error");
 
     await isSensitiveError(page);
   });
