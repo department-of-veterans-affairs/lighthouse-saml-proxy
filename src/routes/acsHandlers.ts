@@ -5,7 +5,7 @@ import { preparePassport } from "./passport";
 
 import { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
-import samlp, { auth } from "samlp";
+import samlp from "samlp";
 import * as url from "url";
 import logger from "../logger";
 import {
@@ -61,12 +61,12 @@ const sufficientLevelOfAssurance = (claims: any) => {
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const authenticateCB = (arg1: any, arg2: any, err: any, status: any) => {
-      if (Object.keys(err).length != 0) {
+      if (err.message) {
         logger.error(err.message);
         logger.error(status);
         return res.redirect("/samlproxy/sp/error");
       } else {
-        // logger.info(arg2); //user obj like below can be deleted 
+        // logger.info(arg2); //user obj like below can be deleted
         /*
   "level": "info",
   "message": {
