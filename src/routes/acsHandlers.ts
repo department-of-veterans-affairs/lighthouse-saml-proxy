@@ -60,44 +60,22 @@ const sufficientLevelOfAssurance = (claims: any) => {
 
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
-    const authenticateCB = (arg1: any, arg2: any, err: any, status: any) => {
+    const authenticateCallBack = (
+      arg1: any,
+      userInfo: any,
+      err: any,
+      status: any
+    ) => {
       if (err.message) {
         logger.error(err.message);
         logger.error(status);
         return res.redirect("/samlproxy/sp/error");
-      } else {
-        // logger.info(arg2); //user obj like below can be deleted
-        /*
-  "level": "info",
-  "message": {
-    "authnContext": {
-      "authnMethod": "http://idmanagement.gov/ns/assurance/loa/3",
-      "sessionIndex": "_504a0d848a564632aec554ed389011f4"
-    },
-    "claims": {
-      "dateOfBirth": "****-10-30",
-      "email": "va.api.user+idme.003@gmail.com",
-      "firstName": "RALPH",
-      "gender": "male",
-      "idp": "id_me",
-      "lastName": "LE",
-      "level_of_assurance": "3",
-      "middleName": "E",
-      "multifactor": "true",
-      "ssn": "79637****",
-      "uuid": "ccb134182ad14a82b53083e3cb2e****"
-    },
-    "issuer": "api.idmelabs.com",
-    "nameIdFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-    "userName": "ccb134182ad14a82b53083e3cb2e****"
-  },
-  "request_id": "a3daddd0-53d6-11ed-****-8bf0d484f72c",
-  "service": "saml-proxy",
-  "time": "2022-10-24T20:01:42.155Z"
-}*/
-        req.user = arg2;
-        next();
       }
+      // userInfo contains the user object returned from the SAML identity provider,
+      // in this case the happy path should simply pass forward the user identity
+      // in the request which be validated later in the execution flow.
+      req.user = userInfo;
+      next();
     };
     logRelayState(req, logger, "from IDP");
     if (
@@ -122,7 +100,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       const strategyOptions = req.strategies.get(spIdpKey)?.options;
       assignIn(strategyOptions, params);
       const passport = preparePassport(req.strategies.get(spIdpKey));
-      passport.authenticate("wsfed-saml2", params, authenticateCB)(
+      passport.authenticate("wsfed-saml2", params, authenticateCallBack)(
         req,
         res,
         next
