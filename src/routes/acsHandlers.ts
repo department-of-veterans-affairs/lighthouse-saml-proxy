@@ -1,4 +1,4 @@
-import { SP_VERIFY } from "./constants";
+import { SP_VERIFY, SP_ERROR_URL } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -60,6 +60,23 @@ const sufficientLevelOfAssurance = (claims: any) => {
 
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
+    const authenticateCallBack = (
+      _1: any,
+      userInfo: any,
+      err: any,
+      status: any
+    ) => {
+      if (err.message) {
+        logger.error(err.message);
+        logger.error(status);
+        return res.redirect(SP_ERROR_URL);
+      }
+      // userInfo contains the user object returned from the SAML identity provider,
+      // in this case the happy path should simply pass forward the user identity
+      // in the request which be validated later in the execution flow.
+      req.user = userInfo;
+      next();
+    };
     logRelayState(req, logger, "from IDP");
     if (
       ((req.method === "GET" || req.method === "POST") &&
@@ -83,7 +100,11 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       const strategyOptions = req.strategies.get(spIdpKey)?.options;
       assignIn(strategyOptions, params);
       const passport = preparePassport(req.strategies.get(spIdpKey));
-      passport.authenticate("wsfed-saml2", params)(req, res, next);
+      passport.authenticate("wsfed-saml2", params, authenticateCallBack)(
+        req,
+        res,
+        next
+      );
     } else {
       res.render("error.hbs", {
         request_id: rTracer.id(),

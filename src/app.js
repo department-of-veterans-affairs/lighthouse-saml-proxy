@@ -25,6 +25,7 @@ const handleMetadata = (argv) => {
     if (metadata.protocol) {
       argv.spProtocol = metadata.protocol;
       if (metadata.signingKeys) {
+        // different provider metadata notation requires look up by an active key or falling back to the first entry by default
         let signingKeyCert;
         signingKeyCert = metadata.signingKeys.find(
           (sKeyCert) => sKeyCert.active === true
