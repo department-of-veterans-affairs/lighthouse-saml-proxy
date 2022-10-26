@@ -25,15 +25,14 @@ const handleMetadata = (argv) => {
     if (metadata.protocol) {
       argv.spProtocol = metadata.protocol;
       if (metadata.signingKeys) {
+        // different provider metadata notation requires look up by an active key or falling back to the first entry by default
         let signingKeyCert;
         signingKeyCert = metadata.signingKeys.find(
           (sKeyCert) => sKeyCert.active === true
         );
         if (signingKeyCert) {
-          //id.me
           argv.spIdpCert = cli.certToPEM(signingKeyCert.cert);
         } else if (metadata.signingKeys[0]) {
-          // normally login.gov
           argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0].cert);
         }
       }
