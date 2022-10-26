@@ -1,4 +1,4 @@
-import { SP_VERIFY } from "./constants";
+import { SP_VERIFY, SP_ERROR_URL } from "./constants";
 import { getReqUrl, logRelayState } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -69,7 +69,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       if (err.message) {
         logger.error(err.message);
         logger.error(status);
-        return res.redirect("/samlproxy/sp/error");
+        return res.redirect(SP_ERROR_URL);
       }
       // userInfo contains the user object returned from the SAML identity provider,
       // in this case the happy path should simply pass forward the user identity
