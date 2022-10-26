@@ -61,7 +61,7 @@ const sufficientLevelOfAssurance = (claims: any) => {
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const authenticateCallBack = (
-      arg1: any,
+      _1: any,
       userInfo: any,
       err: any,
       status: any
