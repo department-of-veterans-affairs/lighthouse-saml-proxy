@@ -31,10 +31,8 @@ const handleMetadata = (argv) => {
           (sKeyCert) => sKeyCert.active === true
         );
         if (signingKeyCert) {
-          //id.me
           argv.spIdpCert = cli.certToPEM(signingKeyCert.cert);
         } else if (metadata.signingKeys[0]) {
-          // normally login.gov
           argv.spIdpCert = cli.certToPEM(metadata.signingKeys[0].cert);
         }
       }
