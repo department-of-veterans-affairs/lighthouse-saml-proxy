@@ -49,9 +49,8 @@ export const samlLogin = function (template) {
       relayState == "" ||
       !relayState.startsWith("%2Foauth2%2F")
     ) {
-      const relayStateDesc = !relayState.startsWith("%2Foauth2%2F")
-        ? "Invalid"
-        : "Empty";
+      const relayStateDesc =
+        relayState == null || relayState == "" ? "Empty" : "Invalid";
       let logMessage =
         template === "verify"
           ? relayStateDesc + " relay state during verify. Invalid request."
