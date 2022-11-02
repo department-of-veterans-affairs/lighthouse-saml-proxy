@@ -44,11 +44,17 @@ export const samlLogin = function (template) {
         ? authnRequest.relayState
         : req.query?.RelayState;
     }
-    if (relayState == null || relayState == "") {
+    if (
+      relayState == null ||
+      relayState == "" ||
+      !relayState.startsWith("%2Foauth2%2F")
+    ) {
+      const relayStateDesc =
+        relayState == null || relayState == "" ? "Empty" : "Invalid";
       let logMessage =
         template === "verify"
-          ? "Empty relay state during verify. Invalid request."
-          : "Empty relay state. Invalid request.";
+          ? relayStateDesc + " relay state during verify. Invalid request."
+          : relayStateDesc + " relay state. Invalid request.";
       logger.error(logMessage);
       throw {
         message: "Error: " + logMessage,
