@@ -290,6 +290,39 @@ describe("samlLogin", () => {
     }
   });
 
+  it("Invalid relay state with authnRequest", async () => {
+    mockRequest.authnRequest = {
+      relayState: "theRelayState",
+    };
+
+    mockResponse.render = function render(template, authOptions) {
+      return promise2check(
+        "login_selection",
+        expected_authoptions,
+        template,
+        authOptions
+      );
+    };
+
+    samlp.mockImplementation(() => {
+      return {
+        getSamlRequestUrl: mockGetSamlRequestUrl,
+      };
+    });
+
+    const doLogin = samlLogin("login_selection");
+    let thrownError;
+    try {
+      doLogin(mockRequest, mockResponse, mockNext);
+      fail("Should not reach here");
+    } catch (err) {
+      thrownError = err;
+    }
+    expect(thrownError.message).toEqual(
+      "Error: Invalid relay state. Invalid request."
+    );
+  });
+
   it("Happy Path login_gov_enabled", async () => {
     mockRequest.authnRequest = {
       relayState: "%2Foauth2%2FtheRelayState",
