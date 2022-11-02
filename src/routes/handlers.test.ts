@@ -264,7 +264,7 @@ describe("samlLogin", () => {
 
   it("Happy Path with authnRequest", async () => {
     mockRequest.authnRequest = {
-      relayState: "theRelayState",
+      relayState: "%2Foauth2%2FtheRelayState",
     };
 
     mockResponse.render = function render(template, authOptions) {
@@ -292,7 +292,7 @@ describe("samlLogin", () => {
 
   it("Happy Path login_gov_enabled", async () => {
     mockRequest.authnRequest = {
-      relayState: "theRelayState",
+      relayState: "%2Foauth2%2FtheRelayState",
     };
 
     mockRequest.sps.options = spOptionsJustwithLoginGov;
@@ -321,7 +321,7 @@ describe("samlLogin", () => {
 
   it("samlp.getSamlRequestUrl errors", async () => {
     mockRequest.authnRequest = {
-      relayState: "theRelayState",
+      relayState: "%2Foauth2%2FtheRelayState",
     };
     const render = jest.fn();
 
@@ -362,7 +362,7 @@ describe("samlLogin", () => {
       };
     });
     mockRequest.authnRequest = null;
-    mockRequest.query.RelayState = "theRelayState";
+    mockRequest.query.RelayState = "%2Foauth2%2FtheRelayState";
     const verify = samlLogin("verify");
     try {
       verify(mockRequest, mockResponse, mockNext);
@@ -388,7 +388,7 @@ describe("samlLogin", () => {
       };
     });
     mockRequest.authnRequest = null;
-    mockRequest.query.RelayState = "theRelayState"; //this really comes from the session, not a query param
+    mockRequest.query.RelayState = "%2Foauth2%2FtheRelayState"; //this really comes from the session, not a query param
     const verify = samlLogin("failureToProof");
     try {
       verify(mockRequest, mockResponse, mockNext);
