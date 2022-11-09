@@ -61,7 +61,11 @@ const sufficientLevelOfAssurance = (claims: any) => {
 export const buildPassportLoginHandler = (acsURL: string) => {
   return (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     const authenticateCallBack = (
+<<<<<<< HEAD
       _1: any,
+=======
+      arg1: any,
+>>>>>>> acsHandlers Pr comment
       userInfo: any,
       err: any,
       status: any
@@ -69,7 +73,11 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       if (err.message) {
         logger.error(err.message);
         logger.error(status);
+<<<<<<< HEAD
         return res.redirect(SP_ERROR_URL);
+=======
+        return res.redirect("/samlproxy/sp/error");
+>>>>>>> acsHandlers Pr comment
       }
       // userInfo contains the user object returned from the SAML identity provider,
       // in this case the happy path should simply pass forward the user identity
