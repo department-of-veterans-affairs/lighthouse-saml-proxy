@@ -124,6 +124,8 @@ okta*.key
 saml-proxy*.key
 test/test.css
 
+test/regression_test/local.txt
+
 # Typescript build
 build/
 test-report.xml

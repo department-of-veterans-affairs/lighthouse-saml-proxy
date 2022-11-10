@@ -13,7 +13,7 @@
   "author": "Pivot!",
   "license": "ISC",
   "dependencies": {
-    "@xmldom/xmldom": "^0.7.6",
+    "@xmldom/xmldom": "^0.7.9",
     "jest": "^27.0.4",
     "puppeteer": "^13.3.0",
     "querystring": "^0.2.1",
