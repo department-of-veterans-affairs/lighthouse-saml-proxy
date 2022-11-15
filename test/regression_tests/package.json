@@ -17,7 +17,7 @@
     "jest": "^27.0.4",
     "puppeteer": "^13.3.0",
     "querystring": "^0.2.1",
-    "saml-attacks": "/Users/larrycrochetjr/Documents/devel/va/lighthouse-saml-utils",
+    "saml-attacks": "github:department-of-veterans-affairs/lighthouse-saml-utils",
     "saml-encoder-decoder-js": "^1.0.1",
     "uuid": "^8.3.2"
   },
