@@ -56,6 +56,7 @@ dev-config.json
 ```
 
 `idpAcsUrl`, `idpIssuer`, `idpAudience`, and `idBaseUrl` are all configuration provided by the IDP.
+`styleLogs` is a optional config that can be added to disable all logs related to styling elements like (png, css, woff etc) for local development  (to disable logs set to false)
 
 A functional dev-config file can be found in the [saml-proxy-configs](https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy-configs) repository. Fields with the `FIX_ME` value must be replaced with real values.
 
