@@ -106,7 +106,10 @@ export default function configureExpress(
    * Middleware
    */
   app.use(rTracer.expressMiddleware());
-  if (argv.styleLogs == null || argv.styleLogs == true) {
+  if (
+    argv.logStyleElementsEnabled == null ||
+    argv.logStyleElementsEnabled == true
+  ) {
     app.use(
       morganMiddleware({
         skip: function (req, res) {
