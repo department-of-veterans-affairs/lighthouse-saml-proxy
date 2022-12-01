@@ -106,16 +106,21 @@ export default function configureExpress(
    * Middleware
    */
   app.use(rTracer.expressMiddleware());
-  app.use(
-    morganMiddleware({
-      skip: function (req, res) {
-        return (
-          req.path.startsWith("/samlproxy/idp/bower_components") ||
-          req.path.startsWith("/samlproxy/idp/css")
-        );
-      },
-    })
-  );
+  if (
+    argv.logStyleElementsEnabled == null ||
+    argv.logStyleElementsEnabled == true
+  ) {
+    app.use(
+      morganMiddleware({
+        skip: function (req, res) {
+          return (
+            req.path.startsWith("/samlproxy/idp/bower_components") ||
+            req.path.startsWith("/samlproxy/idp/css")
+          );
+        },
+      })
+    );
+  }
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
