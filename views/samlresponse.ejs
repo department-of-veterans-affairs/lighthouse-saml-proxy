@@ -3,11 +3,11 @@
     <title>Keep Calm and Single Sign-On!</title>
 </head>
 <body>
-    <form method="post" name="hiddenform" action="{{AcsUrl}}">
+    <form method="post" name="hiddenform" action="<% AcsUrl %> ">
         <input type="hidden"
                name="SAMLResponse"
-               value="{{SAMLResponse}}">
-        <input type="hidden" name="RelayState" value="{{RelayState}}">
+               value="<% SAMLResponse %> ">
+        <input type="hidden" name="RelayState" value="<% RelayState %> ">
         <noscript>
             <p>JavaScript is disabled. Click Submit to continue.</p>
             <input type="submit" value="Submit">
