@@ -89,7 +89,7 @@ export default function configureExpress(
    */
 
   app.set("view engine", "ejs");
-  app.set("view options", { layout: "layout" });
+  // app.set("view options", { layout: "layout" });
   if (useSentry) {
     app.use(
       Sentry.Handlers.requestHandler({

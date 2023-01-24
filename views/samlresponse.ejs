@@ -3,11 +3,11 @@
     <title>Keep Calm and Single Sign-On!</title>
 </head>
 <body>
-    <form method="post" name="hiddenform" action="<% AcsUrl %> ">
+    <form method="post" name="hiddenform" action="<% acs_url %> ">
         <input type="hidden"
                name="SAMLResponse"
-               value="<%= SAMLResponse =%>">
-        <input type="hidden" name="RelayState" value="<% RelayState %> ">
+               value="<% saml_response %>">
+        <input type="hidden" name="RelayState" value="<% relay_state %> ">
         <noscript>
             <p>JavaScript is disabled. Click Submit to continue.</p>
             <input type="submit" value="Submit">

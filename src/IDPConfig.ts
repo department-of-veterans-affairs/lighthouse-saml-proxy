@@ -126,10 +126,11 @@ export default class IDPConfig implements IdPOptions {
     res: Response,
     next: NextFunction
   ) {
-    res.render("samlresponse", {
-      AcsUrl: opts.postUrl,
-      SAMLResponse: response.toString("base64"),
-      RelayState: opts.RelayState,
-    });
+    const payload = {
+      acs_url: opts.postUrl,
+      saml_response: response.toString("base64"),
+      relay_state: opts.RelayState,
+    };
+    res.render("samlresponse", payload);
   }
 }

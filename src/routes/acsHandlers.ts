@@ -107,7 +107,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       );
     } else {
       res.render("layout", {
-        body: "error.hbs",
+        body: "error",
         request_id: rTracer.id(),
         message: "Invalid assertion response.",
       });
