@@ -17,7 +17,6 @@ import {
   logger,
 } from "../logger";
 import addRoutes from "./routes";
-import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
@@ -67,7 +66,6 @@ export default function configureExpress(
     });
   }
 
-  const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
     includeMethod: true,
     includePath: true,
@@ -90,9 +88,8 @@ export default function configureExpress(
    * View Engine
    */
 
-  app.set("view engine", "hbs");
+  app.set("view engine", "ejs");
   app.set("view options", { layout: "layout" });
-  app.engine("handlebars", hbs.__express);
   if (useSentry) {
     app.use(
       Sentry.Handlers.requestHandler({

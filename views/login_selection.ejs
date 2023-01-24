@@ -7,7 +7,7 @@
 <div class="usa-grid login-selection">
   <div class="usa-width-one-half">
     <% if (login_gov_enabled) { %>
-    <a class="no-external-icon usa-button logingov-signin" href="<% login_gov_login_link %>">
+    <a class="no-external-icon usa-button logingov-signin" href="<%- login_gov_login_link -%>">
       <svg
         role="img"
         viewBox="0 0 114 15"
@@ -50,7 +50,7 @@
       </svg>
     </a>
     <% } %>
-    <a class="no-external-icon usa-button idme-signin" href="<% id_me_login_link %>">
+    <a class="no-external-icon usa-button idme-signin" href="<%- id_me_login_link -%>">
       <svg
         role="img"
         xmlns="http://www.w3.org/2000/svg"
@@ -75,8 +75,8 @@
         </g>
       </svg>
     </a>
-    <a class="no-external-icon usa-button dslogon" href="<% dslogon_login_link %>">DS Logon</a>
-    <a class="no-external-icon usa-button mhv" href="<%  mhv_login_link %>">My HealtheVet</a>
+    <a class="no-external-icon usa-button dslogon" href="<%- dslogon_login_link -%>">DS Logon</a>
+    <a class="no-external-icon usa-button mhv" href="<%-  mhv_login_link -%>">My HealtheVet</a>
   </div>
   <div class="usa-width-one-half login-help">
     <h4>Having trouble signing in?</h4>
@@ -87,13 +87,13 @@
   <div class="usa-grid idme-signup-footer">
     <div class="usa-width-one-half">
       <h4>Don't have these accounts?</h4>
-      <% #if login_gov_signup_link_enabled %>
+      <% if (login_gov_signup_link_enabled) { %>
       <div>
-        <a href="<% login_gov_signup_link  %>">Create an account with Login.gov</a>
+        <a href="<%- login_gov_signup_link -%>">Create an account with Login.gov</a>
       </div>  
-      <% /if %>
+      <% } %>
       <div>  
-        <a href="<% id_me_signup_link  %>">Create an account with ID.me</a>
+        <a href="<%- id_me_signup_link -%>">Create an account with ID.me</a>
       </div>
     </div>
   </div>
