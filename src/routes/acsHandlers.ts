@@ -24,9 +24,9 @@ const unknownUsersErrorTemplate = (error: any) => {
     error.name == "StatusCodeError" &&
     error.statusCode.toString() === "404"
   ) {
-    return "internalFailure.hbs";
+    return "internal_failure";
   } else {
-    return "icnError.hbs";
+    return "icn_error";
   }
 };
 
@@ -106,7 +106,8 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         next
       );
     } else {
-      res.render("error.hbs", {
+      res.render("layout", {
+        body: "error.hbs",
         request_id: rTracer.id(),
         message: "Invalid assertion response.",
       });
@@ -163,9 +164,11 @@ export const loadICN = async (
         action,
         result: "failure",
       });
-      res.render(unknownUsersErrorTemplate(mviError), {
+      const error_payload = {
+        body: unknownUsersErrorTemplate(mviError),
         request_id: rTracer.id(),
-      });
+      };
+      res.render("layout", error_payload);
     }
   }
 };
@@ -233,7 +236,10 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
       const sessionIndex = req?.user?.authnContext?.sessionIndex;
       if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
-        return res.render("sensitive_error", { request_id: rTracer.id() });
+        return res.render("layout", {
+          body: "sensitive_error",
+          request_id: rTracer.id(),
+        });
       }
       let sessionIndexCached = null;
       sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
@@ -248,7 +254,10 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
             sessionIndex +
             " was previously cached."
         );
-        return res.render("sensitive_error", { request_id: rTracer.id() });
+        return res.render("layout", {
+          body: "sensitive_error",
+          request_id: rTracer.id(),
+        });
       }
       // Set the session index to expire after 6hrs, or 21600 seconds.
       await cache.set(sessionIndex, "", "EX", 21600);

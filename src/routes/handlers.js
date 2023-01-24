@@ -205,7 +205,11 @@ export const acsFactory = (app, acsUrl, cache, cacheEnabled) => {
 
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
-  res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
+  const error_payload = {
+    body: urlUserErrorTemplate(req),
+    request_id: rTracer.id(),
+  };
+  res.render("layout", error_payload);
 };
 
 function enabled_logingov(req) {
