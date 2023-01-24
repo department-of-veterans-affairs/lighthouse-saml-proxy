@@ -33,7 +33,7 @@ const unknownUsersErrorTemplate = (error: any) => {
 export const urlUserErrorTemplate = () => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-  return "sensitiveError.hbs";
+  return "sensitive_error";
 };
 
 // This depends on being called after buildPassportLoginHandler because it uses
@@ -233,7 +233,7 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
       const sessionIndex = req?.user?.authnContext?.sessionIndex;
       if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
-        return res.render("sensitiveError.hbs", { request_id: rTracer.id() });
+        return res.render("sensitive_error", { request_id: rTracer.id() });
       }
       let sessionIndexCached = null;
       sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
@@ -248,7 +248,7 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
             sessionIndex +
             " was previously cached."
         );
-        return res.render("sensitiveError.hbs", { request_id: rTracer.id() });
+        return res.render("sensitive_error", { request_id: rTracer.id() });
       }
       // Set the session index to expire after 6hrs, or 21600 seconds.
       await cache.set(sessionIndex, "", "EX", 21600);
