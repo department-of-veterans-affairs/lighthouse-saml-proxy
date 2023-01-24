@@ -1,5 +1,5 @@
 import { SP_VERIFY, SP_ERROR_URL } from "./constants";
-import { getReqUrl, logRelayState } from "../utils";
+import { getReqUrl, logRelayState, accessiblePhoneNumber } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
 
@@ -167,6 +167,8 @@ export const loadICN = async (
       const error_payload = {
         body: unknownUsersErrorTemplate(mviError),
         request_id: rTracer.id(),
+        my_va_333: accessiblePhoneNumber("1-844-698-2311"),
+        hearing_loss_number: accessiblePhoneNumber("TTY: 711"),
       };
       res.render("layout", error_payload);
     }

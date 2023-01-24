@@ -39,7 +39,7 @@ export function logRelayState(req, logger, step) {
   );
 }
 
-export function accessible_phone_number(digitString) {
+export function accessiblePhoneNumber(digitString) {
   var digits = digitString.split("").filter(function (ch) {
     return "0123456789".indexOf(ch) !== -1;
   });
