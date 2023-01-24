@@ -1,6 +1,6 @@
 require("jest");
 
-import { getReqUrl, removeHeaders, sassMiddleware } from "../src/utils";
+import { getReqUrl, removeHeaders, sassMiddleware, accessible_phone_number } from "../src/utils";
 import { defaultMockRequest } from "./testUtils";
 import { idpCert } from "./testCerts";
 import path from "path";
@@ -68,6 +68,12 @@ describe("Tests for utils.js", () => {
     return middleware({ path: "/file.css" }, undefined).then(() => {
       expect(sMiddlewareMockLog).toHaveBeenCalledWith("css already rendered");
     });
+  });
+
+  test("Test accessible_phone_number", () => {
+    const numberString = "1-844-698-2311";
+    const result = accessible_phone_number(numberString);
+    expect (result).toBe("<a href=\"tel:18446982311\" aria-label=\" 1. 8 4 4. 6 9 8. 2 3 1 1.\">1-844-698-2311</a>");
   });
 
   test("Test for getReqUrl", () => {

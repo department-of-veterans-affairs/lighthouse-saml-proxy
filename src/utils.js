@@ -39,6 +39,40 @@ export function logRelayState(req, logger, step) {
   );
 }
 
+export function accessible_phone_number(digitString) {
+  var digits = digitString.split("").filter(function (ch) {
+    return "0123456789".indexOf(ch) !== -1;
+  });
+  var justDigitsString = digits.join("");
+
+  var ariaLabelParts = [];
+  var consumeDigits = function (segLen) {
+    if (digits.length == 0) {
+      // no-op
+    } else if (digits.length >= segLen) {
+      ariaLabelParts.unshift(".");
+      for (var idx = 0; idx < segLen; idx++) {
+        ariaLabelParts.unshift(digits.pop());
+        ariaLabelParts.unshift(" ");
+      }
+    } else {
+      ariaLabelParts.unshift(".");
+      while (digits.length > 0) {
+        ariaLabelParts.unshift(digits.pop());
+        ariaLabelParts.unshift(" ");
+      }
+    }
+  };
+
+  consumeDigits(4);
+  consumeDigits(3);
+  consumeDigits(3);
+  consumeDigits(999);
+
+  var ariaLabelString = ariaLabelParts.join("");
+  return `<a href="tel:${justDigitsString}" aria-label="${ariaLabelString}">${digitString}</a>`;
+}
+
 /*
  * Cache of previously rendered CSS files.
  */
