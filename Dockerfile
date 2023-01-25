@@ -19,7 +19,6 @@ COPY --chown=node:node bin/ bin/
 COPY --chown=node:node src/ src/
 COPY --chown=node:node public/ public/
 COPY --chown=node:node styles/ styles/
-COPY --chown=node:node templates/ templates/
 COPY --chown=node:node views/ views/
 COPY --chown=node:node tsconfig.json ./
 RUN ./node_modules/.bin/tsc
@@ -34,7 +33,6 @@ COPY --chown=node:node *.key ./
 COPY --from=tscbuild --chown=node:node /home/node/bin/ ./bin/
 COPY --from=tscbuild --chown=node:node /home/node/public/ ./public/
 COPY --from=tscbuild --chown=node:node /home/node/styles/ ./styles/
-COPY --from=tscbuild --chown=node:node /home/node/templates/ ./templates/
 COPY --from=tscbuild --chown=node:node /home/node/views/ ./views/
 COPY --from=tscbuild --chown=node:node /home/node/node_modules/ ./node_modules/
 COPY --from=tscbuild --chown=node:node /home/node/build/ ./build/
@@ -56,7 +54,6 @@ COPY --chown=node:node src/ src/
 COPY --chown=node:node test/ test/
 COPY --chown=node:node public/ public/
 COPY --chown=node:node styles/ styles/
-COPY --chown=node:node templates/ templates/
 COPY --chown=node:node views/ views/
 COPY --chown=node:node tsconfig.json ./
 COPY --chown=node:node .eslint* ./
