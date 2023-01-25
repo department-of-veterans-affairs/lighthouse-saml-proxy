@@ -110,6 +110,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         body: "error",
         request_id: rTracer.id(),
         message: "Invalid assertion response.",
+        wrapper_tags: accessiblePhoneNumber,
       });
     }
   };

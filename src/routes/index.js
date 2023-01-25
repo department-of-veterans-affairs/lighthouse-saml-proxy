@@ -5,7 +5,7 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
-import { sassMiddleware } from "../utils";
+import { sassMiddleware, accessiblePhoneNumber } from "../utils";
 import sass from "sass";
 import tildeImporter from "node-sass-tilde-importer";
 import { v4 as uuidv4 } from "uuid";
@@ -207,6 +207,7 @@ export default function configureExpress(
         body: res.statusCode == 404 ? "error" : "sensitive_error",
         message: errMessage,
         request_id: rTracer.id(),
+        wrapper_tags: accessiblePhoneNumber,
       };
       res.render("layout", error_payload);
     }
