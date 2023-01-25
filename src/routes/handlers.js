@@ -1,4 +1,9 @@
-import { getPath, getReqUrl, logRelayState } from "../utils";
+import {
+  getPath,
+  getReqUrl,
+  logRelayState,
+  accessiblePhoneNumber,
+} from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import {
@@ -208,6 +213,7 @@ export const handleError = (req, res) => {
   const error_payload = {
     body: urlUserErrorTemplate(req),
     request_id: rTracer.id(),
+    wrapper_tags: accessiblePhoneNumber,
   };
   res.render("layout", error_payload);
 };
