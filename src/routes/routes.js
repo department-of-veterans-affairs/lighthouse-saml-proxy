@@ -41,7 +41,7 @@ export default function addRoutes(
 
   app.get(SP_METADATA_URL, function (req, res, next) {
     res.set("Content-Type", "text/xml");
-    res.render("metadata", spConfigs.id_me.getMetadataParams(req));
+    res.render("xml_template/metadata", spConfigs.id_me.getMetadataParams(req));
   });
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
