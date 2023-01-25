@@ -167,8 +167,7 @@ export const loadICN = async (
       const error_payload = {
         body: unknownUsersErrorTemplate(mviError),
         request_id: rTracer.id(),
-        my_va_333: accessiblePhoneNumber("1-844-698-2311"),
-        hearing_loss_number: accessiblePhoneNumber("TTY: 711"),
+        wrapper_tags: accessiblePhoneNumber,
       };
       res.render("layout", error_payload);
     }
