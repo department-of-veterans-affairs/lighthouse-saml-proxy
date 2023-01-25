@@ -59,8 +59,8 @@ describe("Regression tests", () => {
 
     await isError(
       page,
-      "Some VA.gov tools aren't working right now",
-      "We're sorry. Something went wrong on our end while looking up your account. You may not be able to connect to your VA records until we can figure out what's wrong."
+      "We need to verify your identity before giving you access to your information",
+      "We're sorry. We can't match the information you provided with what we have in our Veteran records. We take your privacy seriously, and we're committed to protecting your information. You won't be able to access some VA tools until we match your information and verify your identity."
     );
   });
 
