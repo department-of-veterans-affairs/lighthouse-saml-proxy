@@ -10,6 +10,7 @@ import {
 } from "../../test/testUtils";
 import { idpConfig } from "../../test/testServer";
 import { IDME_USER } from "../../test/testUsers";
+import { accessiblePhoneNumber } from "../utils";
 jest.mock("passport");
 jest.mock("../VetsAPIClient");
 import passport from "passport";
@@ -356,7 +357,10 @@ describe("validateIdpResponse", () => {
 
     expect(nextFn).toHaveBeenCalledTimes(1);
     expect(mockResponse.render).toHaveBeenCalledTimes(1);
-    expect(mockResponse.render.mock.calls[0][0]).toBe("sensitiveError.hbs");
+    expect(mockResponse.render.mock.calls[0][0]).toBe("layout");
+    expect(mockResponse.render.mock.calls[0][1]["body"]).toBe(
+      "sensitive_error"
+    );
   });
 
   it("should throw an error when processing a saml response with no session index", async () => {
@@ -377,7 +381,10 @@ describe("validateIdpResponse", () => {
 
     expect(nextFn).toHaveBeenCalledTimes(0);
     expect(mockResponse.render).toHaveBeenCalledTimes(1);
-    expect(mockResponse.render.mock.calls[0][0]).toBe("sensitiveError.hbs");
+    expect(mockResponse.render.mock.calls[0][0]).toBe("layout");
+    expect(mockResponse.render.mock.calls[0][1]["body"]).toBe(
+      "sensitive_error"
+    );
   });
 
   it("should not cache anything when cache is not enabled", async () => {
@@ -536,9 +543,11 @@ describe("buildPassportLoginHandler", () => {
       mockResponse,
       mockNext
     );
-    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+    expect(mockResponse.render).toHaveBeenCalledWith("layout", {
+      body: "error",
       request_id: undefined,
       message: "Invalid assertion response.",
+      wrapper_tags: accessiblePhoneNumber,
     });
   });
 
@@ -548,9 +557,11 @@ describe("buildPassportLoginHandler", () => {
       mockResponse,
       mockNext
     );
-    expect(mockResponse.render).toHaveBeenCalledWith("error.hbs", {
+    expect(mockResponse.render).toHaveBeenCalledWith("layout", {
+      body: "error",
       request_id: undefined,
       message: "Invalid assertion response.",
+      wrapper_tags: accessiblePhoneNumber,
     });
   });
 });
