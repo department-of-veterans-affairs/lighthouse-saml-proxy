@@ -7,6 +7,7 @@ import {
   getParticipant,
   handleError,
 } from "./handlers.js";
+import { accessiblePhoneNumber } from "../utils";
 
 jest.mock("../logger");
 jest.mock("passport-wsfed-saml2");
@@ -58,8 +59,10 @@ describe("getHashCode, getSessionIndex", () => {
   });
   test("handleError", () => {
     handleError(mockReq, mockRes);
-    expect(mockRes.render).toHaveBeenCalledWith("sensitiveError.hbs", {
+    expect(mockRes.render).toHaveBeenCalledWith("layout", {
+      body: "sensitive_error",
       request_id: undefined,
+      wrapper_tags: accessiblePhoneNumber,
     });
   });
 });
@@ -201,7 +204,8 @@ describe("samlLogin", () => {
     mockNext = jest.fn();
   });
 
-  const expected_authoptions = {
+  const expected_authoptions_verify = {
+    body: "verify",
     id_me_login_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
     dslogon_login_link:
@@ -214,7 +218,35 @@ describe("samlLogin", () => {
     login_gov_signup_link_enabled: false,
   };
 
+  const expected_authoptions = {
+    body: "login_selection",
+    id_me_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    dslogon_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    mhv_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    id_me_signup_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
+    login_gov_enabled: false,
+    login_gov_signup_link_enabled: false,
+  };
+
+  const expected_authoptions_failure_to_proof = {
+    body: "failure_to_proof",
+    id_me_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    dslogon_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    mhv_login_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
+    id_me_signup_link:
+      "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
+    login_gov_enabled: false,
+    login_gov_signup_link_enabled: false,
+  };
   const expected_authoptions_login_gov_enabled = {
+    body: "login_selection",
     id_me_login_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
     dslogon_login_link:
@@ -269,7 +301,7 @@ describe("samlLogin", () => {
 
     mockResponse.render = function render(template, authOptions) {
       return promise2check(
-        "login_selection",
+        "layout",
         expected_authoptions,
         template,
         authOptions
@@ -332,7 +364,7 @@ describe("samlLogin", () => {
 
     mockResponse.render = function render(template, authOptions) {
       return promise2check(
-        "login_selection",
+        "layout",
         expected_authoptions_login_gov_enabled,
         template,
         authOptions
@@ -382,8 +414,8 @@ describe("samlLogin", () => {
   it("Happy Path, no authnRequest", async () => {
     mockResponse.render = function render(template, authOptions) {
       return promise2check(
-        "verify",
-        expected_authoptions,
+        "layout",
+        expected_authoptions_verify,
         template,
         authOptions
       );
@@ -405,11 +437,12 @@ describe("samlLogin", () => {
     }
   });
 
-  it("Happy Path, no authnRequest, login.gov failureToProof", async () => {
+  it("Happy Path, no authnRequest, login.gov failure_to_proof", async () => {
     mockResponse.render = function render(template, authOptions) {
       return promise2check(
-        "failureToProof",
-        expected_authoptions,
+        "layout",
+
+        expected_authoptions_failure_to_proof,
         template,
         authOptions
       );
@@ -422,7 +455,7 @@ describe("samlLogin", () => {
     });
     mockRequest.authnRequest = null;
     mockRequest.query.RelayState = "%2Foauth2%2FtheRelayState"; //this really comes from the session, not a query param
-    const verify = samlLogin("failureToProof");
+    const verify = samlLogin("failure_to_proof");
     try {
       verify(mockRequest, mockResponse, mockNext);
       expect(mockNext).not.toHaveBeenCalled();
