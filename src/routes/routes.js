@@ -55,7 +55,7 @@ export default function addRoutes(
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
 
-  app.get(SP_FAILURE_TO_PROOF, parseSamlRequest, samlLogin("failureToProof"));
+  app.get(SP_FAILURE_TO_PROOF, parseSamlRequest, samlLogin("failure_to_proof"));
 
   acsFactory(app, acsUrl, cache, cacheEnabled);
 

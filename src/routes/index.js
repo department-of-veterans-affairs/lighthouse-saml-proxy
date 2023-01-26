@@ -5,7 +5,7 @@ import session from "express-session";
 import express from "express";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
-import { sassMiddleware } from "../utils";
+import { sassMiddleware, accessiblePhoneNumber } from "../utils";
 import sass from "sass";
 import tildeImporter from "node-sass-tilde-importer";
 import { v4 as uuidv4 } from "uuid";
@@ -17,7 +17,6 @@ import {
   logger,
 } from "../logger";
 import addRoutes from "./routes";
-import configureHandlebars from "./handlebars";
 import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
@@ -67,7 +66,6 @@ export default function configureExpress(
     });
   }
 
-  const hbs = configureHandlebars();
   const metricsMiddleware = promBundle({
     includeMethod: true,
     includePath: true,
@@ -90,9 +88,8 @@ export default function configureExpress(
    * View Engine
    */
 
-  app.set("view engine", "hbs");
-  app.set("view options", { layout: "layout" });
-  app.engine("handlebars", hbs.__express);
+  app.set("view engine", "ejs");
+  // app.set("view options", { layout: "layout" });
   if (useSentry) {
     app.use(
       Sentry.Handlers.requestHandler({
@@ -206,10 +203,13 @@ export default function configureExpress(
       res.status(err.status || 500);
       let errMessage =
         res.statusCode < 500 ? err.message : "Error processing SAML request";
-      res.render(res.statusCode == 404 ? "error" : "sensitiveError", {
+      const error_payload = {
+        body: res.statusCode == 404 ? "error" : "sensitive_error",
         message: errMessage,
         request_id: rTracer.id(),
-      });
+        wrapper_tags: accessiblePhoneNumber,
+      };
+      res.render("layout", error_payload);
     }
   });
 

@@ -1,4 +1,9 @@
-import { getPath, getReqUrl, logRelayState } from "../utils";
+import {
+  getPath,
+  getReqUrl,
+  logRelayState,
+  accessiblePhoneNumber,
+} from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
 import {
@@ -125,10 +130,11 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
+        authOptions.body = template;
         authOptions.login_gov_enabled = login_gov_enabled;
         authOptions.login_gov_signup_link_enabled =
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
-        res.render(template, authOptions);
+        res.render("layout", authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
@@ -204,7 +210,12 @@ export const acsFactory = (app, acsUrl, cache, cacheEnabled) => {
 
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
-  res.render(urlUserErrorTemplate(req), { request_id: rTracer.id() });
+  const error_payload = {
+    body: urlUserErrorTemplate(req),
+    request_id: rTracer.id(),
+    wrapper_tags: accessiblePhoneNumber,
+  };
+  res.render("layout", error_payload);
 };
 
 function enabled_logingov(req) {
