@@ -1,7 +1,5 @@
 import * as request from "request-promise-native";
 
-const VSO_SEARCH_PATH = "/services/veteran/v0/representatives/find_rep";
-
 export class VetsAPIClient {
   token: string;
   vsoEndpointUrl: string;

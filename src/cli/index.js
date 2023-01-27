@@ -377,7 +377,8 @@ export function processArgs() {
         description: "The URL to the endpont that used to perform VSO lookups.",
         required: true,
         string: true,
-        default: "https://dev-api.va.gov/services/veteran/v0/representatives/find_rep",
+        default:
+          "https://dev-api.va.gov/services/veteran/v0/representatives/find_rep",
       },
       vetsAPIHost: {
         // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
