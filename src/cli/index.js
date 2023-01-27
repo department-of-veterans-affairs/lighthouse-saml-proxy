@@ -367,8 +367,7 @@ export function processArgs() {
       },
       mpiUserEndpoint: {
         alias: "mpiUserEndpoint",
-        description:
-          "The URL to the endpont that used to perform MPI lookups.",
+        description: "The URL to the endpont that used to perform MPI lookups.",
         required: true,
         string: true,
         default: "https://dev-api.va.gov/internal/auth/v3/mpi-user",

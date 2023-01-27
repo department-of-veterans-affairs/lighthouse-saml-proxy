@@ -4,7 +4,7 @@ import Redis, { RedisClient } from "redis";
 import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
 
-import { VetsAPIClient } from "../VetsAPIClient";
+import { VetsAPIClient } from "../VsoEndpointClient";
 import { User } from "@sentry/types";
 
 interface IExtendedStrategy extends Strategy {

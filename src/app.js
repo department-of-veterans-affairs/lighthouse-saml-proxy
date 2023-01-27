@@ -11,7 +11,7 @@ import SPConfig from "./SPConfig";
 import VetsAPIConfig from "./VetsAPIConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
-import { VetsAPIClient } from "./VetsAPIClient";
+import { VetsAPIClient } from "./VsoEndpointClient";
 import { RedisCache } from "./routes/types";
 import createPassportStrategy from "./routes/passport";
 import passport from "passport";
