@@ -14,15 +14,7 @@ import {
   samlLogin,
 } from "./handlers";
 
-import fs from "fs";
-import process from "process";
-import path from "path";
-import template from "lodash.template";
 import samlp from "samlp";
-
-const METADATA_TEMPLATE = template(
-  fs.readFileSync(path.join(process.cwd(), "./templates/metadata.tpl"), "utf8")
-);
 
 export default function addRoutes(
   app,
@@ -48,9 +40,8 @@ export default function addRoutes(
   });
 
   app.get(SP_METADATA_URL, function (req, res, next) {
-    const xml = METADATA_TEMPLATE(spConfigs.id_me.getMetadataParams(req));
     res.set("Content-Type", "text/xml");
-    res.send(xml);
+    res.render("xml_template/metadata", spConfigs.id_me.getMetadataParams(req));
   });
 
   app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));

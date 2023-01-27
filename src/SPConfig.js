@@ -1,17 +1,9 @@
 import { SP_ERROR_URL, SP_SLO_URL } from "./routes/constants";
 import { removeHeaders, getReqUrl } from "./utils";
 
-import fs from "fs";
 import process from "process";
 import path from "path";
-import template from "lodash.template";
-
-const AUTHN_REQUEST_TEMPLATE = template(
-  fs.readFileSync(
-    path.join(process.cwd(), "./templates/authnrequest.tpl"),
-    "utf8"
-  )
-);
+let ejs = require("ejs");
 
 export default class SPConfig {
   constructor(argv) {
@@ -70,6 +62,17 @@ export default class SPConfig {
   }
 
   getAuthnRequestParams(acsUrl, forceAuthn, relayState, authnContext, id) {
+    let requestTemplate;
+    ejs.renderFile(
+      path.join(process.cwd(), "./views/xml_template/authnrequest.ejs"),
+      {
+        ForceAuthn: forceAuthn,
+        NameIDFormat: this.requestNameIDFormat,
+        AuthnContext: this.requestAuthnContext,
+      },
+      undefined,
+      (err, str) => (requestTemplate = str)
+    );
     const params = {
       protocol: this.protocol,
       realm: this.audience,
@@ -83,11 +86,7 @@ export default class SPConfig {
         ID: id,
         NameIDFormat: this.nameIDFormat,
       },
-      requestTemplate: AUTHN_REQUEST_TEMPLATE({
-        ForceAuthn: forceAuthn,
-        NameIDFormat: this.requestNameIDFormat,
-        AuthnContext: this.requestAuthnContext,
-      }),
+      requestTemplate: requestTemplate,
       signatureAlgorithm: this.signatureAlgorithm,
       digestAlgorithm: this.digestAlgorithm,
       deflate: this.deflate,
