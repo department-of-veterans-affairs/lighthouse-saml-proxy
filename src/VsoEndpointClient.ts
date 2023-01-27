@@ -4,12 +4,12 @@ const VSO_SEARCH_PATH = "/services/veteran/v0/representatives/find_rep";
 
 export class VetsAPIClient {
   token: string;
-  apiHost: string;
+  vsoEndpointUrl: string;
   headers: object;
 
-  constructor(token: string, apiHost: string) {
+  constructor(token: string, vsoEndpointUrl: string) {
     this.token = token;
-    this.apiHost = apiHost;
+    this.vsoEndpointUrl = vsoEndpointUrl;
     this.headers = {
       apiKey: this.token,
     };
@@ -25,7 +25,7 @@ export class VetsAPIClient {
     };
 
     const response = await request.get({
-      url: `${this.apiHost}${VSO_SEARCH_PATH}`,
+      url: this.vsoEndpointUrl,
       json: true,
       headers: this.headers,
       qs,
