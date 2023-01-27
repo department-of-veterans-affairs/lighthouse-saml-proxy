@@ -18,6 +18,7 @@
   "idpEncryptionCert": "./idp-encryption-cert.pem",
   "idpEncryptionPublicKey": "./idp-encryption-pub.key",
   "vetsAPIHost": "https://vets-api.example.com",
+  "mpiUserEndpont": "https://dev-mpi.example.com/mpiuser",
   "vetsAPIToken": "vets-api-token",
   "sessionSecret": "fake-session-secret",
   "cacheEnabled": true,

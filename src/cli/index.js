@@ -365,6 +365,14 @@ export function processArgs() {
         required: false,
         string: true,
       },
+      mpiUserEndpoint: {
+        alias: "mpiUserEndpoint",
+        description:
+          "The URL to the endpont that used to perform MPI lookups.",
+        required: true,
+        string: true,
+        default: "https://dev-api.va.gov/internal/auth/v3/mpi-user",
+      },
       vetsAPIHost: {
         // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
         // where it runs environment variables through a camelcase function that transforms
