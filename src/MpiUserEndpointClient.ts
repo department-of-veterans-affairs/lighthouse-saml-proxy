@@ -13,10 +13,10 @@ export class MpiUserEndpointClient {
   ) {
     this.accessKey = accessKey;
     this.mpiUserEndpoint = mpiUserEndpoint;
-    const keytype =
+    const accessKeyType =
       accessKeyType && accessKeyType == "ecsauth" ? "access_key" : "apiKey";
     this.headers = {};
-    this.headers[keytype] = this.accessKey;
+    this.headers[accessKeyType] = this.accessKey;
   }
 
   public async getMpiTraitsForLoa3User(
