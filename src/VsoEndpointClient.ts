@@ -1,6 +1,6 @@
 import * as request from "request-promise-native";
 
-export class VetsAPIClient {
+export class VsoEndpointClient {
   token: string;
   vsoEndpointUrl: string;
   headers: object;
