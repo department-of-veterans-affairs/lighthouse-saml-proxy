@@ -372,6 +372,21 @@ export function processArgs() {
         string: true,
         default: "https://dev-api.va.gov/internal/auth/v3/mpi-user",
       },
+      accessKey: {
+        alias: "accessKey",
+        description:
+          "The access key to the endpont that used to perform MPI lookups.",
+        required: true,
+        string: true,
+      },
+      accessKeyType: {
+        alias: "accessKeyType",
+        description:
+          "The access key type the endpont that used to perform MPI lookups, either 'ecsauth' or 'vetsapi.",
+        required: true,
+        string: true,
+        default: "vetsapi",
+      },
       vsoUserEndpoint: {
         alias: "vsoUserEndpoint",
         description: "The URL to the endpont that used to perform VSO lookups.",
