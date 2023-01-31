@@ -22,7 +22,6 @@ export class MpiUserEndpointClient {
   ): Promise<{ icn: string; first_name: string; last_name: string }> {
     const body = {
       idp_uuid: user.uuid,
-      user_email: user.email,
       dslogon_edipi: user.edipi || null,
       mhv_icn: user.icn || null,
       ssn: user.ssn || null,
@@ -31,7 +30,6 @@ export class MpiUserEndpointClient {
       last_name: user.lastName || null,
       dob: user.dateOfBirth || null,
       gender: user.gender || null,
-      level_of_assurance: "3",
     };
 
     const response = await request.post({
