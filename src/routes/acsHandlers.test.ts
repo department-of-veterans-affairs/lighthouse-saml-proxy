@@ -1,7 +1,8 @@
 import "jest";
 
 import * as handlers from "./acsHandlers";
-import { VetsAPIClient } from "../VetsAPIClient";
+import { MpiUserEndpointClient } from "../MpiUserEndpointClient";
+import { VsoEndpointClient } from "../VsoEndpointClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
 import {
@@ -12,10 +13,19 @@ import { idpConfig } from "../../test/testServer";
 import { IDME_USER } from "../../test/testUsers";
 import { accessiblePhoneNumber } from "../utils";
 jest.mock("passport");
-jest.mock("../VetsAPIClient");
+jest.mock("../VsoEndpointClient");
+jest.mock("../MpiUserEndpointClient");
 import passport from "passport";
 
-const client = new VetsAPIClient("fakeToken", "https://example.gov");
+const vsoEndpointClient = new VsoEndpointClient(
+  "fakeToken",
+  "https://example.gov"
+);
+const mpiUserEndpointClient = new MpiUserEndpointClient(
+  "fakeToken",
+  "http://example.com/mpiuser",
+  "fakekey"
+);
 
 // Technically Doesn't TypeCheck, but typechecking is off for test files
 // Since there's no way to make it work in tests with the mix of js and ts
@@ -196,25 +206,29 @@ describe("scrubUserClaims", () => {
 
 describe("loadICN", () => {
   beforeEach(() => {
-    client.getMVITraitsForLoa3User.mockReset();
+    mpiUserEndpointClient.getMpiTraitsForLoa3User.mockReset();
+    vsoEndpointClient.getVSOSearch.mockReset();
   });
 
   it("should call getMVITraits... calls when ICN Exists", async () => {
     const nextFn = jest.fn();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithICN },
       },
     };
 
-    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+    req.mpiUserEndpointClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
       icn: "anICN",
       first_name: "Edward",
       last_name: "Paget",
     });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
+    expect(
+      req.mpiUserEndpointClient.getMpiTraitsForLoa3User
+    ).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
   });
@@ -222,19 +236,21 @@ describe("loadICN", () => {
   it("should load ICN and assign it as a user claim when edipi exists and no icn", async () => {
     const nextFn = jest.fn();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
       },
     };
 
-    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+    req.mpiUserEndpointClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
       icn: "anICN",
       first_name: "Edward",
       last_name: "Paget",
     });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
+    expect(
+      req.mpiUserEndpointClient.getMpiTraitsForLoa3User
+    ).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
   });
@@ -242,18 +258,20 @@ describe("loadICN", () => {
   it("should load ICN and assign it as a user claim when traits exist and no icn", async () => {
     const nextFn = jest.fn();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
       user: {
         claims: { ...claimsWithNoEDIPI },
       },
     };
-    req.vetsAPIClient.getMVITraitsForLoa3User.mockResolvedValueOnce({
+    req.mpiUserEndpointClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
       icn: "anICN",
       first_name: "Edward",
       last_name: "Paget",
     });
     await handlers.loadICN(req, {}, nextFn);
-    expect(req.vetsAPIClient.getMVITraitsForLoa3User).toHaveBeenCalled();
+    expect(
+      req.mpiUserEndpointClient.getMpiTraitsForLoa3User
+    ).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
   });
@@ -262,7 +280,8 @@ describe("loadICN", () => {
     const nextFn = jest.fn();
     const render = jest.fn();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithNoEDIPI },
       },
@@ -270,8 +289,10 @@ describe("loadICN", () => {
     const err = new Error("Oops");
     err.name = "StatusCodeError";
     err.statusCode = "404";
-    req.vetsAPIClient.getMVITraitsForLoa3User.mockRejectedValueOnce(err);
-    req.vetsAPIClient.getVSOSearch.mockRejectedValueOnce(err);
+    req.mpiUserEndpointClient.getMpiTraitsForLoa3User.mockRejectedValueOnce(
+      err
+    );
+    req.vsoEndpointClient.getVSOSearch.mockRejectedValueOnce(err);
     await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
   });
@@ -318,7 +339,8 @@ describe("validateIdpResponse", () => {
     const testSessionIndex = "test";
     const cache = new TestCache();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
         authnContext: {
@@ -338,7 +360,8 @@ describe("validateIdpResponse", () => {
     const testSessionIndex = "test";
     const cache = new TestCache();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
         authnContext: {
@@ -367,7 +390,8 @@ describe("validateIdpResponse", () => {
     const nextFn = jest.fn();
     const cache = new TestCache();
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
         authnContext: {},
@@ -392,7 +416,7 @@ describe("validateIdpResponse", () => {
     const testSessionIndex = "test";
     const cache = new TestCache();
     const req = {
-      vetsAPIClient: client,
+      VsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
         authnContext: {
@@ -420,7 +444,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsWithEDIPI },
         authnContext: {
@@ -436,7 +461,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: {
           idp: "logingov",
@@ -460,7 +486,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     });
     const testSessionIndex = "test";
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsBasicAccount },
         authnContext: {
@@ -485,7 +512,8 @@ describe("testLevelOfAssuranceOrRedirect", () => {
     });
     const testSessionIndex = "test";
     const req = {
-      vetsAPIClient: client,
+      mpiUserEndpointClient: mpiUserEndpointClient,
+      vsoEndpointClient: vsoEndpointClient,
       user: {
         claims: { ...claimsBasicAccount },
         authnContext: {
