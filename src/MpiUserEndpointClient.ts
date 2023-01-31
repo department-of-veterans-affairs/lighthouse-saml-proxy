@@ -9,10 +9,8 @@ export class MpiUserEndpointClient {
     this.mpiUserEndpoint = mpiUserEndpoint;
     this.headers = {
       apiKey: apiKey,
+      access_key: accessKey,
     };
-    if (accessKey) {
-      this.headers["access_key"] = accessKey;
-    }
   }
 
   public async getMpiTraitsForLoa3User(

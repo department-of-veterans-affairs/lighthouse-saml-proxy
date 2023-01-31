@@ -11,6 +11,7 @@ import SPConfig from "./SPConfig";
 import VetsAPIConfig from "./VsoEndpointConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
+import MpiUserEndpointConfig from "./MpiUserEndpointConfig";
 import { MpiUserEndpointClient } from "./MpiUserEndpointClient";
 import { VsoEndpointClient } from "./VsoEndpointClient";
 import { RedisCache } from "./routes/types";
@@ -89,7 +90,7 @@ function runServer(argv) {
       }
       const idpConfig = new IDPConfig(argv);
       const vsoConfig = new VetsAPIConfig(argv);
-      const mpiUserEndpointConfig = new mpiUserEndpointConfig(argv);
+      const mpiUserEndpointConfig = new MpiUserEndpointConfig(argv);
       const mpiUserEndpointClient = new MpiUserEndpointClient(
         mpiUserEndpointConfig.apiKey,
         mpiUserEndpointConfig.mpiUserEndpoint,
