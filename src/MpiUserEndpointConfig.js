@@ -1,7 +1,7 @@
 export default class MpiUserEndpointConfig {
   constructor(argv) {
-    this.accessKey = argv.mpiUserEndpoint;
-    this.accessKeyType = argv.accessKeyType;
+    this.mpiUserEndpoint = argv.mpiUserEndpoint;
     this.accessKey = argv.accessKey;
+    this.apiKey = argv.apiKey;
   }
 }

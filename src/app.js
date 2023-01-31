@@ -93,7 +93,7 @@ function runServer(argv) {
       const mpiUserEndpointClient = new MpiUserEndpointClient(
         mpiUserEndpointConfig.mpiUserEndpoint,
         mpiUserEndpointConfig.accessKey,
-        mpiUserEndpointConfig.accessKeyType
+        mpiUserEndpointConfig.apiKey
       );
       const vetsApiClient = new VsoEndpointClient(
         vaConfig.token,
