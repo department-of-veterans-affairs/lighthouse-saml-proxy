@@ -16,7 +16,7 @@ export class MpiUserEndpointClient {
   public async getMpiTraitsForLoa3User(
     user: SAMLUser
   ): Promise<{ icn: string; first_name: string; last_name: string }> {
-    const body = {
+    const body: Record<string, any> = {
       idp_uuid: user.uuid,
       dslogon_edipi: user.edipi || null,
       mhv_icn: user.icn || null,
@@ -27,6 +27,10 @@ export class MpiUserEndpointClient {
       dob: user.dateOfBirth || null,
       gender: user.gender?.substring(0, 1).toUpperCase() || null,
     };
+
+    if (this.mpiUserEndpoint.includes("v0/")) {
+      body["level_of_assurance"] = "3";
+    }
 
     const response = await request.post({
       url: this.mpiUserEndpoint,
