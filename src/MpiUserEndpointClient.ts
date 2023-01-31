@@ -9,7 +9,7 @@ export class MpiUserEndpointClient {
     this.mpiUserEndpoint = mpiUserEndpoint;
     this.headers = {
       apiKey: apiKey,
-      access_key: accessKey,
+      accesskey: accessKey,
     };
   }
 
@@ -25,7 +25,7 @@ export class MpiUserEndpointClient {
       middle_name: user.middleName || null,
       last_name: user.lastName || null,
       dob: user.dateOfBirth || null,
-      gender: user.gender || null,
+      gender: user.gender?.substring(0, 1).toUpperCase() || null,
     };
 
     const response = await request.post({
