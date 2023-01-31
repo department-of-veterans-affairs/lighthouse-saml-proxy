@@ -2,19 +2,17 @@ import * as request from "request-promise-native";
 import { SAMLUser } from "./SAMLUser";
 
 export class MpiUserEndpointClient {
-  accessKey: string;
   mpiUserEndpoint: string;
-  apiKey: string;
   headers: object;
 
-  constructor(accessKey: string, mpiUserEndpoint: string, apiKey: string) {
-    this.accessKey = accessKey;
+  constructor(apiKey: string, mpiUserEndpoint: string, accessKey: string) {
     this.mpiUserEndpoint = mpiUserEndpoint;
-    this.apiKey = apiKey;
     this.headers = {
-      apiKey: this.apiKey,
-      access_key: this.accessKey,
+      apiKey: apiKey,
     };
+    if (accessKey) {
+      this.headers["access_key"] = accessKey;
+    }
   }
 
   public async getMpiTraitsForLoa3User(

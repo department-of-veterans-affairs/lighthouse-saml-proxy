@@ -32,7 +32,6 @@ const samlTraitsEDIPI = {
 
 const samlTraitsICN = {
   uuid: "fakeuuid",
-  email: "user@example.com",
   icn: "fakeicn",
 };
 
@@ -57,7 +56,8 @@ describe("getMVITraitsForLoa3User", () => {
   it("should call the mvi-user endpoint with the Veteran's EIDPI in request body", async () => {
     const client = new MpiUserEndpointClient(
       "faketoken",
-      "https://example.gov"
+      "https://example.gov",
+      "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraitsEDIPI);
     expect(request.post).toHaveBeenCalledWith({
@@ -68,14 +68,12 @@ describe("getMVITraitsForLoa3User", () => {
       }),
       body: expect.objectContaining({
         idp_uuid: samlTraitsEDIPI.uuid,
-        user_email: samlTraitsEDIPI.email,
         dslogon_edipi: samlTraitsEDIPI.edipi,
         first_name: samlTraitsEDIPI.firstName,
         middle_name: samlTraitsEDIPI.middleName,
         last_name: samlTraitsEDIPI.lastName,
         dob: samlTraitsEDIPI.dateOfBirth,
         gender: samlTraitsEDIPI.gender,
-        level_of_assurance: "3",
       }),
     });
   });
@@ -83,7 +81,8 @@ describe("getMVITraitsForLoa3User", () => {
   it("should call the mvi-user endpoint with the Veteran's icn in request body", async () => {
     const client = new MpiUserEndpointClient(
       "faketoken",
-      "https://example.gov"
+      "https://example.gov",
+      "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraitsICN);
     expect(request.post).toHaveBeenCalledWith({
@@ -94,9 +93,7 @@ describe("getMVITraitsForLoa3User", () => {
       }),
       body: expect.objectContaining({
         idp_uuid: samlTraitsICN.uuid,
-        user_email: samlTraitsICN.email,
         mhv_icn: samlTraitsICN.icn,
-        level_of_assurance: "3",
       }),
     });
   });
@@ -104,7 +101,8 @@ describe("getMVITraitsForLoa3User", () => {
   it("should call the mvi-user endpoint with the Veteran's PII in request body", async () => {
     const client = new MpiUserEndpointClient(
       "faketoken",
-      "https://example.gov"
+      "https://example.gov",
+      "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraits);
     expect(request.post).toHaveBeenCalledWith({
@@ -115,14 +113,12 @@ describe("getMVITraitsForLoa3User", () => {
       }),
       body: expect.objectContaining({
         idp_uuid: samlTraits.uuid,
-        user_email: samlTraits.email,
         ssn: samlTraits.ssn,
         first_name: samlTraits.firstName,
         middle_name: samlTraits.middleName,
         last_name: samlTraits.lastName,
         dob: samlTraits.dateOfBirth,
         gender: samlTraits.gender,
-        level_of_assurance: "3",
       }),
     });
   });
@@ -130,7 +126,8 @@ describe("getMVITraitsForLoa3User", () => {
   it("should return the Veteran's ICN if the request is successful", async () => {
     const client = new MpiUserEndpointClient(
       "faketoken",
-      "https://example.gov"
+      "https://example.gov",
+      "faketoken"
     );
     const { icn } = await client.getMpiTraitsForLoa3User(samlTraits);
     expect(icn).toEqual("fakeICN");

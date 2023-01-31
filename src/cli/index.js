@@ -376,16 +376,8 @@ export function processArgs() {
         alias: "accessKey",
         description:
           "The access key to the endpont that used to perform MPI lookups.",
-        required: true,
+        required: false,
         string: true,
-      },
-      accessKeyType: {
-        alias: "accessKeyType",
-        description:
-          "The access key type the endpont that used to perform MPI lookups, either 'ecsauth' or 'vetsapi.",
-        required: true,
-        string: true,
-        default: "vetsapi",
       },
       vsoUserEndpoint: {
         alias: "vsoUserEndpoint",

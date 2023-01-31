@@ -8,7 +8,7 @@ import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";
-import VetsAPIConfig from "./VetsAPIConfig";
+import VetsAPIConfig from "./VsoEndpointConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
 import { MpiUserEndpointClient } from "./MpiUserEndpointClient";
@@ -88,16 +88,16 @@ function runServer(argv) {
         });
       }
       const idpConfig = new IDPConfig(argv);
-      const vaConfig = new VetsAPIConfig(argv);
+      const vsoConfig = new VetsAPIConfig(argv);
       const mpiUserEndpointConfig = new mpiUserEndpointConfig(argv);
       const mpiUserEndpointClient = new MpiUserEndpointClient(
+        mpiUserEndpointConfig.apiKey,
         mpiUserEndpointConfig.mpiUserEndpoint,
-        mpiUserEndpointConfig.accessKey,
-        mpiUserEndpointConfig.apiKey
+        mpiUserEndpointConfig.accessKey
       );
       const vetsApiClient = new VsoEndpointClient(
-        vaConfig.token,
-        vaConfig.apiHost
+        vsoConfig.token,
+        vsoConfig.vsoUserEndpoint
       );
       let cache = null;
       const cacheEnabled = argv.cacheEnabled;
