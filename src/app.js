@@ -91,7 +91,7 @@ function runServer(argv) {
       const idpConfig = new IDPConfig(argv);
       const vsoConfig = new VetsAPIConfig(argv);
       const mpiUserEndpointConfig = new MpiUserEndpointConfig(argv);
-      const mpiUserEndpointClient = new MpiUserClient(
+      const mpiUserClient = new MpiUserClient(
         mpiUserEndpointConfig.apiKey,
         mpiUserEndpointConfig.mpiUserEndpoint,
         mpiUserEndpointConfig.accessKey
@@ -111,7 +111,7 @@ function runServer(argv) {
         idpConfig,
         spConfigs,
         strategies,
-        mpiUserEndpointClient,
+        mpiUserClient,
         vetsApiClient,
         cache,
         cacheEnabled
