@@ -96,7 +96,7 @@ function runServer(argv) {
         mpiUserEndpointConfig.mpiUserEndpoint,
         mpiUserEndpointConfig.accessKey
       );
-      const vetsApiClient = new VsoClient(
+      const vsoClient = new VsoClient(
         vsoConfig.token,
         vsoConfig.vsoUserEndpoint
       );
@@ -112,7 +112,7 @@ function runServer(argv) {
         spConfigs,
         strategies,
         mpiUserClient,
-        vetsApiClient,
+        vsoClient,
         cache,
         cacheEnabled
       );

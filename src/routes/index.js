@@ -35,7 +35,7 @@ export default function configureExpress(
   spOptions,
   strategies,
   mpiUserClient,
-  vsoEndpointClient,
+  vsoClient,
   cache = new RedisCache(),
   cacheEnabled = true
 ) {
@@ -151,7 +151,7 @@ export default function configureExpress(
     req.metadata = idpOptions.profileMapper.metadata;
     req.strategies = strategies;
     req.mpiUserClient = mpiUserClient;
-    req.vsoEndpointClient = vsoEndpointClient;
+    req.vsoClient = vsoClient;
     req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
     req.participant = getParticipant(req);

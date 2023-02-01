@@ -15,7 +15,7 @@ interface IExtendedStrategy extends Strategy {
 export interface IConfiguredRequest extends Request {
   session: any;
   mpiUserClient: MpiUserClient;
-  vsoEndpointClient: VsoClient;
+  vsoClient: VsoClient;
   strategies: Map<String, IExtendedStrategy>;
   sps: any;
   idp: any;

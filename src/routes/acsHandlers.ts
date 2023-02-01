@@ -152,7 +152,7 @@ export const loadICN = async (
       await requestWithMetrics(
         VSORequestMetrics,
         (): Promise<any> => {
-          return req.vsoEndpointClient.getVSOSearch(
+          return req.vsoClient.getVSOSearch(
             req.user.claims.firstName,
             req.user.claims.lastName
           );

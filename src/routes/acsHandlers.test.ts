@@ -17,10 +17,7 @@ jest.mock("../VsoEndpointClient");
 jest.mock("../MpiUserEndpointClient");
 import passport from "passport";
 
-const vsoEndpointClient = new VsoClient(
-  "fakeToken",
-  "https://example.gov"
-);
+const vsoEndpointClient = new VsoClient("fakeToken", "https://example.gov");
 const mpiUserEndpointClient = new MpiUserClient(
   "fakeToken",
   "http://example.com/mpiuser",
