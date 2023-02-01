@@ -2,7 +2,7 @@ import "jest";
 
 import * as handlers from "./acsHandlers";
 import { MpiUserClient } from "../MpiUserClient";
-import { VsoEndpointClient } from "../VsoEndpointClient";
+import { VsoClient } from "../VsoClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
 import {
@@ -17,7 +17,7 @@ jest.mock("../VsoEndpointClient");
 jest.mock("../MpiUserEndpointClient");
 import passport from "passport";
 
-const vsoEndpointClient = new VsoEndpointClient(
+const vsoEndpointClient = new VsoClient(
   "fakeToken",
   "https://example.gov"
 );
