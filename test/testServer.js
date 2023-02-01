@@ -40,7 +40,7 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
-export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
+export function getTestExpressApp(mpiUserClient, vsoClient,  cache = new TestCache()) {
   const app = express();
   const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
   const strategies = new Map();
@@ -52,7 +52,8 @@ export function getTestExpressApp(vetsApiClient, cache = new TestCache()) {
     idpConfig,
     spConfigs,
     strategies,
-    vetsApiClient,
+    mpiUserClient,
+    vsoClient,
     cache
   );
   return app;

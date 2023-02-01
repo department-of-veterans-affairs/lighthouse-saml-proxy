@@ -7,7 +7,8 @@ import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";
 import { idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";
-import MockVetsApiClient from "./mockMpiUserClient";
+import MockMpiUserClient from "./mockMpiUserClient";
+import MockVsoClient from "./mockVsoClient";
 import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
@@ -33,7 +34,8 @@ const SP_ERROR = "Found. Redirecting to /samlproxy/sp/error";
 // http://w3c.github.io/html-reference/syntax.html#void-elements)
 const MIME_HTML = "text/html";
 const PORT = 1111;
-const vetsApiClient = new MockVetsApiClient();
+const mpiUserClient = new MockMpiUserClient();
+const vsoClient = new MockVsoClient();
 
 let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
@@ -196,7 +198,7 @@ function getIdFromSamlRequest(request) {
 
 describe("Logins for idp", () => {
   beforeAll(() => {
-    const app = getTestExpressApp(vetsApiClient);
+    const app = getTestExpressApp(mpiUserClient, vsoClient);
     startServerInBackground(app, PORT);
   });
 
@@ -205,7 +207,7 @@ describe("Logins for idp", () => {
   });
 
   beforeEach(() => {
-    vetsApiClient.reset();
+    mpiUserClient.reset();
   });
 
   it("Saml Request check for Request IDs", async () => {
@@ -240,7 +242,7 @@ describe("Logins for idp", () => {
       "3",
       idpConfig
     );
-    vetsApiClient.findUserInMVI = true;
+    mpiUserClient.findUserInMVI = true;
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
     expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -258,7 +260,7 @@ describe("Logins for idp", () => {
     config.cert = idpBadCert;
     config.key = Buffer.from(idpBadKey, "utf-8");
     const requestSamlResponse = await buildSamlResponse(IDME_USER, "3", config);
-    vetsApiClient.findUserInMVI = true;
+    mpiUserClient.findUserInMVI = true;
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
     expect(responseResultType(response)).toEqual(SP_ERROR);
@@ -272,7 +274,7 @@ describe("Logins for idp", () => {
           "2",
           idpConfig
         );
-        vetsApiClient.findUserInMVI = true;
+        mpiUserClient.findUserInMVI = true;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(LOA_REDIRECT);
       });
@@ -283,7 +285,7 @@ describe("Logins for idp", () => {
           "3",
           idpConfig
         );
-        vetsApiClient.findUserInMVI = true;
+        mpiUserClient.findUserInMVI = true;
         const response = await ssoRequest(requestSamlResponse);
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -299,8 +301,8 @@ describe("Logins for idp", () => {
           "3",
           idpConfig
         );
-        vetsApiClient.findUserInMVI = false;
-        vetsApiClient.userIsVSO = true;
+        mpiUserClient.findUserInMVI = false;
+        vsoClient.userIsVSO = true;
         const response = await ssoRequest(requestSamlResponse);
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -316,8 +318,8 @@ describe("Logins for idp", () => {
           "3",
           idpConfig
         );
-        vetsApiClient.findUserInMVI = false;
-        vetsApiClient.userIsVSO = false;
+        mpiUserClient.findUserInMVI = false;
+        vsoClient.userIsVSO = false;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
       });
