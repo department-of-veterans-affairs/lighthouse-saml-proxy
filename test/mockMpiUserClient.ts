@@ -15,7 +15,10 @@ export default class MockMpiUserClient {
       };
     }
 
-    throw new Error("Not found");
+    const error = new Error("Not found");
+    error.name = "StatusCodeError";
+    error.statusCode = "404";
+    throw error;
   }
 
   public reset() {
