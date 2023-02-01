@@ -8,10 +8,10 @@ import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";
-import VetsAPIConfig from "./VsoEndpointConfig";
+import VsoClientConfig from "./VsoClientConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
-import MpiUserEndpointConfig from "./MpiUserEndpointConfig";
+import MpiUserClientConfig from "./MpiUserClientConfig";
 import { MpiUserClient } from "./MpiUserClient";
 import { VsoClient } from "./VsoClient";
 import { RedisCache } from "./routes/types";
@@ -89,12 +89,12 @@ function runServer(argv) {
         });
       }
       const idpConfig = new IDPConfig(argv);
-      const vsoConfig = new VetsAPIConfig(argv);
-      const mpiUserEndpointConfig = new MpiUserEndpointConfig(argv);
+      const vsoConfig = new VsoClientConfig(argv);
+      const mpiUserClientConfig = new MpiUserClientConfig(argv);
       const mpiUserClient = new MpiUserClient(
-        mpiUserEndpointConfig.apiKey,
-        mpiUserEndpointConfig.mpiUserEndpoint,
-        mpiUserEndpointConfig.accessKey
+        mpiUserClientConfig.apiKey,
+        mpiUserClientConfig.mpiUserEndpoint,
+        mpiUserClientConfig.accessKey
       );
       const vsoClient = new VsoClient(
         vsoConfig.token,
