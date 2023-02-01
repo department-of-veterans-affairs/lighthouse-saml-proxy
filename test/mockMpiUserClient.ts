@@ -4,7 +4,7 @@ export default class MockMpiUserClient {
   public findUserInMVI = true;
   public userIsVSO = true;
 
-  public async getMVITraitsForLoa3User(
+  public async getMpiTraitsForLoa3User(
     user: SAMLUser
   ): Promise<{ icn: string; first_name: string; last_name: string }> {
     if (this.findUserInMVI) {

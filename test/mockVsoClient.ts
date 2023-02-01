@@ -1,5 +1,3 @@
-import { SAMLUser } from "../src/SAMLUser";
-
 export default class MockVsoClient {
   public userIsVSO = true;
 

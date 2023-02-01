@@ -302,7 +302,7 @@ describe("Logins for idp", () => {
           idpConfig
         );
         mpiUserClient.findUserInMVI = false;
-        mpiUserClient.userIsVSO = true;
+        vsoClient.userIsVSO = true;
         const response = await ssoRequest(requestSamlResponse);
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
@@ -319,7 +319,7 @@ describe("Logins for idp", () => {
           idpConfig
         );
         mpiUserClient.findUserInMVI = false;
-        mpiUserClient.userIsVSO = false;
+        vsoClient.userIsVSO = false;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
       });
