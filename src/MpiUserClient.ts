@@ -1,7 +1,7 @@
 import * as request from "request-promise-native";
 import { SAMLUser } from "./SAMLUser";
 
-export class MpiUserEndpointClient {
+export class MpiUserClient {
   mpiUserEndpoint: string;
   headers: object;
 

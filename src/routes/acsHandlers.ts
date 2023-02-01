@@ -128,9 +128,7 @@ export const loadICN = async (
     const { icn, first_name, last_name } = await requestWithMetrics(
       MVIRequestMetrics,
       (): Promise<any> => {
-        return req.mpiUserEndpointClient.getMpiTraitsForLoa3User(
-          req.user.claims
-        );
+        return req.mpiUserClient.getMpiTraitsForLoa3User(req.user.claims);
       }
     );
 

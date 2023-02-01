@@ -4,7 +4,7 @@ import Redis, { RedisClient } from "redis";
 import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
 
-import { MpiUserEndpointClient } from "../MpiUserEndpointClient";
+import { MpiUserClient } from "../MpiUserClient";
 import { VsoEndpointClient } from "../VsoEndpointClient";
 import { User } from "@sentry/types";
 
@@ -14,7 +14,7 @@ interface IExtendedStrategy extends Strategy {
 
 export interface IConfiguredRequest extends Request {
   session: any;
-  mpiUserEndpointClient: MpiUserEndpointClient;
+  mpiUserClient: MpiUserClient;
   vsoEndpointClient: VsoEndpointClient;
   strategies: Map<String, IExtendedStrategy>;
   sps: any;

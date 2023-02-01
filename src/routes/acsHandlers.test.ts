@@ -1,7 +1,7 @@
 import "jest";
 
 import * as handlers from "./acsHandlers";
-import { MpiUserEndpointClient } from "../MpiUserEndpointClient";
+import { MpiUserClient } from "../MpiUserClient";
 import { VsoEndpointClient } from "../VsoEndpointClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
@@ -21,7 +21,7 @@ const vsoEndpointClient = new VsoEndpointClient(
   "fakeToken",
   "https://example.gov"
 );
-const mpiUserEndpointClient = new MpiUserEndpointClient(
+const mpiUserEndpointClient = new MpiUserClient(
   "fakeToken",
   "http://example.com/mpiuser",
   "fakekey"
