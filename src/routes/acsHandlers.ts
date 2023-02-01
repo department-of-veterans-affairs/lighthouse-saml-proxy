@@ -128,9 +128,7 @@ export const loadICN = async (
     const { icn, first_name, last_name } = await requestWithMetrics(
       MVIRequestMetrics,
       (): Promise<any> => {
-        return req.mpiUserEndpointClient.getMpiTraitsForLoa3User(
-          req.user.claims
-        );
+        return req.mpiUserClient.getMpiTraitsForLoa3User(req.user.claims);
       }
     );
 
@@ -154,7 +152,7 @@ export const loadICN = async (
       await requestWithMetrics(
         VSORequestMetrics,
         (): Promise<any> => {
-          return req.vsoEndpointClient.getVSOSearch(
+          return req.vsoClient.getVSOSearch(
             req.user.claims.firstName,
             req.user.claims.lastName
           );

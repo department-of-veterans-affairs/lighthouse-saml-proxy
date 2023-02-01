@@ -1,6 +1,6 @@
 import * as request from "request-promise-native";
 
-export class VsoEndpointClient {
+export class VsoClient {
   token: string;
   vsoEndpointUrl: string;
   headers: object;

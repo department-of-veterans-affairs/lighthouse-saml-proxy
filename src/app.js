@@ -12,8 +12,8 @@ import VetsAPIConfig from "./VsoEndpointConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
 import MpiUserEndpointConfig from "./MpiUserEndpointConfig";
-import { MpiUserEndpointClient } from "./MpiUserEndpointClient";
-import { VsoEndpointClient } from "./VsoEndpointClient";
+import { MpiUserClient } from "./MpiUserClient";
+import { VsoClient } from "./VsoClient";
 import { RedisCache } from "./routes/types";
 import createPassportStrategy from "./routes/passport";
 import passport from "passport";
@@ -91,12 +91,12 @@ function runServer(argv) {
       const idpConfig = new IDPConfig(argv);
       const vsoConfig = new VetsAPIConfig(argv);
       const mpiUserEndpointConfig = new MpiUserEndpointConfig(argv);
-      const mpiUserEndpointClient = new MpiUserEndpointClient(
+      const mpiUserClient = new MpiUserClient(
         mpiUserEndpointConfig.apiKey,
         mpiUserEndpointConfig.mpiUserEndpoint,
         mpiUserEndpointConfig.accessKey
       );
-      const vetsApiClient = new VsoEndpointClient(
+      const vsoClient = new VsoClient(
         vsoConfig.token,
         vsoConfig.vsoUserEndpoint
       );
@@ -111,8 +111,8 @@ function runServer(argv) {
         idpConfig,
         spConfigs,
         strategies,
-        mpiUserEndpointClient,
-        vetsApiClient,
+        mpiUserClient,
+        vsoClient,
         cache,
         cacheEnabled
       );

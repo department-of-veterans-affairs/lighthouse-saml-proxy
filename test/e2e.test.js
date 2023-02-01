@@ -7,7 +7,7 @@ import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";
 import { idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";
-import MockVetsApiClient from "./mockVetsApiClient";
+import MockVetsApiClient from "./mockMpiUserClient";
 import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
