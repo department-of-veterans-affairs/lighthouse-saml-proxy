@@ -7,7 +7,7 @@ import { buildBackgroundServerModule } from "./backgroundServer";
 import { getTestExpressApp } from "./testServer";
 import { idpConfig } from "./testServer";
 import { MHV_USER, DSLOGON_USER, IDME_USER } from "./testUsers";
-import MockVetsApiClient from "./mockMpiUserClient";
+import MockMpiUserClient from "./mockMpiUserClient";
 import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
@@ -33,7 +33,7 @@ const SP_ERROR = "Found. Redirecting to /samlproxy/sp/error";
 // http://w3c.github.io/html-reference/syntax.html#void-elements)
 const MIME_HTML = "text/html";
 const PORT = 1111;
-const vetsApiClient = new MockVetsApiClient();
+const vetsApiClient = new MockMpiUserClient();
 
 let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);

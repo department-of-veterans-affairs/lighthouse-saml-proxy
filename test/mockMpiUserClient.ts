@@ -1,6 +1,6 @@
-import { SAMLUser } from "../src/VetsAPIClient";
+import { SAMLUser } from "../src/SAMLUser";
 
-export default class MockVetsApiClient {
+export default class MockMpiUserClient {
   public findUserInMVI = true;
   public userIsVSO = true;
 
@@ -18,26 +18,7 @@ export default class MockVetsApiClient {
     throw new Error("Not found");
   }
 
-  /*
-   * Mock VSO search.
-   *
-   * Params are unused but are present to mimic real signature.
-   */
-  public async getVSOSearch(
-    firstName: string, // eslint-disable-line
-    lastName: string // eslint-disable-line
-  ): Promise<{ poa: string }> {
-    if (this.userIsVSO) {
-      return {
-        poa: "poa",
-      };
-    }
-
-    throw new Error("Not found");
-  }
-
   public reset() {
     this.findUserInMVI = true;
-    this.userIsVSO = true;
   }
 }
