@@ -24,9 +24,9 @@ const unknownUsersErrorTemplate = (error: any) => {
     error.name == "StatusCodeError" &&
     error.statusCode.toString() === "404"
   ) {
-    return "internal_failure";
-  } else {
     return "icn_error";
+  } else {
+    return "internal_failure";
   }
 };
 
