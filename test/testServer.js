@@ -40,7 +40,11 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
-export function getTestExpressApp(mpiUserClient, vsoClient,  cache = new TestCache()) {
+export function getTestExpressApp(
+  mpiUserClient,
+  vsoClient,
+  cache = new TestCache()
+) {
   const app = express();
   const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
   const strategies = new Map();
