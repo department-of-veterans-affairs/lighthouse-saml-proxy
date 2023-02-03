@@ -82,12 +82,12 @@ describe("getMVITraitsForLoa3User", () => {
   it("should call the mvi-user endpoint with the Veteran's icn in request body", async () => {
     const client = new MpiUserClient(
       "faketoken",
-      "https://example.gov//mvi-user",
+      "https://example.gov/mpi-user",
       "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraitsICN);
     expect(request.post).toHaveBeenCalledWith({
-      url: "https://example.gov//mvi-user",
+      url: "https://example.gov/mpi-user",
       json: true,
       headers: expect.objectContaining({
         apiKey: "faketoken",
