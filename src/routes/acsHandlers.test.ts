@@ -14,7 +14,7 @@ import { IDME_USER } from "../../test/testUsers";
 import { accessiblePhoneNumber } from "../utils";
 jest.mock("passport");
 jest.mock("../VsoClient");
-jest.mock("../mpiUserClient");
+jest.mock("../MpiUserClient");
 import passport from "passport";
 
 const vsoClient = new VsoClient("fakeToken", "https://example.gov");
