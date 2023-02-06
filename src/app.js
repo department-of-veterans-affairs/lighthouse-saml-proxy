@@ -8,10 +8,12 @@ import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";
-import VetsAPIConfig from "./VetsAPIConfig";
+import VsoClientConfig from "./VsoClientConfig";
 import configureExpress from "./routes";
 import logger from "./logger";
-import { VetsAPIClient } from "./VetsAPIClient";
+import MpiUserClientConfig from "./MpiUserClientConfig";
+import { MpiUserClient } from "./MpiUserClient";
+import { VsoClient } from "./VsoClient";
 import { RedisCache } from "./routes/types";
 import createPassportStrategy from "./routes/passport";
 import passport from "passport";
@@ -87,8 +89,17 @@ function runServer(argv) {
         });
       }
       const idpConfig = new IDPConfig(argv);
-      const vaConfig = new VetsAPIConfig(argv);
-      const vetsApiClient = new VetsAPIClient(vaConfig.token, vaConfig.apiHost);
+      const vsoConfig = new VsoClientConfig(argv);
+      const mpiUserClientConfig = new MpiUserClientConfig(argv);
+      const mpiUserClient = new MpiUserClient(
+        mpiUserClientConfig.apiKey,
+        mpiUserClientConfig.mpiUserEndpoint,
+        mpiUserClientConfig.accessKey
+      );
+      const vsoClient = new VsoClient(
+        vsoConfig.token,
+        vsoConfig.vsoUserEndpoint
+      );
       let cache = null;
       const cacheEnabled = argv.cacheEnabled;
       if (cacheEnabled) {
@@ -100,7 +111,8 @@ function runServer(argv) {
         idpConfig,
         spConfigs,
         strategies,
-        vetsApiClient,
+        mpiUserClient,
+        vsoClient,
         cache,
         cacheEnabled
       );

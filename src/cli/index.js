@@ -365,16 +365,27 @@ export function processArgs() {
         required: false,
         string: true,
       },
-      vetsAPIHost: {
-        // This alias and the one for vetsAPIToken below are workarounds for a bug in yargs
-        // where it runs environment variables through a camelcase function that transforms
-        // API to Api. Without these aliases, yargs will complain that these arguments are
-        // missing.
-        alias: "vetsApiHost",
-        description:
-          "The URL prefix for the vets-api host used to perform MVI lookups.",
+      mpiUserEndpoint: {
+        alias: "mpiUserEndpoint",
+        description: "The URL to the endpont that used to perform MPI lookups.",
         required: true,
         string: true,
+        default: "https://dev-api.va.gov/internal/auth/v3/mpi-user",
+      },
+      accessKey: {
+        alias: "accessKey",
+        description:
+          "The access key to the endpont that used to perform MPI lookups.",
+        required: false,
+        string: true,
+      },
+      vsoUserEndpoint: {
+        alias: "vsoUserEndpoint",
+        description: "The URL to the endpont that used to perform VSO lookups.",
+        required: true,
+        string: true,
+        default:
+          "https://dev-api.va.gov/services/veteran/v0/representatives/find_rep",
       },
       vetsAPIToken: {
         alias: "vetsApiToken",

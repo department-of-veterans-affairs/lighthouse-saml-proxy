@@ -24,9 +24,9 @@ const unknownUsersErrorTemplate = (error: any) => {
     error.name == "StatusCodeError" &&
     error.statusCode.toString() === "404"
   ) {
-    return "internal_failure";
-  } else {
     return "icn_error";
+  } else {
+    return "internal_failure";
   }
 };
 
@@ -128,7 +128,7 @@ export const loadICN = async (
     const { icn, first_name, last_name } = await requestWithMetrics(
       MVIRequestMetrics,
       (): Promise<any> => {
-        return req.vetsAPIClient.getMVITraitsForLoa3User(req.user.claims);
+        return req.mpiUserClient.getMpiTraitsForLoa3User(req.user.claims);
       }
     );
 
@@ -152,7 +152,7 @@ export const loadICN = async (
       await requestWithMetrics(
         VSORequestMetrics,
         (): Promise<any> => {
-          return req.vetsAPIClient.getVSOSearch(
+          return req.vsoClient.getVSOSearch(
             req.user.claims.firstName,
             req.user.claims.lastName
           );
