@@ -1,11 +1,8 @@
 require("jest");
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
-const qs = require("querystring");
-const { ModifyAttack } = require("saml-attacks");
-const SAML = require("saml-encoder-decoder-js");
 const fs = require("fs");
-const path = require('path');
+const path = require("path");
 
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
@@ -21,43 +18,46 @@ const defaultScope = [
 ];
 
 const authorization_url = process.env.AUTHORIZATION_URL;
-const saml_proxy_url = process.env.SAML_PROXY_URL;
+// const saml_proxy_url = process.env.SAML_PROXY_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
-const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
 
-describe("Happy users tests", () => {
-  jest.setTimeout(70000);
-  let browser;
-  beforeEach(async () => {
-    browser = await puppeteer.launch(launchArgs);
-  });
-
-  afterEach(async () => {
-    await browser.close();
-  });
-
-  const filePath = path.join(__dirname, 'happy_users.txt');
-  let users;
-  fs.readFile(filePath, {encoding: 'utf-8'}, (error, data) => {
+const happyUsers = async () => {
+  const filePath = path.join(__dirname, "happy_users.txt");
+  let happy_users;
+  fs.readFile(filePath, { encoding: "utf-8" }, (error, data) => {
     if (error) {
       console.error(error);
       return;
     }
-    users = data.split(/[ ,]+/);
+    happy_users = data.split(/[ ,]+/);
+    return happy_users;
   });
+};
+
+describe("Happy users tests", () => {
+  jest.setTimeout(70000);
 
   const testUser = async (happy_user) => {
+    const browser = await puppeteer.launch(launchArgs);
+    console.info("Testing with user " + happy_user);
     const page = await browser.newPage();
     await requestToken(page);
 
-    let code = await login(page, valid_user, user_password, true);
+    let code = await login(page, happy_user, user_password, true);
     expect(code).not.toBeNull();
+    await browser.close();
   };
 
   test.only("Happy Path", async () => {
-   await testUser(valid_user);
+    const happy_users = await happyUsers();
+
+    //  happyUsers.forEach(testUser);
+    //  await testUser(valid_user);
+    for (const user of happy_users) {
+      await testUser(user);
+    }
   });
 });
 
@@ -104,78 +104,4 @@ const authentication = async (page, email = valid_user, intercept = false) => {
   await page.setRequestInterception(intercept);
 
   await page.$eval("button.btn-primary", (elem) => elem.click());
-};
-
-const encode = async (data) => {
-  await SAML.encodeSamlPost(data.SAMLResponse, function (err, encoded) {
-    if (!err) {
-      data.SAMLResponse = encoded;
-    }
-  });
-
-  return qs.stringify(data);
-};
-
-const decode = async (request) => {
-  let post_string = request.postData();
-  let post_data = qs.parse(post_string);
-  await SAML.decodeSamlPost(post_data.SAMLResponse, function (err, result) {
-    if (!err) {
-      post_data.SAMLResponse = result;
-    }
-  });
-
-  return post_data;
-};
-
-const isError = async (page, header, errorMessage) => {
-  const heading = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading",
-    (elem) => elem.innerText
-  );
-  expect(heading).toEqual(header);
-
-  const errorText = await page.$eval(
-    ".usa-alert-body > p",
-    (elem) => elem.innerText
-  );
-  expect(errorText).toEqual(errorMessage);
-
-  const errorIdHeadding = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading:nth-of-type(2)",
-    (elem) => elem.innerText
-  );
-  expect(errorIdHeadding).toEqual("Error ID");
-
-  const errorId = await page.$eval(
-    ".usa-alert-body > pre",
-    (elem) => elem.innerText
-  );
-  expect(errorId);
-};
-
-const isSensitiveError = async (page) => {
-  const heading = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading",
-    (elem) => elem.innerText
-  );
-  expect(heading).toEqual("Error");
-
-  const errorText = await page.$eval(
-    ".usa-alert-body > p",
-    (elem) => elem.innerText
-  );
-  expect(errorText).toEqual("Your request could not be processed.");
-
-  const errorIdHeadding = await page.$eval(
-    ".usa-alert-body > .usa-alert-heading:nth-of-type(2)",
-    (elem) => elem.innerText
-  );
-  expect(errorIdHeadding).toEqual("Error ID");
-
-  const errorId = await page.$eval(
-    ".usa-alert-body > pre",
-    (elem) => elem.innerText
-  );
-  expect(errorId);
 };
