@@ -22,19 +22,7 @@ const authorization_url = process.env.AUTHORIZATION_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
-
-const happyUsers = async () => {
-  const filePath = path.join(__dirname, "happy_users.txt");
-  let happy_users;
-  fs.readFile(filePath, { encoding: "utf-8" }, (error, data) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    happy_users = data.split(/[ ,]+/);
-    return happy_users;
-  });
-};
+const filePath = path.join(__dirname, "happy_users.txt");
 
 describe("Happy users tests", () => {
   jest.setTimeout(70000);
@@ -51,13 +39,19 @@ describe("Happy users tests", () => {
   };
 
   test.only("Happy Path", async () => {
-    const happy_users = await happyUsers();
 
+    fs.readFile(filePath, { encoding: "utf-8" }, async function(error, data) {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      const happy_users = data.split(/[ ,]+/);
+      for (const user of happy_users) {
+        await testUser(user);
+      }
+      });
     //  happyUsers.forEach(testUser);
     //  await testUser(valid_user);
-    for (const user of happy_users) {
-      await testUser(user);
-    }
   });
 });
 
