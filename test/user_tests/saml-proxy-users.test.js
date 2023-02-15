@@ -4,6 +4,9 @@ const puppeteer = require("puppeteer");
 const qs = require("querystring");
 const { ModifyAttack } = require("saml-attacks");
 const SAML = require("saml-encoder-decoder-js");
+const fs = require("fs");
+const path = require('path');
+
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
@@ -35,14 +38,27 @@ describe("Happy users tests", () => {
     await browser.close();
   });
 
-  test.only("Happy Path", async () => {
+  const filePath = path.join(__dirname, 'happy_users.txt');
+  let users;
+  fs.readFile(filePath, {encoding: 'utf-8'}, (error, data) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    users = data.split(/[ ,]+/);
+  });
+
+  const testUser = async (happy_user) => {
     const page = await browser.newPage();
     await requestToken(page);
 
     let code = await login(page, valid_user, user_password, true);
     expect(code).not.toBeNull();
-  });
+  };
 
+  test.only("Happy Path", async () => {
+   await testUser(valid_user);
+  });
 });
 
 const requestToken = async (page) => {
