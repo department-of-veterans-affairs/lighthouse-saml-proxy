@@ -21,34 +21,24 @@ const authorization_url = process.env.AUTHORIZATION_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const filePath = path.join(__dirname, "happy_users.txt");
+const happy_users = fs.readFileSync(filePath, {encoding: "utf-8"}).split(/[ ,]+/);
+
+const testUser = async (happy_user) => {
+  const browser = await puppeteer.launch(launchArgs);
+  console.info("Testing with user " + happy_user);
+  const page = await browser.newPage();
+  await requestToken(page);
+
+  let code = await login(page, happy_user, user_password, true);
+  expect(code).not.toBeNull();
+  await browser.close();
+};
 
 describe("Happy users tests", () => {
   jest.setTimeout(70000);
-
-  const testUser = async (happy_user) => {
-    const browser = await puppeteer.launch(launchArgs);
-    console.info("Testing with user " + happy_user);
-    const page = await browser.newPage();
-    await requestToken(page);
-
-    let code = await login(page, happy_user, user_password, true);
-    expect(code).not.toBeNull();
-    await browser.close();
-  };
-
-  test.only("Happy Path", () => {
-    fs.readFile(filePath, { encoding: "utf-8" }, async (error, data) => {
-      if (error) {
-        console.error(error);
-        throw ("Error reading user file");
-      }
-      const happy_users = data.split(/[ ,]+/);
-      // happy_users.forEach(async (user) => await testUser(user.trim()));
-      for (const user of happy_users) {
-        await testUser(user.trim());
-      }
-    });
-  });
+  const users = [];
+  happy_users.forEach(user => users.push(user.trim()));
+  test.each(users)("Login with %s", (user) => testUser(user));
 });
 
 const requestToken = async (page) => {
