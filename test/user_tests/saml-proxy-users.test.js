@@ -18,10 +18,8 @@ const defaultScope = [
 ];
 
 const authorization_url = process.env.AUTHORIZATION_URL;
-// const saml_proxy_url = process.env.SAML_PROXY_URL;
 const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
-const valid_user = process.env.VALID_USER_EMAIL;
 const filePath = path.join(__dirname, "happy_users.txt");
 
 describe("Happy users tests", () => {
@@ -38,20 +36,18 @@ describe("Happy users tests", () => {
     await browser.close();
   };
 
-  test.only("Happy Path", async () => {
-
-    fs.readFile(filePath, { encoding: "utf-8" }, async function(error, data) {
+  test.only("Happy Path", () => {
+    fs.readFile(filePath, { encoding: "utf-8" }, async (error, data) => {
       if (error) {
         console.error(error);
-        return;
+        throw ("Error reading user file");
       }
       const happy_users = data.split(/[ ,]+/);
+      // happy_users.forEach(async (user) => await testUser(user.trim()));
       for (const user of happy_users) {
-        await testUser(user);
+        await testUser(user.trim());
       }
-      });
-    //  happyUsers.forEach(testUser);
-    //  await testUser(valid_user);
+    });
   });
 });
 
@@ -85,7 +81,7 @@ const login = async (page, useremail, password, get_code = false) => {
   return code;
 };
 
-const authentication = async (page, email = valid_user, intercept = false) => {
+const authentication = async (page, email, intercept = false) => {
   await page.$eval(".idme-signin", (elem) => elem.click());
   await page.waitForSelector("#user_email");
   await page.type("#user_email", email);
