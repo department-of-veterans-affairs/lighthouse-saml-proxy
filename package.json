@@ -26,7 +26,7 @@
     "start": "node build/app.js",
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "test": "jest --testPathIgnorePatterns test/**/*",
+    "test": "jest --testPathIgnorePatterns test/regression_tests/* test/user_tests/*",
     "test:ci": "jest --ci --testPathIgnorePatterns test/**/*",
     "test:watch": "jest --watch",
     "start-dev": "npx eslint . && ts-node -r source-map-support/register src/app.js --config dev-config.json",
