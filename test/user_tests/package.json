@@ -1,0 +1,27 @@
+{
+  "name": "saml_proxy_regression_tests",
+  "version": "1.0.0",
+  "description": "Saml Proxy regression tests.",
+  "main": "saml-proxy-regression.test.js",
+  "scripts": {
+    "preinstall": "npx npm-force-resolutions",
+    "test": "jest -- saml-proxy-users.test.js"
+  },
+  "keywords": [
+    "saml-proxy"
+  ],
+  "author": "Pivot!",
+  "license": "ISC",
+  "dependencies": {
+    "@xmldom/xmldom": "^0.7.9",
+    "jest": "^27.0.4",
+    "puppeteer": "^17.1.3",
+    "querystring": "^0.2.1",
+    "saml-attacks": "github:department-of-veterans-affairs/lighthouse-saml-utils",
+    "saml-encoder-decoder-js": "^1.0.1",
+    "uuid": "^8.3.2"
+  },
+  "resolutions": {
+    "node-forge": ">=1.0.0"
+  }
+}
