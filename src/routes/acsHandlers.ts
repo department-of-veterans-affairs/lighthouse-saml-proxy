@@ -141,12 +141,12 @@ export const loadICN = async (
     if (first_name) {
       req.user.claims.firstName = first_name;
     } else {
-      logger.warn("Null mpi_user first_name for " + icn);
+      logger.warn("Null mpi_user first_name");
     }
     if (last_name) {
       req.user.claims.lastName = last_name;
     } else {
-      logger.warn("Null mpi_user last_name for " + icn);
+      logger.warn("Null mpi_user last_name");
     }
     next();
   } catch (mviError) {

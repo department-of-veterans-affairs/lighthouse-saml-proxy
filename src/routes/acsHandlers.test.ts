@@ -250,9 +250,7 @@ describe("loadICN", () => {
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
-    expect(logger.warn).toHaveBeenCalledWith(
-      "Null mpi_user first_name for anICN"
-    );
+    expect(logger.warn).toHaveBeenCalledWith("Null mpi_user first_name");
   });
 
   it("should call getMVITraits... calls when ICN Exists, null last_name", async () => {
@@ -274,9 +272,7 @@ describe("loadICN", () => {
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
-    expect(logger.warn).toHaveBeenCalledWith(
-      "Null mpi_user last_name for anICN"
-    );
+    expect(logger.warn).toHaveBeenCalledWith("Null mpi_user last_name");
   });
 
   it("should load ICN and assign it as a user claim when edipi exists and no icn", async () => {
