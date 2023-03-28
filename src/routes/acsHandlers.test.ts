@@ -15,7 +15,10 @@ import { accessiblePhoneNumber } from "../utils";
 jest.mock("passport");
 jest.mock("../VsoClient");
 jest.mock("../MpiUserClient");
+jest.mock("../logger");
+
 import passport from "passport";
+import logger from "../logger";
 
 const vsoClient = new VsoClient("fakeToken", "https://example.gov");
 const mpiUserClient = new MpiUserClient(
@@ -247,6 +250,9 @@ describe("loadICN", () => {
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Null mpi_user first_name for anICN"
+    );
   });
 
   it("should call getMVITraits... calls when ICN Exists, null last_name", async () => {
@@ -268,6 +274,9 @@ describe("loadICN", () => {
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Null mpi_user last_name for anICN"
+    );
   });
 
   it("should load ICN and assign it as a user claim when edipi exists and no icn", async () => {
