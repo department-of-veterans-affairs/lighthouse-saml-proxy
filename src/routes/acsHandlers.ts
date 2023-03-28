@@ -138,8 +138,16 @@ export const loadICN = async (
       result: "success",
     });
     req.user.claims.icn = icn;
-    req.user.claims.firstName = first_name;
-    req.user.claims.lastName = last_name;
+    if (first_name) {
+      req.user.claims.firstName = first_name;
+    } else {
+      logger.warn("Null mpi_user first_name for " + icn);
+    }
+    if (last_name) {
+      req.user.claims.lastName = last_name;
+    } else {
+      logger.warn("Null mpi_user last_name for " + icn);
+    }
     next();
   } catch (mviError) {
     logger.warn("Failed MVI lookup; will try VSO search", {
