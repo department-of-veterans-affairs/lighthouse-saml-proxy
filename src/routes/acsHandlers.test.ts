@@ -228,6 +228,48 @@ describe("loadICN", () => {
     expect(req.user.claims.icn).toEqual("anICN");
   });
 
+  it("should call getMVITraits... calls when ICN Exists, null first_name", async () => {
+    const nextFn = jest.fn();
+    const req = {
+      mpiUserClient: mpiUserClient,
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
+      icn: "anICN",
+      first_name: null,
+      last_name: "Paget",
+    });
+    await handlers.loadICN(req, {}, nextFn);
+    expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
+    expect(req.user.claims.icn).toEqual("anICN");
+  });
+
+  it("should call getMVITraits... calls when ICN Exists, null last_name", async () => {
+    const nextFn = jest.fn();
+    const req = {
+      mpiUserClient: mpiUserClient,
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
+      icn: "anICN",
+      first_name: "Edward",
+      last_name: null,
+    });
+    await handlers.loadICN(req, {}, nextFn);
+    expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
+    expect(req.user.claims.icn).toEqual("anICN");
+  });
+
   it("should load ICN and assign it as a user claim when edipi exists and no icn", async () => {
     const nextFn = jest.fn();
     const req = {
