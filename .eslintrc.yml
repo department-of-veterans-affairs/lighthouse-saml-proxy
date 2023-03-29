@@ -7,9 +7,12 @@ env:
 extends:
   - "eslint:recommended"
   - "plugin:prettier/recommended"
+  - "plugin:jsdoc/recommended"
+  - "plugin:jsdoc/recommended-error"
 plugins:
   - prettier
   - jest
+  - jsdoc
 parserOptions:
   ecmaVersion: 11
   sourceType: module
@@ -47,6 +50,7 @@ overrides:
     plugins:
       - prettier
       - jest
+      - jsdoc
     parser: "@typescript-eslint/parser"
     parserOptions:
       ecmaVersion: 11
