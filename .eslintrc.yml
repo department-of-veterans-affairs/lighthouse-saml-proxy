@@ -8,7 +8,6 @@ extends:
   - "eslint:recommended"
   - "plugin:prettier/recommended"
   - "plugin:jsdoc/recommended"
-  - "plugin:jsdoc/recommended-error"
 plugins:
   - prettier
   - jest
@@ -47,6 +46,7 @@ overrides:
       - "plugin:prettier/recommended"
       - "plugin:@typescript-eslint/eslint-recommended"
       - "plugin:@typescript-eslint/recommended"
+      - "plugin:jsdoc/recommended"
     plugins:
       - prettier
       - jest
@@ -78,3 +78,4 @@ overrides:
       "@typescript-eslint/no-unused-vars":
         - error
         - { argsIgnorePattern: \b(?:res|req|next)\b }
+      "jsdoc/no-undefined-types": 0
