@@ -83,14 +83,13 @@ let renderedCss = {};
  *
  * Modeled after node-sass-middleware.
  *
- * @param {{
+ * @param {*} options parameter object for options
  *     src: string,
  *     dest: string,
  *     importer: Function,
  *     outputStyle: String,
  *     sass: Function, log: Function
- *   }} options
- * @returns {Function}
+ * @returns {Function} next()
  */
 export function sassMiddleware(options) {
   const src = options.src;

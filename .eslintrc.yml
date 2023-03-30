@@ -33,6 +33,7 @@ rules:
     - { argsIgnorePattern: \b(?:res|req|next)\b }
   no-prototype-builtins:
     - off
+  "jsdoc/require-jsdoc" : 0
 overrides:
   - files: ["**/*.ts", "**/*.tsx"]
     env:
@@ -78,4 +79,4 @@ overrides:
       "@typescript-eslint/no-unused-vars":
         - error
         - { argsIgnorePattern: \b(?:res|req|next)\b }
-      "jsdoc/no-undefined-types": 0
+      "jsdoc/require-jsdoc" : 0
