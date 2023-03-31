@@ -8,7 +8,7 @@ const logger = require("./logger");
  * Creates a check to get the binding location
  *
  * @param {*} serviceEl serviceEl
- * @param {*} bindingUri bindingUri
+ * @param {*} bindingUri specifies information to communicate with location
  * @returns {*} returns the binding location
  */
 function getBindingLocation(serviceEl, bindingUri) {
@@ -43,7 +43,7 @@ function getFirstCert(keyEl) {
 /**
  * Creates the check for fetching url
  *
- * @param {*} url param url
+ * @param {*} url fetch url
  * @returns {*} returns Promise constructor
  */
 export function fetch(url) {

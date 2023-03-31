@@ -6,9 +6,9 @@ export function getPath(path) {
 /**
  * Creates a check to get the req url
  *
- * @param {*} req request
- * @param {*} path url path
- * @returns {*} req url
+ * @param {*} req The HTTP request
+ * @param {*} path the HTTP url path
+ * @returns {*} request url path
  */
 export function getReqUrl(req, path) {
   if (req.get("host") === "localhost:7000") {
@@ -24,8 +24,8 @@ export function getReqUrl(req, path) {
 /**
  * Creates a check to remove headers
  *
- * @param {*} cert certificate
- * @returns {*} cert
+ * @param {*} cert the param for certificate
+ * @returns {*} returns the cert param
  */
 export function removeHeaders(cert) {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert);
@@ -37,7 +37,7 @@ export function removeHeaders(cert) {
 /**
  * Logger for relay state
  *
- * @param {*} req request
+ * @param {*} req The HTTP request
  * @param {*} logger logs information
  * @param {*} step relay state step
  */
@@ -59,8 +59,8 @@ export function logRelayState(req, logger, step) {
 /**
  * Function for getting accessible phone number
  *
- * @param {*} digitString phone number string
- * @returns {*} digit string and label of phone number
+ * @param {*} digitString the string fir phone number
+ * @returns {*} returns phone number and label
  */
 export function accessiblePhoneNumber(digitString) {
   var digits = digitString.split("").filter(function (ch) {

@@ -23,8 +23,8 @@ import samlp from "samlp";
  * @param {*} spConfigs user sp configs
  * @param {*} acsUrl assertion consumer service url
  * @param {*} cache redis cache
- * @param {*} cacheEnabled bool param
- * @returns {*} returns event
+ * @param {*} cacheEnabled boolean param
+ * @returns {*} returns app
  */
 export default function addRoutes(
   app,

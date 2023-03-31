@@ -35,12 +35,12 @@ function filterProperty(object, property) {
  * @param {*} argv argument vector
  * @param {*} idpOptions user idp options
  * @param {*} spOptions user sp options
- * @param {*} strategies --
+ * @param {*} strategies map
  * @param {*} mpiUserClient user in master patient index
  * @param {*} vsoClient used for connected with oauth
  * @param {*} cache redis cache
  * @param {*} cacheEnabled bool param
- * @returns {*} returns event
+ * @returns {*} returns event data
  */
 export default function configureExpress(
   app,

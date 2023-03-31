@@ -7,7 +7,7 @@ import { IDPProfileMapper } from "../IDPProfileMapper";
  * Creates the passport strategy using the spConfig
  *
  * @param {*} spConfig config parameter
- * @returns {Strategy} returns the strategy to use
+ * @returns {Strategy} returns the responseParams
  */
 export default function createPassportStrategy(spConfig) {
   const responseParams = spConfig.getResponseParams();
@@ -43,7 +43,7 @@ export default function createPassportStrategy(spConfig) {
 /**
  * Called before handling the SAML response
  *
- * @param {*} strategy The stategy to use
+ * @param {*} strategy passport strategy
  * @returns {passport} returns passport user information
  */
 export function preparePassport(strategy) {
@@ -63,7 +63,7 @@ export function preparePassport(strategy) {
 
 /**
  * Uses the request to select a key which will be used
- * for selecting the appropriate passport stategy when
+ * for selecting the appropriate passport strategy when
  * handing a SAML response
  *
  * @param {*} req The instance of IConfiguredRequest

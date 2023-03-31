@@ -10,9 +10,9 @@ import {
 import { checkEncryptionCerts, checkWhenNoMetadata } from "./checks";
 import { BINDINGS } from "../samlConstants";
 /**
- * Function for processing arguments
+ * Function for processing different arguments that use idp
  *
- * @returns {yargs} returns args
+ * @returns {*} returns certToPEM or idp value
  */
 export function processArgs() {
   return yargs

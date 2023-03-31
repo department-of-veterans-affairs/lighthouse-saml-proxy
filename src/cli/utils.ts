@@ -6,7 +6,7 @@ import { cwd, env } from "process";
  * Creates the check to resolve the file path
  *
  * @param {*} filePath name of the filepath
- * @returns {*} name of filepath or null
+ * @returns {filePath} name of filepath or null
  */
 export function resolveFilePath(filePath: string) {
   let possiblePath;

@@ -114,7 +114,7 @@ function SAMLResponseFromHtml(html) {
  * Checks for if user is not found
  *
  * @param {*} body user information
- * @returns {boolean} if user is found or not found
+ * @returns {boolean} returns if user is found or not found
  */
 function isUserNotFound(body) {
   const parser = new DOMParser();
@@ -130,7 +130,7 @@ function isUserNotFound(body) {
 /**
  * returns element value
  *
- * @param {*} elements request
+ * @param {*} elements elements
  * @param {*} name attribute node
  * @returns {*} element value
  */
@@ -235,7 +235,13 @@ function decode_saml_uri(saml) {
   var b64decoded = new Buffer.from(uriDecoded, "base64");
   return zlib.inflateRawSync(b64decoded).toString();
 }
-
+/**
+ * This function gets the idp saml request and returns a decoded saml uri
+ *
+ * @param {*} response saml proxy response
+ * @param {*} class_tags class tags
+ * @returns {*} idp saml request
+ */
 function getIdpSamlRequest(response, class_tags) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(response.body, MIME_HTML);
