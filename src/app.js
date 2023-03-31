@@ -63,7 +63,11 @@ const handleMetadata = (argv) => {
     }
   };
 };
-
+/**
+ * Creates running the server
+ *
+ * @param {*} argv argument vector
+ */
 function runServer(argv) {
   const strategies = new Map();
   IdPMetadata.fetch(argv.spIdpMetaUrl)

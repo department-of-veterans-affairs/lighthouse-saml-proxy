@@ -307,7 +307,13 @@ export const serializeAssertions = (
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
   samlp.auth(authOptions)(req, res, next);
 };
-
+/**
+ * Creates a request with metrics
+ *
+ * @param {*} metrics param using IRequestMetrics
+ * @param {*} promiseFunc calls the Promise function
+ * @returns {*} returns const res calls the promiseFunc()
+ */
 export async function requestWithMetrics(
   metrics: IRequestMetrics,
   promiseFunc: () => Promise<any>

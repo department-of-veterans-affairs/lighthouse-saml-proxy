@@ -15,7 +15,17 @@ import {
 } from "./handlers";
 
 import samlp from "samlp";
-
+/**
+ * Function for adding routes
+ *
+ * @param {*} app param app
+ * @param {*} idpConfig user idp config
+ * @param {*} spConfigs user sp configs
+ * @param {*} acsUrl assertion consumer service url
+ * @param {*} cache redis cache
+ * @param {*} cacheEnabled bool param
+ * @returns {*} returns event
+ */
 export default function addRoutes(
   app,
   idpConfig,

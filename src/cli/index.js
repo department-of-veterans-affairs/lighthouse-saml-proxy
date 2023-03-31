@@ -9,7 +9,11 @@ import {
 } from "./coercing";
 import { checkEncryptionCerts, checkWhenNoMetadata } from "./checks";
 import { BINDINGS } from "../samlConstants";
-
+/**
+ * Function for processing arguments
+ *
+ * @returns {yargs} returns args
+ */
 export function processArgs() {
   return yargs
     .usage(

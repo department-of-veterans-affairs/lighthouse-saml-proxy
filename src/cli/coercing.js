@@ -22,7 +22,14 @@ export function bufferFromString(value) {
     return new Buffer(value);
   }
 }
-
+/**
+ * Creates the make cert file coercer
+ *
+ * @param {*} type file type
+ * @param {*} description file description
+ * @param {*} helpText file help text
+ * @returns {*} returns a filepath or a cert type value
+ */
 export function makeCertFileCoercer(type, description, helpText) {
   return function certFileCoercer(value) {
     if (matchesCertType(value, type)) {
@@ -41,6 +48,12 @@ export function makeCertFileCoercer(type, description, helpText) {
   };
 }
 
+/**
+ * Creates the certificate to PEM
+ *
+ * @param {*} cert certificate param
+ * @returns {cert} returns the certificate if matches
+ */
 export function certToPEM(cert) {
   if (/-----BEGIN CERTIFICATE-----/.test(cert)) {
     return cert;
@@ -52,6 +65,12 @@ export function certToPEM(cert) {
   return cert;
 }
 
+/**
+ * Creates the check for load file sync
+ *
+ * @param {*} value load file sync value
+ * @returns {*} returns empty string or reads in the filepath
+ */
 export function loadFileSync(value) {
   const filePath = resolveFilePath(value);
   if (filePath) {

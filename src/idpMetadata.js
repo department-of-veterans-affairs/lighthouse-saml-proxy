@@ -4,6 +4,13 @@ const request = require("request");
 const xml2js = require("xml2js");
 const logger = require("./logger");
 
+/**
+ * Creates a check to get the binding location
+ *
+ * @param {*} serviceEl serviceEl
+ * @param {*} bindingUri bindingUri
+ * @returns {*} returns the binding location
+ */
 function getBindingLocation(serviceEl, bindingUri) {
   var location;
   if (serviceEl && serviceEl.length > 0) {
@@ -16,6 +23,12 @@ function getBindingLocation(serviceEl, bindingUri) {
   return location;
 }
 
+/**
+ * Creates a check to get the first cert
+ *
+ * @param {*} keyEl keyEl
+ * @returns {keyEl}  returns the first cert
+ */
 function getFirstCert(keyEl) {
   if (
     (keyEl.KeyInfo && keyEl.KeyInfo.length === 1,
@@ -27,7 +40,12 @@ function getFirstCert(keyEl) {
   }
   return null;
 }
-
+/**
+ * Creates the check for fetching url
+ *
+ * @param {*} url param url
+ * @returns {*} returns Promise constructor
+ */
 export function fetch(url) {
   return new Promise((resolve, reject) => {
     const metadata = { sso: {}, slo: {}, nameIdFormats: [], signingKeys: [] };
