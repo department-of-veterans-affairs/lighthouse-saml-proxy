@@ -13,7 +13,12 @@ export const KEY_CERT_HELP_TEXT = `Please generate a key-pair for the IdP using 
 export function matchesCertType(value, type) {
   return cryptTypes[type] && cryptTypes[type].test(value);
 }
-
+/**
+ * Creates a buffer from string
+ *
+ * @param {*} value buffer value
+ * @returns {Buffer} buffer value
+ */
 export function bufferFromString(value) {
   if (Buffer.hasOwnProperty("from")) {
     // node 6+

@@ -64,7 +64,7 @@ const handleMetadata = (argv) => {
   };
 };
 /**
- * Creates running the server
+ * Creates check for running the server
  *
  * @param {*} argv argument vector
  */

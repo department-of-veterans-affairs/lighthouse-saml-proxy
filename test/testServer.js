@@ -40,6 +40,14 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
+/**
+ * Get test express app
+ *
+ * @param {*} mpiUserClient user in master patient index
+ * @param {*} vsoClient used for connecting with oauth
+ * @param {*} cache test cache
+ * @returns {*} const app
+ */
 export function getTestExpressApp(
   mpiUserClient,
   vsoClient,

@@ -3,7 +3,13 @@ import fs from "fs";
 export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }
-
+/**
+ * Creates a check to get the req url
+ *
+ * @param {*} req request
+ * @param {*} path url path
+ * @returns {*} req url
+ */
 export function getReqUrl(req, path) {
   if (req.get("host") === "localhost:7000") {
     return `http://${req.get("x-forwarded-host") || req.get("host")}${getPath(
@@ -15,7 +21,12 @@ export function getReqUrl(req, path) {
     )}`;
   }
 }
-
+/**
+ * Creates a check to remove headers
+ *
+ * @param {*} cert certificate
+ * @returns {*} cert
+ */
 export function removeHeaders(cert) {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert);
   if (pem && pem.length > 0) {
@@ -23,7 +34,13 @@ export function removeHeaders(cert) {
   }
   return cert;
 }
-
+/**
+ * Logger for relay state
+ *
+ * @param {*} req request
+ * @param {*} logger logs information
+ * @param {*} step relay state step
+ */
 export function logRelayState(req, logger, step) {
   const relayStateBody = req.body.RelayState;
   const relayStateQuery = req.query.RelayState;
@@ -39,6 +56,12 @@ export function logRelayState(req, logger, step) {
   );
 }
 
+/**
+ * Function for getting accessible phone number
+ *
+ * @param {*} digitString phone number string
+ * @returns {*} digit string and label of phone number
+ */
 export function accessiblePhoneNumber(digitString) {
   var digits = digitString.split("").filter(function (ch) {
     return "0123456789".indexOf(ch) !== -1;

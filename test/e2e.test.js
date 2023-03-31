@@ -40,6 +40,13 @@ const vsoClient = new MockVsoClient();
 let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
 
+/**
+ * Generates an sso request using samlResponse and state
+ *
+ * @param {*} samlResponse saml proxy response
+ * @param {*} state relay state
+ * @returns {*} sso request
+ */
 function ssoRequest(samlResponse, state = "state") {
   const reqOpts = {
     method: "POST",
@@ -69,15 +76,20 @@ async function ssoIdpRequest() {
 
   return request(reqOpts);
 }
-// These are the HTML parsers. The SSO endpoint renders HTML/javascript that automatically
-// submits a form of the SAMLResponse and RelayState back to Okta. It doesn't simply redirect
-// because it would need to do a 307 redirect to stay a POST. The user would need to "approve"
-// this redirect (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). The `samlp`
-// library we use allows the form template to be specified via config. We define the template
-// to use in in the function `responseHandler` in  `src/IDPConfig`. See `src/views/samlresponse.hbs`
-// for the html we are parsing. We decided to get the SAMLResponse and RelayState by parsing the
-// resulting HTML instead of mocking out the response handler. Parsing the HTML keeps the
-// functionality of these tests closer to what users actually experience.
+
+/**
+ * These are the HTML parsers. The SSO endpoint renders HTML/javascript that automatically
+ * submits a form of the SAMLResponse and RelayState back to Okta. It doesn't simply redirect
+ * because it would need to do a 307 redirect to stay a POST. The user would need to "approve"
+ * this redirect (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). The `samlp`
+ * library we use allows the form template to be specified via config. We define the template
+ * to use in the function `responseHandler` in  `src/IDPConfig`. See `src/views/samlresponse.hbs`
+ * for the html we are parsing. We decided to get the SAMLResponse and RelayState by parsing the
+ * functionality of these tests closer to what users actually experience.
+ *
+ * @param {*} html sso endpoint renders this
+ * @returns {*} elementValue
+ */
 function stateFromHtml(html) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(html, MIME_HTML);
@@ -85,6 +97,12 @@ function stateFromHtml(html) {
   return elementValue(inputs, "RelayState");
 }
 
+/**
+ * This function has the same purpose as said in above description.
+ *
+ * @param {*} html sso endpoint renders this
+ * @returns {*} elementValue
+ */
 function SAMLResponseFromHtml(html) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(html, MIME_HTML);
@@ -92,7 +110,12 @@ function SAMLResponseFromHtml(html) {
   return elementValue(inputs, "SAMLResponse");
 }
 
-// This function looks for the userNotFoundText in `src/views/icnError.hbs`
+/**
+ * Checks for if user is not found
+ *
+ * @param {*} body user information
+ * @returns {boolean} if user is found or not found
+ */
 function isUserNotFound(body) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(body, MIME_HTML);
@@ -104,7 +127,13 @@ function isUserNotFound(body) {
   }
   return false;
 }
-
+/**
+ * returns element value
+ *
+ * @param {*} elements request
+ * @param {*} name attribute node
+ * @returns {*} element value
+ */
 function elementValue(elements, name) {
   for (const element of elements) {
     if (element.getAttributeNode("name").nodeValue === name) {
@@ -113,8 +142,14 @@ function elementValue(elements, name) {
   }
 }
 
-// These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
-// for an example of the xml document we are parsing
+/**
+ * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
+ * for an example of the xml document we are parsing
+ *
+ * @param {*} samlResponse saml proxy response
+ * @param {*} assertion assertion in saml response
+ * @returns {*} element
+ */
 function assertionValueFromSAMLResponse(samlResponse, assertion) {
   const element = findAssertionInSamlResponse(samlResponse, assertion);
   if (!element) {
@@ -123,6 +158,14 @@ function assertionValueFromSAMLResponse(samlResponse, assertion) {
   return element.textContent;
 }
 
+/**
+ * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
+ * for an example of the xml document we are parsing
+ *
+ * @param {*} samlResponse saml proxy response
+ * @param {*} assertion assertion in saml response
+ * @returns {*} element
+ */
 function findAssertionInSamlResponse(samlResponse, assertion) {
   const parser = new DOMParser();
   const parsed = parser.parseFromString(samlResponse);
@@ -136,6 +179,13 @@ function findAssertionInSamlResponse(samlResponse, assertion) {
   }
 }
 
+/**
+ * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
+ * for an example of the xml document we are parsing
+ *
+ * @param {*} body saml response from html
+ * @returns {boolean} if the body is saml response or not
+ */
 function isBodySamlResponse(body) {
   const parser = new DOMParser();
   try {
@@ -147,7 +197,12 @@ function isBodySamlResponse(body) {
     return false;
   }
 }
-
+/**
+ * Checks for the saml response result type
+ *
+ * @param {*} response saml response
+ * @returns {*} response result
+ */
 function responseResultType(response) {
   const status = response.statusCode;
   const body = response.body;

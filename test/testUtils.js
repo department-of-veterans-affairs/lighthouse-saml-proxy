@@ -2,6 +2,12 @@ import btoa from "btoa";
 import { getSamlResponse } from "samlp";
 import { getUser } from "./testUsers";
 
+/**
+ * Builds the saml response function
+ *
+ * @param {*} sessionIndex saml session index
+ * @returns {*} new Promise constructor
+ */
 export function buildSamlResponseFunction(sessionIndex) {
   return function buildSamlResponse(type, level_of_assurance, config) {
     const user = getUser(type, level_of_assurance);

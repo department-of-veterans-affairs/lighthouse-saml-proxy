@@ -1,9 +1,12 @@
 "use strict";
 
-// Generates objects that can be used to start and stop a server hosting an
-// express app. Returns an object with two fields:
-//   startServerInBackground: (app) => void
-//   stopBackgroundServer: () => void
+/**
+ * Generates objects that can be used to start and stop a server hosting an
+ * express app.
+ *
+ * @param {*} name server name
+ * @returns {*} Returns an object with two fields: startServerInBackground: (app) => void, stopBackgroundServer: () => void
+ */
 function buildBackgroundServerModule(name) {
   let serverRef;
   return {
