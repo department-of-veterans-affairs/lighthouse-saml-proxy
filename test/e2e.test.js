@@ -41,11 +41,11 @@ let sessionIndex = 1;
 let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
 
 /**
- * Generates an sso request using samlResponse and state
+ * Generates an sso request using samlResponse and relay state
  *
  * @param {*} samlResponse saml proxy response
  * @param {*} state relay state
- * @returns {*} sso request
+ * @returns {*} sso request with the request options
  */
 function ssoRequest(samlResponse, state = "state") {
   const reqOpts = {
@@ -88,7 +88,7 @@ async function ssoIdpRequest() {
  * functionality of these tests closer to what users actually experience.
  *
  * @param {*} html sso endpoint renders this
- * @returns {*} elementValue
+ * @returns {*} submits a form of the relay state back to okta
  */
 function stateFromHtml(html) {
   const parser = new DOMParser();
@@ -101,7 +101,7 @@ function stateFromHtml(html) {
  * This function has the same purpose as said in above description.
  *
  * @param {*} html sso endpoint renders this
- * @returns {*} elementValue
+ * @returns {*} submits a form of the saml response back to okta
  */
 function SAMLResponseFromHtml(html) {
   const parser = new DOMParser();
@@ -111,7 +111,8 @@ function SAMLResponseFromHtml(html) {
 }
 
 /**
- * Checks for if user is not found
+ * This function checks if the user is not found after
+ * parsing the string using the body which is user information.
  *
  * @param {*} body user information
  * @returns {boolean} returns if user is found or not found
@@ -128,11 +129,13 @@ function isUserNotFound(body) {
   return false;
 }
 /**
- * returns element value
+ * This function is to get element values. It does this
+ * by going through a loop and doing a check to get the node value
+ * which is the name.
  *
  * @param {*} elements elements
  * @param {*} name attribute node
- * @returns {*} element value
+ * @returns {*} returns the value from get attribute node
  */
 function elementValue(elements, name) {
   for (const element of elements) {
@@ -164,7 +167,7 @@ function assertionValueFromSAMLResponse(samlResponse, assertion) {
  *
  * @param {*} samlResponse saml proxy response
  * @param {*} assertion assertion in saml response
- * @returns {*} element
+ * @returns {*} returns the element which is received from elements by tag name
  */
 function findAssertionInSamlResponse(samlResponse, assertion) {
   const parser = new DOMParser();
@@ -181,10 +184,10 @@ function findAssertionInSamlResponse(samlResponse, assertion) {
 
 /**
  * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
- * for an example of the xml document we are parsing
+ * for an example of the xml document we are parsing. It checks whether the body is a saml response.
  *
  * @param {*} body saml response from html
- * @returns {boolean} if the body is saml response or not
+ * @returns {boolean} returns a bool if the body is saml response or not
  */
 function isBodySamlResponse(body) {
   const parser = new DOMParser();
@@ -198,10 +201,11 @@ function isBodySamlResponse(body) {
   }
 }
 /**
- * Checks for the saml response result type
+ * This function checks for the response result type based off of
+ * the status codes, value of the body, saml response and if the user was found or not.
  *
  * @param {*} response saml response
- * @returns {*} response result
+ * @returns {*} returns result based off of the checks from status code, body values, and existing users.
  */
 function responseResultType(response) {
   const status = response.statusCode;
@@ -237,10 +241,11 @@ function decode_saml_uri(saml) {
 }
 /**
  * This function gets the idp saml request and returns a decoded saml uri
+ * based off of the saml request
  *
  * @param {*} response saml proxy response
  * @param {*} class_tags class tags
- * @returns {*} idp saml request
+ * @returns {*} returns the decoded saml uri which is gotten from the saml request
  */
 function getIdpSamlRequest(response, class_tags) {
   const parser = new DOMParser();

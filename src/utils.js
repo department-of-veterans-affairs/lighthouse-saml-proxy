@@ -4,11 +4,12 @@ export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }
 /**
- * Creates a check to get the req url
+ * This function creates a check to see if host is equal to localhost then
+ * returns a req url accordingly
  *
  * @param {*} req The HTTP request
  * @param {*} path the HTTP url path
- * @returns {*} request url path
+ * @returns {*} returns a http or https path depending on the check
  */
 export function getReqUrl(req, path) {
   if (req.get("host") === "localhost:7000") {
@@ -22,10 +23,10 @@ export function getReqUrl(req, path) {
   }
 }
 /**
- * Creates a check to remove headers
+ * Creates a check to remove headers with BEGIN and END message
  *
  * @param {*} cert the param for certificate
- * @returns {*} returns the cert param
+ * @returns {*} returns the cert pem
  */
 export function removeHeaders(cert) {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert);
@@ -35,7 +36,7 @@ export function removeHeaders(cert) {
   return cert;
 }
 /**
- * Logger for relay state
+ * This function logs the relay state using relay state
  *
  * @param {*} req The HTTP request
  * @param {*} logger logs information
@@ -57,10 +58,11 @@ export function logRelayState(req, logger, step) {
 }
 
 /**
- * Function for getting accessible phone number
+ * This function gets an accessible phone number using the digitString
+ * param and unshifts digits accordingly
  *
  * @param {*} digitString the string fir phone number
- * @returns {*} returns phone number and label
+ * @returns {*} returns the telephone number with the label
  */
 export function accessiblePhoneNumber(digitString) {
   var digits = digitString.split("").filter(function (ch) {
@@ -112,7 +114,7 @@ let renderedCss = {};
  *     importer: Function,
  *     outputStyle: String,
  *     sass: Function, log: Function
- * @returns {Function} next()
+ * @returns {Function} next() function within sass middleware
  */
 export function sassMiddleware(options) {
   const src = options.src;

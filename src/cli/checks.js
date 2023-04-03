@@ -19,10 +19,13 @@ export function checkEncryptionCerts(argv) {
 }
 
 /**
- * Creates the check for metadata
+ * This function checks when there is no metadata present
+ * using the idp sso assertion consumer url and the idp
+ * signing certificate or signing key thumbprint. Based off
+ * of the checks it will return a boolean or a message.
  *
  * @param {*} argv argument vector
- * @returns {boolean} returns a true when metadata is present
+ * @returns {boolean} returns a true when metadata is present or returns message to show what is required
  */
 export function checkWhenNoMetadata(argv) {
   if (!isString(argv.spIdpMetaUrl)) {

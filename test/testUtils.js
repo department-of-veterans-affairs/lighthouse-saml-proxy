@@ -3,10 +3,12 @@ import { getSamlResponse } from "samlp";
 import { getUser } from "./testUsers";
 
 /**
- * Builds the saml response function
+ * This test function builds the saml response function using session index
+ * and making a call to buildSamlResponse which returns the saml response with
+ * config and user parameters.
  *
  * @param {*} sessionIndex saml session index
- * @returns {*} new Promise constructor
+ * @returns {*} returns the saml response using config (sessionIndex) and user info
  */
 export function buildSamlResponseFunction(sessionIndex) {
   return function buildSamlResponse(type, level_of_assurance, config) {

@@ -308,11 +308,13 @@ export const serializeAssertions = (
   samlp.auth(authOptions)(req, res, next);
 };
 /**
- * Creates an async request with metrics
+ * Creates an asynchronous request with metrics using the
+ * MVIRequestMetrics and creates a const timer to record
+ * status codes
  *
  * @param {*} metrics the param uses type IRequestMetrics
  * @param {*} promiseFunc calls the Promise function
- * @returns {*} returns res using promiseFunc()
+ * @returns {*} returns a response which uses param promiseFunc() or throws an error
  */
 export async function requestWithMetrics(
   metrics: IRequestMetrics,

@@ -4,10 +4,12 @@ import omit from "lodash.omit";
 import { IDPProfileMapper } from "../IDPProfileMapper";
 
 /**
- * Creates the passport strategy using the spConfig
+ * Creates the passport strategy using the response params
+ * which come from the service provider config data
  *
  * @param {*} spConfig config parameter
- * @returns {Strategy} returns the responseParams
+ * @returns {Strategy} returns the strategy which contains response params from
+ * service provider configs and user profile
  */
 export default function createPassportStrategy(spConfig) {
   const responseParams = spConfig.getResponseParams();
@@ -41,10 +43,12 @@ export default function createPassportStrategy(spConfig) {
 }
 
 /**
- * Called before handling the SAML response
+ * This function prepare passport user info and is
+ * called before handling the SAML response.
  *
  * @param {*} strategy passport strategy
- * @returns {passport} returns passport user information
+ * @returns {passport} returns passports information after passport either
+ * serialized, deserialized or initialized.
  */
 export function preparePassport(strategy) {
   passport.use(strategy);

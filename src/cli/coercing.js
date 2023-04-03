@@ -14,10 +14,11 @@ export function matchesCertType(value, type) {
   return cryptTypes[type] && cryptTypes[type].test(value);
 }
 /**
- * Creates a buffer from string
+ * Creates a buffer from string using checks to see if buffer
+ * has own property then returns the buffer value
  *
  * @param {*} value param for holding buffer value
- * @returns {Buffer} returns the value
+ * @returns {Buffer} returns either a new buffer value or existing value
  */
 export function bufferFromString(value) {
   if (Buffer.hasOwnProperty("from")) {
@@ -28,12 +29,13 @@ export function bufferFromString(value) {
   }
 }
 /**
- * Creates the make cert file coercer
+ * This function makes a certificate file coercer based on the cert type
+ * and returns a filepath or cert type value based off of the check.
  *
  * @param {*} type the type of the file
  * @param {*} description the file description
  * @param {*} helpText the help text contained within the file
- * @returns {*} returns a filepath or a cert type value
+ * @returns {*} returns a filepath that is read in or a cert type value
  */
 export function makeCertFileCoercer(type, description, helpText) {
   return function certFileCoercer(value) {
@@ -57,7 +59,7 @@ export function makeCertFileCoercer(type, description, helpText) {
  * Creates the certificate to PEM
  *
  * @param {*} cert the param for a certificate
- * @returns {cert} returns the certificate to PEM
+ * @returns {cert} returns the certificate to PEM with BEGIN and END messages
  */
 export function certToPEM(cert) {
   if (/-----BEGIN CERTIFICATE-----/.test(cert)) {
@@ -71,7 +73,7 @@ export function certToPEM(cert) {
 }
 
 /**
- * Creates the check for load file sync
+ * Creates the check for load file sync using the filepath and value of the file
  *
  * @param {*} value the value of the file
  * @returns {*} returns empty string or reads in the file and returns filepath

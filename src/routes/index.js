@@ -32,15 +32,16 @@ function filterProperty(object, property) {
  * Function for configure express
  *
  * @param {*} app param app
- * @param {*} argv argument vector
- * @param {*} idpOptions user idp options
- * @param {*} spOptions user sp options
+ * @param {*} argv argument vector for the sentry environment
+ * @param {*} idpOptions user open id options
+ * @param {*} spOptions user service provider options
  * @param {*} strategies map
- * @param {*} mpiUserClient user in master patient index
+ * @param {*} mpiUserClient client within the master patient index
  * @param {*} vsoClient used for connected with oauth
  * @param {*} cache redis cache
- * @param {*} cacheEnabled bool param
- * @returns {*} returns event data
+ * @param {*} cacheEnabled bool to check whether redis cache was enabled (set to true)
+ * @returns {*} if sentry is undefined then it will return request data or it will return the app
+ * which has params for error, request and respose messages.
  */
 export default function configureExpress(
   app,
