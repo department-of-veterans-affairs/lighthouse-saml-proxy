@@ -63,7 +63,13 @@ const handleMetadata = (argv) => {
     }
   };
 };
-
+/**
+ * This function creates a server and passport strategy then
+ * calls the configureExpress() func and starts running the
+ * proxy server on defined port
+ *
+ * @param {*} argv argument vector used in client config
+ */
 function runServer(argv) {
   const strategies = new Map();
   IdPMetadata.fetch(argv.spIdpMetaUrl)
@@ -128,7 +134,9 @@ function runServer(argv) {
       httpServer.listen(app.get("port"));
     });
 }
-
+/**
+ * This function runs the server using the process args function
+ */
 function main() {
   runServer(cli.processArgs());
 }

@@ -40,6 +40,17 @@ const defaultTestingConfig = {
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
 
+/**
+ * This test function tests the functionality of getting
+ * the test express app using mpiUserClient,
+ * vsoClient and test cache.
+ *
+ * @param {*} mpiUserClient user within the master patient index
+ * @param {*} vsoClient client used for connecting with oauth
+ * @param {*} cache test cache which implements ICache
+ * @returns {*} returns the app which calls the expresss() function and
+ * initializes the passport information
+ */
 export function getTestExpressApp(
   mpiUserClient,
   vsoClient,

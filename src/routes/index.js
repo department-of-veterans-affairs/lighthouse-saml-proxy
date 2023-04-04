@@ -22,12 +22,33 @@ import { getParticipant } from "./handlers";
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 
+/**
+ * This function filters the property object
+ *
+ * @param {*} object property
+ * @param {*} property the object being filtered
+ */
 function filterProperty(object, property) {
   if (property in object) {
     object[property] = "[Filtered]";
   }
 }
 
+/**
+ * Function for configure express
+ *
+ * @param {*} app param app
+ * @param {*} argv argument vector for the sentry environment
+ * @param {*} idpOptions user open id options
+ * @param {*} spOptions user service provider options
+ * @param {*} strategies map
+ * @param {*} mpiUserClient client within the master patient index
+ * @param {*} vsoClient used for connected with oauth
+ * @param {*} cache redis cache
+ * @param {*} cacheEnabled bool to check whether redis cache was enabled (set to true)
+ * @returns {*} if sentry is undefined then it will return request data or it will return the app
+ * which has params for error, request and respose messages.
+ */
 export default function configureExpress(
   app,
   argv,

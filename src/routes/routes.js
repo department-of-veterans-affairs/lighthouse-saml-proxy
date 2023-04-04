@@ -15,7 +15,19 @@ import {
 } from "./handlers";
 
 import samlp from "samlp";
-
+/**
+ * Function for adding routes
+ *
+ * @param {*} app param app
+ * @param {*} idpConfig user open id config
+ * @param {*} spConfigs user service provider configs
+ * @param {*} acsUrl assertion consumer service url
+ * @param {*} cache redis cache
+ * @param {*} cacheEnabled boolean param used for redis cache
+ * @returns {*} returns the app after the saml request is being process to be able to
+ * log in after using idp sso, then gets idp metadata, metadata url and verifies the request.
+ * If not verified it will return an error.
+ */
 export default function addRoutes(
   app,
   idpConfig,

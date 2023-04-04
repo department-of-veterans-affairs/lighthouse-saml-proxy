@@ -218,6 +218,12 @@ export const handleError = (req, res) => {
   res.render("layout", error_payload);
 };
 
+/**
+ * This function returns boolean based off enabled loging ov
+ *
+ * @param {*} req service provider request
+ * @returns {*} boolean based off of if the logingov is emable
+ */
 function enabled_logingov(req) {
   if (req.sps.options.logingov) {
     return true;

@@ -307,7 +307,15 @@ export const serializeAssertions = (
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
   samlp.auth(authOptions)(req, res, next);
 };
-
+/**
+ * Creates an asynchronous request with metrics using the
+ * MVIRequestMetrics and creates a const timer to record
+ * status codes
+ *
+ * @param metrics the param uses type IRequestMetrics
+ * @param promiseFunc calls the Promise function
+ * @returns returns a response which uses param promiseFunc() or throws an error
+ */
 export async function requestWithMetrics(
   metrics: IRequestMetrics,
   promiseFunc: () => Promise<any>

@@ -4,6 +4,14 @@ const request = require("request");
 const xml2js = require("xml2js");
 const logger = require("./logger");
 
+/**
+ * Creates a check to receive the binding location
+ * using serviceEl and the bindingUri
+ *
+ * @param {*} serviceEl serviceEl
+ * @param {*} bindingUri specifies information to communicate with location
+ * @returns {*} returns the binding location if the element matches the bindingUri
+ */
 function getBindingLocation(serviceEl, bindingUri) {
   var location;
   if (serviceEl && serviceEl.length > 0) {
@@ -16,6 +24,13 @@ function getBindingLocation(serviceEl, bindingUri) {
   return location;
 }
 
+/**
+ * Creates a check to get the first cert using
+ * key info data.
+ *
+ * @param {*} keyEl encryption key
+ * @returns {keyEl}  returns the first cert using keyInfo
+ */
 function getFirstCert(keyEl) {
   if (
     (keyEl.KeyInfo && keyEl.KeyInfo.length === 1,
@@ -27,7 +42,14 @@ function getFirstCert(keyEl) {
   }
   return null;
 }
-
+/**
+ * Creates the check for fetching url by requesting the url,
+ * parsing the config parameters, getting the binding location and
+ * parsing the RoleDescriptor metadata
+ *
+ * @param {*} url fetch url
+ * @returns {*} returns the RoleDescriptor metadata with parameters sso, slo, nameIdFormat and signingKeys
+ */
 export function fetch(url) {
   return new Promise((resolve, reject) => {
     const metadata = { sso: {}, slo: {}, nameIdFormats: [], signingKeys: [] };
