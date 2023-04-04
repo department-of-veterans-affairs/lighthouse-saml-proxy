@@ -33,7 +33,6 @@ rules:
     - { argsIgnorePattern: \b(?:res|req|next)\b }
   no-prototype-builtins:
     - off
-  "jsdoc/require-jsdoc" : 0
 overrides:
   - files: ["**/*.ts", "**/*.tsx"]
     env:

@@ -22,6 +22,12 @@ import { getParticipant } from "./handlers";
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 
+/**
+ * This function filters the property object
+ *
+ * @param {*} object property
+ * @param {*} property the object being filtered
+ */
 function filterProperty(object, property) {
   if (property in object) {
     object[property] = "[Filtered]";

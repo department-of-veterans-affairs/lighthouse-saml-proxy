@@ -1,5 +1,11 @@
 import fs from "fs";
 
+/**
+ * This function gets the path
+ *
+ * @param {*} path string path
+ * @returns {*} returns the string path
+ */
 export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }

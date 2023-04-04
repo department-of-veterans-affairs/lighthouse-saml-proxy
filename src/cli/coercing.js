@@ -10,6 +10,13 @@ const cryptTypes = {
 export const KEY_CERT_HELP_TEXT = `Please generate a key-pair for the IdP using the following openssl command:
 \topenssl req -x509 -new -newkey rsa:2048 -nodes -subj '/C=US/ST=California/L=San Francisco/O=JankyCo/CN=Test Identity Provider' -keyout idp-private-key.pem -out idp-public-cert.pem -days 7300`;
 
+/**
+ * This function matches the cert type and returns crypt types
+ *
+ * @param {*} value test value
+ * @param {*} type crypt type
+ * @returns {*} cryptTypes
+ */
 export function matchesCertType(value, type) {
   return cryptTypes[type] && cryptTypes[type].test(value);
 }

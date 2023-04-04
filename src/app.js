@@ -134,7 +134,9 @@ function runServer(argv) {
       httpServer.listen(app.get("port"));
     });
 }
-
+/**
+ * This function runs the server using the process args function
+ */
 function main() {
   runServer(cli.processArgs());
 }
