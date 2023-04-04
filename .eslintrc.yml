@@ -78,7 +78,5 @@ overrides:
       "@typescript-eslint/no-unused-vars":
         - error
         - { argsIgnorePattern: \b(?:res|req|next)\b }
-      "jsdoc/require-jsdoc" : 0
-
     globals:
       "fail" : "readonly"
