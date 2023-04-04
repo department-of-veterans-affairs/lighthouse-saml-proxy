@@ -312,9 +312,9 @@ export const serializeAssertions = (
  * MVIRequestMetrics and creates a const timer to record
  * status codes
  *
- * @param {*} metrics the param uses type IRequestMetrics
- * @param {*} promiseFunc calls the Promise function
- * @returns {*} returns a response which uses param promiseFunc() or throws an error
+ * @param metrics the param uses type IRequestMetrics
+ * @param promiseFunc calls the Promise function
+ * @returns returns a response which uses param promiseFunc() or throws an error
  */
 export async function requestWithMetrics(
   metrics: IRequestMetrics,

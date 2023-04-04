@@ -45,13 +45,13 @@ overrides:
     extends:
       - "eslint:recommended"
       - "plugin:prettier/recommended"
-      - "plugin:@typescript-eslint/eslint-recommended"
-      - "plugin:@typescript-eslint/recommended"
       - "plugin:jsdoc/recommended"
+      - "plugin:jsdoc/recommended-typescript"
     plugins:
       - prettier
       - jest
       - jsdoc
+      - '@typescript-eslint'
     parser: "@typescript-eslint/parser"
     parserOptions:
       ecmaVersion: 11
@@ -62,8 +62,7 @@ overrides:
         - off
       "@typescript-eslint/explicit-module-boundary-types":
         - off
-      "@typescript-eslint/no-explicit-any":
-        - off
+      "@typescript-eslint/no-explicit-any": 0
       linebreak-style:
         - error
         - unix
@@ -80,3 +79,6 @@ overrides:
         - error
         - { argsIgnorePattern: \b(?:res|req|next)\b }
       "jsdoc/require-jsdoc" : 0
+
+    globals:
+      "fail" : "readonly"

@@ -6,8 +6,8 @@ import { cwd, env } from "process";
  * Creates the check to resolve the file path
  * and returns accordingly if the sync exists
  *
- * @param {*} filePath name of the filepath
- * @returns {filePath} name of filepath (string) or null
+ * @param filePath name of the filepath
+ * @returns name of filepath (string) or null
  */
 export function resolveFilePath(filePath: string) {
   let possiblePath;
