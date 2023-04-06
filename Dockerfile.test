@@ -1,6 +1,6 @@
 # This dockerfile is only used during ci/cd to run regression tests following the ci/cd deploy.
 
-FROM vasdvp/lighthouse-node-application-base:node16 as chromeinstall
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:node16 as chromeinstall
 
 # Build Args
 ARG BUILD_DATE_TIME
