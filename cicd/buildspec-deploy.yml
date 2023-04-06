@@ -37,8 +37,6 @@ env:
     IMAGE: "saml-proxy"
   parameter-store:
     # For pulling docker images
-    DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
-    DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
     GHCR_USERNAME: "/dvp/devops/GHCR_USERNAME"
     GHCR_TOKEN: "/dvp/devops/GHCR_TOKEN"
     # SLACK_WEBHOOK should be a webhook that posts to the Slack channel you want notifications to go to
@@ -110,8 +108,6 @@ phases:
             fi
             echo Logging into ECR
             make login
-            echo Logging into Docker Hub
-            echo "${DOCKER_PASSWORD}" | docker login --username ${DOCKER_USERNAME} --password-stdin
             echo Logging into GHCR
             echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GHCR_USERNAME} --password-stdin
             echo Running regression tests.
