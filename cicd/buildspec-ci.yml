@@ -23,6 +23,8 @@ env:
   parameter-store:
     DOCKER_USERNAME: "/dvp/devops/DOCKER_USERNAME"
     DOCKER_PASSWORD: "/dvp/devops/DOCKER_PASSWORD"
+    GHCR_USERNAME: "/dvp/devops/GHCR_USERNAME"
+    GHCR_TOKEN: "/dvp/devops/GHCR_TOKEN"
   exported-variables:
     - DOCKER_BUILDKIT
 phases:
@@ -45,6 +47,9 @@ phases:
       # Login to Docker Hub prior to pulling base images to avoid rate limiting
       - echo Logging into Docker Hub
       - echo "${DOCKER_PASSWORD}" | docker login --username ${DOCKER_USERNAME} --password-stdin
+      # Login to GHCR prior to pulling base images to avoid rate limiting
+        - echo Logging into GHCR
+        - echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GHCR_USERNAME} --password-stdin
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
