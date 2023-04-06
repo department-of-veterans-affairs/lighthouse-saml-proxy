@@ -48,8 +48,8 @@ phases:
       - echo Logging into Docker Hub
       - echo "${DOCKER_PASSWORD}" | docker login --username ${DOCKER_USERNAME} --password-stdin
       # Login to GHCR prior to pulling base images to avoid rate limiting
-        - echo Logging into GHCR
-        - echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GHCR_USERNAME} --password-stdin
+      - echo Logging into GHCR
+      - echo "${GHCR_TOKEN}" | docker login ghcr.io -u ${GHCR_USERNAME} --password-stdin
       # Build the image
       - echo Building commit ${TAG}
       - time="${time}\nBuild - $(date +%r) - started"
