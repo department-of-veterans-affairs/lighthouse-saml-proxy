@@ -11,7 +11,6 @@ import { accessiblePhoneNumber } from "../utils";
 
 jest.mock("../logger");
 jest.mock("passport-wsfed-saml2");
-// @ts-ignore
 import { samlp } from "passport-wsfed-saml2";
 
 describe("getHashCode, getSessionIndex", () => {
@@ -69,9 +68,9 @@ describe("getHashCode, getSessionIndex", () => {
 });
 
 describe("parseSamlRequest", () => {
-  let mockResponse: any;
-  let mockRequest: any;
-  let mockNext: any;
+  let mockResponse;
+  let mockRequest;
+  let mockNext;
   beforeEach(() => {
     mockRequest = {
       query: {},
@@ -117,9 +116,9 @@ describe("parseSamlRequest", () => {
 });
 
 describe("samlLogin", () => {
-  let mockResponse: any;
-  let mockRequest: any;
-  let mockNext: any;
+  let mockResponse;
+  let mockRequest;
+  let mockNext;
 
   const spOptionsJustIdMe = {
     id_me: {
@@ -197,7 +196,7 @@ describe("samlLogin", () => {
         options: spOptionsJustIdMe,
       },
       authnRequest: {},
-      get: (param: any) => {
+      get: (param) => {
         return param;
       },
     };
@@ -278,10 +277,10 @@ describe("samlLogin", () => {
     });
 
   const promise2check = (
-    expected_template: any,
-    expected_authoptions: any,
-    template: any,
-    auth_options: any
+    expected_template,
+    expected_authoptions,
+    template,
+    auth_options
   ) => {
     return new Promise((resolve, reject) => {
       try {
@@ -300,7 +299,7 @@ describe("samlLogin", () => {
       relayState: "%2Foauth2%2FtheRelayState",
     };
 
-    mockResponse.render = function render(template: any, authOptions: any) {
+    mockResponse.render = function render(template, authOptions) {
       return promise2check(
         "layout",
         expected_authoptions,
@@ -328,7 +327,7 @@ describe("samlLogin", () => {
       relayState: "theRelayState",
     };
 
-    mockResponse.render = function render(template: any, authOptions: any) {
+    mockResponse.render = function render(template, authOptions) {
       return promise2check(
         "login_selection",
         expected_authoptions,
@@ -363,7 +362,7 @@ describe("samlLogin", () => {
 
     mockRequest.sps.options = spOptionsJustwithLoginGov;
 
-    mockResponse.render = function render(template: any, authOptions: any) {
+    mockResponse.render = function render(template, authOptions) {
       return promise2check(
         "layout",
         expected_authoptions_login_gov_enabled,
@@ -413,7 +412,7 @@ describe("samlLogin", () => {
   });
 
   it("Happy Path, no authnRequest", async () => {
-    mockResponse.render = function render(template: any, authOptions: any) {
+    mockResponse.render = function render(template, authOptions) {
       return promise2check(
         "layout",
         expected_authoptions_verify,
@@ -439,7 +438,7 @@ describe("samlLogin", () => {
   });
 
   it("Happy Path, no authnRequest, login.gov failure_to_proof", async () => {
-    mockResponse.render = function render(template: any, authOptions: any) {
+    mockResponse.render = function render(template, authOptions) {
       return promise2check(
         "layout",
 
