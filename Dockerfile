@@ -4,7 +4,7 @@ ARG VERSION
 ARG BUILD_NUMBER
 ARG BUILD_TOOL
 
-FROM vasdvp/lighthouse-node-application-base:node16 as npminstall
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:node16 as npminstall
 
 WORKDIR /home/node
 
@@ -23,7 +23,7 @@ COPY --chown=node:node views/ views/
 COPY --chown=node:node tsconfig.json ./
 RUN ./node_modules/.bin/tsc
 
-FROM vasdvp/lighthouse-node-application-base:node16 as deploy
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:node16 as deploy
 
 WORKDIR /home/node
 
