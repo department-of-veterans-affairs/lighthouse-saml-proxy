@@ -118,7 +118,8 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 
 export const loadICN = async (
   req: IConfiguredRequest,
-  res: {},
+  res: Response,
+  // eslint-disable-next-line no-undef
   next: e.NextFunction
 ) => {
   const session = req.sessionID;
@@ -186,7 +187,7 @@ export const loadICN = async (
 
 export const scrubUserClaims = (
   req: IConfiguredRequest,
-  res: {},
+  res: Response,
   next: e.NextFunction
 ) => {
   // Makes sure we're only serializing user claims as SAML Assertions
