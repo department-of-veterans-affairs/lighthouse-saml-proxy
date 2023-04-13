@@ -3,7 +3,7 @@ import { getReqUrl, logRelayState, accessiblePhoneNumber } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
 
-import { NextFunction, Response } from "express";
+import e, { NextFunction, Response } from "express";
 import assignIn from "lodash.assignin";
 import samlp from "samlp";
 import * as url from "url";
@@ -118,8 +118,8 @@ export const buildPassportLoginHandler = (acsURL: string) => {
 
 export const loadICN = async (
   req: IConfiguredRequest,
-  res: Response,
-  next: NextFunction
+  res: {},
+  next: e.NextFunction
 ) => {
   const session = req.sessionID;
   const action = "loadICN";
@@ -178,6 +178,7 @@ export const loadICN = async (
         request_id: rTracer.id(),
         wrapper_tags: accessiblePhoneNumber,
       };
+      // @ts-ignore
       res.render("layout", error_payload);
     }
   }
@@ -185,8 +186,8 @@ export const loadICN = async (
 
 export const scrubUserClaims = (
   req: IConfiguredRequest,
-  res: Response,
-  next: NextFunction
+  res: {},
+  next: e.NextFunction
 ) => {
   // Makes sure we're only serializing user claims as SAML Assertions
   // that are safe to pass to Okta
