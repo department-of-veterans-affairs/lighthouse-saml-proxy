@@ -121,6 +121,7 @@ phases:
               USER_PASSWORD=${USER_PASSWORD} \
               VALID_USER_EMAIL=${VALID_USER_EMAIL} \
               ICN_ERROR_USER_EMAIL=${ICN_ERROR_USER_EMAIL}
+              TIMEOUT=${TIMEOUT}
             if [[ $? -gt 0 ]]; then
               slackpost.sh -t warning "Some regression tests failed."
             fi

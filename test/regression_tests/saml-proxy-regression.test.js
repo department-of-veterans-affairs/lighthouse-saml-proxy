@@ -162,7 +162,7 @@ describe("Regression tests", () => {
     await page.waitForSelector(".usa-alert-error");
 
     await isSensitiveError(page);
-  });
+  }, process.env.TIMEOUT);
 });
 
 const requestToken = async (page) => {
