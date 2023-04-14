@@ -378,7 +378,6 @@ describe("requestWithMetrics", () => {
 });
 
 describe("validateIdpResponse", () => {
-  // @ts-ignore
   let mockResponse: any;
 
   beforeEach(() => {
@@ -480,7 +479,7 @@ describe("validateIdpResponse", () => {
     const validateFn = handlers.validateIdpResponse(cache, false);
     await validateFn(req, mockResponse, nextFn);
     expect(nextFn).toHaveBeenCalled();
-    expect(!cache.has(testSessionIndex));
+    expect(!(await cache.has(testSessionIndex)));
   });
 });
 
