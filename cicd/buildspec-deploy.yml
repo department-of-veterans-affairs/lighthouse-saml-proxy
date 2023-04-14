@@ -49,6 +49,7 @@ env:
     USER_PASSWORD: "/dvp/common/ecs-saml-proxy/codebuild/user_password"
     VALID_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/valid_user_email"
     ICN_ERROR_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/icn_error_user_email"
+    TIMEOUT: "/dvp/common/ecs-saml-proxy/codebuild/regression_test_timeout"
 phases:
   install:
     commands:
