@@ -49,7 +49,7 @@ env:
     USER_PASSWORD: "/dvp/common/ecs-saml-proxy/codebuild/user_password"
     VALID_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/valid_user_email"
     ICN_ERROR_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/icn_error_user_email"
-    TIMEOUT: "/dvp/common/ecs-saml-proxy/codebuild/regression_test_timeout"
+    REGRESSION_TEST_TIMEOUT: "/dvp/common/ecs-saml-proxy/codebuild/regression_test_timeout"
 phases:
   install:
     commands:
@@ -122,7 +122,7 @@ phases:
               USER_PASSWORD=${USER_PASSWORD} \
               VALID_USER_EMAIL=${VALID_USER_EMAIL} \
               ICN_ERROR_USER_EMAIL=${ICN_ERROR_USER_EMAIL}
-              TIMEOUT=${TIMEOUT}
+              REGRESSION_TEST_TIMEOUT=${REGRESSION_TEST_TIMEOUT}
             if [[ $? -gt 0 ]]; then
               slackpost.sh -t warning "Some regression tests failed."
             fi
