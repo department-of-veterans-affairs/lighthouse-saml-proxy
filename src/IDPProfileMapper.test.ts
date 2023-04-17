@@ -108,7 +108,6 @@ describe("IDPProfileMapper", () => {
   describe("idmeAssertion", () => {
     it("should map the Veteran's level_of_assurance", () => {
       const profile = createProfileMapper(idmeAssertions);
-      // @ts-ignore
       expect(profile.getMappedClaims().level_of_assurance).toEqual("3");
     });
 
@@ -135,7 +134,6 @@ describe("IDPProfileMapper", () => {
 
     it("should map the level of assurance", () => {
       const profile = createProfileMapper(dslogonAssertions);
-      // @ts-ignore
       expect(profile.getMappedClaims().dslogon_assurance).toEqual("2");
     });
   });
@@ -143,13 +141,11 @@ describe("IDPProfileMapper", () => {
   describe("mhvAssertion", () => {
     it("should map the mhv icn", () => {
       const profile = createProfileMapper(mhvAssertions);
-      // @ts-ignore
       expect(profile.getMappedClaims().icn).toEqual("anICN");
     });
 
     it("should map account type from mhv profile", () => {
       const profile = createProfileMapper(mhvAssertions);
-      // @ts-ignore
       expect(profile.getMappedClaims().mhv_account_type).toEqual("Premium");
     });
   });
@@ -157,7 +153,6 @@ describe("IDPProfileMapper", () => {
   describe("loginGovAssertion", () => {
     it("should map loa", () => {
       const profile = createProfileMapper(loginGovAssertions);
-      // @ts-ignore
       expect(profile.getMappedClaims().ial).toEqual(2);
     });
 

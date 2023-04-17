@@ -86,10 +86,9 @@ const claimsBasicAccount = {
 describe("scrubUserClaims", () => {
   it("should return a user claims object with only permitted keys for dslogon logins", () => {
     // ICN will have been looked up before this function runs
-    const req: any = { user: { claims: { icn: "anICN", ...claimsWithEDIPI } } };
+    const req = { user: { claims: { icn: "anICN", ...claimsWithEDIPI } } };
     const nextFn = jest.fn();
-    const response: any = {};
-    handlers.scrubUserClaims(req, response, nextFn);
+    handlers.scrubUserClaims(req, {}, nextFn);
     expect(req.user.claims).toEqual(
       expect.objectContaining({
         firstName: expect.any(String),
@@ -115,12 +114,9 @@ describe("scrubUserClaims", () => {
 
   it("should return a user claims object with only permitted keys for idme logins", () => {
     // ICN will have been looked up before this function runs
-    const req: any = {
-      user: { claims: { icn: "anICN", ...claimsWithNoEDIPI } },
-    };
+    const req = { user: { claims: { icn: "anICN", ...claimsWithNoEDIPI } } };
     const nextFn = jest.fn();
-    const response: any = {};
-    handlers.scrubUserClaims(req, response, nextFn);
+    handlers.scrubUserClaims(req, {}, nextFn);
     expect(req.user.claims).toEqual(
       expect.objectContaining({
         firstName: expect.any(String),
@@ -145,14 +141,13 @@ describe("scrubUserClaims", () => {
 
   it("should return a user claims object with only permitted keys for mhv logins", () => {
     // First and Last Name are looked up in MVI before this function runs
-    const req: any = {
+    const req = {
       user: {
         claims: { firstName: "Ed", lastName: "Paget", ...claimsWithICN },
       },
     };
     const nextFn = jest.fn();
-    const response: any = {};
-    handlers.scrubUserClaims(req, response, nextFn);
+    handlers.scrubUserClaims(req, {}, nextFn);
     expect(req.user.claims).toEqual(
       expect.objectContaining({
         firstName: expect.any(String),
@@ -177,14 +172,13 @@ describe("scrubUserClaims", () => {
 
   it("should return a user claims object with only permitted keys for login.gov logins", () => {
     // First and Last Name are looked up in MVI before this function runs
-    const req: any = {
+    const req = {
       user: {
         claims: { ...claimsLoginGov },
       },
     };
     const nextFn = jest.fn();
-    const response: any = {};
-    handlers.scrubUserClaims(req, response, nextFn);
+    handlers.scrubUserClaims(req, {}, nextFn);
     expect(req.user.claims).toEqual(
       expect.objectContaining({
         firstName: expect.any(String),
@@ -212,15 +206,13 @@ describe("scrubUserClaims", () => {
 
 describe("loadICN", () => {
   beforeEach(() => {
-    // @ts-ignore
     mpiUserClient.getMpiTraitsForLoa3User.mockReset();
-    // @ts-ignore
     vsoClient.getVSOSearch.mockReset();
   });
 
   it("should call getMVITraits... calls when ICN Exists", async () => {
     const nextFn = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -233,8 +225,7 @@ describe("loadICN", () => {
       first_name: "Edward",
       last_name: "Paget",
     });
-    const response: any = {};
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, {}, nextFn);
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
@@ -242,7 +233,7 @@ describe("loadICN", () => {
 
   it("should call getMVITraits... calls when ICN Exists, null first_name", async () => {
     const nextFn = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -255,8 +246,7 @@ describe("loadICN", () => {
       first_name: null,
       last_name: "Paget",
     });
-    const response: any = {};
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, {}, nextFn);
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
@@ -265,7 +255,7 @@ describe("loadICN", () => {
 
   it("should call getMVITraits... calls when ICN Exists, null last_name", async () => {
     const nextFn = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -278,8 +268,7 @@ describe("loadICN", () => {
       first_name: "Edward",
       last_name: null,
     });
-    const response: any = {};
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, {}, nextFn);
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
@@ -288,7 +277,7 @@ describe("loadICN", () => {
 
   it("should load ICN and assign it as a user claim when edipi exists and no icn", async () => {
     const nextFn = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       user: {
         claims: { ...claimsWithEDIPI },
@@ -300,8 +289,7 @@ describe("loadICN", () => {
       first_name: "Edward",
       last_name: "Paget",
     });
-    const response: any = {};
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, {}, nextFn);
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
@@ -309,7 +297,7 @@ describe("loadICN", () => {
 
   it("should load ICN and assign it as a user claim when traits exist and no icn", async () => {
     const nextFn = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       user: {
         claims: { ...claimsWithNoEDIPI },
@@ -320,8 +308,7 @@ describe("loadICN", () => {
       first_name: "Edward",
       last_name: "Paget",
     });
-    const response: any = {};
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, {}, nextFn);
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(nextFn).toHaveBeenCalled();
     expect(req.user.claims.icn).toEqual("anICN");
@@ -330,7 +317,7 @@ describe("loadICN", () => {
   it("should render error page when getMVITraitsForLoa3User errors and getVSOSearch errors", async () => {
     const nextFn = jest.fn();
     const render = jest.fn();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -339,12 +326,10 @@ describe("loadICN", () => {
     };
     const err = new Error("Oops");
     err.name = "StatusCodeError";
-    // @ts-ignore
     err.statusCode = "404";
     req.mpiUserClient.getMpiTraitsForLoa3User.mockRejectedValueOnce(err);
     req.vsoClient.getVSOSearch.mockRejectedValueOnce(err);
-    const response: any = { render };
-    await handlers.loadICN(req, response, nextFn);
+    await handlers.loadICN(req, { render }, nextFn);
     expect(render).toHaveBeenCalled();
   });
 });
@@ -353,7 +338,7 @@ describe("requestWithMetrics", () => {
   it("should call the passed in functions promise", async () => {
     let called = false;
     const func = () => {
-      return new Promise<void>((resolve) => {
+      return new Promise((resolve) => {
         called = true;
         resolve();
       });
@@ -378,7 +363,7 @@ describe("requestWithMetrics", () => {
 });
 
 describe("validateIdpResponse", () => {
-  let mockResponse: any;
+  let mockResponse;
 
   beforeEach(() => {
     mockResponse = {
@@ -389,7 +374,7 @@ describe("validateIdpResponse", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -410,7 +395,7 @@ describe("validateIdpResponse", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -440,7 +425,7 @@ describe("validateIdpResponse", () => {
   it("should throw an error when processing a saml response with no session index", async () => {
     const nextFn = jest.fn();
     const cache = new TestCache();
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -466,7 +451,7 @@ describe("validateIdpResponse", () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
     const cache = new TestCache();
-    const req: any = {
+    const req = {
       vsoClient: vsoClient,
       user: {
         claims: { ...claimsWithEDIPI },
@@ -479,12 +464,12 @@ describe("validateIdpResponse", () => {
     const validateFn = handlers.validateIdpResponse(cache, false);
     await validateFn(req, mockResponse, nextFn);
     expect(nextFn).toHaveBeenCalled();
-    expect(!(await cache.has(testSessionIndex)));
+    expect(!cache.has(testSessionIndex));
   });
 });
 
 describe("testLevelOfAssuranceOrRedirect", () => {
-  let mockResponse: any;
+  let mockResponse;
   beforeEach(() => {
     mockResponse = {
       render: jest.fn(),
@@ -494,7 +479,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
   it("testLevelOfAssuranceOrRedirect, sufficient loa.", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -511,7 +496,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
   it("testLevelOfAssuranceOrRedirect, sufficient loa. loginGov", async () => {
     const nextFn = jest.fn();
     const testSessionIndex = "test";
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -536,7 +521,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       redirectUrl = url;
     });
     const testSessionIndex = "test";
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -562,7 +547,7 @@ describe("testLevelOfAssuranceOrRedirect", () => {
       fail("Redirect should not have been called to '" + url + "'");
     });
     const testSessionIndex = "test";
-    const req: any = {
+    const req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
       user: {
@@ -589,9 +574,9 @@ describe("testLevelOfAssuranceOrRedirect", () => {
 });
 
 describe("buildPassportLoginHandler", () => {
-  let req: any;
-  let mockResponse: any;
-  let mockNext: any;
+  let req;
+  let mockResponse;
+  let mockNext;
   const buildSamlResponse = buildSamlResponseFunction(1);
   beforeEach(async () => {
     req = defaultMockRequest;
@@ -599,7 +584,6 @@ describe("buildPassportLoginHandler", () => {
       render: jest.fn(),
     };
     mockNext = jest.fn();
-    // @ts-ignore
     passport.authenticate.mockImplementation((args) => {
       expect(args).toBe("wsfed-saml2");
       return jest.fn;
