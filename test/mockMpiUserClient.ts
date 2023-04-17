@@ -1,12 +1,12 @@
+
 import { SAMLUser } from "../src/SAMLUser";
 
 export default class MockMpiUserClient {
   public findUserInMVI = true;
-  public userIsVSO = true;
 
   public async getMpiTraitsForLoa3User(
     user: SAMLUser
-  ): Promise<{ icn: string; first_name: string; last_name: string }> {
+  ): Promise<{ icn: string; first_name: string | undefined; last_name: string | undefined }> {
     if (this.findUserInMVI) {
       return {
         icn: "123",
@@ -17,7 +17,8 @@ export default class MockMpiUserClient {
 
     const error = new Error("Not found");
     error.name = "StatusCodeError";
-    error.statusCode = "404";
+    // @ts-ignore
+    error.statusCode= "404";
     throw error;
   }
 
