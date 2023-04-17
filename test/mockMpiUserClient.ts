@@ -6,12 +6,12 @@ export default class MockMpiUserClient {
 
   public async getMpiTraitsForLoa3User(
     user: SAMLUser
-  ): Promise<{ icn: string; first_name: string; last_name: string }> {
+  ): Promise<{ icn: string; first_name: string | undefined; last_name: string | undefined }> {
     if (this.findUserInMVI) {
       return {
         icn: "123",
-        first_name: user.firstName!,
-        last_name: user.lastName!,
+        first_name: user.firstName,
+        last_name: user.lastName,
       };
     }
 
