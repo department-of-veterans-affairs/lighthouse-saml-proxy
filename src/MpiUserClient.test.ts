@@ -33,13 +33,10 @@ const samlTraitsEDIPI = {
 const samlTraitsICN = {
   uuid: "fakeuuid",
   icn: "fakeicn",
-  email: "fakeemail",
 };
 
 beforeEach(() => {
-  // @ts-ignore
   request.post.mockReset();
-  // @ts-ignore
   request.post.mockImplementation(() =>
     Promise.resolve({
       data: {
