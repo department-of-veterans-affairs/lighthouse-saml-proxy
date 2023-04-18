@@ -23,9 +23,10 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
+const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT ? process.env.REGRESSION_TEST_TIMEOUT : 70000;
 
 describe("Regression tests", () => {
-  jest.setTimeout(70000);
+  jest.setTimeout(regression_test_timeout);
   let browser;
   beforeEach(async () => {
     browser = await puppeteer.launch(launchArgs);
