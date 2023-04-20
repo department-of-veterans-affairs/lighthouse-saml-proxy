@@ -178,6 +178,7 @@ export const loadICN = async (
         request_id: rTracer.id(),
         wrapper_tags: accessiblePhoneNumber,
       };
+      // @ts-ignore
       res.render("layout", error_payload);
     }
   }
