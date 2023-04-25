@@ -1,5 +1,4 @@
-import * as request from "request-promise-native";
-
+import axios from "axios";
 export class VsoClient {
   token: string;
   vsoEndpointUrl: string;
@@ -22,11 +21,8 @@ export class VsoClient {
       last_name: lastName,
     };
 
-    const response = await request.get({
-      url: this.vsoEndpointUrl,
-      json: true,
+    const response = await axios.post(this.vsoEndpointUrl, qs, {
       headers: this.headers,
-      qs,
     });
     return response.data.attributes;
   }

@@ -32,9 +32,9 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    const response = await axios.post(this.mpiUserEndpoint, body,
-      {headers: this.headers},
-      )
+    const response = await axios.post(this.mpiUserEndpoint, body, {
+      headers: this.headers,
+    });
     return response.data.attributes;
   }
 }

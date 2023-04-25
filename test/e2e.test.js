@@ -1,6 +1,5 @@
 require("jest");
 
-import request from "request-promise-native";
 import { DOMParser } from "@xmldom/xmldom";
 import { buildSamlResponseFunction } from "./testUtils";
 import { buildBackgroundServerModule } from "./backgroundServer";
@@ -12,6 +11,8 @@ import MockVsoClient from "./mockVsoClient";
 import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
+import axios, { request } from "axios";
+
 const {
   startServerInBackground,
   stopBackgroundServer,

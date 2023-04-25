@@ -1,7 +1,9 @@
+// @ts-ignore
+
 import "jest";
-import * as request from "request-promise-native";
+import axios from "axios";
 import { MpiUserClient } from "./MpiUserClient";
-jest.mock("request-promise-native", () => {
+jest.mock("axios", () => {
   return {
     post: jest.fn(() => Promise.resolve({})),
   };
@@ -38,9 +40,9 @@ const samlTraitsICN = {
 
 beforeEach(() => {
   // @ts-ignore
-  request.post.mockReset();
+  axios.post.mockReset();
   // @ts-ignore
-  request.post.mockImplementation(() =>
+  axios.post.mockImplementation(() =>
     Promise.resolve({
       data: {
         id: "fakeICN",
@@ -63,14 +65,9 @@ describe("getMVITraitsForLoa3User", () => {
       "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraitsEDIPI);
-    expect(request.post).toHaveBeenCalledWith({
-      url: "https://example.gov/mvi-user",
-      json: true,
-      headers: expect.objectContaining({
-        apiKey: "faketoken",
-        accesskey: "faketoken",
-      }),
-      body: expect.objectContaining({
+    expect(axios.post).toHaveBeenCalledWith(
+      "https://example.gov/mvi-user",
+      expect.objectContaining({
         idp_uuid: samlTraitsEDIPI.uuid,
         dslogon_edipi: samlTraitsEDIPI.edipi,
         first_name: samlTraitsEDIPI.firstName,
@@ -79,7 +76,13 @@ describe("getMVITraitsForLoa3User", () => {
         dob: samlTraitsEDIPI.dateOfBirth,
         gender: "M",
       }),
-    });
+      {
+        headers: expect.objectContaining({
+          apiKey: "faketoken",
+          accesskey: "faketoken",
+        }),
+      }
+    );
   });
 
   it("should call the mvi-user endpoint with the Veteran's icn in request body", async () => {
@@ -89,18 +92,19 @@ describe("getMVITraitsForLoa3User", () => {
       "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraitsICN);
-    expect(request.post).toHaveBeenCalledWith({
-      url: "https://example.gov/mpi-user",
-      json: true,
-      headers: expect.objectContaining({
-        apiKey: "faketoken",
-        accesskey: "faketoken",
-      }),
-      body: expect.objectContaining({
+    expect(axios.post).toHaveBeenCalledWith(
+      "https://example.gov/mpi-user",
+      expect.objectContaining({
         idp_uuid: samlTraitsICN.uuid,
         mhv_icn: samlTraitsICN.icn,
       }),
-    });
+      {
+        headers: expect.objectContaining({
+          apiKey: "faketoken",
+          accesskey: "faketoken",
+        }),
+      }
+    );
   });
 
   it("should call the mvi-user endpoint with the Veteran's PII in request body", async () => {
@@ -110,14 +114,9 @@ describe("getMVITraitsForLoa3User", () => {
       "faketoken"
     );
     await client.getMpiTraitsForLoa3User(samlTraits);
-    expect(request.post).toHaveBeenCalledWith({
-      url: "https://example.gov/mpi-user",
-      json: true,
-      headers: expect.objectContaining({
-        apiKey: "faketoken",
-        accesskey: "faketoken",
-      }),
-      body: expect.objectContaining({
+    expect(axios.post).toHaveBeenCalledWith(
+      "https://example.gov/mpi-user",
+      expect.objectContaining({
         idp_uuid: samlTraits.uuid,
         ssn: samlTraits.ssn,
         first_name: samlTraits.firstName,
@@ -126,7 +125,13 @@ describe("getMVITraitsForLoa3User", () => {
         dob: samlTraits.dateOfBirth,
         gender: "M",
       }),
-    });
+      {
+        headers: expect.objectContaining({
+          apiKey: "faketoken",
+          accesskey: "faketoken",
+        }),
+      }
+    );
   });
 
   it("should return the Veteran's ICN if the request is successful", async () => {

@@ -1,8 +1,8 @@
 "use strict";
 
-const axios = require("axios");
 const xml2js = require("xml2js");
 const logger = require("./logger");
+const axios = require("axios");
 
 /**
  * Creates a check to receive the binding location
