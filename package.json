@@ -35,7 +35,9 @@
   },
   "jest": {
     "collectCoverage": true,
-    "transformIgnorePatterns": ["node_modules\/(?!axios)"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)"
+    ],
     "coverageThreshold": {
       "global": {
         "lines": 83.45

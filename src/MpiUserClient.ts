@@ -1,4 +1,5 @@
 import { SAMLUser } from "./SAMLUser";
+// @ts-ignore
 import axios from "axios";
 
 export class MpiUserClient {
