@@ -1,6 +1,6 @@
 "use strict";
 
-const request = require("request");
+const axios = require("axios");
 const xml2js = require("xml2js");
 const logger = require("./logger");
 
@@ -58,7 +58,7 @@ export function fetch(url) {
       return resolve(metadata);
     }
 
-    request.get(url, (err, resp, body) => {
+    axios.get(url, (err, resp, body) => {
       if (err) {
         return reject(err);
       }

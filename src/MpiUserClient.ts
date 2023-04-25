@@ -1,5 +1,5 @@
-import * as request from "request-promise-native";
 import { SAMLUser } from "./SAMLUser";
+import axios from "axios";
 
 export class MpiUserClient {
   mpiUserEndpoint: string;
@@ -32,12 +32,9 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    const response = await request.post({
-      url: this.mpiUserEndpoint,
-      json: true,
-      headers: this.headers,
-      body,
-    });
+    const response = await axios.post(this.mpiUserEndpoint, body,
+      {headers: this.headers},
+      )
     return response.data.attributes;
   }
 }
