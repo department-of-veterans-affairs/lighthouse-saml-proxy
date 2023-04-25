@@ -11,7 +11,7 @@ import MockVsoClient from "./mockVsoClient";
 import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
-import axios, { request } from "axios";
+import axios from "axios";
 
 const {
   startServerInBackground,
@@ -50,7 +50,6 @@ let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
  */
 function ssoRequest(samlResponse, state = "state") {
   const reqOpts = {
-    method: "POST",
     resolveWithFullResponse: true,
     simple: false,
     uri: `http://localhost:${PORT}/samlproxy/sp/saml/sso`,
@@ -59,8 +58,7 @@ function ssoRequest(samlResponse, state = "state") {
       RelayState: state,
     },
   };
-
-  return request(reqOpts);
+  return axios.post(reqOpts);
 }
 
 async function ssoIdpRequest() {
@@ -75,7 +73,7 @@ async function ssoIdpRequest() {
     },
   };
 
-  return request(reqOpts);
+  return axios(reqOpts);
 }
 
 /**

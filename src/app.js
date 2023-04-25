@@ -4,7 +4,7 @@
 
 import express from "express";
 import http from "http";
-import * as IdPMetadata from "./idpMetadata.js";
+import * as IdPMetadata from "./idpMetadata";
 import * as cli from "./cli";
 import IDPConfig from "./IDPConfig";
 import SPConfig from "./SPConfig";

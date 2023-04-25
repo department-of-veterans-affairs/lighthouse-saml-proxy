@@ -21,9 +21,14 @@ export class VsoClient {
       last_name: lastName,
     };
 
-    const response = await axios.post(this.vsoEndpointUrl, qs, {
+    const config = {
+      method: "get",
+      url: this.vsoEndpointUrl,
       headers: this.headers,
-    });
+      qs,
+    };
+
+    const response = await axios(config);
     return response.data.attributes;
   }
 }
