@@ -2,7 +2,8 @@
 
 const xml2js = require("xml2js");
 const logger = require("./logger");
-const axios = require("axios");
+//const axios = require("axios");
+const request = require("request");
 
 /**
  * Creates a check to receive the binding location
@@ -58,7 +59,7 @@ export function fetch(url) {
       return resolve(metadata);
     }
 
-    axios.get(url, (err, resp, body) => {
+    request.get(url, (err, resp, body) => {
       if (err) {
         return reject(err);
       }

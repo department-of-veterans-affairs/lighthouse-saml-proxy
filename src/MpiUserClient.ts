@@ -1,5 +1,4 @@
 import { SAMLUser } from "./SAMLUser";
-// @ts-ignore
 import axios from "axios";
 
 export class MpiUserClient {
@@ -33,9 +32,13 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    const response = await axios.post(this.mpiUserEndpoint, body, {
-      headers: this.headers,
-    });
+    const response = await axios.post(
+      this.mpiUserEndpoint,
+      {
+        headers: this.headers,
+      },
+      body
+    );
     return response.data.attributes;
   }
 }

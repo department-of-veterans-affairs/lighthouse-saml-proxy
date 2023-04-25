@@ -1,5 +1,3 @@
-// @ts-ignore
-
 import "jest";
 import axios from "axios";
 import { MpiUserClient } from "./MpiUserClient";
