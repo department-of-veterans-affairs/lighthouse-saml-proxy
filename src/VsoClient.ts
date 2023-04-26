@@ -1,4 +1,6 @@
-import axios from "axios";
+//import axios from "axios";
+import * as request from "request-promise-native";
+
 export class VsoClient {
   token: string;
   vsoEndpointUrl: string;
@@ -20,15 +22,20 @@ export class VsoClient {
       first_name: firstName,
       last_name: lastName,
     };
+//     const response = await axios.get(this.vsoEndpointUrl, {
+//       headers: this.headers,
+//       params: qs,
+//     });
+//     return response.data.attributes;
+//   }
+// }
 
-    const config = {
-      method: "get",
+    const response = await request.get({
       url: this.vsoEndpointUrl,
+      json: true,
       headers: this.headers,
       qs,
-    };
-
-    const response = await axios(config);
+    });
     return response.data.attributes;
   }
 }
