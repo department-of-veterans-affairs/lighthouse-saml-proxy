@@ -1,7 +1,6 @@
 import { SAMLUser } from "./SAMLUser";
-//import axios, { AxiosResponse } from "axios";
-import * as request from "request-promise-native";
-//import bent from "bent";
+import axios from "axios";
+//import * as request from "request-promise-native";
 
 export class MpiUserClient {
   mpiUserEndpoint: string;
@@ -34,23 +33,24 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    // const response: AxiosResponse = await axios({
-    //   method: "post",
-    //   url: this.mpiUserEndpoint,
-    //   headers: this.headers,
-    //   data: body,
-    //   responseType: "json",
-    // });
+    //   const response = await axios.post(this.mpiUserEndpoint, body, {
+    //     headers: this.headers,
+    //     responseType: "json",
+    //   });
+    //   return response.data.data.attributes;
+    // }
 
-    // const data = response.data;
-    // return data.attributes;
-
-    const response = await request.post({
-      url: this.mpiUserEndpoint,
-      json: true,
-      headers: this.headers,
-      body,
-    });
-    return response.data.attributes;
+    return axios
+      .post(this.mpiUserEndpoint, body, {
+        headers: this.headers,
+      })
+      .then((response) => {
+        const data = response.data.data;
+        return data.attributes;
+      })
+      .catch((error) => {
+        console.error(error);
+        throw error;
+      });
   }
 }

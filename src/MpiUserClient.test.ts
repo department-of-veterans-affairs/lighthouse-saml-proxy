@@ -43,12 +43,14 @@ beforeEach(() => {
   axios.post.mockImplementation(() =>
     Promise.resolve({
       data: {
-        id: "fakeICN",
-        type: "user-mvi-icn",
-        attributes: {
-          icn: "fakeICN",
-          first_name: "Edward",
-          last_name: "Paget",
+        data: {
+          id: "fakeICN",
+          type: "user-mvi-icn",
+          attributes: {
+            icn: "fakeICN",
+            first_name: "Edward",
+            last_name: "Paget",
+          },
         },
       },
     })
