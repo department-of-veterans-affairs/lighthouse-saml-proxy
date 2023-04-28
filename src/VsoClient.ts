@@ -21,11 +21,17 @@ export class VsoClient {
       first_name: firstName,
       last_name: lastName,
     };
-    const response = await axios.get(this.vsoEndpointUrl, {
-      headers: this.headers,
-      params: qs,
-    });
-    const attributes = response.data.data.attributes;
-    return attributes;
+    return axios
+      .get(this.vsoEndpointUrl, {
+        headers: this.headers,
+        params: qs,
+      })
+      .then((response) => {
+        const data = response.data.data;
+        return data.attributes;
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 }
