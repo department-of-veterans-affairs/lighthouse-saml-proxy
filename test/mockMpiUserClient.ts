@@ -16,9 +16,9 @@ export default class MockMpiUserClient {
     }
 
     const error = new Error("Not found");
-    error.name = "StatusCodeError";
+    error.name = "MPILookupFailure";
     // @ts-ignore
-    error.statusCode= "404";
+    error.statusCode= 404;
     throw error;
   }
 
