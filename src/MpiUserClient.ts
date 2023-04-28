@@ -33,24 +33,28 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    //   const response = await axios.post(this.mpiUserEndpoint, body, {
-    //     headers: this.headers,
-    //     responseType: "json",
-    //   });
-    //   return response.data.data.attributes;
-    // }
-
-    return axios
-      .post(this.mpiUserEndpoint, body, {
-        headers: this.headers,
-      })
-      .then((response) => {
-        const data = response.data.data;
-        return data.attributes;
-      })
-      .catch((error) => {
-        console.error(error);
-        throw error;
-      });
+    const response = await axios.post(this.mpiUserEndpoint, body, {
+      headers: this.headers,
+      responseType: "json",
+    });
+    if (response.data.data.attributes) {
+      return response.data.data.attributes;
+    } else {
+      console.log(Error);
+      throw Error;
+    }
   }
+
+  // return axios
+  //   .post(this.mpiUserEndpoint, body, {
+  //     headers: this.headers,
+  //   })
+  //   .then((response) => {
+  //     const data = response.data.data;
+  //     return data.attributes;
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //     throw error;
+  //   });
 }
