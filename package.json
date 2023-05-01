@@ -118,8 +118,6 @@
     "@types/xmldom": "^0.1.30",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "@types/request": "^2.48.5",
-    "@types/request-promise-native": "^1.0.17",
     "atob": "^2.1.2",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
@@ -131,8 +129,6 @@
     "nodemon": "^2.0.7",
     "prettier": "2.2.1",
     "source-map-support": "^0.5.19",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.9",
     "ts-jest": "^27.0.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"

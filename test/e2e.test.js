@@ -57,18 +57,18 @@ async function ssoRequest(samlResponse, state = "state") {
       SAMLResponse: samlResponse,
       RelayState: state,
     }),
-    validateStatus(status) {
-      return status >=200 && status < 300;
-    }
+    maxRedirects: 0,
+    validateStatus: function (status) {
+      return status < 500;
+    },
   };
   return await axios(reqOpts)
     .then((response) => {
       return response;
     })
-    .catch(() => {
-      return {
-        status: 302,
-        data: loaRedirect,
+    .catch((err) => {
+      throw {
+        error: err,
       }
     });
 } 
@@ -346,7 +346,7 @@ describe("Logins for idp", () => {
     mpiUserClient.findUserInMVI = true;
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
-    expect(responseResultType(response)).toEqual(UNKNOWN);
+    expect(responseResultType(response)).toEqual(SP_ERROR);
   });
 
   for (const idp of [IDME_USER, MHV_USER, DSLOGON_USER]) {
