@@ -47,7 +47,7 @@ let buildSamlResponse = buildSamlResponseFunction(sessionIndex);
  * @param {*} state relay state
  * @returns {*} sso request with the request options
  */
-async function ssoRequest(samlResponse, state = "state") {
+function ssoRequest(samlResponse, state = "state") {
   const reqOpts1 = {
     method: "POST",
     url: `http://localhost:${PORT}/samlproxy/sp/saml/sso`,
@@ -60,7 +60,7 @@ async function ssoRequest(samlResponse, state = "state") {
   };
   return axios(reqOpts1)
   .then((response) => {
-    return response.config.data;
+    return response;
   })
   .catch(function (error) {
     return error;
@@ -81,9 +81,9 @@ async function ssoIdpRequest() {
     maxRedirects: 0,
   };
 
-  return await axios(reqOpts2)
+  return axios(reqOpts2)
   .then((response) => {
-    return response.config.data;
+    return response;
   })
   .catch(function (error) {
     return error;
@@ -222,7 +222,7 @@ function isBodySamlResponse(body) {
  */
 function responseResultType(response) {
   const status = response.status;
-  const body = response.config.data;
+  const body = response.data;
 
   if (status >= 500) {
     return ERROR;
@@ -262,7 +262,7 @@ function decode_saml_uri(saml) {
  */
 function getIdpSamlRequest(response, class_tags) {
   const parser = new DOMParser();
-  const parsed = parser.parseFromString(response.config.data, MIME_HTML);
+  const parsed = parser.parseFromString(response.data, MIME_HTML);
   const url = parsed
     .getElementsByClassName(class_tags)
     ["0"].getAttributeNode("href").nodeValue;
@@ -325,8 +325,8 @@ describe("Logins for idp", () => {
     const response = await ssoRequest(requestSamlResponse, expectedState);
 
     expect(responseResultType(response)).toEqual(SAML_RESPONSE);
-    const responseSamlResponse = SAMLResponseFromHtml(response.config.data);
-    const state = stateFromHtml(response.config.data);
+    const responseSamlResponse = SAMLResponseFromHtml(response.data);
+    const state = stateFromHtml(response.data);
 
     // make sure we've actually updated the saml response
     expect(responseSamlResponse).not.toEqual(requestSamlResponse);
@@ -369,7 +369,7 @@ describe("Logins for idp", () => {
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
 
-        const responseSamlResponse = atob(SAMLResponseFromHtml(response.config.data));
+        const responseSamlResponse = atob(SAMLResponseFromHtml(response.data));
         const icn = assertionValueFromSAMLResponse(responseSamlResponse, "icn");
         expect(icn).toEqual("123");
       });
@@ -386,7 +386,7 @@ describe("Logins for idp", () => {
 
         expect(responseResultType(response)).toEqual(SAML_RESPONSE);
 
-        const responseSamlResponse = atob(SAMLResponseFromHtml(response.config.data));
+        const responseSamlResponse = atob(SAMLResponseFromHtml(response.data));
         const icn = assertionValueFromSAMLResponse(responseSamlResponse, "icn");
         expect(icn).toBeUndefined();
       });
