@@ -60,7 +60,7 @@ async function ssoRequest(samlResponse, state = "state") {
   };
   return axios(reqOpts1)
   .then((response) => {
-    return response;
+    return response.config.data;
   })
   .catch(function (error) {
     return error;
@@ -83,7 +83,7 @@ async function ssoIdpRequest() {
 
   return await axios(reqOpts2)
   .then((response) => {
-    return response;
+    return response.config.data;
   })
   .catch(function (error) {
     return error;
