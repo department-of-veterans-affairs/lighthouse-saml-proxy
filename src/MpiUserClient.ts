@@ -1,6 +1,5 @@
 import { SAMLUser } from "./SAMLUser";
 import axios from "axios";
-//import * as request from "request-promise-native";
 
 export class MpiUserClient {
   mpiUserEndpoint: string;

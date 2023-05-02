@@ -152,7 +152,7 @@ export function fetch(url) {
         }
       })
       .catch(() => {
-        console.log("error occurred");
+        logger.error("Error receiving metadata");
       });
   });
 }
