@@ -20,10 +20,7 @@ import { selectPassportStrategyKey } from "./passport";
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
   // https://github.com/request/promise-core/blob/master/lib/errors.js
-  if (
-    error.name == "StatusCodeError" &&
-    error.statusCode.toString() === "404"
-  ) {
+  if (error.name == "MPILookupFailure" && error.statusCode === 404) {
     return "icn_error";
   } else {
     return "internal_failure";

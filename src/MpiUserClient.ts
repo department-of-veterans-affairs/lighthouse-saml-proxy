@@ -1,5 +1,5 @@
-import * as request from "request-promise-native";
 import { SAMLUser } from "./SAMLUser";
+import axios from "axios";
 
 export class MpiUserClient {
   mpiUserEndpoint: string;
@@ -32,12 +32,20 @@ export class MpiUserClient {
       body["level_of_assurance"] = "3";
     }
 
-    const response = await request.post({
-      url: this.mpiUserEndpoint,
-      json: true,
-      headers: this.headers,
-      body,
-    });
-    return response.data.attributes;
+    return axios
+      .post(this.mpiUserEndpoint, body, {
+        headers: this.headers,
+      })
+      .then((response) => {
+        const data = response.data.data;
+        return data.attributes;
+      })
+      .catch(() => {
+        throw {
+          name: "MPILookupFailure",
+          statusCode: 404,
+          message: "Error with MPI Lookup",
+        };
+      });
   }
 }
