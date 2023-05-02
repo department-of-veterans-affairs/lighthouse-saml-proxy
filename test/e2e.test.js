@@ -12,7 +12,6 @@ import { idpBadCert, idpBadKey } from "./testCerts";
 import atob from "atob";
 import zlib from "zlib";
 import axios from "axios";
-import { clear } from "console";
 const {
   startServerInBackground,
   stopBackgroundServer,
