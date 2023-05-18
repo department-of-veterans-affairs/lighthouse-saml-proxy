@@ -287,14 +287,14 @@ export const serializeAssertions = (
   const time = new Date().toISOString();
   if (req.session) {
     authOptions.RelayState = req.options.ssoResponse.state;
-    authOptions.inRepsonseTo = req.session.authnRequest.id;
+    authOptions.inResponseTo = req.session.authnRequest.id;
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
-      inRepsonseTo: authOptions.inRepsonseTo,
+      inResponseTo: authOptions.inResponseTo,
     };
 
     logger.info(
