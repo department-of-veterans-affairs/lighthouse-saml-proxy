@@ -43,6 +43,7 @@ export default class IDPConfig implements IdPOptions {
     redirect?: string;
     post?: string;
   };
+  inResponseTo: string;
 
   constructor(argv: any) {
     this.idpBaseUrl = argv.idpBaseUrl;
@@ -74,6 +75,7 @@ export default class IDPConfig implements IdPOptions {
     this.postEndpointPath = IDP_SSO;
     this.redirectEndpointPath = IDP_SSO;
     this.logoutEndpointPaths = {};
+    this.inResponseTo = argv.inResponseTo;
   }
 
   public getUserFromRequest(req: Request) {
