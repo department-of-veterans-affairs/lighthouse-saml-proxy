@@ -1,5 +1,3 @@
-import {inspect} from "util";
-
 require("jest");
 
 import { DOMParser } from "@xmldom/xmldom";
