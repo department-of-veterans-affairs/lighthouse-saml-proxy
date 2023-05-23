@@ -1,3 +1,5 @@
+import {inspect} from "util";
+
 require("jest");
 
 import { DOMParser } from "@xmldom/xmldom";
@@ -196,6 +198,12 @@ function findAssertionInSamlResponse(samlResponse, assertion) {
       }
     }
   }
+}
+
+function getAttributeValueFromSamlResponse(samlResponse, attributeName) {
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(samlResponse);
+  return parsed.documentElement.getAttributeNode(attributeName).nodeValue;
 }
 
 /**
@@ -404,6 +412,20 @@ describe("Logins for idp", () => {
         vsoClient.userIsVSO = false;
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
+      });
+      it("includes InResponseTo SAML attribute", async () => {
+        const requestSamlResponse = await buildSamlResponse(
+          idp,
+          "3",
+          idpConfig
+        );
+        mpiUserClient.findUserInMVI = true;
+        const response = await ssoRequest(requestSamlResponse);
+        expect(responseResultType(response)).toEqual(SAML_RESPONSE);
+
+        const responseSamlResponse = atob(SAMLResponseFromHtml(response.data));
+        const inResponseTo = getAttributeValueFromSamlResponse(responseSamlResponse, "InResponseTo");
+        expect(inResponseTo).toBeDefined()
       });
     });
   }
