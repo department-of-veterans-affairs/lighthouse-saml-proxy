@@ -203,7 +203,7 @@ function findAssertionInSamlResponse(samlResponse, assertion) {
  * for an example of the xml document we are parsing
  *
  * @param {*} samlResponse saml proxy response
- * @param {*} attributeName assertion in saml response
+ * @param {*} attributeName attribute in saml response
  * @returns {*} returns the value which is received from elements by tag name
  */
 function getAttributeValueFromSamlResponse(samlResponse, attributeName) {
