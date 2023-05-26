@@ -688,6 +688,8 @@ describe("serializeAssertions", () => {
     const mockSamlp = jest.spyOn(samlp, "auth");
     mockSamlp.mockImplementation(jest.fn(() => jest.fn));
     handlers.serializeAssertions(req, mockResponse, mockNext);
-    expect(mockSamlp.mock.calls[0][0].inResponseTo).toEqual("id182335062341510412002199304");
+    expect(mockSamlp.mock.calls[0][0].inResponseTo).toEqual(
+      "id182335062341510412002199304"
+    );
   });
 });
