@@ -684,7 +684,7 @@ describe("serializeAssertions", () => {
     mockNext = jest.fn();
   });
 
-  it("buildAuthOptions includes inResponseTo", () => {
+  it("authOptions includes inResponseTo", () => {
     const mockSamlp = jest.spyOn(samlp, "auth");
     mockSamlp.mockImplementation(jest.fn(() => jest.fn));
     handlers.serializeAssertions(req, mockResponse, mockNext);
