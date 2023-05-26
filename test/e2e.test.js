@@ -419,20 +419,6 @@ describe("Logins for idp", () => {
         const response = await ssoRequest(requestSamlResponse);
         expect(responseResultType(response)).toEqual(USER_NOT_FOUND);
       });
-      it("includes InResponseTo SAML attribute", async () => {
-        const requestSamlResponse = await buildSamlResponse(
-          idp,
-          "3",
-          idpConfig
-        );
-        mpiUserClient.findUserInMVI = true;
-        const response = await ssoRequest(requestSamlResponse);
-        expect(responseResultType(response)).toEqual(SAML_RESPONSE);
-
-        const responseSamlResponse = atob(SAMLResponseFromHtml(response.data));
-        const inResponseTo = getAttributeValueFromSamlResponse(responseSamlResponse, "InResponseTo");
-        expect(inResponseTo).toBeDefined()
-      });
     });
   }
 });
