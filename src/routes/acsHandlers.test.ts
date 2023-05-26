@@ -12,6 +12,8 @@ import {
 import { idpConfig } from "../../test/testServer";
 import { IDME_USER } from "../../test/testUsers";
 import { accessiblePhoneNumber } from "../utils";
+import samlp from "samlp";
+
 jest.mock("passport");
 jest.mock("../VsoClient");
 jest.mock("../MpiUserClient");
@@ -643,5 +645,49 @@ describe("buildPassportLoginHandler", () => {
       message: "Invalid assertion response.",
       wrapper_tags: accessiblePhoneNumber,
     });
+  });
+});
+
+describe("serializeAssertions", () => {
+  let req: any;
+  let mockResponse: any;
+  let mockNext: any;
+  beforeEach(async () => {
+    req = defaultMockRequest;
+    req.session = {
+      authnRequest: {
+        relayState: undefined,
+        id: "id182335062341510412002199304",
+        issuer:
+          "https://www.okta.com/saml2/service-provider/spayqztpxyfjkeunxobw",
+        destination: "http://localhost:7000/sso",
+        acsUrl: "https://deptva-eval.okta.com/sso/saml2/0oa37x2cwf9yOtqGb2p7",
+        forceAuthn: false,
+      },
+    };
+    req.options = {
+      ssoResponse: {
+        state: "something",
+      },
+    };
+    req.idp = {
+      options: {},
+    };
+    req.user = {
+      authnContext: {
+        authnMethod: "test",
+      },
+    };
+    mockResponse = {
+      render: jest.fn(),
+    };
+    mockNext = jest.fn();
+  });
+
+  it("buildAuthOptions includes inResponseTo", () => {
+    const mockSamlp = jest.spyOn(samlp, "auth");
+    mockSamlp.mockImplementation(jest.fn(() => jest.fn));
+    handlers.serializeAssertions(req, mockResponse, mockNext);
+    expect(mockSamlp.mock.calls[0][0].inResponseTo).toEqual("id182335062341510412002199304");
   });
 });

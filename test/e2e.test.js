@@ -200,20 +200,6 @@ function findAssertionInSamlResponse(samlResponse, assertion) {
 
 /**
  * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
- * for an example of the xml document we are parsing
- *
- * @param {*} samlResponse saml proxy response
- * @param {*} attributeName attribute in saml response
- * @returns {*} returns the value which is received from elements by tag name
- */
-function getAttributeValueFromSamlResponse(samlResponse, attributeName) {
-  const parser = new DOMParser();
-  const parsed = parser.parseFromString(samlResponse);
-  return parsed.documentElement.getAttributeNode(attributeName).nodeValue;
-}
-
-/**
- * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
  * for an example of the xml document we are parsing. It checks whether the body is a saml response.
  *
  * @param {*} body saml response from html

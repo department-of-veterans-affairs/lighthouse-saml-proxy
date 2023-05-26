@@ -174,7 +174,6 @@ export const parseSamlRequest = function (req, res, next) {
         action: "parseSamlRequest",
         result: "failure",
         session: req.sessionID,
-        samlRequest: data,
       });
     }
     next();

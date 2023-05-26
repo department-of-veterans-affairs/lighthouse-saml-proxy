@@ -298,7 +298,6 @@ export const serializeAssertions = (
       relayState: authOptions.RelayState,
       inResponseTo: authOptions.inResponseTo || "id not found",
     };
-
     logger.info(
       `Relay state to Okta (from session): ${authOptions.RelayState}`,
       logObj
