@@ -18,9 +18,10 @@ import {
 } from "../logger";
 import addRoutes from "./routes";
 import { getParticipant } from "./handlers";
-
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
+import RedisStore from "connect-redis";
+import { createClient } from "redis";
 
 /**
  * This function filters the property object
@@ -143,8 +144,27 @@ export default function configureExpress(
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  let redisClient = createClient({
+    host: argv.redisHost,
+    port: argv.redisPort,
+  });
+  let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "samlSession:",
+  });
+  redisClient.on("error", function (err) {
+    logger.error(
+      "Could not establish a session store connection with redis. ",
+      err
+    );
+  });
+  redisClient.on("connect", function (err) {
+    logger.info("Connected to redis session store successfully. ", err);
+  });
   app.use(
     session({
+      store: redisStore,
       secret: argv.sessionSecret,
       resave: false,
       saveUninitialized: true,
@@ -153,8 +173,8 @@ export default function configureExpress(
       cookie: { maxAge: 1000 * 60 * 5 },
     })
   );
-  app.use(flash());
 
+  app.use(flash());
   app.use(
     sassMiddleware({
       src: path.join(process.cwd(), "styles", "core.scss"),
