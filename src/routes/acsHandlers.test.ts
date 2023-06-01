@@ -4,7 +4,6 @@ import * as handlers from "./acsHandlers";
 import { MpiUserClient } from "../MpiUserClient";
 import { VsoClient } from "../VsoClient";
 import { MVIRequestMetrics } from "../metrics";
-import { TestCache } from "./types";
 import {
   buildSamlResponseFunction,
   defaultMockRequest,

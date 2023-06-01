@@ -8,7 +8,6 @@ import sass from "sass";
 import tildeImporter from "node-sass-tilde-importer";
 import { v4 as uuidv4 } from "uuid";
 import rTracer from "cls-rtracer";
-import { RedisCache } from "./types";
 import {
   loggingMiddleware as morganMiddleware,
   winstonMiddleware,
@@ -44,8 +43,6 @@ function filterProperty(object, property) {
  * @param {*} strategies map
  * @param {*} mpiUserClient client within the master patient index
  * @param {*} vsoClient used for connected with oauth
- * @param {*} cache redis cache
- * @param {*} cacheEnabled bool to check whether redis cache was enabled (set to true)
  * @returns {*} if sentry is undefined then it will return request data or it will return the app
  * which has params for error, request and respose messages.
  */
@@ -56,9 +53,7 @@ export default function configureExpress(
   spOptions,
   strategies,
   mpiUserClient,
-  vsoClient,
-  cache = RedisCache,
-  cacheEnabled = true
+  vsoClient
 ) {
   const useSentry =
     argv.sentryDSN !== undefined && argv.sentryEnvironment !== undefined;
@@ -162,6 +157,7 @@ export default function configureExpress(
     });
   let redisStore = new RedisStore({
     client: redisClient,
+    prefix: "samlsess:",
   });
   app.use(
     session({
@@ -213,7 +209,7 @@ export default function configureExpress(
     }
   });
 
-  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
+  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

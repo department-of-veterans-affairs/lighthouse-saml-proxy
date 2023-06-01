@@ -14,7 +14,6 @@ import logger from "./logger";
 import MpiUserClientConfig from "./MpiUserClientConfig";
 import { MpiUserClient } from "./MpiUserClient";
 import { VsoClient } from "./VsoClient";
-import { RedisCache } from "./routes/types";
 import createPassportStrategy from "./routes/passport";
 import passport from "passport";
 
@@ -106,11 +105,6 @@ function runServer(argv) {
         vsoConfig.token,
         vsoConfig.vsoUserEndpoint
       );
-      let cache = null;
-      const cacheEnabled = argv.cacheEnabled;
-      if (cacheEnabled) {
-        cache = new RedisCache(argv.redisPort, argv.redisHost);
-      }
       configureExpress(
         app,
         argv,
@@ -118,9 +112,7 @@ function runServer(argv) {
         spConfigs,
         strategies,
         mpiUserClient,
-        vsoClient,
-        cache,
-        cacheEnabled
+        vsoClient
       );
 
       const env = app.get("env"),
