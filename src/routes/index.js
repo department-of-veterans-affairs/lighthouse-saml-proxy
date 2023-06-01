@@ -3,7 +3,6 @@ import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
 import express from "express";
-import cookieParser from "cookie-parser";
 import flash from "connect-flash";
 import { sassMiddleware, accessiblePhoneNumber } from "../utils";
 import sass from "sass";
@@ -58,7 +57,7 @@ export default function configureExpress(
   strategies,
   mpiUserClient,
   vsoClient,
-  cache = new RedisCache(),
+  cache = RedisCache,
   cacheEnabled = true
 ) {
   const useSentry =
@@ -143,24 +142,22 @@ export default function configureExpress(
   }
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser());
 
-  let redisClient = createClient({
+  const redisClient = createClient({
     host: argv.redisHost,
     port: argv.redisPort,
   });
-  let redisStore = new RedisStore({
+  const redisStore = new RedisStore({
     client: redisClient,
-    prefix: "samlSession:",
   });
-  redisClient.on("error", function (err) {
+  redisClient.on("error", (err) => {
     logger.error(
       "Could not establish a session store connection with redis. ",
       err
     );
   });
-  redisClient.on("connect", function (err) {
-    logger.info("Connected to redis session store successfully. ", err);
+  redisClient.on("connect", () => {
+    logger.info("Connected to redis session store successfully.");
   });
   app.use(
     session({
@@ -170,7 +167,9 @@ export default function configureExpress(
       saveUninitialized: true,
       name: "idp_sid",
       genid: uuidv4,
-      cookie: { maxAge: 1000 * 60 * 5 },
+      cookie: {
+        maxAge: 1000 * 60 * 5,
+      },
     })
   );
 
