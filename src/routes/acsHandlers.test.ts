@@ -84,6 +84,18 @@ const claimsBasicAccount = {
   uuid: "totally-uniq",
   level_of_assurance: "0",
 };
+
+const validSession = {
+  authnRequest: {
+    relayState: undefined,
+    id: "id182335062341510412002199304",
+    issuer: "https://www.okta.com/saml2/service-provider/spayqztpxyfjkeunxobw",
+    destination: "http://localhost:7000/sso",
+    acsUrl: "https://deptva-eval.okta.com/sso/saml2/0oa37x2cwf9yOtqGb2p7",
+    forceAuthn: false,
+  },
+};
+
 describe("scrubUserClaims", () => {
   it("should return a user claims object with only permitted keys for dslogon logins", () => {
     // ICN will have been looked up before this function runs
@@ -379,81 +391,23 @@ describe("requestWithMetrics", () => {
 });
 
 describe("validateIdpResponse", () => {
+  let req: any;
   let mockResponse: any;
+  const nextFn = jest.fn();
 
   beforeEach(() => {
     mockResponse = {
       render: jest.fn(),
     };
-  });
-  it("should cache session index for a given saml response", async () => {
-    const nextFn = jest.fn();
-    const testSessionIndex = "test";
-    const cache = new TestCache();
-    const req: any = {
+    req = {
       mpiUserClient: mpiUserClient,
       vsoClient: vsoClient,
-      user: {
-        claims: { ...claimsWithEDIPI },
-        authnContext: {
-          sessionIndex: testSessionIndex,
-        },
-      },
     };
-
-    const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, mockResponse, nextFn);
-    expect(nextFn).toHaveBeenCalled();
-    expect(cache.has(testSessionIndex));
   });
 
-  it("should return sensitiveError on repeated idp saml response", async () => {
-    const nextFn = jest.fn();
-    const testSessionIndex = "test";
-    const cache = new TestCache();
-    const req: any = {
-      mpiUserClient: mpiUserClient,
-      vsoClient: vsoClient,
-      user: {
-        claims: { ...claimsWithEDIPI },
-        authnContext: {
-          sessionIndex: testSessionIndex,
-        },
-      },
-    };
-
-    const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, mockResponse, nextFn).catch((err) => {
-      fail("Test failure due to unexpected error " + err);
-    });
-    await validateFn(req, mockResponse, nextFn).catch((err) => {
-      fail("Test failure due to unexpected error " + err);
-    });
-
-    expect(nextFn).toHaveBeenCalledTimes(1);
-    expect(mockResponse.render).toHaveBeenCalledTimes(1);
-    expect(mockResponse.render.mock.calls[0][0]).toBe("layout");
-    expect(mockResponse.render.mock.calls[0][1]["body"]).toBe(
-      "sensitive_error"
-    );
-  });
-
-  it("should throw an error when processing a saml response with no session index", async () => {
-    const nextFn = jest.fn();
-    const cache = new TestCache();
-    const req: any = {
-      mpiUserClient: mpiUserClient,
-      vsoClient: vsoClient,
-      user: {
-        claims: { ...claimsWithEDIPI },
-        authnContext: {},
-      },
-    };
-
-    const validateFn = handlers.validateIdpResponse(cache, true);
-    await validateFn(req, mockResponse, nextFn).catch((err) => {
-      fail("Test failure due to unexpected error " + err);
-    });
+  it("should return sensitiveError without valid session", async () => {
+    req.session = null;
+    handlers.validateIdpResponse(req, mockResponse, nextFn);
 
     expect(nextFn).toHaveBeenCalledTimes(0);
     expect(mockResponse.render).toHaveBeenCalledTimes(1);
@@ -463,24 +417,11 @@ describe("validateIdpResponse", () => {
     );
   });
 
-  it("should not cache anything when cache is not enabled", async () => {
-    const nextFn = jest.fn();
-    const testSessionIndex = "test";
-    const cache = new TestCache();
-    const req: any = {
-      vsoClient: vsoClient,
-      user: {
-        claims: { ...claimsWithEDIPI },
-        authnContext: {
-          sessionIndex: testSessionIndex,
-        },
-      },
-    };
+  it("should succeed if valid session exists", async () => {
+    req.session = validSession;
+    handlers.validateIdpResponse(req, mockResponse, nextFn);
 
-    const validateFn = handlers.validateIdpResponse(cache, false);
-    await validateFn(req, mockResponse, nextFn);
-    expect(nextFn).toHaveBeenCalled();
-    expect(!(await cache.has(testSessionIndex)));
+    expect(nextFn).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -653,17 +594,7 @@ describe("serializeAssertions", () => {
   let mockNext: any;
   beforeEach(async () => {
     req = defaultMockRequest;
-    req.session = {
-      authnRequest: {
-        relayState: undefined,
-        id: "id182335062341510412002199304",
-        issuer:
-          "https://www.okta.com/saml2/service-provider/spayqztpxyfjkeunxobw",
-        destination: "http://localhost:7000/sso",
-        acsUrl: "https://deptva-eval.okta.com/sso/saml2/0oa37x2cwf9yOtqGb2p7",
-        forceAuthn: false,
-      },
-    };
+    req.session = validSession;
     req.options = {
       ssoResponse: {
         state: "something",
