@@ -200,10 +200,10 @@ export const getParticipant = (req) => {
   return participant;
 };
 
-const processAcs = (acsUrl, cache, cacheEnabled) => [
+const processAcs = (acsUrl) => [
   buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
-  validateIdpResponse(cache, cacheEnabled),
+  validateIdpResponse,
   loadICN,
   scrubUserClaims,
   serializeAssertions,

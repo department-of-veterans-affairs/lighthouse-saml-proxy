@@ -1,7 +1,6 @@
 import process from "process";
 import path from "path";
 import bodyParser from "body-parser";
-import session from "express-session";
 import express from "express";
 import flash from "connect-flash";
 import { sassMiddleware, accessiblePhoneNumber } from "../utils";
@@ -20,6 +19,7 @@ import { getParticipant } from "./handlers";
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 import RedisStore from "connect-redis";
+import session from "express-session";
 import { createClient } from "redis";
 
 /**
@@ -143,21 +143,25 @@ export default function configureExpress(
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  const redisClient = createClient({
-    host: argv.redisHost,
-    port: argv.redisPort,
+  let redisClient = createClient({
+    socket: {
+      host: argv.redisHost,
+      port: argv.redisPort,
+    },
   });
-  const redisStore = new RedisStore({
+  redisClient
+    .connect()
+    .then(() => {
+      logger.info("Established a session store connection with redis.");
+    })
+    .catch((err) => {
+      logger.error(
+        "Could not establish a session store connection with redis.",
+        err
+      );
+    });
+  let redisStore = new RedisStore({
     client: redisClient,
-  });
-  redisClient.on("error", (err) => {
-    logger.error(
-      "Could not establish a session store connection with redis. ",
-      err
-    );
-  });
-  redisClient.on("connect", () => {
-    logger.info("Connected to redis session store successfully.");
   });
   app.use(
     session({
