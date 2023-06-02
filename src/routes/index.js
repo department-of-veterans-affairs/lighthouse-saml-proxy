@@ -186,6 +186,9 @@ export default function configureExpress(
         },
       })
     );
+    logger.warn(
+      "Using in-memory session store, deployed environments must use Redis."
+    );
   }
 
   app.use(flash());
