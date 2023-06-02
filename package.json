@@ -63,6 +63,9 @@
       "ts-jest": {
         "diagnostics": false
       }
+    },
+    "moduleNameMapper": {
+      "connect-redis": "<rootDir>/node_modules/connect-redis/dist/cjs"
     }
   },
   "bin": "./bin/run.js",
