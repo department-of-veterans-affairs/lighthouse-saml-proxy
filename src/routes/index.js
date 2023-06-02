@@ -203,7 +203,7 @@ export default function configureExpress(
   app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
 
   app.use(function (req, res, next) {
-    req.metadata = idpOptions.metadata;
+    req.metadata = idpOptions.profileMapper.metadata;
     req.strategies = strategies;
     req.mpiUserClient = mpiUserClient;
     req.vsoClient = vsoClient;
