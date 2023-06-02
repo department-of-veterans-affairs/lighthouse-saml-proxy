@@ -138,40 +138,55 @@ export default function configureExpress(
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  let redisClient = createClient({
-    socket: {
-      host: argv.redisHost,
-      port: argv.redisPort,
-    },
-  });
-  redisClient
-    .connect()
-    .then(() => {
-      logger.info("Established a session store connection with redis.");
-    })
-    .catch((err) => {
-      logger.error(
-        "Could not establish a session store connection with redis.",
-        err
-      );
-    });
-  let redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "samlsess:",
-  });
-  app.use(
-    session({
-      store: redisStore,
-      secret: argv.sessionSecret,
-      resave: false,
-      saveUninitialized: true,
-      name: "idp_sid",
-      genid: uuidv4,
-      cookie: {
-        maxAge: 1000 * 60 * 5,
+  if (argv.redisEnabled) {
+    let redisClient = createClient({
+      socket: {
+        host: argv.redisHost,
+        port: argv.redisPort,
       },
-    })
-  );
+    });
+    redisClient
+      .connect()
+      .then(() => {
+        logger.info("Established a session store connection with redis.");
+      })
+      .catch((err) => {
+        logger.error(
+          "Could not establish a session store connection with redis.",
+          err
+        );
+      });
+    let redisStore = new RedisStore({
+      client: redisClient,
+      prefix: "samlsess:",
+    });
+    app.use(
+      session({
+        store: redisStore,
+        secret: argv.sessionSecret,
+        resave: false,
+        saveUninitialized: true,
+        name: "idp_sid",
+        genid: uuidv4,
+        cookie: {
+          maxAge: 1000 * 60 * 5,
+        },
+      })
+    );
+  } else {
+    app.use(
+      session({
+        secret: argv.sessionSecret,
+        resave: false,
+        saveUninitialized: true,
+        name: "idp_sid",
+        genid: uuidv4,
+        cookie: {
+          maxAge: 1000 * 60 * 5,
+        },
+      })
+    );
+  }
 
   app.use(flash());
   app.use(
@@ -188,7 +203,7 @@ export default function configureExpress(
   app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
 
   app.use(function (req, res, next) {
-    req.metadata = idpOptions.profileMapper.metadata;
+    req.metadata = idpOptions.metadata;
     req.strategies = strategies;
     req.mpiUserClient = mpiUserClient;
     req.vsoClient = vsoClient;

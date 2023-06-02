@@ -94,6 +94,9 @@ const validSession = {
     acsUrl: "https://deptva-eval.okta.com/sso/saml2/0oa37x2cwf9yOtqGb2p7",
     forceAuthn: false,
   },
+  destroy: () => {
+    jest.fn();
+  },
 };
 
 describe("scrubUserClaims", () => {

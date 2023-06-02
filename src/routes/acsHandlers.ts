@@ -282,7 +282,7 @@ export const serializeAssertions = (
     logRelayState(req, logger, "to Okta");
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  req.session.destroy();
+  if (req.session) req.session.destroy();
   samlp.auth(authOptions)(req, res, next);
 };
 /**

@@ -47,14 +47,12 @@ export const idpConfig = new IDPConfig(defaultTestingConfig);
  *
  * @param {*} mpiUserClient user within the master patient index
  * @param {*} vsoClient client used for connecting with oauth
- * @param {*} cache test cache which implements ICache
  * @returns {*} returns the app which calls the expresss() function and
  * initializes the passport information
  */
 export function getTestExpressApp(
   mpiUserClient,
   vsoClient,
-  cache = new TestCache()
 ) {
   const app = express();
   const spConfigs = { id_me: new SPConfig(defaultTestingConfig) };
@@ -68,8 +66,7 @@ export function getTestExpressApp(
     spConfigs,
     strategies,
     mpiUserClient,
-    vsoClient,
-    cache
+    vsoClient
   );
   return app;
 }

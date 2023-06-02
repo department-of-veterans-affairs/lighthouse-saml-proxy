@@ -77,7 +77,6 @@
     "@types/lodash.assignin": "^4.2.6",
     "@types/morgan": "^1.9.2",
     "@types/passport": "^1.0.6",
-    "@types/redis": "^4.0.11",
     "@types/xml2js": "^0.4.8",
     "@xmldom/xmldom": "^0.7.9",
     "acorn": "^8.1.1",
