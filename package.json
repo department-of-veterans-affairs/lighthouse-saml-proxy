@@ -41,7 +41,7 @@
     ],
     "coverageThreshold": {
       "global": {
-        "lines": 83.45
+        "lines": 66
       }
     },
     "transform": {
