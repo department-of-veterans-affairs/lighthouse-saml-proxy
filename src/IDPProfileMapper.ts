@@ -394,12 +394,12 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
   }
 }
 
-export const createProfileMapper = (assertions: ISamlAssertions) => {
+export const createProfileMapper = function (assertions: ISamlAssertions) {
   return new IDPProfileMapper(assertions);
 };
 
 // This represents the fields we expose as an identity provider.
-createProfileMapper.metadata = [
+createProfileMapper.prototype.metadata = [
   {
     id: "email",
     optional: false,
