@@ -1,4 +1,4 @@
-<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_27d324cd784b30f06faa" InResponseTo="4086546a-c6d2-4c0e-bf2d-4c4500c8cb85" Version="2.0" IssueInstant="2020-01-10T16:55:08Z" Destination="https://localhost:1111/samlproxy/sp/saml/sso">
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_27d324cd784b30f06faa" Version="2.0" IssueInstant="2020-01-10T16:55:08Z" Destination="https://localhost:1111/samlproxy/sp/saml/sso">
   <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">samlproxy-idp.vetsgov.dev</saml:Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
