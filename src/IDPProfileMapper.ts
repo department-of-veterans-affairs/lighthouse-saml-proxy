@@ -399,7 +399,7 @@ export const createProfileMapper = (assertions: ISamlAssertions) => {
 };
 
 // This represents the fields we expose as an identity provider.
-createProfileMapper.prototype.metadata = [
+createProfileMapper.metadata = [
   {
     id: "email",
     optional: false,
