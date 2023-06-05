@@ -110,7 +110,7 @@ export const samlLogin = function (template) {
           (authnRequest && authnRequest.forceAuthn) || "false",
           relayState || "/",
           authnContext,
-          rTracer.id()
+          authnRequest?.id || rTracer.id()
         );
         return memo.then((m) => {
           return new Promise((resolve, reject) => {

@@ -134,6 +134,7 @@ sp-metadata.xml
 
 # Local config
 dev-config.json
+local-config.json
 
 ## Webstorm
 .idea/
