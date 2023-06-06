@@ -295,7 +295,7 @@ export const serializeAssertions = (
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
-      inResponseTo: inResponseTo,
+      inResponseTo: inResponseTo || "id not found",
     };
 
     logger.info(
@@ -306,7 +306,7 @@ export const serializeAssertions = (
     logRelayState(req, logger, "to Okta");
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  authOptions.inResponseTo = inResponseTo;
+  if (inResponseTo) authOptions.inResponseTo = inResponseTo;
   samlp.auth(authOptions)(req, res, next);
 };
 /**
@@ -334,17 +334,17 @@ export async function requestWithMetrics(
     throw err;
   }
 }
+
 /**
- * Creates an asynchronous request with metrics using the
- * MVIRequestMetrics and creates a const timer to record
- * status codes
+ * Retrieves InResponseTo assertion from SAMLResponse
  *
- * @param config the param uses type IRequestMetrics
- * @param user calls the Promise function
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
  */
-function getInResponseToFromSAML(encodedResponse: any) {
-  let decoded = Buffer.from(encodedResponse, "base64").toString("ascii");
+function getInResponseToFromSAML(samlResponse: any) {
+  const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
   const parser = new DOMParser();
-  const parsed = parser.parseFromString(decoded);
-  return parsed?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  return parser
+    .parseFromString(decoded)
+    ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
 }
