@@ -16,6 +16,7 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
+import { DOMParser } from "@xmldom/xmldom";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -283,6 +284,7 @@ export const serializeAssertions = (
   res: Response,
   next: NextFunction
 ) => {
+  const inResponseTo = getInResponseToFromSAML(req.body.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
@@ -293,6 +295,7 @@ export const serializeAssertions = (
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
+      inResponseTo: inResponseTo,
     };
 
     logger.info(
@@ -303,6 +306,7 @@ export const serializeAssertions = (
     logRelayState(req, logger, "to Okta");
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
+  authOptions.inResponseTo = inResponseTo;
   samlp.auth(authOptions)(req, res, next);
 };
 /**
@@ -329,4 +333,18 @@ export async function requestWithMetrics(
     timer({ status_code: err.statusCode || "unknown" });
     throw err;
   }
+}
+/**
+ * Creates an asynchronous request with metrics using the
+ * MVIRequestMetrics and creates a const timer to record
+ * status codes
+ *
+ * @param config the param uses type IRequestMetrics
+ * @param user calls the Promise function
+ */
+function getInResponseToFromSAML(encodedResponse: any) {
+  let decoded = Buffer.from(encodedResponse, "base64").toString("ascii");
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(decoded);
+  return parsed?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
 }
