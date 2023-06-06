@@ -80,19 +80,19 @@ export default class IDPConfig implements IdPOptions {
     return req.user;
   }
 
-  public getPostURL(
+  public getPostURL = (
     audience: string,
     authnRequestDom: any,
     req: IdPRequest,
     callback: (err: any, url: string) => void
-  ) {
+  ) => {
     callback(
       null,
       req.authnRequest && req.authnRequest.acsUrl
         ? req.authnRequest.acsUrl
         : this.acsUrl
     );
-  }
+  };
 
   public transformAssertion(assertionDom: any) {
     if (this.authnContextDecl) {
