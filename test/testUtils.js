@@ -37,6 +37,7 @@ export let defaultMockRequest = {
   },
   body: {
     relayState: "relay",
+    SAMLResponse: null
   },
   sps: {
     options: {
@@ -46,6 +47,20 @@ export let defaultMockRequest = {
       },
     },
   },
+  options: {
+    ssoResponse: {
+      state: "something",
+    },
+  },
+  idp: {
+    options: {},
+  },
+  user: {
+    authnContext: {
+      authnMethod: null,
+    },
+  },
+
   strategies: strategies,
   get: function (prop) {
     switch (prop) {

@@ -651,44 +651,34 @@ describe("serializeAssertions", () => {
   let req: any;
   let mockResponse: any;
   let mockNext: any;
-  beforeEach(async () => {
+  let mockSamlp: any;
+
+  beforeAll(() => {
     req = defaultMockRequest;
-    req.options = {
-      ssoResponse: {
-        state: "something",
-      },
-    };
-    req.idp = {
-      options: {},
-    };
-    req.user = {
-      authnContext: {
-        authnMethod: "test",
-      },
-    };
     mockResponse = {
       render: jest.fn(),
     };
     mockNext = jest.fn();
+    mockSamlp = jest.spyOn(samlp, "auth");
+    mockSamlp.mockImplementation(jest.fn(() => jest.fn));
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
+
   it("authOptions includes inResponseTo if in SAMLResponse", () => {
     req.body.SAMLResponse =
       "PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIElEPSJfYmZiZDA0M2I1ZGNhZDJjOWM4MmYiIEluUmVzcG9uc2VUbz0iaWQ4Mjg3MzQyOTYwMzg1NDQ2ODg0OTQ1NzIiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDIzLTA2LTA3VDE2OjE0OjIzLjAyNVoiIERlc3RpbmF0aW9uPSJodHRwczovL2RlcHR2YS5va3RhcHJldmlldy5jb20vc3NvL3NhbWwyLzBvYTd5dzI1OHRXOTcwbDZTMWQ3Ij48c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+aHR0cDovL2xvY2FsaG9zdDo3MDAwPC9zYW1sOklzc3Vlcj48U2lnbmF0dXJlIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIj48U2lnbmVkSW5mbz48Q2Fub25pY2FsaXphdGlvbk1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyIvPjxTaWduYXR1cmVNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2Ii8+PFJlZmVyZW5jZSBVUkk9IiNfYmZiZDA0M2I1ZGNhZDJjOWM4MmYiPjxUcmFuc2Zvcm1zPjxUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjZW52ZWxvcGVkLXNpZ25hdHVyZSIvPjxUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzEwL3htbC1leGMtYzE0biMiLz48L1RyYW5zZm9ybXM+PERpZ2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZW5jI3NoYTI1NiIvPjxEaWdlc3RWYWx1ZT56T3gxRC9Cd1l1RXA4MVFIRnBEeWpCd2hESnNaV1dScjIxS1V6QlJDdCtvPTwvRGlnZXN0VmFsdWU+PC9SZWZlcmVuY2U+PC9TaWduZWRJbmZvPjwvU2lnbmF0dXJlPjxzYW1scDpTdGF0dXM+PHNhbWxwOlN0YXR1c0NvZGUgVmFsdWU9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpzdGF0dXM6U3VjY2VzcyIvPjwvc2FtbHA6U3RhdHVzPjwvc2FtbHA6UmVzcG9uc2U+";
-    const mockSamlp = jest.spyOn(samlp, "auth");
-    mockSamlp.mockImplementation(jest.fn(() => jest.fn));
     handlers.serializeAssertions(req, mockResponse, mockNext);
     expect(mockSamlp.mock.calls[0][0].inResponseTo).toEqual(
       "id828734296038544688494572"
     );
   });
+
   it("authOptions excludes inResponseTo if not in SAMLResponse", () => {
     req.body.SAMLResponse =
       "lVRbb5swFP4riDxOYEPuFkFqwqZlazUtaRutL5MDJ4ENbORjQppfP0PWjkhd1735cr7L+XzkAHmRl2wFWEqBYB2LXCBrD2d2pQSTHDNkgheATMdsfXVzzXyXslJJLWOZ29Yymtnft7ttQgf97TCJeeLH03ji72zrHhRmUsxsgzCFiBUsBWoutDmift+hI4eOb70R8wbM77vUHz7YVgSoM8F1i0y1LpERkkCpD9yVPzUvFRwyqN1YFgRRksatT6jk48faH070Zjqm+WjtJWM7DJpL1iqrTnOv98YRQTXydtjIG/VcxjxPJWo2ppQGpMMaButsb9xW6nd6Z88GVNe1W/ddqfbENyhCp8QUJJjte/YZBclS7GQYLLiQIjMS2alt+wZ0KhPrKt9Llem0+AulRzzaUDpwjJ3YG4ieTTp23sxCB0/GnEIq6CnkDqbcH44avhXsQIGIwbpbLWd27+W3DoNbxQXupCqws/6n+kUsIA6QyxISB5+aaBy8ne3lREjXWpTtzXz9Zzam/d6fRM4U9zyvIDx9OXoRmdffqvflxPv68UMZPf6Y12n0CR82m5Xyvc93p/lqod/JWUC6yIA8J2vW3XEgz094nt+SrbXZ4uVuIROwWqrXpxnbarau4hgQ2zwuScnlHxD+Ag==";
-    const mockSamlp = jest.spyOn(samlp, "auth");
-    mockSamlp.mockImplementation(jest.fn(() => jest.fn));
     handlers.serializeAssertions(req, mockResponse, mockNext);
     expect(mockSamlp.mock.calls[0][0].inResponseTo).toBeUndefined();
   });
