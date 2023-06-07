@@ -284,7 +284,7 @@ export const serializeAssertions = (
   res: Response,
   next: NextFunction
 ) => {
-  const inResponseTo = getInResponseToFromSAML(req.body.SAMLResponse);
+  const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
@@ -297,7 +297,6 @@ export const serializeAssertions = (
       relayState: authOptions.RelayState,
       inResponseTo: inResponseTo || "id not found",
     };
-
     logger.info(
       `Relay state to Okta (from session): ${authOptions.RelayState}`,
       logObj
@@ -342,9 +341,13 @@ export async function requestWithMetrics(
  * @returns returns a string if InResponseTo is present
  */
 function getInResponseToFromSAML(samlResponse: any) {
-  const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
-  const parser = new DOMParser();
-  return parser
-    .parseFromString(decoded)
-    ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  } catch (err) {
+    logger.error("getInResponseToFromSAML failed: ", err);
+  }
 }
