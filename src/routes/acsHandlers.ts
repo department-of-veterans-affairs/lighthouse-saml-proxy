@@ -16,6 +16,7 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
+import { DOMParser } from "@xmldom/xmldom";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -283,20 +284,18 @@ export const serializeAssertions = (
   res: Response,
   next: NextFunction
 ) => {
+  const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
     authOptions.RelayState = req.options.ssoResponse.state;
-    if (req.session.authnRequest?.id) {
-      authOptions.inResponseTo = req.session.authnRequest.id;
-    }
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
-      inResponseTo: authOptions.inResponseTo || "id not found",
+      inResponseTo: inResponseTo || "id not found",
     };
     logger.info(
       `Relay state to Okta (from session): ${authOptions.RelayState}`,
@@ -306,6 +305,7 @@ export const serializeAssertions = (
     logRelayState(req, logger, "to Okta");
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
+  if (inResponseTo) authOptions.inResponseTo = inResponseTo;
   samlp.auth(authOptions)(req, res, next);
 };
 /**
@@ -331,5 +331,23 @@ export async function requestWithMetrics(
     metrics.failure.inc();
     timer({ status_code: err.statusCode || "unknown" });
     throw err;
+  }
+}
+
+/**
+ * Retrieves InResponseTo assertion from SAMLResponse
+ *
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
+ */
+function getInResponseToFromSAML(samlResponse: any) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  } catch (err) {
+    logger.error("getInResponseToFromSAML failed: ", err);
   }
 }

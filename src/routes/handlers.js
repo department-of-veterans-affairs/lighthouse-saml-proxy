@@ -110,7 +110,7 @@ export const samlLogin = function (template) {
           (authnRequest && authnRequest.forceAuthn) || "false",
           relayState || "/",
           authnContext,
-          rTracer.id()
+          authnRequest?.id || rTracer.id()
         );
         return memo.then((m) => {
           return new Promise((resolve, reject) => {
@@ -136,7 +136,7 @@ export const samlLogin = function (template) {
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
         res.render("layout", authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
-          action: "samlLogin",
+          action: "parseSamlRequest",
           result: "success",
           session: req.sessionID,
         });
@@ -159,7 +159,7 @@ export const parseSamlRequest = function (req, res, next) {
       logger.warn("Allowing login with no final redirect.");
       next();
     }
-    if (data?.id) {
+    if (data) {
       req.authnRequest = {
         relayState: req.query.RelayState || req.body.RelayState,
         id: data.id,
@@ -169,12 +169,6 @@ export const parseSamlRequest = function (req, res, next) {
         forceAuthn: data.forceAuthn === "true",
       };
       req.session.authnRequest = req.authnRequest;
-    } else {
-      logger.warn("Allowing login with no authnRequest.", {
-        action: "parseSamlRequest",
-        result: "failure",
-        session: req.sessionID,
-      });
     }
     next();
   });
