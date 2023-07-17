@@ -288,7 +288,7 @@ export const serializeAssertions = (
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
-    authOptions.RelayState = req.options.ssoResponse.state;
+    authOptions.RelayState = req.options.ssoResponse.state.replace(/\n|\r/g, "");
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
