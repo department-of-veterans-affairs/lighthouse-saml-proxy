@@ -59,7 +59,7 @@ export function logRelayState(req, logger, step) {
     step: step,
     session: req.sessionID,
   };
-  logger.info(logMessage, logObj);
+  logger.info(logMessage.replace(/\n|\r/g, ""), logObj);
 }
 
 /**
