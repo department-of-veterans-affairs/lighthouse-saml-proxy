@@ -58,7 +58,7 @@ export function logRelayState(req, logger, step) {
       time: new Date().toISOString(),
       relayStateBody,
       relayStateQuery,
-      step: step,
+      step: relayStateStep,
       session: req.sessionID,
     }
   );
