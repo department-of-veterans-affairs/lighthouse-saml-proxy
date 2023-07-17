@@ -150,8 +150,10 @@ export default function configureExpress(
       saveUninitialized: true,
       name: "idp_sid",
       genid: uuidv4,
-      cookie: { maxAge: 1000 * 60 * 5 },
-      secure: true,
+      cookie: {
+        maxAge: 1000 * 60 * 5,
+        secure: true,
+      },
     })
   );
   app.use(flash());
