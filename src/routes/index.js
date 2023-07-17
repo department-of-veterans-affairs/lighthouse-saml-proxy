@@ -155,7 +155,6 @@ export default function configureExpress(
     })
   );
   app.use(flash());
-  app.use(lusca.csrf());
 
   app.use(
     sassMiddleware({
@@ -207,6 +206,8 @@ export default function configureExpress(
     err.status = 404;
     next(err);
   });
+
+  app.use(lusca.csrf());
 
   if (useSentry) {
     app.use(
