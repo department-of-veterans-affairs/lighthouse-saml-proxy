@@ -126,6 +126,7 @@ export default function configureExpress(
    * Middleware
    */
   app.use(rTracer.expressMiddleware());
+  app.use(csrf());
   if (
     argv.logStyleElementsEnabled == null ||
     argv.logStyleElementsEnabled == true
@@ -206,8 +207,6 @@ export default function configureExpress(
     err.status = 404;
     next(err);
   });
-
-  app.use(csrf());
 
   if (useSentry) {
     app.use(
