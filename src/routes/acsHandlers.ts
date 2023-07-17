@@ -250,7 +250,7 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
           request_id: rTracer.id(),
         });
       }
-      let sessionIndexCached = null;
+      let sessionIndexCached: boolean | void;
       sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
         logger.error(
           "Cache was unable to retrieve session index." + JSON.stringify(err)
@@ -288,7 +288,10 @@ export const serializeAssertions = (
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
-    authOptions.RelayState = req.options.ssoResponse.state;
+    authOptions.RelayState = req.options.ssoResponse.state.replace(
+      /\n|\r/g,
+      ""
+    );
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,
