@@ -51,11 +51,11 @@ export function removeHeaders(cert) {
 export function logRelayState(req, logger, step) {
   let relayStateBody = req.body.RelayState;
   let relayStateQuery = req.query.RelayState;
-  let relayStateStep = step.replace(/\n|\r/g, "");
-  if (req.body.RelayState) {
+  const relayStateStep = step.replace(/\n|\r/g, "");
+  if (req.body.RelayState != undefined) {
     relayStateBody = req.body.RelayState.replace(/\n|\r/g, "");
   }
-  if (req.query.RelayState) {
+  if (req.query.RelayState != undefined) {
     relayStateQuery = req.query.RelayState.replace(/\n|\r/g, "");
   }
   logger.info(
