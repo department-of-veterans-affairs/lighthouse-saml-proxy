@@ -22,7 +22,6 @@ import { getParticipant } from "./handlers";
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 import csrf from "csurf";
-
 /**
  * This function filters the property object
  *
