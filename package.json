@@ -94,6 +94,7 @@
     "lodash.assignin": "^4.2.0",
     "lodash.isstring": "^4.0.1",
     "lodash.omit": "^4.5.0",
+    "lusca": "^1.7.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "node-sass-tilde-importer": "^1.0.2",

@@ -21,6 +21,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
+import lusca from "lusca";
 
 /**
  * This function filters the property object
@@ -154,6 +155,7 @@ export default function configureExpress(
     })
   );
   app.use(flash());
+  app.use(lusca.csrf());
 
   app.use(
     sassMiddleware({
