@@ -51,6 +51,7 @@ export function removeHeaders(cert) {
 export function logRelayState(req, logger, step) {
   let relayStateBody = req.body.RelayState;
   let relayStateQuery = req.query.RelayState;
+  let relayStateStep = step.replace(/\n|\r/g, "");
   if (req.body.RelayState) {
     relayStateBody = req.body.RelayState.replace(/\n|\r/g, "");
   }
@@ -58,7 +59,7 @@ export function logRelayState(req, logger, step) {
     relayStateQuery = req.query.RelayState.replace(/\n|\r/g, "");
   }
   logger.info(
-    `Relay state ${step} - body: ${relayStateBody} query: ${relayStateQuery}`,
+    `Relay state ${relayStateStep} - body: ${relayStateBody} query: ${relayStateQuery}`,
     {
       time: new Date().toISOString(),
       relayStateBody,
