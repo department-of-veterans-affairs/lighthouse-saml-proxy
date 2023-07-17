@@ -21,7 +21,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
-import lusca from "lusca";
+import csrf from "csurf";
 
 /**
  * This function filters the property object
@@ -207,7 +207,7 @@ export default function configureExpress(
     next(err);
   });
 
-  app.use(lusca.csrf());
+  app.use(csrf());
 
   if (useSentry) {
     app.use(
