@@ -49,8 +49,8 @@ export function removeHeaders(cert) {
  * @param {*} step relay state step
  */
 export function logRelayState(req, logger, step) {
-  let relayStateBody = req.body.RelayState.replace(/\n|\r/g, "");
-  let relayStateQuery = req.query.RelayState.replace(/\n|\r/g, "");
+  const relayStateBody = req.body.RelayState;
+  const relayStateQuery = req.query.RelayState;
   logger.info(
     `Relay state ${step} - body: ${relayStateBody} query: ${relayStateQuery}`,
     {
