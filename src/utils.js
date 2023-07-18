@@ -52,12 +52,15 @@ export function removeHeaders(cert) {
  * @param {*} step relay state step
  */
 export function logRelayState(req, logger, step) {
-  const logMessage = `Relay state ${step} - body: ${req.body.RelayState} query: ${req.query.RelayState}`;
-  logger.info(sanitize(logMessage), {
+  const relayStateBody = sanitize(req.body.RelayState);
+  const relayStateQuery = sanitize(req.query.RelayState);
+  const relayStateStep = sanitize(step);
+  const logMessage = `Relay state ${relayStateStep} - body: ${relayStateBody} query: ${relayStateQuery}`;
+  logger.info(logMessage, {
     time: new Date().toISOString(),
-    relayStateBody: req.body.RelayState,
-    relayStateQuery: req.query.RelayState,
-    step: step,
+    relayStateBody: relayStateBody,
+    relayStateQuery: relayStateQuery,
+    step: relayStateStep,
     session: req.sessionID,
   });
 }
@@ -70,7 +73,7 @@ export function logRelayState(req, logger, step) {
  */
 export function sanitize(message) {
   if (message === null || message === undefined) {
-    throw new Error("Message to sanitize is null or undefined");
+    return "";
   }
   return message.replace(/\n|\r/g, "");
 }
