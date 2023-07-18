@@ -32,10 +32,12 @@ function getBindingLocation(serviceEl, bindingUri) {
  */
 function getFirstCert(keyEl) {
   if (
-    void(keyEl.KeyInfo && keyEl.KeyInfo.length === 1,
-    keyEl.KeyInfo[0].X509Data && keyEl.KeyInfo[0].X509Data.length === 1,
+    keyEl.KeyInfo &&
+    keyEl.KeyInfo.length === 1 &&
+    keyEl.KeyInfo[0].X509Data &&
+    keyEl.KeyInfo[0].X509Data.length === 1 &&
     keyEl.KeyInfo[0].X509Data[0].X509Certificate &&
-      keyEl.KeyInfo[0].X509Data[0].X509Certificate.length === 1)
+    keyEl.KeyInfo[0].X509Data[0].X509Certificate.length === 1
   ) {
     return keyEl.KeyInfo[0].X509Data[0].X509Certificate[0]._;
   }
