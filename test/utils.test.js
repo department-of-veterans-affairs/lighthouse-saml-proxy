@@ -100,6 +100,12 @@ describe("tests for utils.js", () => {
     expect(sanitizedMessage).toBe('Hello,World!');
   });
 
+  test('tests should return an empty string when message is an empty string', () => {
+    const message = '';
+    const sanitizedMessage = sanitize(message);
+    expect(sanitizedMessage).toBe('');
+  });
+
   test('tests should return an empty string when message is null', () => {
     const message = null;
     const sanitizedMessage = sanitize(message);

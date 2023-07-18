@@ -72,10 +72,11 @@ export function logRelayState(req, logger, step) {
  * @returns {string} returns sanitized message
  */
 export function sanitize(message) {
-  if (message === null || message === undefined) {
+  if (message) {
+    return message.replace(/\n|\r/g, "");
+  } else {
     return "";
   }
-  return message.replace(/\n|\r/g, "");
 }
 
 /**
