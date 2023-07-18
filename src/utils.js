@@ -39,7 +39,7 @@ export function getReqUrl(req, path) {
 export function removeHeaders(cert) {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert);
   if (pem && pem.length > 0) {
-    return pem[2].replace(/[\n|\r\n]/g, "");
+    return sanitize(pem[2]);
   }
   return cert;
 }
