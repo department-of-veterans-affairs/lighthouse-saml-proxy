@@ -21,7 +21,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
-import csrf from "csurf";
+import { csrf } from "lusca";
 /**
  * This function filters the property object
  *
@@ -125,7 +125,6 @@ export default function configureExpress(
    * Middleware
    */
   app.use(rTracer.expressMiddleware());
-  app.use(csrf());
   if (
     argv.logStyleElementsEnabled == null ||
     argv.logStyleElementsEnabled == true
@@ -144,6 +143,7 @@ export default function configureExpress(
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
+  const csrfProtection = csrf();
   app.use(
     session({
       secret: argv.sessionSecret,
@@ -206,6 +206,8 @@ export default function configureExpress(
     err.status = 404;
     next(err);
   });
+
+  app.use(csrfProtection);
 
   if (useSentry) {
     app.use(
