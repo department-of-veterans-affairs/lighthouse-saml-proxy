@@ -42,24 +42,31 @@ export function removeHeaders(cert) {
   return cert;
 }
 /**
- * This function logs the relay state using relay state
+ * This function logs the relay state
  *
  * @param {*} req The HTTP request
  * @param {*} logger logs information
  * @param {*} step relay state step
  */
 export function logRelayState(req, logger, step) {
-  const relayStateBody = req.body.RelayState;
-  const relayStateQuery = req.query.RelayState;
-  const logMessage = `Relay state ${step} - body: ${relayStateBody} query: ${relayStateQuery}`;
-  const logObj = {
+  const logMessage = `Relay state ${step} - body: ${req.body.RelayState} query: ${req.query.RelayState}`;
+  logger.info(sanatize(logMessage), {
     time: new Date().toISOString(),
-    relayStateBody,
-    relayStateQuery,
+    relayStateBody: req.body.RelayState,
+    relayStateQuery: req.query.RelayState,
     step: step,
     session: req.sessionID,
-  };
-  logger.info(logMessage.replace(/\n|\r/g, ""), logObj);
+  });
+}
+
+/**
+ * This function sanatizes a message, by replacing new line escapes with ""
+ *
+ * @param {*} message message that needs sanitized
+ * @returns {*} returns sanitized message
+ */
+export function sanatize(message) {
+  return message.replace(/\n|\r/g, "");
 }
 
 /**
