@@ -21,7 +21,7 @@ import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
-import { csrf } from "lusca";
+import lusca from "lusca";
 /**
  * This function filters the property object
  *
@@ -143,7 +143,6 @@ export default function configureExpress(
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
-  const csrfProtection = csrf();
   app.use(
     session({
       secret: argv.sessionSecret,
@@ -155,6 +154,8 @@ export default function configureExpress(
     })
   );
   app.use(flash());
+  app.use(lusca.xframe("SAMEORIGIN"));
+  app.use(lusca.xssProtection(true));
 
   app.use(
     sassMiddleware({
@@ -207,8 +208,6 @@ export default function configureExpress(
     next(err);
   });
 
-  app.use(csrfProtection);
-
   if (useSentry) {
     app.use(
       Sentry.Handlers.errorHandler({
@@ -234,6 +233,7 @@ export default function configureExpress(
         message: errMessage,
         request_id: rTracer.id(),
         wrapper_tags: accessiblePhoneNumber,
+        csrfToken: req.csrfToken(),
       };
       res.render("layout", error_payload);
     }
