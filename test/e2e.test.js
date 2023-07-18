@@ -91,7 +91,7 @@ return axios(reqOpts)
   .catch(() => {
     console.log("error occurred");
   });
- }
+ };
 
 /**
  * These are the HTML parsers. The SSO endpoint renders HTML/javascript that automatically
