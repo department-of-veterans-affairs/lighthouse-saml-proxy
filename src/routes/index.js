@@ -147,14 +147,13 @@ export default function configureExpress(
     session({
       secret: argv.sessionSecret,
       resave: false,
-      saveUninitialized: false,
+      saveUninitialized: true,
       name: "idp_sid",
       genid: uuidv4,
       cookie: { maxAge: 1000 * 60 * 5 },
     })
   );
   app.use(flash());
-  app.use(lusca.csp(""));
   app.use(lusca.xframe("SAMEORIGIN"));
   app.use(lusca.p3p("ABCDEF"));
   app.use(lusca.hsts({ maxAge: 31536000 }));
