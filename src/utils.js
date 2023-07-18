@@ -50,7 +50,7 @@ export function removeHeaders(cert) {
  */
 export function logRelayState(req, logger, step) {
   const logMessage = `Relay state ${step} - body: ${req.body.RelayState} query: ${req.query.RelayState}`;
-  logger.info(sanatize(logMessage), {
+  logger.info(sanitize(logMessage), {
     time: new Date().toISOString(),
     relayStateBody: req.body.RelayState,
     relayStateQuery: req.query.RelayState,
@@ -60,12 +60,15 @@ export function logRelayState(req, logger, step) {
 }
 
 /**
- * This function sanatizes a message, by replacing new line escapes with ""
+ * This function sanitizes a message, by replacing new line escapes with ""
  *
  * @param {*} message message that needs sanitized
- * @returns {*} returns sanitized message
+ * @returns {string} returns sanitized message
  */
-export function sanatize(message) {
+export function sanitize(message) {
+  if (message === null || message === undefined) {
+    throw new Error("Message to sanitize is null or undefined");
+  }
   return message.replace(/\n|\r/g, "");
 }
 
