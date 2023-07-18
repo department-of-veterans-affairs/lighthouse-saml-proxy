@@ -1,5 +1,10 @@
 import { SP_VERIFY, SP_ERROR_URL } from "./constants";
-import { getReqUrl, logRelayState, accessiblePhoneNumber } from "../utils";
+import {
+  getReqUrl,
+  logRelayState,
+  accessiblePhoneNumber,
+  sanitize,
+} from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
 
@@ -288,10 +293,7 @@ export const serializeAssertions = (
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (req.session) {
-    authOptions.RelayState = req.options.ssoResponse.state.replace(
-      /\n|\r/g,
-      ""
-    );
+    authOptions.RelayState = sanitize(req.options.ssoResponse.state);
     const logObj = {
       session: req.sessionID,
       stateFromSession: true,

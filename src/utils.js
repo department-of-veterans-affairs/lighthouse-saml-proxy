@@ -9,6 +9,7 @@ import fs from "fs";
 export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }
+
 /**
  * This function creates a check to see if host is equal to localhost then
  * returns a req url accordingly
@@ -28,6 +29,7 @@ export function getReqUrl(req, path) {
     )}`;
   }
 }
+
 /**
  * Creates a check to remove headers with BEGIN and END message
  *
@@ -37,30 +39,44 @@ export function getReqUrl(req, path) {
 export function removeHeaders(cert) {
   const pem = /-----BEGIN (\w*)-----([^-]*)-----END (\w*)-----/g.exec(cert);
   if (pem && pem.length > 0) {
-    return pem[2].replace(/[\n|\r\n]/g, "");
+    return sanitize(pem[2]);
   }
   return cert;
 }
+
 /**
- * This function logs the relay state using relay state
+ * This function logs the relay state
  *
  * @param {*} req The HTTP request
  * @param {*} logger logs information
  * @param {*} step relay state step
  */
 export function logRelayState(req, logger, step) {
-  const relayStateBody = req.body.RelayState;
-  const relayStateQuery = req.query.RelayState;
-  logger.info(
-    `Relay state ${step} - body: ${relayStateBody} query: ${relayStateQuery}`,
-    {
-      time: new Date().toISOString(),
-      relayStateBody,
-      relayStateQuery,
-      step: step,
-      session: req.sessionID,
-    }
-  );
+  const relayStateBody = sanitize(req.body.RelayState);
+  const relayStateQuery = sanitize(req.query.RelayState);
+  const relayStateStep = sanitize(step);
+  const logMessage = `Relay state ${relayStateStep} - body: ${relayStateBody} query: ${relayStateQuery}`;
+  logger.info(logMessage, {
+    time: new Date().toISOString(),
+    relayStateBody: relayStateBody,
+    relayStateQuery: relayStateQuery,
+    step: relayStateStep,
+    session: req.sessionID,
+  });
+}
+
+/**
+ * This function sanitizes a message, by replacing new line escapes with ""
+ *
+ * @param {string} message message that needs sanitized
+ * @returns {string} returns sanitized message
+ */
+export function sanitize(message) {
+  if (message) {
+    return message.replace(/\n|\r/g, "");
+  } else {
+    return "";
+  }
 }
 
 /**
