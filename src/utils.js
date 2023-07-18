@@ -9,6 +9,7 @@ import fs from "fs";
 export function getPath(path) {
   return path.startsWith("/") ? path : "/" + path;
 }
+
 /**
  * This function creates a check to see if host is equal to localhost then
  * returns a req url accordingly
@@ -28,6 +29,7 @@ export function getReqUrl(req, path) {
     )}`;
   }
 }
+
 /**
  * Creates a check to remove headers with BEGIN and END message
  *
@@ -41,6 +43,7 @@ export function removeHeaders(cert) {
   }
   return cert;
 }
+
 /**
  * This function logs the relay state
  *
