@@ -211,7 +211,7 @@ export const acsFactory = (app, acsUrl, cache, cacheEnabled) => {
 export const handleError = (req, res) => {
   logger.error({ idp_sid: req.cookies.idp_sid });
   const error_payload = {
-    body: urlUserErrorTemplate(req),
+    body: urlUserErrorTemplate(),
     request_id: rTracer.id(),
     wrapper_tags: accessiblePhoneNumber,
   };
