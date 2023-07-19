@@ -154,13 +154,13 @@ export default function configureExpress(
     })
   );
   app.use(flash());
-  app.use(lusca.xframe("SAMEORIGIN"));
-  app.use(lusca.p3p("ABCDEF"));
-  app.use(lusca.hsts({ maxAge: 31536000 }));
-  app.use(lusca.xssProtection(true));
   app.use(
     lusca({
       csrf: false,
+      xframe: "SAMEORIGIN",
+      p3p: "ABCDEF",
+      hsts: { maxAge: 31536000 },
+      xssProtection: true,
     })
   );
 
