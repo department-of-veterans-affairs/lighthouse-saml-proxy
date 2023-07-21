@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { Strategy } from "passport";
 import Redis, { RedisClient } from "redis";
+import RedisStore from "connect-redis";
 import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
 
@@ -43,6 +44,7 @@ export interface ICache {
  */
 export class RedisCache implements ICache {
   theCache: RedisClient;
+  theStore: RedisStore;
 
   set(
     Key: string,
@@ -70,6 +72,13 @@ export class RedisCache implements ICache {
   }
   constructor(redisPort: number, redisHost: string) {
     this.theCache = Redis.createClient(redisPort, redisHost);
+    this.theStore = new RedisStore({
+      client: this.theCache,
+      prefix: "samlproxystore:",
+    });
+  }
+  getStore(): RedisStore {
+    return this.theStore;
   }
 }
 
