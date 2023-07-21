@@ -154,7 +154,6 @@ export default function configureExpress(
         maxAge: 1000 * 60 * 5,
         secure: true,
       },
-      store: cache.getStore(),
     })
   );
   app.use(flash());
