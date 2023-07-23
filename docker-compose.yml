@@ -8,6 +8,17 @@ services:
       - '6379:6379'
     expose:
       - '6379'
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+       - "18081:8081"
+    depends_on:
+      - redis
   saml-proxy:
     build:
       context: ./
