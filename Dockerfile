@@ -27,6 +27,9 @@ FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthous
 
 WORKDIR /home/node
 
+COPY --chown=node:node *.pem ./
+COPY --chown=node:node *.key ./
+
 COPY --from=tscbuild --chown=node:node /home/node/bin/ ./bin/
 COPY --from=tscbuild --chown=node:node /home/node/public/ ./public/
 COPY --from=tscbuild --chown=node:node /home/node/styles/ ./styles/
