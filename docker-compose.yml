@@ -16,10 +16,5 @@ services:
     ports:
       - '7000:7000'
     volumes:
-      - ./ecr-config.json:/etc/saml-proxy/config.json:Z
-      - ./idp-private-key.pem:/home/node/idp-private-key.pem:Z
-      - ./idp-public-cert.pem:/home/node/idp-public-cert.pem:Z
-      - ./okta.pem:/home/node/okta.pem:Z
-      - ./sp-cert.pem:/home/node/sp-cert.pem:Z
-      - ./sp-key.pem:/home/node/sp-key.pem:Z
-      - ./okta-pub.key:/home/node/okta-pub.key:Z
+      - ./dev-config.json:/etc/saml-proxy/config.json:Z
+    command: "node build/app.js --config /etc/saml-proxy/config.json"
