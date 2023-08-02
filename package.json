@@ -98,7 +98,7 @@
     "node-cache": "^5.1.2",
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.6.0",
-    "passport-wsfed-saml2": "github:auth0/passport-wsfed-saml2#v4.5.1",
+    "passport-wsfed-saml2": "github:auth0/passport-wsfed-saml2",
     "prom-client": "^13.1.0",
     "redis": "^3.0.2",
     "samlp": "^7.0.1",
