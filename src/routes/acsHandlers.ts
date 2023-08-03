@@ -91,6 +91,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         state: getRelayState(req),
         url: getReqUrl(req, acsURL),
       };
+      res.locals.state = ssoResponse.state;
       const spIdpKey: string = selectPassportStrategyKey(req);
       const params = req.sps.options[spIdpKey].getResponseParams(
         ssoResponse.url
