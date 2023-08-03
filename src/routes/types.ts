@@ -3,7 +3,6 @@ import { Strategy } from "passport";
 import Redis, { RedisClient } from "redis";
 import NodeCache = require("../../node_modules/node-cache");
 import { promisify } from "util";
-
 import { MpiUserClient } from "../MpiUserClient";
 import { VsoClient } from "../VsoClient";
 import { User } from "@sentry/types";
@@ -20,8 +19,6 @@ export interface IConfiguredRequest extends Request {
   idp: any;
   user: User;
   requestAcsUrl: string;
-  options: any;
-  authnRequest: any;
 }
 
 /**
