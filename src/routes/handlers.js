@@ -35,14 +35,10 @@ export const samlLogin = function (template) {
     const acsUrl = req.query.acsUrl
       ? getReqUrl(req, req.query.acsUrl)
       : getReqUrl(req, req.requestAcsUrl);
-    const authnRequest = req.authnRequest
-      ? req.authnRequest
-      : req.session
-      ? req.session.authnRequest
-      : null;
+    const authnRequest = req.authnRequest;
     let relayState;
     if (!authnRequest) {
-      logger.warn("There is no authnRequest in the request or session");
+      logger.warn("There is no authnRequest in the request");
       relayState = req.query?.RelayState || req.body?.RelayState;
     } else {
       relayState = authnRequest.relayState
@@ -138,7 +134,7 @@ export const samlLogin = function (template) {
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
-          session: req.sessionID,
+          session: req.id,
         });
       })
       .catch(next);
@@ -151,15 +147,13 @@ export const samlLogin = function (template) {
 
 export const parseSamlRequest = function (req, res, next) {
   logRelayState(req, logger, "from Okta");
-  if (!req.session) {
-    logger.warn("session is null or undefined parsing the SAML request");
-  }
   samlp.parseRequest(req, function (err, data) {
     if (err) {
       logger.warn("Allowing login with no final redirect.");
       next();
     }
     if (data) {
+      req.id = data.id;
       req.authnRequest = {
         relayState: req.query.RelayState || req.body.RelayState,
         id: data.id,
@@ -168,15 +162,14 @@ export const parseSamlRequest = function (req, res, next) {
         acsUrl: data.assertionConsumerServiceURL,
         forceAuthn: data.forceAuthn === "true",
       };
-      req.session.authnRequest = req.authnRequest;
     }
     next();
   });
 };
 
 export const getSessionIndex = (req) => {
-  if (req && req.session) {
-    return Math.abs(getHashCode(req.session.id)).toString();
+  if (req && req.id) {
+    return Math.abs(getHashCode(req.id)).toString();
   }
   return 0;
 };

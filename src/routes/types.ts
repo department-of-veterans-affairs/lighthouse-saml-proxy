@@ -13,7 +13,7 @@ interface IExtendedStrategy extends Strategy {
 }
 
 export interface IConfiguredRequest extends Request {
-  session: any;
+  id: any;
   mpiUserClient: MpiUserClient;
   vsoClient: VsoClient;
   strategies: Map<String, IExtendedStrategy>;
@@ -22,6 +22,7 @@ export interface IConfiguredRequest extends Request {
   user: User;
   requestAcsUrl: string;
   options: any;
+  authnRequest: any;
 }
 
 /**

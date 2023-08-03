@@ -124,7 +124,7 @@ export const loadICN = async (
   res: Response,
   next: NextFunction
 ) => {
-  const session = req.sessionID;
+  const session = req.id;
   const action = "loadICN";
 
   try {
@@ -292,11 +292,11 @@ export const serializeAssertions = (
   const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
-  if (req.session) {
+  req.id = inResponseTo;
+  if (req.id) {
     authOptions.RelayState = sanitize(req.options.ssoResponse.state);
     const logObj = {
-      session: req.sessionID,
-      stateFromSession: true,
+      session: req.id,
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
