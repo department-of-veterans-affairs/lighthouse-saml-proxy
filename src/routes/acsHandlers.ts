@@ -3,8 +3,9 @@ import {
   getReqUrl,
   logRelayState,
   accessiblePhoneNumber,
-  getSAMLId,
-  getRelayState,
+  sanitize,
+  getSessionIndex,
+  getInResponseToFromSAML,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -88,10 +89,14 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       (req.body && req.body.SAMLResponse)
     ) {
       const ssoResponse = {
-        state: getRelayState(req),
+        state: req.query.RelayState || req.body.RelayState,
         url: getReqUrl(req, acsURL),
       };
-      res.locals.state = ssoResponse.state;
+      if (req.options) {
+        req.options.ssoResponse = ssoResponse;
+      } else {
+        req.options = { ssoResponse: ssoResponse };
+      }
       const spIdpKey: string = selectPassportStrategyKey(req);
       const params = req.sps.options[spIdpKey].getResponseParams(
         ssoResponse.url
@@ -120,7 +125,7 @@ export const loadICN = async (
   res: Response,
   next: NextFunction
 ) => {
-  const session = getSAMLId(req);
+  const session = getSessionIndex(req);
   const action = "loadICN";
 
   try {
@@ -220,8 +225,7 @@ export const testLevelOfAssuranceOrRedirect = (
     req.user.claims &&
     !sufficientLevelOfAssurance(req.user.claims)
   ) {
-    let state = getRelayState(req);
-    if (!state) {
+    if (!req.query?.RelayState && !req.body?.RelayState) {
       throw {
         message: "Error: Empty relay state during loa test. Invalid request.",
         status: 400,
@@ -232,7 +236,7 @@ export const testLevelOfAssuranceOrRedirect = (
         pathname: SP_VERIFY,
         query: {
           authnContext: "http://idmanagement.gov/ns/assurance/loa/3",
-          RelayState: state,
+          RelayState: req.query?.RelayState || req.body?.RelayState,
         },
       })
     );
@@ -244,25 +248,25 @@ export const testLevelOfAssuranceOrRedirect = (
 export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
   return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     if (cacheEnabled) {
-      const cacheId = getSAMLId(req);
-      if (!cacheId) {
+      const sessionIndex = getSessionIndex(req);
+      if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
         return res.render("layout", {
           body: "sensitive_error",
           request_id: rTracer.id(),
         });
       }
-      let isReplay: boolean | void;
-      isReplay = await cache.has(cacheId).catch((err) => {
+      let sessionIndexCached: boolean | void;
+      sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
         logger.error(
           "Cache was unable to retrieve session index." + JSON.stringify(err)
         );
       });
 
-      if (isReplay) {
+      if (sessionIndexCached) {
         logger.error(
           "SAML response with session index " +
-            cacheId +
+            sessionIndex +
             " was previously cached."
         );
         return res.render("layout", {
@@ -271,9 +275,9 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
         });
       }
       // Set the session index to expire after 6hrs, or 21600 seconds.
-      await cache.set(cacheId, "", "EX", 21600);
+      await cache.set(sessionIndex, "", "EX", 21600);
       logger.info(
-        "Caching valid Idp Saml Response with session index " + cacheId
+        "Caching valid Idp Saml Response with session index " + sessionIndex
       );
       return next();
     }
@@ -286,22 +290,27 @@ export const serializeAssertions = (
   res: Response,
   next: NextFunction
 ) => {
-  const inResponseTo = getSAMLId(req);
-  const time = new Date().toISOString();
+  const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
-  authOptions.relayState = getRelayState(req);
-  authOptions.inResponseTo = inResponseTo;
+  const time = new Date().toISOString();
+  if (inResponseTo) {
+    authOptions.RelayState = sanitize(req.options.ssoResponse.state);
+    authOptions.inResponseTo = inResponseTo;
+    const logObj = {
+      session: getSessionIndex(req),
+      step: "to Okta",
+      time,
+      relayState: authOptions.RelayState,
+      inResponseTo: inResponseTo || "id not found",
+    };
+    logger.info(
+      `Relay state to Okta (from session): ${authOptions.RelayState}`,
+      logObj
+    );
+  } else {
+    logRelayState(req, logger, "to Okta");
+  }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  const logObj = {
-    step: "to Okta",
-    time,
-    relayState: authOptions.relayState,
-    Id: inResponseTo,
-  };
-  logger.info(
-    `Relay state to Okta (from ssoResponse): ${authOptions.relayState}`,
-    logObj
-  );
   samlp.auth(authOptions)(req, res, next);
 };
 /**

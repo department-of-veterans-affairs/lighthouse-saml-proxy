@@ -3,7 +3,7 @@ import {
   getHashCode,
   samlLogin,
   parseSamlRequest,
-  getSAMLId,
+  getSessionIndex,
   getParticipant,
   handleError,
 } from "./handlers.js";
@@ -44,10 +44,10 @@ describe("getHashCode, getSessionIndex", () => {
     expect(getHashCode("")).toEqual(0);
   });
   test("getSessionIndex happy", () => {
-    expect(getSAMLId(mockReq)).toEqual("1666277972");
+    expect(getSessionIndex(mockReq)).toEqual("1666277972");
   });
   test("getSessionIndex empty string", () => {
-    expect(getSAMLId({})).toEqual(0);
+    expect(getSessionIndex({})).toEqual(0);
   });
   test("getParticipant", () => {
     expect(getParticipant(mockReq)).toEqual({

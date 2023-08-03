@@ -181,31 +181,30 @@ export function sassMiddleware(options) {
 }
 
 /**
- * Gets the ID (InResponseTo) from SAMLRequest or SAMLResponse
+ * Retrieves session index.
  *
- * @param {*} req The HTTP request
- * @returns {*} a string if ID or InResponseTo is present
+ * @param req
  */
-export function getSAMLId(req) {
+export function getSessionIndex(req) {
   if (req?.authnRequest?.id) {
     return req?.authnRequest?.id;
-  }
-  if (req?.body?.SAMLRequest) {
-    return getIdFromSAML(req?.body?.SAMLRequest);
   }
   if (req?.body?.SAMLResponse) {
     return getInResponseToFromSAML(req?.body?.SAMLResponse);
   }
-  logger.error("SAML ID not found");
+  if (req?.body?.SAMLRequest) {
+    return getIdToFromSAML(req?.body?.SAMLRequest);
+  }
+  return 0;
 }
 
 /**
  * Retrieves InResponseTo assertion from SAMLResponse
  *
- * @param {string} samlResponse the raw samlResponse
- * @returns {*} a string if InResponseTo is present
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
  */
-function getInResponseToFromSAML(samlResponse) {
+export function getInResponseToFromSAML(samlResponse) {
   try {
     const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
     const parser = new DOMParser();
@@ -220,36 +219,17 @@ function getInResponseToFromSAML(samlResponse) {
 /**
  * Retrieves InResponseTo assertion from SAMLResponse
  *
- * @param {string} samlRequest the raw samlRequest
- * @returns {*} a string if ID is present
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
  */
-function getIdFromSAML(samlRequest) {
+export function getIdToFromSAML(samlResponse) {
   try {
-    const decoded = Buffer.from(samlRequest, "base64").toString("ascii");
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
     const parser = new DOMParser();
     return parser
       .parseFromString(decoded)
       ?.documentElement?.getAttributeNode("ID")?.nodeValue;
   } catch (err) {
-    logger.error("getIdFromSAML failed: ", err);
+    logger.error("getInResponseToFromSAML failed: ", err);
   }
-}
-
-/**
- * Retrieves InResponseTo assertion from SAMLResponse
- *
- * @param {*} req the raw request
- * @returns {*} a string if ID is present
- */
-export function getRelayState(req) {
-  if (req?.authnRequest?.RelayState) {
-    return req?.authnRequest?.RelayState;
-  }
-  if (req?.query?.RelayState) {
-    return req?.query?.RelayState;
-  }
-  if (req?.body?.RelayState) {
-    return req?.body?.RelayState;
-  }
-  logger.error("RelayState not found");
 }

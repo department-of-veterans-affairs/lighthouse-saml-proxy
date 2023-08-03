@@ -3,8 +3,7 @@ import {
   getReqUrl,
   logRelayState,
   accessiblePhoneNumber,
-  getSAMLId,
-  getRelayState,
+  getSessionIndex,
 } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
@@ -38,10 +37,15 @@ export const samlLogin = function (template) {
       ? getReqUrl(req, req.query.acsUrl)
       : getReqUrl(req, req.requestAcsUrl);
     const authnRequest = req.authnRequest;
+    let relayState;
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request");
+      relayState = req.query?.RelayState || req.body?.RelayState;
+    } else {
+      relayState = authnRequest.relayState
+        ? authnRequest.relayState
+        : req.query?.RelayState;
     }
-    let relayState = getRelayState(req);
     if (
       relayState == null ||
       relayState == "" ||
@@ -131,7 +135,7 @@ export const samlLogin = function (template) {
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
-          Id: getSAMLId(req),
+          session: getSessionIndex(req),
         });
       })
       .catch(next);
@@ -151,7 +155,7 @@ export const parseSamlRequest = function (req, res, next) {
     }
     if (data) {
       req.authnRequest = {
-        relayState: getRelayState(req),
+        relayState: req.query.RelayState || req.body.RelayState,
         id: data.id,
         issuer: data.issuer,
         destination: data.destination,
@@ -166,7 +170,7 @@ export const parseSamlRequest = function (req, res, next) {
 export const getParticipant = (req) => {
   const participant = {
     serviceProviderId: req.idp.options.serviceProviderId,
-    sessionIndex: getSAMLId(req),
+    sessionIndex: getSessionIndex(req),
     serviceProviderLogoutURL: req.idp.options.sloUrl,
   };
   if (req.user) {
