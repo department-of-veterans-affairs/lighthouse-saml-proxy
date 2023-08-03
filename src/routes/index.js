@@ -2,7 +2,6 @@ import process from "process";
 import path from "path";
 import bodyParser from "body-parser";
 import express from "express";
-import cookieParser from "cookie-parser";
 import flash from "connect-flash";
 import { sassMiddleware, accessiblePhoneNumber } from "../utils";
 import sass from "sass";
@@ -140,7 +139,6 @@ export default function configureExpress(
   }
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser());
   app.use(flash());
 
   app.use(
@@ -166,16 +164,6 @@ export default function configureExpress(
     req.participant = getParticipant(req);
     req.requestAcsUrl = argv.spAcsUrl;
     next();
-  });
-
-  app.use(function (req, res, next) {
-    if (req.idp.options.rollSession) {
-      req.session.regenerate(function () {
-        return next();
-      });
-    } else {
-      next();
-    }
   });
 
   addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);

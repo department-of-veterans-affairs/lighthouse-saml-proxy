@@ -13,7 +13,6 @@ interface IExtendedStrategy extends Strategy {
 }
 
 export interface IConfiguredRequest extends Request {
-  id: any;
   mpiUserClient: MpiUserClient;
   vsoClient: VsoClient;
   strategies: Map<String, IExtendedStrategy>;

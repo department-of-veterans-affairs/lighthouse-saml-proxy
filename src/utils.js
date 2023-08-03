@@ -1,4 +1,6 @@
 import fs from "fs";
+import logger from "./logger";
+import { DOMParser } from "@xmldom/xmldom";
 
 /**
  * This function gets the path
@@ -176,4 +178,58 @@ export function sassMiddleware(options) {
 
     return next();
   };
+}
+
+/**
+ * Retrieves session index.
+ *
+ * @param req
+ */
+export function getSessionIndex(req) {
+  if (req?.authnRequest?.id) {
+    return req?.authnRequest?.id;
+  }
+  if (req?.body?.SAMLResponse) {
+    return getInResponseToFromSAML(req?.body?.SAMLResponse);
+  }
+  if (req?.body?.SAMLRequest) {
+    return getIdToFromSAML(req?.body?.SAMLRequest);
+  }
+  return 0;
+}
+
+/**
+ * Retrieves InResponseTo assertion from SAMLResponse
+ *
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
+ */
+export function getInResponseToFromSAML(samlResponse) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  } catch (err) {
+    logger.error("getInResponseToFromSAML failed: ", err);
+  }
+}
+
+/**
+ * Retrieves InResponseTo assertion from SAMLResponse
+ *
+ * @param samlResponse the raw samlResponse
+ * @returns returns a string if InResponseTo is present
+ */
+export function getIdToFromSAML(samlResponse) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("ID")?.nodeValue;
+  } catch (err) {
+    logger.error("getInResponseToFromSAML failed: ", err);
+  }
 }

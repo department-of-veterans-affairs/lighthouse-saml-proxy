@@ -4,6 +4,8 @@ import {
   logRelayState,
   accessiblePhoneNumber,
   sanitize,
+  getSessionIndex,
+  getInResponseToFromSAML,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -21,7 +23,6 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
-import { DOMParser } from "@xmldom/xmldom";
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -124,7 +125,7 @@ export const loadICN = async (
   res: Response,
   next: NextFunction
 ) => {
-  const session = req.id;
+  const session = getSessionIndex(req);
   const action = "loadICN";
 
   try {
@@ -247,7 +248,7 @@ export const testLevelOfAssuranceOrRedirect = (
 export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
   return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     if (cacheEnabled) {
-      const sessionIndex = req?.user?.authnContext?.sessionIndex;
+      const sessionIndex = getSessionIndex(req);
       if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
         return res.render("layout", {
@@ -292,11 +293,11 @@ export const serializeAssertions = (
   const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
-  req.id = inResponseTo;
-  if (req.id) {
+  if (inResponseTo) {
     authOptions.RelayState = sanitize(req.options.ssoResponse.state);
+    authOptions.inResponseTo = inResponseTo;
     const logObj = {
-      session: req.id,
+      session: getSessionIndex(req),
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
@@ -310,7 +311,6 @@ export const serializeAssertions = (
     logRelayState(req, logger, "to Okta");
   }
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  if (inResponseTo) authOptions.inResponseTo = inResponseTo;
   samlp.auth(authOptions)(req, res, next);
 };
 /**
@@ -336,23 +336,5 @@ export async function requestWithMetrics(
     metrics.failure.inc();
     timer({ status_code: err.statusCode || "unknown" });
     throw err;
-  }
-}
-
-/**
- * Retrieves InResponseTo assertion from SAMLResponse
- *
- * @param samlResponse the raw samlResponse
- * @returns returns a string if InResponseTo is present
- */
-function getInResponseToFromSAML(samlResponse: any) {
-  try {
-    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
-    const parser = new DOMParser();
-    return parser
-      .parseFromString(decoded)
-      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
-  } catch (err) {
-    logger.error("getInResponseToFromSAML failed: ", err);
   }
 }
