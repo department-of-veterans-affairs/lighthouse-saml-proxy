@@ -3,7 +3,7 @@ import {
   getReqUrl,
   logRelayState,
   accessiblePhoneNumber,
-  getSessionIndex,
+  getSamlId,
 } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
@@ -135,7 +135,7 @@ export const samlLogin = function (template) {
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
-          session: getSessionIndex(req),
+          session: getSamlId(req),
         });
       })
       .catch(next);
@@ -170,7 +170,7 @@ export const parseSamlRequest = function (req, res, next) {
 export const getParticipant = (req) => {
   const participant = {
     serviceProviderId: req.idp.options.serviceProviderId,
-    sessionIndex: getSessionIndex(req),
+    sessionIndex: getSamlId(req),
     serviceProviderLogoutURL: req.idp.options.sloUrl,
   };
   if (req.user) {

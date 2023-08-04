@@ -1,6 +1,7 @@
 import fs from "fs";
 import logger from "./logger";
 import { DOMParser } from "@xmldom/xmldom";
+import { IConfiguredRequest } from "./types";
 
 /**
  * This function gets the path
@@ -181,11 +182,12 @@ export function sassMiddleware(options) {
 }
 
 /**
- * Retrieves session index.
+ * Gets the ID (InResponseTo) from SAMLRequest or SAMLResponse
  *
- * @param req
+ * @param {IConfiguredRequest} req The HTTP request
+ * @returns {*} a string if ID or InResponseTo is present
  */
-export function getSessionIndex(req) {
+export function getSamlId(req) {
   if (req?.authnRequest?.id) {
     return req?.authnRequest?.id;
   }
@@ -195,16 +197,16 @@ export function getSessionIndex(req) {
   if (req?.body?.SAMLRequest) {
     return getIdToFromSAML(req?.body?.SAMLRequest);
   }
-  return 0;
+  logger.error("SAML ID not found");
 }
 
 /**
  * Retrieves InResponseTo assertion from SAMLResponse
  *
- * @param samlResponse the raw samlResponse
- * @returns returns a string if InResponseTo is present
+ * @param {string} samlResponse the raw samlResponse
+ * @returns {*} a string if InResponseTo is present
  */
-export function getInResponseToFromSAML(samlResponse) {
+function getInResponseToFromSAML(samlResponse) {
   try {
     const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
     const parser = new DOMParser();
@@ -217,19 +219,38 @@ export function getInResponseToFromSAML(samlResponse) {
 }
 
 /**
- * Retrieves InResponseTo assertion from SAMLResponse
+ * Retrieves ID assertion from SAMLRequest
  *
- * @param samlResponse the raw samlResponse
- * @returns returns a string if InResponseTo is present
+ * @param {string} samlRequest the raw samlRequest
+ * @returns {*} a string if ID is present
  */
-export function getIdToFromSAML(samlResponse) {
+function getIdToFromSAML(samlRequest) {
   try {
-    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const decoded = Buffer.from(samlRequest, "base64").toString("ascii");
     const parser = new DOMParser();
     return parser
       .parseFromString(decoded)
       ?.documentElement?.getAttributeNode("ID")?.nodeValue;
   } catch (err) {
-    logger.error("getInResponseToFromSAML failed: ", err);
+    logger.error("getIdToFromSAML failed: ", err);
   }
+}
+
+/**
+ * Retrieves InResponseTo assertion from SAMLResponse
+ *
+ * @param {IConfiguredRequest} req the raw request
+ * @returns {*} a string if ID is present
+ */
+export function getRelayState(req) {
+  if (req?.authnRequest?.RelayState) {
+    return req?.authnRequest?.RelayState;
+  }
+  if (req?.query?.RelayState) {
+    return req?.query?.RelayState;
+  }
+  if (req?.body?.RelayState) {
+    return req?.body?.RelayState;
+  }
+  logger.error("RelayState not found");
 }

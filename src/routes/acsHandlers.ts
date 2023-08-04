@@ -4,8 +4,7 @@ import {
   logRelayState,
   accessiblePhoneNumber,
   sanitize,
-  getSessionIndex,
-  getInResponseToFromSAML,
+  getSamlId,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -125,7 +124,7 @@ export const loadICN = async (
   res: Response,
   next: NextFunction
 ) => {
-  const session = getSessionIndex(req);
+  const session = getSamlId(req);
   const action = "loadICN";
 
   try {
@@ -248,7 +247,7 @@ export const testLevelOfAssuranceOrRedirect = (
 export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
   return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     if (cacheEnabled) {
-      const sessionIndex = getSessionIndex(req);
+      const sessionIndex = getSamlId(req);
       if (!sessionIndex) {
         logger.error("No session index found in the saml response.");
         return res.render("layout", {
@@ -290,14 +289,14 @@ export const serializeAssertions = (
   res: Response,
   next: NextFunction
 ) => {
-  const inResponseTo = getInResponseToFromSAML(req.body?.SAMLResponse);
+  const inResponseTo = getSamlId(req);
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (inResponseTo) {
     authOptions.RelayState = sanitize(req.options.ssoResponse.state);
     authOptions.inResponseTo = inResponseTo;
     const logObj = {
-      session: getSessionIndex(req),
+      session: inResponseTo,
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
