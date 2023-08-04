@@ -71,7 +71,7 @@ export function logRelayState(req, logger, step) {
 /**
  * This function sanitizes a message, by replacing new line escapes with ""
  *
- * @param {string} message message that needs sanitized
+ * @param {string} message message that needs to be sanitized
  * @returns {string} returns sanitized message
  */
 export function sanitize(message) {
