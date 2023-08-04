@@ -1,7 +1,7 @@
 import fs from "fs";
 import logger from "./logger";
 import { DOMParser } from "@xmldom/xmldom";
-import { IConfiguredRequest } from "./types";
+import { IConfiguredRequest } from "./routes/types.ts";
 
 /**
  * This function gets the path
