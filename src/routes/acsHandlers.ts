@@ -242,26 +242,24 @@ export const testLevelOfAssuranceOrRedirect = (
 export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
   return async (req: IConfiguredRequest, res: Response, next: NextFunction) => {
     if (cacheEnabled) {
-      const sessionIndex = getSamlId(req);
-      if (!sessionIndex) {
-        logger.error("No session index found in the saml response.");
+      const samlId = getSamlId(req);
+      if (!samlId) {
+        logger.error("No ID found in the saml response.");
         return res.render("layout", {
           body: "sensitive_error",
           request_id: rTracer.id(),
         });
       }
-      let sessionIndexCached: boolean | void;
-      sessionIndexCached = await cache.has(sessionIndex).catch((err) => {
+      let isReplay: boolean | void;
+      isReplay = await cache.has(samlId).catch((err) => {
         logger.error(
-          "Cache was unable to retrieve session index." + JSON.stringify(err)
+          "Cache was unable to retrieve SAML ID." + JSON.stringify(err)
         );
       });
 
-      if (sessionIndexCached) {
+      if (isReplay) {
         logger.error(
-          "SAML response with session index " +
-            sessionIndex +
-            " was previously cached."
+          "SAML response with SAML ID " + samlId + " was previously cached."
         );
         return res.render("layout", {
           body: "sensitive_error",
@@ -269,10 +267,8 @@ export const validateIdpResponse = (cache: ICache, cacheEnabled: Boolean) => {
         });
       }
       // Set the session index to expire after 6hrs, or 21600 seconds.
-      await cache.set(sessionIndex, "", "EX", 21600);
-      logger.info(
-        "Caching valid Idp Saml Response with session index " + sessionIndex
-      );
+      await cache.set(samlId, "", "EX", 21600);
+      logger.info("Caching valid Idp Saml Response with SAML ID " + samlId);
       return next();
     }
     return next();
