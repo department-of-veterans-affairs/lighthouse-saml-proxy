@@ -3,11 +3,10 @@ import {
   getHashCode,
   samlLogin,
   parseSamlRequest,
-  getSessionIndex,
   getParticipant,
   handleError,
 } from "./handlers.js";
-import { accessiblePhoneNumber } from "../utils";
+import { accessiblePhoneNumber, getSamlId } from "../utils";
 
 jest.mock("../logger");
 jest.mock("passport-wsfed-saml2");
@@ -43,11 +42,8 @@ describe("getHashCode, getSessionIndex", () => {
   test("getHashCode empty string hash", () => {
     expect(getHashCode("")).toEqual(0);
   });
-  test("getSessionIndex happy", () => {
-    expect(getSessionIndex(mockReq)).toEqual("1666277972");
-  });
-  test("getSessionIndex empty string", () => {
-    expect(getSessionIndex({})).toEqual(0);
+  test("getSamlId happy", () => {
+    expect(getSamlId(mockReq)).toEqual("1666277972");
   });
   test("getParticipant", () => {
     expect(getParticipant(mockReq)).toEqual({

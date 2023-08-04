@@ -5,6 +5,7 @@ import {
   accessiblePhoneNumber,
   getSamlId,
   getRelayState,
+  sanitize,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -294,7 +295,7 @@ export const serializeAssertions = (
       inResponseTo: inResponseTo || "id not found",
     };
     logger.info(
-      `Relay state to Okta (from session): ${authOptions.RelayState}`,
+      `Relay state to Okta (from session): ${sanitize(authOptions.RelayState)}`,
       logObj
     );
   } else {

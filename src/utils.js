@@ -192,10 +192,12 @@ export function getSamlId(req) {
     return req?.authnRequest?.id;
   }
   if (req?.body?.SAMLResponse) {
-    return getInResponseToFromSAML(req?.body?.SAMLResponse);
+    let id = getInResponseToFromSAML(req?.body?.SAMLResponse);
+    if (id) return id;
   }
   if (req?.body?.SAMLRequest) {
-    return getIdToFromSAML(req?.body?.SAMLRequest);
+    let id = getIdToFromSAML(req?.body?.SAMLRequest);
+    if (id) return id;
   }
   logger.error("SAML ID not found");
 }
