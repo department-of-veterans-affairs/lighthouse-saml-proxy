@@ -4,6 +4,7 @@ import {
   logRelayState,
   accessiblePhoneNumber,
   getSamlId,
+  getRelayState,
 } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
@@ -37,14 +38,9 @@ export const samlLogin = function (template) {
       ? getReqUrl(req, req.query.acsUrl)
       : getReqUrl(req, req.requestAcsUrl);
     const authnRequest = req.authnRequest;
-    let relayState;
+    let relayState = getRelayState(req);
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request");
-      relayState = req.query?.RelayState || req.body?.RelayState;
-    } else {
-      relayState = authnRequest.relayState
-        ? authnRequest.relayState
-        : req.query?.RelayState;
     }
     if (
       relayState == null ||

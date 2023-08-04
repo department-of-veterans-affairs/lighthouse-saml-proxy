@@ -5,6 +5,7 @@ import {
   accessiblePhoneNumber,
   sanitize,
   getSamlId,
+  getRelayState,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
@@ -88,7 +89,7 @@ export const buildPassportLoginHandler = (acsURL: string) => {
       (req.body && req.body.SAMLResponse)
     ) {
       const ssoResponse = {
-        state: req.query.RelayState || req.body.RelayState,
+        state: getRelayState(req),
         url: getReqUrl(req, acsURL),
       };
       if (req.options) {
@@ -224,7 +225,7 @@ export const testLevelOfAssuranceOrRedirect = (
     req.user.claims &&
     !sufficientLevelOfAssurance(req.user.claims)
   ) {
-    if (!req.query?.RelayState && !req.body?.RelayState) {
+    if (!getRelayState(req)) {
       throw {
         message: "Error: Empty relay state during loa test. Invalid request.",
         status: 400,
@@ -235,7 +236,7 @@ export const testLevelOfAssuranceOrRedirect = (
         pathname: SP_VERIFY,
         query: {
           authnContext: "http://idmanagement.gov/ns/assurance/loa/3",
-          RelayState: req.query?.RelayState || req.body?.RelayState,
+          RelayState: getRelayState(req),
         },
       })
     );
