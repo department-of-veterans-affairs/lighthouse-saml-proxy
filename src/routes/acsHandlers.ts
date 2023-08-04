@@ -3,7 +3,6 @@ import {
   getReqUrl,
   logRelayState,
   accessiblePhoneNumber,
-  sanitize,
   getSamlId,
   getRelayState,
 } from "../utils";
@@ -92,11 +91,6 @@ export const buildPassportLoginHandler = (acsURL: string) => {
         state: getRelayState(req),
         url: getReqUrl(req, acsURL),
       };
-      if (req.options) {
-        req.options.ssoResponse = ssoResponse;
-      } else {
-        req.options = { ssoResponse: ssoResponse };
-      }
       const spIdpKey: string = selectPassportStrategyKey(req);
       const params = req.sps.options[spIdpKey].getResponseParams(
         ssoResponse.url
@@ -294,7 +288,7 @@ export const serializeAssertions = (
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
   if (inResponseTo) {
-    authOptions.RelayState = sanitize(req.options.ssoResponse.state);
+    authOptions.RelayState = getRelayState(req);
     authOptions.inResponseTo = inResponseTo;
     const logObj = {
       session: inResponseTo,

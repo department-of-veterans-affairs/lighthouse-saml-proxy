@@ -20,7 +20,6 @@ export interface IConfiguredRequest extends Request {
   idp: any;
   user: User;
   requestAcsUrl: string;
-  options: any;
   authnRequest: any;
 }
 
