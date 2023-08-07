@@ -14,7 +14,6 @@ export function buildSamlResponseFunction(sessionIndex) {
   return function buildSamlResponse(type, level_of_assurance, config) {
     const user = getUser(type, level_of_assurance);
     config.sessionIndex = sessionIndex;
-    config.inResponseTo = "someId";
     sessionIndex++;
     return new Promise((resolve) => {
       getSamlResponse(config, user, (_, samlResponse) => {

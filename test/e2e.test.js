@@ -319,6 +319,7 @@ describe("Logins for idp", () => {
 
   it("uses the RelayState from the request", async () => {
     const expectedState = "expectedState";
+    idpConfig.inResponseTo = "someId";
     const requestSamlResponse = await buildSamlResponse(
       IDME_USER,
       "3",
