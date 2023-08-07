@@ -38,7 +38,7 @@ export const samlLogin = function (template) {
       ? getReqUrl(req, req.query.acsUrl)
       : getReqUrl(req, req.requestAcsUrl);
     const authnRequest = req.authnRequest;
-    let relayState = getRelayState(req);
+    const relayState = getRelayState(req);
     if (!authnRequest) {
       logger.warn("There is no authnRequest in the request");
     }

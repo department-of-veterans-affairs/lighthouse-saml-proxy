@@ -64,7 +64,7 @@ export function logRelayState(req, logger, step) {
     relayStateBody: relayStateBody,
     relayStateQuery: relayStateQuery,
     step: relayStateStep,
-    session: req.id,
+    session: getSamlId(req) || req.id,
   });
 }
 
