@@ -283,22 +283,16 @@ export const serializeAssertions = (
 ) => {
   const authOptions = assignIn({}, req.idp.options);
   const time = new Date().toISOString();
-  const inResponseTo = getSamlId(req);
-  if (inResponseTo) {
-    authOptions.inResponseTo = inResponseTo;
-  } else {
-    logRelayState(req, logger, "to Okta without InResponseTo");
-  }
+  authOptions.inResponseTo = getSamlId(req);
   authOptions.RelayState = getRelayState(req);
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
   logger.info(
     `Relay state to Okta (from session): ${sanitize(authOptions.RelayState)}`,
     {
-      session: inResponseTo,
+      session: authOptions.inResponseTo,
       step: "to Okta",
       time,
       relayState: authOptions.RelayState,
-      inResponseTo: inResponseTo || "id not found",
     }
   );
   samlp.auth(authOptions)(req, res, next);

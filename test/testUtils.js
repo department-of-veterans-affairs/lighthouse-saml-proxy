@@ -13,6 +13,7 @@ import { getUser } from "./testUsers";
 export function buildSamlResponseFunction(sessionIndex) {
   return function buildSamlResponse(type, level_of_assurance, config) {
     const user = getUser(type, level_of_assurance);
+    config.inResponseTo = Math.floor(Math.random() * Date.now());
     config.sessionIndex = sessionIndex;
     sessionIndex++;
     return new Promise((resolve) => {
