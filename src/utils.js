@@ -239,10 +239,10 @@ function getIdToFromSAML(samlRequest) {
 }
 
 /**
- * Retrieves InResponseTo assertion from SAMLResponse
+ * Retrieves RelayState from Request
  *
  * @param {IConfiguredRequest} req the raw request
- * @returns {*} a string if ID is present
+ * @returns {*} a string if state is present
  */
 export function getRelayState(req) {
   if (req?.authnRequest?.RelayState) {
