@@ -286,15 +286,12 @@ export const serializeAssertions = (
   authOptions.inResponseTo = getSamlId(req);
   authOptions.RelayState = getRelayState(req);
   authOptions.authnContextClassRef = req.user.authnContext.authnMethod;
-  logger.info(
-    `Relay state to Okta (from session): ${sanitize(authOptions.RelayState)}`,
-    {
-      session: authOptions.inResponseTo,
-      step: "to Okta",
-      time,
-      relayState: authOptions.RelayState,
-    }
-  );
+  logger.info("Serialize assertions for SAMLResponse", {
+    session: authOptions.inResponseTo,
+    step: "to Okta",
+    time,
+    relayState: authOptions.RelayState,
+  });
   samlp.auth(authOptions)(req, res, next);
 };
 /**
