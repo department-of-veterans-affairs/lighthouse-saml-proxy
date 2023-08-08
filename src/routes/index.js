@@ -1,14 +1,11 @@
 import process from "process";
 import path from "path";
 import bodyParser from "body-parser";
-import session from "express-session";
 import express from "express";
-import cookieParser from "cookie-parser";
 import flash from "connect-flash";
 import { sassMiddleware, accessiblePhoneNumber } from "../utils";
 import sass from "sass";
 import tildeImporter from "node-sass-tilde-importer";
-import { v4 as uuidv4 } from "uuid";
 import rTracer from "cls-rtracer";
 import { RedisCache } from "./types";
 import {
@@ -142,20 +139,6 @@ export default function configureExpress(
   }
   app.use(winstonMiddleware);
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser());
-  app.use(
-    session({
-      secret: argv.sessionSecret,
-      resave: false,
-      saveUninitialized: true,
-      name: "idp_sid",
-      genid: uuidv4,
-      cookie: {
-        maxAge: 1000 * 60 * 5,
-        secure: true,
-      },
-    })
-  );
   app.use(flash());
 
   app.use(
@@ -181,16 +164,6 @@ export default function configureExpress(
     req.participant = getParticipant(req);
     req.requestAcsUrl = argv.spAcsUrl;
     next();
-  });
-
-  app.use(function (req, res, next) {
-    if (req.idp.options.rollSession) {
-      req.session.regenerate(function () {
-        return next();
-      });
-    } else {
-      next();
-    }
   });
 
   addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);

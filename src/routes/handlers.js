@@ -3,6 +3,8 @@ import {
   getReqUrl,
   logRelayState,
   accessiblePhoneNumber,
+  getSamlId,
+  getRelayState,
 } from "../utils";
 import samlp from "samlp";
 import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
@@ -35,19 +37,10 @@ export const samlLogin = function (template) {
     const acsUrl = req.query.acsUrl
       ? getReqUrl(req, req.query.acsUrl)
       : getReqUrl(req, req.requestAcsUrl);
-    const authnRequest = req.authnRequest
-      ? req.authnRequest
-      : req.session
-      ? req.session.authnRequest
-      : null;
-    let relayState;
+    const authnRequest = req.authnRequest;
+    const relayState = getRelayState(req);
     if (!authnRequest) {
-      logger.warn("There is no authnRequest in the request or session");
-      relayState = req.query?.RelayState || req.body?.RelayState;
-    } else {
-      relayState = authnRequest.relayState
-        ? authnRequest.relayState
-        : req.query?.RelayState;
+      logger.warn("There is no authnRequest in the request");
     }
     if (
       relayState == null ||
@@ -138,7 +131,7 @@ export const samlLogin = function (template) {
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
-          session: req.sessionID,
+          session: getSamlId(req),
         });
       })
       .catch(next);
@@ -151,9 +144,6 @@ export const samlLogin = function (template) {
 
 export const parseSamlRequest = function (req, res, next) {
   logRelayState(req, logger, "from Okta");
-  if (!req.session) {
-    logger.warn("session is null or undefined parsing the SAML request");
-  }
   samlp.parseRequest(req, function (err, data) {
     if (err) {
       logger.warn("Allowing login with no final redirect.");
@@ -168,23 +158,15 @@ export const parseSamlRequest = function (req, res, next) {
         acsUrl: data.assertionConsumerServiceURL,
         forceAuthn: data.forceAuthn === "true",
       };
-      req.session.authnRequest = req.authnRequest;
     }
     next();
   });
 };
 
-export const getSessionIndex = (req) => {
-  if (req && req.session) {
-    return Math.abs(getHashCode(req.session.id)).toString();
-  }
-  return 0;
-};
-
 export const getParticipant = (req) => {
   const participant = {
     serviceProviderId: req.idp.options.serviceProviderId,
-    sessionIndex: getSessionIndex(req),
+    sessionIndex: getSamlId(req),
     serviceProviderLogoutURL: req.idp.options.sloUrl,
   };
   if (req.user) {

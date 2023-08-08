@@ -395,9 +395,9 @@ describe("validateIdpResponse", () => {
       vsoClient: vsoClient,
       user: {
         claims: { ...claimsWithEDIPI },
-        authnContext: {
-          sessionIndex: testSessionIndex,
-        },
+      },
+      authnRequest: {
+        id: testSessionIndex,
       },
     };
 
@@ -416,9 +416,9 @@ describe("validateIdpResponse", () => {
       vsoClient: vsoClient,
       user: {
         claims: { ...claimsWithEDIPI },
-        authnContext: {
-          sessionIndex: testSessionIndex,
-        },
+      },
+      authnRequest: {
+        id: testSessionIndex,
       },
     };
 

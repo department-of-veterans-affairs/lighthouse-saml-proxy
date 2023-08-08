@@ -1,4 +1,7 @@
 import fs from "fs";
+import logger from "./logger";
+import { DOMParser } from "@xmldom/xmldom";
+import { IConfiguredRequest } from "./routes/types";
 
 /**
  * This function gets the path
@@ -61,14 +64,14 @@ export function logRelayState(req, logger, step) {
     relayStateBody: relayStateBody,
     relayStateQuery: relayStateQuery,
     step: relayStateStep,
-    session: req.sessionID,
+    session: getSamlId(req) || req.id,
   });
 }
 
 /**
  * This function sanitizes a message, by replacing new line escapes with ""
  *
- * @param {string} message message that needs sanitized
+ * @param {string} message message that needs to be sanitized
  * @returns {string} returns sanitized message
  */
 export function sanitize(message) {
@@ -176,4 +179,80 @@ export function sassMiddleware(options) {
 
     return next();
   };
+}
+
+/**
+ * Gets the ID (InResponseTo) from SAMLRequest or SAMLResponse
+ *
+ * @param {IConfiguredRequest} req The HTTP request
+ * @returns {*} a string if ID or InResponseTo is present
+ */
+export function getSamlId(req) {
+  if (req?.authnRequest?.id) {
+    return req?.authnRequest?.id;
+  }
+  if (req?.body?.SAMLResponse) {
+    let id = getInResponseToFromSAML(req?.body?.SAMLResponse);
+    if (id) return id;
+  }
+  if (req?.body?.SAMLRequest) {
+    let id = getIdToFromSAML(req?.body?.SAMLRequest);
+    if (id) return id;
+  }
+  logger.error("SAML ID not found");
+}
+
+/**
+ * Retrieves InResponseTo assertion from SAMLResponse
+ *
+ * @param {string} samlResponse the raw samlResponse
+ * @returns {*} a string if InResponseTo is present
+ */
+function getInResponseToFromSAML(samlResponse) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+  } catch (err) {
+    logger.error("getInResponseToFromSAML failed: ", err);
+  }
+}
+
+/**
+ * Retrieves ID assertion from SAMLRequest
+ *
+ * @param {string} samlRequest the raw samlRequest
+ * @returns {*} a string if ID is present
+ */
+function getIdToFromSAML(samlRequest) {
+  try {
+    const decoded = Buffer.from(samlRequest, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("ID")?.nodeValue;
+  } catch (err) {
+    logger.error("getIdToFromSAML failed: ", err);
+  }
+}
+
+/**
+ * Retrieves RelayState from Request
+ *
+ * @param {IConfiguredRequest} req the raw request
+ * @returns {*} a string if state is present
+ */
+export function getRelayState(req) {
+  if (req?.authnRequest?.RelayState) {
+    return req?.authnRequest?.RelayState;
+  }
+  if (req?.query?.RelayState) {
+    return req?.query?.RelayState;
+  }
+  if (req?.body?.RelayState) {
+    return req?.body?.RelayState;
+  }
+  logger.error("RelayState not found");
 }

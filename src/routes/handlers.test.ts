@@ -3,11 +3,10 @@ import {
   getHashCode,
   samlLogin,
   parseSamlRequest,
-  getSessionIndex,
   getParticipant,
   handleError,
 } from "./handlers.js";
-import { accessiblePhoneNumber } from "../utils";
+import { accessiblePhoneNumber, getSamlId } from "../utils";
 
 jest.mock("../logger");
 jest.mock("passport-wsfed-saml2");
@@ -32,6 +31,9 @@ describe("getHashCode, getSessionIndex", () => {
       idp: {
         options: { serviceProviderId: "serviceProviderId1", sloUrl: "sloUrl1" },
       },
+      authnRequest: {
+        id: "1666277972",
+      },
     };
     mockRes = {
       render: jest.fn(),
@@ -43,11 +45,8 @@ describe("getHashCode, getSessionIndex", () => {
   test("getHashCode empty string hash", () => {
     expect(getHashCode("")).toEqual(0);
   });
-  test("getSessionIndex happy", () => {
-    expect(getSessionIndex(mockReq)).toEqual("1666277972");
-  });
-  test("getSessionIndex empty string", () => {
-    expect(getSessionIndex({})).toEqual(0);
+  test("getSamlId happy", () => {
+    expect(getSamlId(mockReq)).toEqual("1666277972");
   });
   test("getParticipant", () => {
     expect(getParticipant(mockReq)).toEqual({
@@ -297,7 +296,7 @@ describe("samlLogin", () => {
 
   it("Happy Path with authnRequest", async () => {
     mockRequest.authnRequest = {
-      relayState: "%2Foauth2%2FtheRelayState",
+      RelayState: "%2Foauth2%2FtheRelayState",
     };
 
     mockResponse.render = function render(template: any, authOptions: any) {
@@ -325,7 +324,7 @@ describe("samlLogin", () => {
 
   it("Invalid relay state with authnRequest", async () => {
     mockRequest.authnRequest = {
-      relayState: "theRelayState",
+      RelayState: "theRelayState",
     };
 
     mockResponse.render = function render(template: any, authOptions: any) {
@@ -358,7 +357,7 @@ describe("samlLogin", () => {
 
   it("Happy Path login_gov_enabled", async () => {
     mockRequest.authnRequest = {
-      relayState: "%2Foauth2%2FtheRelayState",
+      RelayState: "%2Foauth2%2FtheRelayState",
     };
 
     mockRequest.sps.options = spOptionsJustwithLoginGov;
@@ -387,7 +386,7 @@ describe("samlLogin", () => {
 
   it("samlp.getSamlRequestUrl errors", async () => {
     mockRequest.authnRequest = {
-      relayState: "%2Foauth2%2FtheRelayState",
+      RelayState: "%2Foauth2%2FtheRelayState",
     };
     const render = jest.fn();
 

@@ -13,6 +13,7 @@ import { getUser } from "./testUsers";
 export function buildSamlResponseFunction(sessionIndex) {
   return function buildSamlResponse(type, level_of_assurance, config) {
     const user = getUser(type, level_of_assurance);
+    config.inResponseTo = Math.floor(Math.random() * Date.now());
     config.sessionIndex = sessionIndex;
     sessionIndex++;
     return new Promise((resolve) => {
@@ -36,7 +37,7 @@ export let defaultMockRequest = {
     origin: "https://idp.example.com",
   },
   body: {
-    relayState: "relay",
+    RelayState: "relay",
     SAMLResponse: null
   },
   sps: {
@@ -45,11 +46,6 @@ export let defaultMockRequest = {
         getResponseParams: jest.fn(() => {}),
         idpSsoUrl: "https://idp.example.com/saml/sso",
       },
-    },
-  },
-  options: {
-    ssoResponse: {
-      state: "something",
     },
   },
   idp: {
