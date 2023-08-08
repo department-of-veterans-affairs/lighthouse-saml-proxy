@@ -5,7 +5,6 @@ import {
   accessiblePhoneNumber,
   getSamlId,
   getRelayState,
-  sanitize,
 } from "../utils";
 import { ICache, IConfiguredRequest } from "./types";
 import { preparePassport } from "./passport";
