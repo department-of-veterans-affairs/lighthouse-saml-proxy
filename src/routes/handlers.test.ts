@@ -3,7 +3,6 @@ import {
   getHashCode,
   samlLogin,
   parseSamlRequest,
-  getParticipant,
   handleError,
 } from "./handlers.js";
 import { accessiblePhoneNumber, getSamlId } from "../utils";
@@ -47,15 +46,6 @@ describe("getHashCode, getSessionIndex", () => {
   });
   test("getSamlId happy", () => {
     expect(getSamlId(mockReq)).toEqual("1666277972");
-  });
-  test("getParticipant", () => {
-    expect(getParticipant(mockReq)).toEqual({
-      serviceProviderId: "serviceProviderId1",
-      sessionIndex: "1666277972",
-      serviceProviderLogoutURL: "sloUrl1",
-      nameId: "uname1",
-      nameIdFormat: "nameIdFormat1",
-    });
   });
   test("handleError", () => {
     handleError(mockReq, mockRes);

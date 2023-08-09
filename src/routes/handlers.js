@@ -163,19 +163,6 @@ export const parseSamlRequest = function (req, res, next) {
   });
 };
 
-export const getParticipant = (req) => {
-  const participant = {
-    serviceProviderId: req.idp.options.serviceProviderId,
-    sessionIndex: getSamlId(req),
-    serviceProviderLogoutURL: req.idp.options.sloUrl,
-  };
-  if (req.user) {
-    participant.nameId = req.user.userName;
-    participant.nameIdFormat = req.user.nameIdFormat;
-  }
-  return participant;
-};
-
 const processAcs = (acsUrl, cache, cacheEnabled) => [
   buildPassportLoginHandler(acsUrl),
   testLevelOfAssuranceOrRedirect,
