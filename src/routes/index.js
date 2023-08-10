@@ -14,7 +14,6 @@ import {
   logger,
 } from "../logger";
 import addRoutes from "./routes";
-import { getParticipant } from "./handlers";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
@@ -161,7 +160,6 @@ export default function configureExpress(
     req.vsoClient = vsoClient;
     req.sps = { options: spOptions };
     req.idp = { options: idpOptions };
-    req.participant = getParticipant(req);
     req.requestAcsUrl = argv.spAcsUrl;
     next();
   });
