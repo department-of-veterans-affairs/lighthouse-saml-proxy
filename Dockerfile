@@ -42,8 +42,6 @@ EXPOSE 7000 7000
 HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
   CMD curl -f http://localhost:7000/samlproxy/idp/metadata || exit 1
 
-USER node
-
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
 
@@ -58,8 +56,6 @@ COPY --chown=lhuser:lhuser views/ views/
 COPY --chown=lhuser:lhuser tsconfig.json ./
 COPY --chown=lhuser:lhuser .eslint* ./
 COPY --chown=lhuser:lhuser tsconfig.json ./
-
-USER node
 
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
