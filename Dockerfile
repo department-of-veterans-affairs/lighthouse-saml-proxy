@@ -70,6 +70,8 @@ COPY --chown=lhuser:lhuser views/ /home/node/views/
 COPY --chown=lhuser:lhuser tsconfig.json /home/node/
 COPY --chown=lhuser:lhuser .eslint* /home/node/
 COPY --chown=lhuser:lhuser tsconfig.json /home/node/
+COPY --chown=lhuser:lhuser --from=npminstall package*.json /home/node/
+COPY --chown=lhuser:lhuser --from=npminstall node_modules/ /home/node/node_modules/
 
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
