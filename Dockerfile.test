@@ -1,6 +1,6 @@
 # This dockerfile is only used during ci/cd to run regression tests following the ci/cd deploy.
 
-FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/developer-utils:v2 as devnodebase
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/developer-utils:v2 as devchromebase
 
 # Build Args
 ARG BUILD_DATE_TIME
@@ -17,7 +17,10 @@ LABEL org.opencontainers.image.authors="Pivot!" \
       org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy" \
       org.opencontainers.image.description="SAML Proxy Tests for Lighthouse APIs"
 
-USER root
+# Install chrome dependencies
+RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+
+FROM devchromebase as devnodebase
 
 #
 # NodeJS 16.x
