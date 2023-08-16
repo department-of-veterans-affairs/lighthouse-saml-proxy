@@ -1,6 +1,6 @@
 # This dockerfile is only used during ci/cd to run regression tests following the ci/cd deploy.
 
-FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:node16 as chromeinstall
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/developer-utils:v2 as devchromebase
 
 # Build Args
 ARG BUILD_DATE_TIME
@@ -17,16 +17,24 @@ LABEL org.opencontainers.image.authors="Pivot!" \
       org.opencontainers.image.source="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy" \
       org.opencontainers.image.description="SAML Proxy Tests for Lighthouse APIs"
 
-USER root
-
 # Install chrome dependencies
-RUN dnf -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 
-FROM chromeinstall
+FROM devchromebase as devnodebase
 
-WORKDIR /home/node
-USER node
-COPY --chown=node:node ./test/regression_tests/ .
+#
+# NodeJS 16.x
+#
+RUN curl -sL https://rpm.nodesource.com/setup_16.x | bash -
+RUN retry yum install -y -q nodejs gcc-c++ make python3 git \
+  && retry yum install --assumeyes --quiet tar gzip xz zip unzip
+RUN npm install -g npm@7.15.1
+
+FROM devnodebase
+
+USER lhuser
+WORKDIR /home/lhuser
+COPY --chown=lhuser:lhuser ./test/regression_tests/ .
 RUN npm i
 
 ENTRYPOINT ["./entrypoint_test.sh"]
