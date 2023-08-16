@@ -57,12 +57,6 @@ COPY --chown=lhuser:lhuser tsconfig.json ./
 COPY --chown=lhuser:lhuser .eslint* ./
 COPY --chown=lhuser:lhuser tsconfig.json ./
 
-# The following section is temporary until a followup fix on the ci
-USER root
-RUN cp -r /home/lhuser/. /home/node/
-RUN chown -R lhuser:lhuser /home/node/
-USER lhuser
-
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
       org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/Dockerfile" \
