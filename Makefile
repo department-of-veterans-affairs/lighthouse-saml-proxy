@@ -90,7 +90,6 @@ build/saml_tests:
 lint:
 	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
 	docker run --rm --entrypoint='' \
-		-w "/home/node" \
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		npm run-script lint
 
@@ -99,7 +98,6 @@ lint:
 test:
 	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
 	docker run --rm --entrypoint='' \
-		-w "/home/node" \
 		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
 		npm run test:ci
 
