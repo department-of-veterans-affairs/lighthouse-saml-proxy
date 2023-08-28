@@ -68,6 +68,7 @@ export const samlLogin = function (template) {
     });
 
     let login_gov_enabled = enabled_logingov(req);
+    let mock_idp_enabled = enabled_mockidp(req);
 
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
@@ -92,11 +93,27 @@ export const samlLogin = function (template) {
       }
     }
 
+    if (mock_idp_enabled) {
+      authnSelection.push([
+        "mock_idp_login_link",
+        "http://idmanagement.gov/ns/assurance/ial/2",
+      ]);
+      if (req.sps.options.logingov.signupLinkEnabled) {
+        authnSelection.push([
+          "mock_idp_signup_link",
+          "http://idmanagement.gov/ns/assurance/ial/2",
+        ]);
+      }
+    }
+
     authnSelection
       .reduce((memo, [key, authnContext, exParams = null]) => {
         let idpKey = "id_me";
         if (key === "login_gov_login_link" || key === "login_gov_signup_link") {
           idpKey = "logingov";
+        }
+        if (key === "mock_idp_login_link" || key === "mock_idp_signup_link") {
+          idpKey = "mockidp";
         }
         const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
@@ -127,6 +144,7 @@ export const samlLogin = function (template) {
         authOptions.login_gov_enabled = login_gov_enabled;
         authOptions.login_gov_signup_link_enabled =
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
+        authOptions.mock_idp_enabled = mock_idp_enabled;
         res.render("layout", authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
@@ -195,6 +213,19 @@ export const handleError = (req, res) => {
  */
 function enabled_logingov(req) {
   if (req.sps.options.logingov) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * This function returns boolean based off enabled loging ov
+ *
+ * @param {*} req service provider request
+ * @returns {*} boolean based off of if the logingov is emable
+ */
+function enabled_mockidp(req) {
+  if (req.sps.options.mockidp) {
     return true;
   }
   return false;
