@@ -213,7 +213,7 @@ function enabled_logingov(req) {
 }
 
 /**
- * This function returns boolean based off enabled loging ov
+ * This function returns boolean based off enabled mock idp
  *
  * @param {*} req service provider request
  * @returns {*} boolean based off of if the logingov is emable
