@@ -98,12 +98,6 @@ export const samlLogin = function (template) {
         "mock_idp_login_link",
         "http://idmanagement.gov/ns/assurance/ial/2",
       ]);
-      if (req.sps.options.logingov.signupLinkEnabled) {
-        authnSelection.push([
-          "mock_idp_signup_link",
-          "http://idmanagement.gov/ns/assurance/ial/2",
-        ]);
-      }
     }
 
     authnSelection
@@ -112,7 +106,7 @@ export const samlLogin = function (template) {
         if (key === "login_gov_login_link" || key === "login_gov_signup_link") {
           idpKey = "logingov";
         }
-        if (key === "mock_idp_login_link" || key === "mock_idp_signup_link") {
+        if (key === "mock_idp_login_link") {
           idpKey = "mockidp";
         }
         const params = req.sps.options[idpKey].getAuthnRequestParams(
