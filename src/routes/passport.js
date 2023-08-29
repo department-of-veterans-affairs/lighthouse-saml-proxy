@@ -75,7 +75,7 @@ export function preparePassport(strategy) {
  */
 export const selectPassportStrategyKey = (req) => {
   const origin = req.headers.origin;
-  let passportKey = "id_me";
+  let passportKey = "mockidp";
   Object.entries(req.sps.options).forEach((spIdpEntry) => {
     if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
       passportKey = spIdpEntry[0];

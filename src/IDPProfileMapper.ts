@@ -218,6 +218,58 @@ const idmeConfiguration: IClaimDescriptions = {
   },
 };
 
+const oktaConfiguration: IClaimDescriptions = {
+  level_of_assurance: {
+    id: "level_of_assurance",
+    optional: false,
+    displayName: "Level of Assurance",
+    description: "Level of identify proofing available for the user",
+    multiValue: false,
+  },
+  firstName: {
+    id: "fname",
+    optional: true,
+    displayName: "First Name",
+    description: "The given name of the user",
+    multiValue: false,
+  },
+  lastName: {
+    id: "lname",
+    optional: true,
+    displayName: "Last Name",
+    description: "The surname of the user",
+    multiValue: false,
+  },
+  middleName: {
+    id: "mname",
+    optional: true,
+    displayName: "Middle Name",
+    description: "The middle name of the user",
+    multiValue: false,
+  },
+  ssn: {
+    id: "social",
+    optional: true,
+    displayName: "SSN",
+    description: "The SSN of the user",
+    multiValue: false,
+  },
+  gender: {
+    id: "gender",
+    optional: true,
+    displayName: "Gender",
+    description: "The administrative gender of the user",
+    multiValue: false,
+  },
+  dateOfBirth: {
+    id: "birth_date",
+    optional: true,
+    displayName: "Birth Date",
+    description: "The birth date of the user",
+    multiValue: false,
+  },
+};
+
 const dsLogonConfiguration: IClaimDescriptions = {
   dateOfBirth: {
     id: "dslogon_birth_date",
@@ -359,6 +411,8 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
       this.getClaimFields(idmeConfiguration, claims);
     } else if (this.samlAssertions.claims.category === "logingov") {
       this.getClaimFields(logonGovConfiguration, claims);
+    } else if (this.samlAssertions.claims.category === "mockidp") {
+      this.getClaimFields(oktaConfiguration, claims);
     }
     return claims;
   }
