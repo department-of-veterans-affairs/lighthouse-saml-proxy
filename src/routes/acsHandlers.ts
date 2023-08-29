@@ -54,6 +54,10 @@ const sufficientLevelOfAssurance = (claims: any) => {
     logger.info("Checking ID.me LOA.");
     IdpLoginCounter.labels({ idp: "id_me" }).inc();
     return claims.level_of_assurance === "3";
+  } else if (claims.idp === "mockidp") {
+    logger.info("Checking mockidp LOA.");
+    IdpLoginCounter.labels({ idp: "mockidp" }).inc();
+    return claims.level_of_assurance === "3";
   } else if (claims.idp === "logingov" && claims.ial && claims.aal) {
     logger.info("Checking LogonGov LOA.");
     IdpLoginCounter.labels({ idp: "login_gov" }).inc();
