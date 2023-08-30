@@ -206,7 +206,7 @@ describe("samlLogin", () => {
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
     login_gov_enabled: false,
     login_gov_signup_link_enabled: false,
-    mock_idp_enabled: false
+    mock_idp_enabled: false,
   };
 
   const expected_authoptions = {
@@ -221,7 +221,7 @@ describe("samlLogin", () => {
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
     login_gov_enabled: false,
     login_gov_signup_link_enabled: false,
-    mock_idp_enabled: false
+    mock_idp_enabled: false,
   };
 
   const expected_authoptions_failure_to_proof = {
@@ -236,7 +236,7 @@ describe("samlLogin", () => {
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=&op=signup",
     login_gov_enabled: false,
     login_gov_signup_link_enabled: false,
-    mock_idp_enabled: false
+    mock_idp_enabled: false,
   };
   const expected_authoptions_login_gov_enabled = {
     body: "login_selection",
@@ -254,7 +254,7 @@ describe("samlLogin", () => {
     login_gov_signup_link_enabled: true,
     login_gov_signup_link:
       "https://identityProviderUrl.com?SAMLRequest=utrequest&RelayState=",
-      mock_idp_enabled: false
+    mock_idp_enabled: false,
   };
 
   const mockGetSamlRequestUrl = jest
