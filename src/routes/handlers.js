@@ -200,10 +200,10 @@ export const handleError = (req, res) => {
 };
 
 /**
- * This function returns boolean based off enabled loging ov
+ * This function returns boolean based off enabled logingov
  *
  * @param {*} req service provider request
- * @returns {*} boolean based off of if the logingov is emable
+ * @returns {*} boolean based off of if logingov is enabled
  */
 function enabled_logingov(req) {
   if (req.sps.options.logingov) {
@@ -213,10 +213,10 @@ function enabled_logingov(req) {
 }
 
 /**
- * This function returns boolean based off enabled mock idp
+ * This function returns boolean based off enabled mockidp
  *
  * @param {*} req service provider request
- * @returns {*} boolean based off of if the logingov is emable
+ * @returns {*} boolean based off of if mockidp is enabled
  */
 function enabled_mockidp(req) {
   if (req.sps.options.mockidp) {

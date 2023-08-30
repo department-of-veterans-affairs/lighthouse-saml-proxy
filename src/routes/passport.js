@@ -75,13 +75,15 @@ export function preparePassport(strategy) {
  */
 export const selectPassportStrategyKey = (req) => {
   const origin = req.headers.origin;
-  const decodedSamlResponse = Buffer.from(
-    req.body.SAMLResponse,
-    "base64"
-  ).toString("utf-8");
   let passportKey = "id_me";
-  if (decodedSamlResponse.includes("okta")) {
-    passportKey = "mockidp";
+  if (!origin) {
+    const decodedSamlResponse = Buffer.from(
+      req.body.SAMLResponse,
+      "base64"
+    ).toString("utf-8");
+    if (decodedSamlResponse.includes("okta")) {
+      passportKey = "mockidp";
+    }
   }
   Object.entries(req.sps.options).forEach((spIdpEntry) => {
     if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
