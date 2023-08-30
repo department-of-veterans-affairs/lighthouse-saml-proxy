@@ -110,8 +110,7 @@
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
     "xml2js": "^0.5.00",
-    "yargs": "^16.2.0",
-    "saml-encoder-decoder-js": "^1.0.2"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
