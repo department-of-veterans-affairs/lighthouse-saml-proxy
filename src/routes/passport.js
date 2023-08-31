@@ -76,7 +76,7 @@ export function preparePassport(strategy) {
 export const selectPassportStrategyKey = (req) => {
   const origin = req.headers.origin;
   let passportKey = "id_me";
-  if (!origin) {
+  if (origin === "null") {
     const decodedSamlResponse = Buffer.from(
       req.body.SAMLResponse,
       "base64"

@@ -96,7 +96,7 @@ export const samlLogin = function (template) {
     if (mock_idp_enabled) {
       authnSelection.push([
         "mock_idp_login_link",
-        "http://idmanagement.gov/ns/assurance/ial/2",
+        "http://idmanagement.gov/ns/assurance/loa/3",
       ]);
     }
 
