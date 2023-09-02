@@ -46,7 +46,7 @@ describe("selectPassportStrategyKey", () => {
     );
   });
   test("selectPassportStrategyKey idp2", () => {
-    fs.readFile(
+    fs.readFileSync(
       "./test/samlResponses/logingov_example.xml.b64",
       "utf8",
       (err, data) => {
@@ -61,7 +61,7 @@ describe("selectPassportStrategyKey", () => {
   });
 
   test("selectPassportStrategyKey idp3", () => {
-    fs.readFile(
+    fs.readFileSync(
       "./test/samlResponses/keycloak_example.xml.b64",
       "utf8",
       (err, data) => {
@@ -76,7 +76,7 @@ describe("selectPassportStrategyKey", () => {
   });
 
   test("selectPassportStrategyKey idp4", () => {
-    fs.readFile(
+    fs.readFileSync(
       "./test/samlResponses/okta_example.xml.b64",
       "utf8",
       (err, data) => {
