@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-returns */
 import "jest";
 import { selectPassportStrategyKey } from "./passport";
 const fs = require("fs");
@@ -33,47 +34,17 @@ const mockReq = {
 };
 describe("selectPassportStrategyKey", () => {
   test("selectPassportStrategyKey idp1", () => {
-    fs.readFile(
-      "./test/samlResponses/idme_example.xml.b64",
-      "utf8",
-      (err, data) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        mockReq.body = { SAMLResponse: data };
-        expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
-      }
-    );
+    mockReq.body = { SAMLResponse: samlResponse("idme_example.xml.b64") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    fs.readFileSync(
-      "./test/samlResponses/logingov_example.xml.b64",
-      "utf8",
-      (err, data) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        mockReq.body = { SAMLResponse: data };
-        expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
-      }
-    );
+    mockReq.body = { SAMLResponse: samlResponse("logingov_example.xml.b64") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
 
   test("selectPassportStrategyKey idp3", () => {
-    fs.readFileSync(
-      "./test/samlResponses/keycloak_example.xml.b64",
-      "utf8",
-      (err, data) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        mockReq.body = { SAMLResponse: data };
-        expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
-      }
-    );
+    mockReq.body = { SAMLResponse: samlResponse("keycloak_example.xml.b64") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
   });
 
   test("selectPassportStrategyKey idp4", () => {
@@ -86,14 +57,15 @@ describe("selectPassportStrategyKey", () => {
   //   expect(selectPassportStrategyKey(mockReq)).toBe("id_me");
   // });
 });
+
+/**
+ *
+ * @param {*} fname The file with test data
+ */
 function samlResponse(fname) {
-  const file = path.join(
-    "./test/samlResponses",
-    fname
-  );
-  const b64data = fs.readFileSync(file, "utf8", function (err: any, data: any) {
+  const file = path.join("./test/samlResponses", fname);
+  const b64data = fs.readFileSync(file, "utf8", function (err, data) {
     return data;
   });
   return b64data;
 }
-
