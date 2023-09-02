@@ -45,10 +45,51 @@ describe("selectPassportStrategyKey", () => {
       }
     );
   });
-  // test("selectPassportStrategyKey idp2", () => {
-  //   mockReq.headers.origin = "http://login.example2.com";
-  //   expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
-  // });
+  test("selectPassportStrategyKey idp2", () => {
+    fs.readFile(
+      "./test/samlResponses/logingov_example.xml.b64",
+      "utf8",
+      (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        mockReq.body = { SAMLResponse: data };
+        expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
+      }
+    );
+  });
+
+  test("selectPassportStrategyKey idp3", () => {
+    fs.readFile(
+      "./test/samlResponses/keycloak_example.xml.b64",
+      "utf8",
+      (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        mockReq.body = { SAMLResponse: data };
+        expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
+      }
+    );
+  });
+
+  test("selectPassportStrategyKey idp4", () => {
+    fs.readFile(
+      "./test/samlResponses/okta_example.xml.b64",
+      "utf8",
+      (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        mockReq.body = { SAMLResponse: data };
+        expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
+      }
+    );
+  });
+
   // test("selectPassportStrategyKey default 'id_me'", () => {
   //   mockReq.headers.origin = "http://login.example0.com";
   //   expect(selectPassportStrategyKey(mockReq)).toBe("id_me");
