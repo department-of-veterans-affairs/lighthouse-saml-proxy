@@ -74,12 +74,15 @@ export function preparePassport(strategy) {
  * @returns {*} A string with the correct spIdp key
  */
 export const selectPassportStrategyKey = (req) => {
-  const origin = req.headers.origin;
-  let passportKey = "id_me";
-  Object.entries(req.sps.options).forEach((spIdpEntry) => {
-    if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
-      passportKey = spIdpEntry[0];
-    }
+  const decodedSamlResponse = Buffer.from(
+    req.body.SAMLResponse,
+    "base64"
+  ).toString("utf-8");
+
+  const spIdpEntry = Object.values(req.sps.options).find((spIdp) => {
+    const url = new URL(spIdp.spIdpMetaUrl);
+    const hostname = url.host;
+    return decodedSamlResponse.includes(hostname);
   });
-  return passportKey;
+  return spIdpEntry.category;
 };
