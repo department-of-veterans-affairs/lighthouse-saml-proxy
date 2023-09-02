@@ -8,10 +8,23 @@ const mockReq = {
   sps: {
     options: {
       idp1: {
-        idpSsoUrl: "http://login.example1.com/saml/sso",
+        category: "idp1",
+        spIdpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
       },
       idp2: {
-        idpSsoUrl: "http://login.example2.com/saml/sso",
+        category: "idp2",
+        spIdpMetaUrl:
+          "https://idp.int.identitysandbox.gov/api/saml/metadata2023",
+      },
+      idp3: {
+        category: "idp3",
+        spIdpMetaUrl:
+          "http://localhost:9080/realms/mockidp/protocol/saml/descriptor",
+      },
+      idp4: {
+        category: "idp4",
+        spIdpMetaUrl:
+          "https://deptva.oktapreview.com/app/exk9rdi3kczXMv1tB1d7/sso/saml/metadata",
       },
     },
   },
