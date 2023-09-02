@@ -81,7 +81,7 @@ export const selectPassportStrategyKey = (req) => {
 
   const spIdpEntries = Object.values(req.sps.options);
   const spIdpEntry = spIdpEntries.find((spIdp) => {
-    const url = new URL(spIdp.spIdpMetaUrl);
+    const url = new URL(spIdp.idpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
       ? domain_parts[1]
