@@ -52,10 +52,10 @@ describe("selectPassportStrategyKey", () => {
     expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
   });
 
-  // test("selectPassportStrategyKey default 'id_me'", () => {
-  //   mockReq.headers.origin = "http://login.example0.com";
-  //   expect(selectPassportStrategyKey(mockReq)).toBe("id_me");
-  // });
+  test("selectPassportStrategyKey default 'idp1'", () => {
+    mockReq.body = { SAMLResponse: samlResponse("unmatched_example.xml.b64") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
+  });
 });
 
 /**

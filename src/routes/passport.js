@@ -79,7 +79,8 @@ export const selectPassportStrategyKey = (req) => {
     "base64"
   ).toString("utf-8");
 
-  const spIdpEntry = Object.values(req.sps.options).find((spIdp) => {
+  const spIdpEntries = Object.values(req.sps.options);
+  const spIdpEntry = spIdpEntries.find((spIdp) => {
     const url = new URL(spIdp.spIdpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
@@ -88,5 +89,5 @@ export const selectPassportStrategyKey = (req) => {
     ).replace("preview", "");
     return decodedSamlResponse.includes(domain);
   });
-  return spIdpEntry.category;
+  return spIdpEntry ? spIdpEntry.category : spIdpEntries[0].category;
 };
