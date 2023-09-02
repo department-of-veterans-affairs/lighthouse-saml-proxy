@@ -1,6 +1,7 @@
 import "jest";
 import { selectPassportStrategyKey } from "./passport";
 const fs = require("fs");
+const path = require("path");
 
 const mockReq = {
   headers: {
@@ -76,18 +77,8 @@ describe("selectPassportStrategyKey", () => {
   });
 
   test("selectPassportStrategyKey idp4", () => {
-    fs.readFileSync(
-      "./test/samlResponses/okta_example.xml.b64",
-      "utf8",
-      (err, data) => {
-        if (err) {
-          console.error(err);
-          expect(true).toBe(false);
-        }
-        mockReq.body = { SAMLResponse: data };
-        expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
-      }
-    );
+    mockReq.body = { SAMLResponse: samlResponse("okta_example.xml.b64") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
   });
 
   // test("selectPassportStrategyKey default 'id_me'", () => {
@@ -95,3 +86,14 @@ describe("selectPassportStrategyKey", () => {
   //   expect(selectPassportStrategyKey(mockReq)).toBe("id_me");
   // });
 });
+function samlResponse(fname) {
+  const file = path.join(
+    "./test/samlResponses",
+    fname
+  );
+  const b64data = fs.readFileSync(file, "utf8", function (err: any, data: any) {
+    return data;
+  });
+  return b64data;
+}
+
