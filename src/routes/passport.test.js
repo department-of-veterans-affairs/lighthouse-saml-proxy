@@ -82,7 +82,7 @@ describe("selectPassportStrategyKey", () => {
       (err, data) => {
         if (err) {
           console.error(err);
-          return;
+          expect(true).toBe(false);
         }
         mockReq.body = { SAMLResponse: data };
         expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
