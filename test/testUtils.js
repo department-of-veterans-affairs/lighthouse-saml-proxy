@@ -35,9 +35,6 @@ export let defaultMockRequest = {
   query: {
     relayState: "relay",
   },
-  headers: {
-    origin: "https://idp.example.com",
-  },
   body: {
     RelayState: "relay",
     SAMLResponse: null
