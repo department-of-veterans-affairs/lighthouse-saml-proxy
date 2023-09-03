@@ -88,7 +88,7 @@ export const selectPassportStrategyKey = (req) => {
     const domain = (domain_parts.length > 1
       ? domain_parts[1]
       : domain_parts[0]
-    ).replace("preview", "");
+    ).replace("preview", ""); // An IDP broke convention and created a mismatch between the metdata url domain vs the issuer in the saml response
     return decodedSamlResponse.includes(domain);
   });
   return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
