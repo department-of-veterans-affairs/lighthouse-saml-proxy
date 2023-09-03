@@ -74,14 +74,16 @@ export function preparePassport(strategy) {
  * @returns {*} A string with the correct spIdp key
  */
 export const selectPassportStrategyKey = (req) => {
-  const decodedSamlResponse = Buffer.from(
-    req.body.SAMLResponse,
-    "base64"
-  ).toString("utf-8");
+  const samlResponse = req.body?.SAMLResponse
+    ? req.body.SAMLResponse
+    : req.query.SAMLResponse;
+  const decodedSamlResponse = Buffer.from(samlResponse, "base64").toString(
+    "utf-8"
+  );
 
-  const spIdpEntries = Object.values(req.sps.options);
-  const spIdpEntry = spIdpEntries.find((spIdp) => {
-    const url = new URL(spIdp.idpMetaUrl);
+  const spIdpKeys = Object.keys(req.sps.options);
+  const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
+    const url = new URL(req.sps.options[spIdpKey].idpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
       ? domain_parts[1]
@@ -89,5 +91,5 @@ export const selectPassportStrategyKey = (req) => {
     ).replace("preview", "");
     return decodedSamlResponse.includes(domain);
   });
-  return spIdpEntry ? spIdpEntry.category : spIdpEntries[0].category;
+  return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
 };

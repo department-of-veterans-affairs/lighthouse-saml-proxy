@@ -47,6 +47,7 @@ export let defaultMockRequest = {
       id_me: {
         getResponseParams: jest.fn(() => {}),
         idpSsoUrl: "https://idp.example.com/saml/sso",
+        idpMetaUrl: "https://api.idmelabs.com/metadata",
       },
     },
   },
