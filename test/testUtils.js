@@ -1,6 +1,8 @@
 import btoa from "btoa";
 import { getSamlResponse } from "samlp";
 import { getUser } from "./testUsers";
+const fs = require("fs");
+const path = require("path");
 
 /**
  * This test function builds the saml response function using session index
@@ -72,3 +74,16 @@ export let defaultMockRequest = {
   originalUrl: "http://original.example.com",
   x_fowarded_host: "fowarded.example.com",
 };
+
+/**
+ * Loads test data into a string.
+ * 
+ * @param {*} fname The file with test data
+ */
+export function dataFromFile(fname) {
+  const file = path.join("./test/samlResponses", fname);
+  const out = fs.readFileSync(file, "utf8", function (err, data) {
+    return data;
+  });
+  return out;
+}

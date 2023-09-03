@@ -1,8 +1,7 @@
 /* eslint-disable jsdoc/require-returns */
 import "jest";
 import { selectPassportStrategyKey } from "./passport";
-const fs = require("fs");
-const path = require("path");
+import { dataFromFile } from "../../test/testUtils";
 
 const mockReq = {
   headers: {
@@ -33,38 +32,28 @@ const mockReq = {
 };
 describe("selectPassportStrategyKey", () => {
   test("selectPassportStrategyKey idp1", () => {
-    mockReq.body = { SAMLResponse: samlResponse("idme_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idme_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    mockReq.body = { SAMLResponse: samlResponse("logingov_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("logingov_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
 
   test("selectPassportStrategyKey idp3", () => {
-    mockReq.body = { SAMLResponse: samlResponse("keycloak_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("keycloak_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
   });
 
   test("selectPassportStrategyKey idp4", () => {
-    mockReq.body = { SAMLResponse: samlResponse("okta_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("okta_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
   });
 
   test("selectPassportStrategyKey default 'idp1'", () => {
-    mockReq.body = { SAMLResponse: samlResponse("unmatched_example.xml.b64") };
+    mockReq.body = {
+      SAMLResponse: dataFromFile("unmatched_example.xml.b64"),
+    };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
 });
-
-/**
- *
- * @param {*} fname The file with test data
- */
-function samlResponse(fname) {
-  const file = path.join("./test/samlResponses", fname);
-  const b64data = fs.readFileSync(file, "utf8", function (err, data) {
-    return data;
-  });
-  return b64data;
-}
