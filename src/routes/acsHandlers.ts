@@ -59,6 +59,9 @@ const sufficientLevelOfAssurance = (claims: any) => {
     IdpLoginCounter.labels({ idp: "login_gov" }).inc();
     return claims.aal >= 2 && claims.ial >= 2;
   }
+  logger.info("Checking default LOA");
+  IdpLoginCounter.labels({ idp: "default" }).inc();
+  return claims.level_of_assurance === "3";
 };
 
 export const buildPassportLoginHandler = (acsURL: string) => {
