@@ -411,6 +411,8 @@ export class IDPProfileMapper implements ISamlpProfileMapper {
       this.getClaimFields(idmeConfiguration, claims);
     } else if (this.samlAssertions.claims.category === "logingov") {
       this.getClaimFields(logonGovConfiguration, claims);
+    } else {
+      this.getClaimFields(defaultConfiguration, claims);
     }
     return claims;
   }
