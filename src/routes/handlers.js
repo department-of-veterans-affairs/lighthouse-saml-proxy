@@ -59,16 +59,6 @@ export const samlLogin = function (template) {
         status: 400,
       };
     }
-    const samlp = {};
-    Object.keys(req.sps.options).forEach((idpKey) => {
-      samlp[idpKey] = new _samlp(
-        req.sps.options[idpKey].getResponseParams(),
-        new SAML.SAML(req.sps.options[idpKey].getResponseParams())
-      );
-    });
-
-    let login_gov_enabled = enabled_logingov(req);
-
     const authnSelection = [
       ["id_me_login_link", "http://idmanagement.gov/ns/assurance/loa/3"],
       ["dslogon_login_link", "dslogon"],
@@ -79,6 +69,23 @@ export const samlLogin = function (template) {
         "&op=signup",
       ],
     ];
+    const baseSpsIdpKeys = ["id_me", "logingov", "login_gov", "dslogon", "mhv"];
+    const samlp = {};
+    Object.keys(req.sps.options).forEach((idpKey) => {
+      samlp[idpKey] = new _samlp(
+        req.sps.options[idpKey].getResponseParams(),
+        new SAML.SAML(req.sps.options[idpKey].getResponseParams())
+      );
+      if (!baseSpsIdpKeys.includes(idpKey)) {
+        authnSelection.push([
+          idpKey + "_login_link",
+          "http://idmanagement.gov/ns/assurance/loa/3",
+        ]);
+      }
+    });
+
+    let login_gov_enabled = enabled_logingov(req);
+
     if (login_gov_enabled) {
       authnSelection.push([
         "login_gov_login_link",
@@ -127,6 +134,21 @@ export const samlLogin = function (template) {
         authOptions.login_gov_enabled = login_gov_enabled;
         authOptions.login_gov_signup_link_enabled =
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
+        authOptions.idp_logins = [];
+        Object.keys(authOptions).forEach((optionKey) => {
+          if (optionKey.includes("login_link")) {
+            const idpKey = optionKey.substring(
+              0,
+              optionKey.indexOf("_login_link")
+            );
+            if (!baseSpsIdpKeys.includes(idpKey)) {
+              authOptions.idp_logins.push({
+                idp: idpKey,
+                login_link: authOptions[optionKey],
+              });
+            }
+          }
+        });
         res.render("layout", authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
