@@ -105,6 +105,13 @@ export const samlLogin = function (template) {
         if (key === "login_gov_login_link" || key === "login_gov_signup_link") {
           idpKey = "logingov";
         }
+        const idp_end_index = Math.max(
+          key.indexOf("_login_link"),
+          key.indexOf("_signup_link")
+        );
+        if (!baseSpsIdpKeys.includes(key.substring(0, idp_end_index))) {
+          idpKey = key.substring(0, idp_end_index);
+        }
         const params = req.sps.options[idpKey].getAuthnRequestParams(
           acsUrl,
           (authnRequest && authnRequest.forceAuthn) || "false",
@@ -119,36 +126,22 @@ export const samlLogin = function (template) {
                 reject(err);
               }
 
-              if (exParams) {
-                m[key] = url + exParams;
+              const link_url = exParams ? url + exParams : url;
+              if (!baseSpsIdpKeys.includes(idpKey)) {
+                m.idp_logins[idpKey] = { login_link: link_url };
               } else {
-                m[key] = url;
+                m[key] = link_url;
               }
               resolve(m);
             });
           });
         });
-      }, Promise.resolve({}))
+      }, Promise.resolve({ idp_logins: {} }))
       .then((authOptions) => {
         authOptions.body = template;
         authOptions.login_gov_enabled = login_gov_enabled;
         authOptions.login_gov_signup_link_enabled =
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
-        authOptions.idp_logins = [];
-        Object.keys(authOptions).forEach((optionKey) => {
-          if (optionKey.includes("login_link")) {
-            const idpKey = optionKey.substring(
-              0,
-              optionKey.indexOf("_login_link")
-            );
-            if (!baseSpsIdpKeys.includes(idpKey)) {
-              authOptions.idp_logins.push({
-                idp: idpKey,
-                login_link: authOptions[optionKey],
-              });
-            }
-          }
-        });
         res.render("layout", authOptions);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
