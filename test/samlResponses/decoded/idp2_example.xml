@@ -1,0 +1,7 @@
+<samlp:Response ID="_03af590d-49cf-4360-9da8-cef9ce89986e" Version="2.0"
+    IssueInstant="2023-09-01T22:33:07Z" Destination="https://localhost:9001/samlproxy/sp/saml/sso"
+    Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified"
+    InResponseTo="id771166074202739869068838" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+    <Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+        https://idp2.org/api/saml</Issuer>
+</samlp:Response>
