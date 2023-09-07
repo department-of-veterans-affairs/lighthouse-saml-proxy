@@ -602,7 +602,7 @@ describe("buildPassportLoginHandler", () => {
   });
 
   it("happy path", () => {
-    req.query.SAMLResponse = dataFromFile("idme_example.xml.b64");
+    req.query.SAMLResponse = dataFromFile("idp1_example.xml.b64");
     handlers.buildPassportLoginHandler("http://example.com/acs")(
       req,
       mockResponse,

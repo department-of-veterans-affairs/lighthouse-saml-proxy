@@ -210,9 +210,11 @@ export function getSamlId(req) {
  */
 function getInResponseToFromSAML(samlResponse) {
   try {
-    decodedSamlResponse(samlResponse)?.documentElement?.getAttributeNode(
-      "InResponseTo"
-    )?.nodeValue;
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser
+      .parseFromString(decoded)
+      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
   } catch (err) {
     logger.error("getInResponseToFromSAML failed: ", err);
   }
