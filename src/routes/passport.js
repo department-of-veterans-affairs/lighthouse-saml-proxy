@@ -79,7 +79,8 @@ export const selectPassportStrategyKey = (req) => {
     ? req.body.SAMLResponse
     : req.query.SAMLResponse;
   const decodedSamlResp = decodedSamlResponse(samlResponse);
-  var issuerElems = decodedSamlResp.documentElement.getElementsByTagName(
+  var issuerElems = decodedSamlResp.documentElement.getElementsByTagNameNS(
+    "urn:oasis:names:tc:SAML:2.0:assertion",
     "Issuer"
   );
   var issuer = issuerElems[0].textContent.trim();
