@@ -210,13 +210,28 @@ export function getSamlId(req) {
  */
 function getInResponseToFromSAML(samlResponse) {
   try {
-    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
-    const parser = new DOMParser();
-    return parser
-      .parseFromString(decoded)
-      ?.documentElement?.getAttributeNode("InResponseTo")?.nodeValue;
+    decodedSamlResponse(samlResponse)?.documentElement?.getAttributeNode(
+      "InResponseTo"
+    )?.nodeValue;
   } catch (err) {
     logger.error("getInResponseToFromSAML failed: ", err);
+  }
+}
+
+/**
+ * Decodes and xml parses from a b64 encoded SAMLResponse
+ *
+ * @param {string} samlResponse the raw samlResponse
+ * @returns {*} a string if InResponseTo is present
+ */
+export function decodedSamlResponse(samlResponse) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    return parser.parseFromString(decoded);
+  } catch (err) {
+    logger.error("decodedSamlResponse failed: ", err);
+    throw err;
   }
 }
 

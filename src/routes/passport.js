@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
 import { IDPProfileMapper } from "../IDPProfileMapper";
+import { decodedSamlResponse } from "../utils";
 
 /**
  * Creates the passport strategy using the response params
@@ -77,19 +78,21 @@ export const selectPassportStrategyKey = (req) => {
   const samlResponse = req.body?.SAMLResponse
     ? req.body.SAMLResponse
     : req.query.SAMLResponse;
-  const decodedSamlResponse = Buffer.from(samlResponse, "base64").toString(
-    "utf-8"
+  const decodedSamlResp = decodedSamlResponse(samlResponse);
+  var issuerElems = decodedSamlResp.documentElement.getElementsByTagName(
+    "Issuer"
   );
+  var issuer = issuerElems[0].textContent.trim();
 
   const spIdpKeys = Object.keys(req.sps.options);
   const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
     const url = new URL(req.sps.options[spIdpKey].idpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
-      ? domain_parts[1]
+      ? domain_parts[domain_parts.length - 1]
       : domain_parts[0]
     ).replace("preview", ""); // An IDP broke convention and created a mismatch between the metdata url domain vs the issuer in the saml response
-    return decodedSamlResponse.includes(domain);
+    return issuer.includes(domain);
   });
   return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
 };

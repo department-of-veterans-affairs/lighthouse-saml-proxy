@@ -34,7 +34,7 @@ describe("selectPassportStrategyKey", () => {
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idp2example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp2_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
 

@@ -3,6 +3,5 @@
     ID="id62198144964841931471458631" InResponseTo="id58204955972369371611730360"
     IssueInstant="2023-09-02T04:30:28.137Z" Version="2.0"
     xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
-        xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://www.idp4.com/yyyyyy</saml2:Issuer>
+    <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://www.idp4.com/yyyyyy</saml2:Issuer>
 </saml2p:Response>
