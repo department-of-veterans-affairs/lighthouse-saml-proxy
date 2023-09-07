@@ -224,7 +224,7 @@ function getInResponseToFromSAML(samlResponse) {
  * Decodes and xml parses from a b64 encoded SAMLResponse
  *
  * @param {string} samlResponse the raw samlResponse
- * @returns {*} a string if InResponseTo is present
+ * @returns {*} a DOM The parsed xml document
  */
 export function decodedSamlResponse(samlResponse) {
   try {
@@ -234,6 +234,27 @@ export function decodedSamlResponse(samlResponse) {
   } catch (err) {
     logger.error("decodedSamlResponse failed: ", err);
     throw err;
+  }
+}
+
+/**
+ * Retrieves the issuer from a b64 encoded SAMLResponse
+ *
+ * @param {string} samlResponse the raw samlResponse
+ * @returns {*} a string if Issuer is present
+ */
+export function issuerFromSamlResponse(samlResponse) {
+  try {
+    const issuerElems = decodedSamlResponse(
+      samlResponse
+    ).documentElement.getElementsByTagNameNS(
+      "urn:oasis:names:tc:SAML:2.0:assertion",
+      "Issuer"
+    );
+    const issuer = issuerElems[0].textContent.trim();
+    return issuer;
+  } catch (err) {
+    logger.error("decodedSamlResponse failed: ", err);
   }
 }
 

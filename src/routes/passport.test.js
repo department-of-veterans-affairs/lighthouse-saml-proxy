@@ -23,7 +23,8 @@ const mockReq = {
       },
       idp4: {
         category: "idp4",
-        idpMetaUrl: "https://deptva.idp4preview.com/app/yyyy/sso/saml/metadata",
+        idpMetaUrl:
+          "https://deptyyy.idp4preview.com/app/yyyy/sso/saml/metadata",
       },
     },
   },

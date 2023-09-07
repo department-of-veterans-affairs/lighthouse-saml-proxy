@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
 import { IDPProfileMapper } from "../IDPProfileMapper";
-import { decodedSamlResponse } from "../utils";
+import { issuerFromSamlResponse } from "../utils";
 
 /**
  * Creates the passport strategy using the response params
@@ -78,19 +78,13 @@ export const selectPassportStrategyKey = (req) => {
   const samlResponse = req.body?.SAMLResponse
     ? req.body.SAMLResponse
     : req.query.SAMLResponse;
-  const decodedSamlResp = decodedSamlResponse(samlResponse);
-  var issuerElems = decodedSamlResp.documentElement.getElementsByTagNameNS(
-    "urn:oasis:names:tc:SAML:2.0:assertion",
-    "Issuer"
-  );
-  var issuer = issuerElems[0].textContent.trim();
-
+  const issuer = issuerFromSamlResponse(samlResponse);
   const spIdpKeys = Object.keys(req.sps.options);
   const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
     const url = new URL(req.sps.options[spIdpKey].idpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
-      ? domain_parts[domain_parts.length - 1]
+      ? domain_parts[domain_parts.length - 2]
       : domain_parts[0]
     ).replace("preview", ""); // An IDP broke convention and created a mismatch between the metdata url domain vs the issuer in the saml response
     return issuer.includes(domain);
