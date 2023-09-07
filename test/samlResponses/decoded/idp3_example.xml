@@ -3,8 +3,5 @@
     Destination="http://localhost:7000/samlproxy/sp/saml/sso"
     ID="ID_218901a1-603f-4688-87e0-2072c87bf36c" InResponseTo="id31972267796844074658910450"
     IssueInstant="2023-08-30T19:54:56.160Z" Version="2.0">
-    <saml:Issuer>http://wontfind/xxxx</saml:Issuer>
-    <samlp:Status>
-        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
-    </samlp:Status>
+    <saml:Issuer>https://idp3:18443/idp</saml:Issuer>
 </samlp:Response>
