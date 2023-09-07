@@ -11,42 +11,40 @@ const mockReq = {
     options: {
       idp1: {
         category: "idp1",
-        idpMetaUrl: "https://api.idmelabs.com/saml/metadata/provider",
+        idpMetaUrl: "https://api.idp1.com/saml/metadata/provider",
       },
       idp2: {
         category: "idp2",
-        idpMetaUrl: "https://idp.int.identitysandbox.gov/api/saml/metadata2023",
+        idpMetaUrl: "https://idp.int.idp2.org/api/saml/metadata2023",
       },
       idp3: {
         category: "idp3",
-        idpMetaUrl:
-          "http://localhost:9080/realms/mockidp/protocol/saml/descriptor",
+        idpMetaUrl: "https://idp3:18443/realms/xxxx/protocol/saml/descriptor",
       },
       idp4: {
         category: "idp4",
-        idpMetaUrl:
-          "https://deptva.oktapreview.com/app/exk9rdi3kczXMv1tB1d7/sso/saml/metadata",
+        idpMetaUrl: "https://deptva.idp4review.com/app/yyyy/sso/saml/metadata",
       },
     },
   },
 };
 describe("selectPassportStrategyKey", () => {
   test("selectPassportStrategyKey idp1", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idme_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp1_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("logingov_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp2example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
 
   test("selectPassportStrategyKey idp3", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("keycloak_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp3_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
   });
 
   test("selectPassportStrategyKey idp4", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("okta_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp4_example.xml.b64") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
   });
 
