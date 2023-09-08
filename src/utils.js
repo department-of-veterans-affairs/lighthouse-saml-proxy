@@ -239,7 +239,7 @@ export function issuerFromSamlResponse(samlResponse) {
     const issuer = issuerElems[0].textContent.trim();
     return issuer;
   } catch (err) {
-    logger.error("decodedSamlResponse failed: ", err);
+    logger.error("issuerFromSamlResponse failed: ", err);
   }
 }
 
