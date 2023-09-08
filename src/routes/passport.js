@@ -84,7 +84,9 @@ export const selectPassportStrategyKey = (req) => {
     const url = new URL(req.sps.options[spIdpKey].idpMetaUrl);
     const domain_parts = url.host.split(".");
     const domain = (domain_parts.length > 1
-      ? domain_parts[domain_parts.length - 2]
+      ? domain_parts[domain_parts.length - 2] +
+        "." +
+        domain_parts[domain_parts.length - 1]
       : domain_parts[0]
     ).replace("preview", ""); // An IDP broke convention and created a mismatch between the metdata url domain vs the issuer in the saml response
     return issuer.includes(domain);
