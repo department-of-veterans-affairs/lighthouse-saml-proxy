@@ -79,15 +79,18 @@ export const selectPassportStrategyKey = (req) => {
   const issuer = issuerFromSamlResponse(samlResponse);
   const spIdpKeys = Object.keys(req.sps.options);
   const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
-    const url = new URL(req.sps.options[spIdpKey].idpMetaUrl);
+    const spIdpOption = req.sps.options[spIdpKey];
+    const url = new URL(spIdpOption.idpMetaUrl);
     const domain_parts = url.host.split(".");
-    const domain = (domain_parts.length > 1
-      ? domain_parts[domain_parts.length - 2] +
-        "." +
-        domain_parts[domain_parts.length - 1]
-      : domain_parts[0]
-    ).replace("preview", ""); // An IDP broke convention and created a mismatch between the metdata url domain vs the issuer in the saml response
-    return issuer.includes(domain);
+    const domain =
+      domain_parts.length > 1
+        ? domain_parts[domain_parts.length - 2] +
+          "." +
+          domain_parts[domain_parts.length - 1]
+        : domain_parts[0];
+    return spIdpOption.idpIssuerMatchOverride
+      ? issuer.includes(spIdpOption.idpIssuerMatchOverride)
+      : issuer.includes(domain);
   });
   return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
 };

@@ -25,6 +25,7 @@ const mockReq = {
         category: "idp4",
         idpMetaUrl:
           "https://deptyyy.idp4preview.com/app/yyyy/sso/saml/metadata",
+        idpIssuerMatchOverride: "idp4.com",
       },
     },
   },
