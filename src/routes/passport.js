@@ -80,17 +80,26 @@ export const selectPassportStrategyKey = (req) => {
   const spIdpKeys = Object.keys(req.sps.options);
   const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
     const spIdpOption = req.sps.options[spIdpKey];
-    const url = new URL(spIdpOption.idpMetaUrl);
-    const domain_parts = url.host.split(".");
-    const domain =
-      domain_parts.length > 1
-        ? domain_parts[domain_parts.length - 2] +
-          "." +
-          domain_parts[domain_parts.length - 1]
-        : domain_parts[0];
+    const domain = spIdpHostDomain(spIdpOption);
     return spIdpOption.idpIssuerMatchOverride
       ? issuer.includes(spIdpOption.idpIssuerMatchOverride)
       : issuer.includes(domain);
   });
   return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
 };
+
+/**
+ * Returns the domain that cooresponds to the host of the metadata url.
+ *
+ * @param {spConfig} spIdpOption The SP Config Option
+ * @returns {string} The domain name
+ */
+function spIdpHostDomain(spIdpOption) {
+  const url = new URL(spIdpOption.idpMetaUrl);
+  const domain_parts = url.host.split(".");
+  const domain =
+    domain_parts.length > 1
+      ? domain_parts[domain_parts.length - 2]
+      : domain_parts[0];
+  return domain;
+}
