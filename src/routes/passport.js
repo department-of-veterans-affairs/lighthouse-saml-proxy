@@ -75,7 +75,7 @@ export function preparePassport(strategy) {
  * @returns {*} A string with the correct spIdp key
  */
 export const selectPassportStrategyKey = (req) => {
-  const samlResponse = req.body?.SAMLResponse || req.query.SAMLResponse;
+  const samlResponse = req.body?.SAMLResponse || req.query?.SAMLResponse;
   const issuer = issuerFromSamlResponse(samlResponse);
   const spIdpKeys = Object.keys(req.sps.options);
   const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
