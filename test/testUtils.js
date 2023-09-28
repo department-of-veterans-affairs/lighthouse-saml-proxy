@@ -78,7 +78,7 @@ export let defaultMockRequest = {
  *
  * @param {*} fname The file with test data
  */
-export function dataFromFile(fname) {
+export function b64encodedDataFromFile(fname) {
   const file = path.join("./test/samlResponses/decoded", fname);
   const samlResponse = fs.readFileSync(file, "utf8", function (err, data) {
     return data;
