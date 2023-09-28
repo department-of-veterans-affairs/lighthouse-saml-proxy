@@ -5,7 +5,10 @@ import { MpiUserClient } from "../MpiUserClient";
 import { VsoClient } from "../VsoClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
-import { defaultMockRequest, b64encodedDataFromFile } from "../../test/testUtils";
+import {
+  defaultMockRequest,
+  b64encodedDataFromFile,
+} from "../../test/testUtils";
 import { accessiblePhoneNumber } from "../utils";
 import samlp from "samlp";
 jest.mock("passport");

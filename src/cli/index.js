@@ -175,6 +175,12 @@ export function processArgs() {
         string: true,
         default: "samlp",
       },
+      spIdpCategory: {
+        description: "The IDP category for the default upstream IDP",
+        required: true,
+        string: true,
+        default: "id_me",
+      },
       spIdpIssuer: {
         description: "IdP Issuer URI",
         required: false,
