@@ -32,27 +32,27 @@ const mockReq = {
 };
 describe("selectPassportStrategyKey", () => {
   test("selectPassportStrategyKey idp1", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idp1_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp1_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idp2_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp2_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
 
   test("selectPassportStrategyKey idp3", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idp3_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp3_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
   });
 
   test("selectPassportStrategyKey idp4", () => {
-    mockReq.body = { SAMLResponse: dataFromFile("idp4_example.xml.b64") };
+    mockReq.body = { SAMLResponse: dataFromFile("idp4_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
   });
 
   test("selectPassportStrategyKey default 'idp1'", () => {
     mockReq.body = {
-      SAMLResponse: dataFromFile("unmatched_example.xml.b64"),
+      SAMLResponse: dataFromFile("unmatched_example.xml"),
     };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });

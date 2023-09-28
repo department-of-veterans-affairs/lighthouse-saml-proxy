@@ -75,13 +75,14 @@ export let defaultMockRequest = {
 
 /**
  * Loads test data into a string.
- * 
+ *
  * @param {*} fname The file with test data
  */
 export function dataFromFile(fname) {
-  const file = path.join("./test/samlResponses", fname);
-  const out = fs.readFileSync(file, "utf8", function (err, data) {
+  const file = path.join("./test/samlResponses/decoded", fname);
+  const samlResponse = fs.readFileSync(file, "utf8", function (err, data) {
     return data;
   });
-  return out;
+  const encoded = Buffer.from(samlResponse, "ascii").toString("base64");
+  return encoded;
 }
