@@ -5,7 +5,7 @@ import { MpiUserClient } from "../MpiUserClient";
 import { VsoClient } from "../VsoClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
-import { defaultMockRequest, dataFromFile } from "../../test/testUtils";
+import { defaultMockRequest, b64encodedDataFromFile } from "../../test/testUtils";
 import { accessiblePhoneNumber } from "../utils";
 import samlp from "samlp";
 jest.mock("passport");
@@ -602,7 +602,7 @@ describe("buildPassportLoginHandler", () => {
   });
 
   it("happy path", () => {
-    req.query.SAMLResponse = dataFromFile("idp1_example.xml.b64");
+    req.query.SAMLResponse = b64encodedDataFromFile("idp1_example.xml");
     handlers.buildPassportLoginHandler("http://example.com/acs")(
       req,
       mockResponse,
