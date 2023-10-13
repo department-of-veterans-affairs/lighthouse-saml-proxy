@@ -4,11 +4,15 @@ ARG VERSION
 ARG BUILD_NUMBER
 ARG BUILD_TOOL
 
-FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:v2-node16 as npminstall
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:v2-node18 as npminstall
+
+# Downgrade of npm needed to run npm install for saml-proxy
+USER root 
+RUN npm install -g npm@7.15.1
+USER lhuser
 
 WORKDIR /home/lhuser
 
-RUN git config --global url."https://".insteadOf git://
 COPY --chown=lhuser:lhuser package.json package.json
 COPY --chown=lhuser:lhuser package-lock.json package-lock.json
 RUN npm install
@@ -23,7 +27,7 @@ COPY --chown=lhuser:lhuser views/ views/
 COPY --chown=lhuser:lhuser tsconfig.json ./
 RUN ./node_modules/.bin/tsc
 
-FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:v2-node16 as deploy
+FROM ghcr.io/department-of-veterans-affairs/health-apis-docker-octopus/lighthouse-node-application-base:v2-node18 as deploy
 
 WORKDIR /home/lhuser
 
