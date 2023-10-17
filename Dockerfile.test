@@ -20,14 +20,14 @@ LABEL org.opencontainers.image.authors="Pivot!" \
 # Install chrome dependencies
 RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 
+FROM ghcr.io/department-of-veterans-affairs/lighthouse-node-build:v2-node18 as nodebuild
+
 FROM devchromebase as devnodebase
 
 #
 # NodeJS 18.x
 #
-RUN curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-RUN retry yum install -y -q nodejs gcc-c++ make python3 git \
-  && retry yum install --assumeyes --quiet tar gzip xz zip unzip
+COPY --from=nodebuild /usr/local/ /usr/local/
 RUN npm install -g npm@7.15.1
 
 FROM devnodebase
