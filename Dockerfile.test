@@ -22,13 +22,13 @@ RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_curre
 
 FROM devchromebase as devnodebase
 
-# #
-# # NodeJS 18.x
-# #
-# RUN curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-# RUN retry yum install -y -q nodejs gcc-c++ make python3 git \
-#   && retry yum install --assumeyes --quiet tar gzip xz zip unzip
-# RUN npm install -g npm@7.15.1
+#
+# NodeJS 18.x
+#
+RUN curl -sL https://rpm.nodesource.com/setup_18.x | bash -
+RUN retry yum install -y -q nodejs gcc-c++ make python3 git \
+  && retry yum install --assumeyes --quiet tar gzip xz zip unzip
+RUN npm install -g npm@7.15.1
 
 FROM devnodebase
 
