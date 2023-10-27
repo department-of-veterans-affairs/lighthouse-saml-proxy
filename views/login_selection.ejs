@@ -50,6 +50,9 @@
       </svg>
     </a>
     <% } %>
+    <% if (mock_idp_enabled) { %>
+      <a class="no-external-icon usa-button mockidp-signin" href="<%- mock_idp_login_link -%>">Mock IDP</a>
+    <% } %>
     <a class="no-external-icon usa-button idme-signin" href="<%- id_me_login_link -%>">
       <svg
         role="img"
@@ -90,9 +93,9 @@
       <% if (login_gov_signup_link_enabled) { %>
       <div>
         <a href="<%- login_gov_signup_link -%>">Create an account with Login.gov</a>
-      </div>  
+      </div>
       <% } %>
-      <div>  
+      <div>
         <a href="<%- id_me_signup_link -%>">Create an account with ID.me</a>
       </div>
     </div>
