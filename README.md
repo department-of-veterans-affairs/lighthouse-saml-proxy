@@ -4,7 +4,7 @@ This app provides a [SAML SP](https://en.wikipedia.org/wiki/Service_provider_(SA
 
 ## Installation
 
-Requires Docker and/or Node.js > 16.
+Requires Docker and/or Node.js > 16. 
 
 ### Config File
 
