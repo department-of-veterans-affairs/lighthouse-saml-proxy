@@ -25,8 +25,9 @@ FROM devchromebase as devnodebase
 #
 # NodeJS 16.x
 #
-RUN curl -sL https://rpm.nodesource.com/setup_16.x | bash -
-RUN retry yum install -y -q nodejs gcc-c++ make python3 git \
+RUN retry yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y \
+  && retry yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+RUN retry yum install -y -q gcc-c++ make python3 git \
   && retry yum install --assumeyes --quiet tar gzip xz zip unzip
 RUN npm install -g npm@7.15.1
 
