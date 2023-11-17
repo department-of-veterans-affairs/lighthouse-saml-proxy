@@ -2,8 +2,8 @@ require("jest");
 const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const qs = require("querystring");
-const { ModifyAttack } = require("./modifyAttack");
 const SAML = require("saml-encoder-decoder-js");
+const ModifyAttack = require("./modifyAttack");
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
@@ -23,7 +23,9 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
-const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT ? Number(process.env.REGRESSION_TEST_TIMEOUT) : 70000;
+const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT
+  ? Number(process.env.REGRESSION_TEST_TIMEOUT)
+  : 70000;
 
 describe("Regression tests", () => {
   jest.setTimeout(regression_test_timeout);
@@ -160,7 +162,9 @@ describe("Regression tests", () => {
       }
     });
 
-    await page.waitForSelector(".usa-alert-error", { timeout: regression_test_timeout });
+    await page.waitForSelector(".usa-alert-error", {
+      timeout: regression_test_timeout,
+    });
 
     await isSensitiveError(page);
   });
