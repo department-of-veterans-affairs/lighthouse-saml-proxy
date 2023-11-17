@@ -13,6 +13,9 @@
   "author": "Pivot!",
   "license": "ISC",
   "dependencies": {
+    "fs": "0.0.1-security",
+    "samlify": "^2.8.7",
+    "xml2js": "^0.5.0",
     "@xmldom/xmldom": "^0.7.9",
     "jest": "^29.6.1",
     "puppeteer": "^17.1.3",

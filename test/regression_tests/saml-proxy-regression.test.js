@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const qs = require("querystring");
 const SAML = require("saml-encoder-decoder-js");
+const ModifyAttack = require("./modifyAttack");
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
   args: ["--no-sandbox", "--enable-features=NetworkService"],
@@ -22,7 +23,9 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
-const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT ? Number(process.env.REGRESSION_TEST_TIMEOUT) : 70000;
+const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT
+  ? Number(process.env.REGRESSION_TEST_TIMEOUT)
+  : 70000;
 
 describe("Regression tests", () => {
   jest.setTimeout(regression_test_timeout);
@@ -128,6 +131,43 @@ describe("Regression tests", () => {
     await isError(page, "Error", "Route Not Found");
   });
 
+  test("modify", async () => {
+    const page = await browser.newPage();
+    await requestToken(page);
+    await authentication(page, valid_user, true);
+
+    page.on("request", async (request) => {
+      if (
+        request.url().includes(`${saml_proxy_url}/samlproxy/sp/saml/sso`) &&
+        request.method() == "POST"
+      ) {
+        let post_data = await decode(request);
+        let modify = await ModifyAttack(
+          post_data.SAMLResponse,
+          "uuid",
+          "modify"
+        );
+        post_data.SAMLResponse = modify;
+        let data = await encode(post_data);
+        await request.continue({
+          method: "POST",
+          postData: data,
+          headers: {
+            ...request.headers(),
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+      } else {
+        await request.continue();
+      }
+    });
+
+    await page.waitForSelector(".usa-alert-error", {
+      timeout: regression_test_timeout,
+    });
+
+    await isSensitiveError(page);
+  });
 });
 
 const requestToken = async (page) => {
