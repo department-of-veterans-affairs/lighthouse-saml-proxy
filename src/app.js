@@ -76,6 +76,7 @@ function runServer(argv) {
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
+      app.disable("x-powered-by");
       const httpServer = http.createServer(app);
       const spConfigs = { id_me: new SPConfig(argv) };
       strategies.set("id_me", createPassportStrategy(spConfigs.id_me));
