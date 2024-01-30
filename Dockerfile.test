@@ -18,6 +18,7 @@ LABEL org.opencontainers.image.authors="Pivot!" \
       org.opencontainers.image.description="SAML Proxy Tests for Lighthouse APIs"
 
 # Install chrome dependencies
+USER root
 RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 
 FROM devchromebase as devnodebase
