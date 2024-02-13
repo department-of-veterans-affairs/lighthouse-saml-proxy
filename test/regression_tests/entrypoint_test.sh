@@ -13,6 +13,7 @@ docker run \
   --authorization-url=$AUTHORIZATION_URL \
   --user-password=$USER_PASSWORD \
   --valid-user=$VALID_USER_EMAIL \
+  --icn-error-password=$ICN_ERROR_PASSWORD \
   --icn-error-user=$ICN_ERROR_USER_EMAIL
 
 EOF
@@ -44,6 +45,8 @@ case $i in
       export VALID_USER_EMAIL="${i#*=}"; shift ;;
     --icn-error-user=*)
       export ICN_ERROR_USER_EMAIL="${i#*=}"; shift ;;
+    --icn-error-password=*)
+      export ICN_ERROR_PASSWORD="${i#*=}"; shift ;;
 esac
 done
 

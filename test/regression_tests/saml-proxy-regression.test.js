@@ -23,6 +23,7 @@ const redirect_uri = "https://app/after-auth";
 const user_password = process.env.USER_PASSWORD;
 const valid_user = process.env.VALID_USER_EMAIL;
 const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
+const icn_error_password = process.env.ICN_ERROR_PASSWORD
 const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT
   ? Number(process.env.REGRESSION_TEST_TIMEOUT)
   : 70000;
@@ -50,7 +51,7 @@ describe("Regression tests", () => {
     const page = await browser.newPage();
     await requestToken(page);
 
-    await login(page, icn_error_user, user_password);
+    await login(page, icn_error_user, icn_error_password);
 
     await page.waitForRequest((request) => {
       return request.url().includes("/samlproxy/sp/saml/sso");
@@ -134,7 +135,7 @@ describe("Regression tests", () => {
   test("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
-    await authentication(page, valid_user, true);
+    await authentication(page, valid_user, user_password, true);
 
     page.on("request", async (request) => {
       if (
@@ -186,7 +187,7 @@ const requestToken = async (page) => {
 };
 
 const login = async (page, useremail, password, get_code = false) => {
-  await authentication(page, useremail);
+  await authentication(page, useremail, password);
 
   let code;
   if (get_code) {
@@ -200,11 +201,11 @@ const login = async (page, useremail, password, get_code = false) => {
   return code;
 };
 
-const authentication = async (page, email = valid_user, intercept = false) => {
+const authentication = async (page, email = valid_user, password = user_password, intercept = false) => {
   await page.$eval(".idme-signin", (elem) => elem.click());
   await page.waitForSelector("#user_email");
   await page.type("#user_email", email);
-  await page.type("#user_password", user_password);
+  await page.type("#user_password", password);
   await page.$eval('[name="commit"]', (elem) => elem.click());
   await page.waitForSelector(".phone");
   await page.$eval("button.btn-primary", (elem) => elem.click());
