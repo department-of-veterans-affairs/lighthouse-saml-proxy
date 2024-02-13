@@ -115,7 +115,7 @@ regression:
 		--user-password=$(USER_PASSWORD) \
 		--valid-user=$(VALID_USER_EMAIL) \
 		--icn-error-user=$(ICN_ERROR_USER_EMAIL) \
-		--icn-error-password=$(ICN_ERROR_PASSWORD)
+		--icn-error-password=$(ICN_ERROR_PASSWORD) \
 		--regression-test-timeout=$(REGRESSION_TEST_TIMEOUT)
 
 ## pull: 	Pull an image to ECR
