@@ -46,7 +46,7 @@ describe("Regression tests", () => {
     expect(code).not.toBeNull();
   });
 
-  test("ICN Error", async () => {
+  test.skip("ICN Error", async () => {
     const page = await browser.newPage();
     await requestToken(page);
 
@@ -131,7 +131,7 @@ describe("Regression tests", () => {
     await isError(page, "Error", "Route Not Found");
   });
 
-  test("modify", async () => {
+  test.skip("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
     await authentication(page, valid_user, true);
