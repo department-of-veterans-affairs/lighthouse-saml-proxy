@@ -163,7 +163,7 @@ function elementValue(elements, name) {
 
 /**
  * These are the SAMLResponse parsers. See `./SAMLResponse.example.xml` in the current dir (test)
- * for an example of the xml document we are parsing
+ * for an example of the xml document we are parsing.
  *
  * @param {*} samlResponse saml proxy response
  * @param {*} assertion assertion in saml response
