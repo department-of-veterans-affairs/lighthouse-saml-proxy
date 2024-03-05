@@ -221,6 +221,29 @@ function getInResponseToFromSAML(samlResponse) {
 }
 
 /**
+ * Retrieves the issuer from a b64 encoded SAMLResponse
+ *
+ * @param {string} samlResponse the raw samlResponse
+ * @returns {*} a string if Issuer is present
+ */
+export function issuerFromSamlResponse(samlResponse) {
+  try {
+    const decoded = Buffer.from(samlResponse, "base64").toString("ascii");
+    const parser = new DOMParser();
+    const issuerElems = parser
+      .parseFromString(decoded)
+      .documentElement.getElementsByTagNameNS(
+        "urn:oasis:names:tc:SAML:2.0:assertion",
+        "Issuer"
+      );
+    const issuer = issuerElems[0].textContent.trim();
+    return issuer;
+  } catch (err) {
+    logger.error("decodedSamlResponse failed: ", err);
+  }
+}
+
+/**
  * Retrieves ID assertion from SAMLRequest
  *
  * @param {string} samlRequest the raw samlRequest
