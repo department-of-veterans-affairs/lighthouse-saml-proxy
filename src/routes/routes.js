@@ -38,25 +38,18 @@ export default function addRoutes(
   cache,
   cacheEnabled
 ) {
-  app.get(
-    ["/", "/idp", IDP_SSO],
-    parseSamlRequest,
-    samlLogin("login_selection")
-  );
-  app.post(
-    ["/", "/idp", IDP_SSO],
-    parseSamlRequest,
-    samlLogin("login_selection")
-  );
-
   Object.entries(idpConfigs).forEach((idpEntry) => {
+    var ipdPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + IDP_PATH;
+    if (idpEntry[0] == "default") {
+      ipdPath = IDP_SSO;
+    }
     app.get(
-      ["/", "/idp", SAMLPRXOY_PATH + idpEntry[0] + IDP_PATH],
+      ["/", "/idp", ipdPath],
       parseSamlRequest,
       samlLogin("login_selection")
     );
     app.post(
-      ["/", "/idp", SAMLPRXOY_PATH + idpEntry[0] + IDP_PATH],
+      ["/", "/idp", ipdPath],
       parseSamlRequest,
       samlLogin("login_selection")
     );
