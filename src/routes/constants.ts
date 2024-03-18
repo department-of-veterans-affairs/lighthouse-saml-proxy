@@ -1,4 +1,6 @@
-export const IDP_SSO = "/samlproxy/idp/saml/sso";
+export const SAMLPRXOY_PATH = "/samlproxy";
+export const IDP_PATH = "/idp/saml/sso";
+export const IDP_SSO = SAMLPRXOY_PATH + IDP_PATH;
 export const IDP_METADATA = "/samlproxy/idp/metadata";
 export const IDP_REDIRECT = "/samlproxy//idp/redirect";
 export const SP_METADATA_URL = "/samlproxy/sp/metadata";

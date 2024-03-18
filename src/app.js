@@ -95,7 +95,13 @@ function runServer(argv) {
             });
         });
       }
-      const idpConfig = new IDPConfig(argv);
+      const idpConfigs = {};
+      idpConfigs.default = new IDPConfig(argv);
+      if (argv.authServerIdpConfigs) {
+        argv.authServerIdpConfigs.forEach((idpEntry) => {
+          idpConfigs.idpEntry.category = new IDPConfig(idpEntry);
+        });
+      }
       const vsoConfig = new VsoClientConfig(argv);
       const mpiUserClientConfig = new MpiUserClientConfig(argv);
       const mpiUserClient = new MpiUserClient(
@@ -115,7 +121,7 @@ function runServer(argv) {
       configureExpress(
         app,
         argv,
-        idpConfig,
+        idpConfigs,
         spConfigs,
         strategies,
         mpiUserClient,
