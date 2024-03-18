@@ -40,8 +40,10 @@ export default function addRoutes(
 ) {
   Object.entries(idpConfigs).forEach((idpEntry) => {
     var ipdPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + IDP_PATH;
+    var idpMetadataPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/idp/metadata";
     if (idpEntry[0] == "default") {
       ipdPath = IDP_SSO;
+      idpMetadataPath = IDP_METADATA;
     }
     app.get(
       ["/", "/idp", ipdPath],
@@ -53,10 +55,9 @@ export default function addRoutes(
       parseSamlRequest,
       samlLogin("login_selection")
     );
-  });
-
-  app.get(IDP_METADATA, function (req, res, next) {
-    samlp.metadata(req.idp.options)(req, res);
+    app.get(idpMetadataPath, function (req, res, next) {
+      samlp.metadata(req.idp.options)(req, res);
+    });
   });
 
   app.get(SP_METADATA_URL, function (req, res, next) {
