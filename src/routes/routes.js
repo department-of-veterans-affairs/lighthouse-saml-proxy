@@ -5,6 +5,8 @@ import {
   SP_VERIFY,
   SP_ERROR_URL,
   SP_FAILURE_TO_PROOF,
+  SAMLPRXOY_PATH,
+  IDP_PATH,
 } from "./constants";
 
 import {
@@ -19,7 +21,7 @@ import samlp from "samlp";
  * Function for adding routes
  *
  * @param {*} app param app
- * @param {*} idpConfig user open id config
+ * @param {*} idpConfigs user open id configs
  * @param {*} spConfigs user service provider configs
  * @param {*} acsUrl assertion consumer service url
  * @param {*} cache redis cache
@@ -30,7 +32,7 @@ import samlp from "samlp";
  */
 export default function addRoutes(
   app,
-  idpConfig,
+  idpConfigs,
   spConfigs,
   acsUrl,
   cache,
@@ -46,6 +48,19 @@ export default function addRoutes(
     parseSamlRequest,
     samlLogin("login_selection")
   );
+
+  Object.entries(idpConfigs).forEach((idpEntry) => {
+    app.get(
+      ["/", "/idp", SAMLPRXOY_PATH + idpEntry[0] + IDP_PATH],
+      parseSamlRequest,
+      samlLogin("login_selection")
+    );
+    app.post(
+      ["/", "/idp", SAMLPRXOY_PATH + idpEntry[0] + IDP_PATH],
+      parseSamlRequest,
+      samlLogin("login_selection")
+    );
+  });
 
   app.get(IDP_METADATA, function (req, res, next) {
     samlp.metadata(req.idp.options)(req, res);

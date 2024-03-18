@@ -99,7 +99,7 @@ function runServer(argv) {
       idpConfigs.default = new IDPConfig(argv);
       if (argv.authServerIdpConfigs) {
         argv.authServerIdpConfigs.forEach((idpEntry) => {
-          idpConfigs.idpEntry.category = new IDPConfig(idpEntry);
+          idpConfigs.authServer = new IDPConfig(idpEntry);
         });
       }
       const vsoConfig = new VsoClientConfig(argv);

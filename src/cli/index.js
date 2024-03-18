@@ -154,6 +154,136 @@ export function processArgs() {
         required: false,
         string: true,
       },
+      authServerIdpConfigs: {
+        description:
+          "An array of objects used to describe IDP options for open id authorization servers delegating to SAML Proxy as an IDP",
+        required: false,
+        type: "array",
+        authServer: {
+          description: "authServer, For instance 'okta high' ",
+          required: true,
+          string: true,
+        },
+        idpCert: {
+          description: "IdP Signature PublicKey Certificate",
+          required: true,
+          default: path.resolve(cwd(), "./idp-public-cert.pem"),
+          coerce: makeCertFileCoercer(
+            "certificate",
+            "IdP Signature PublicKey Certificate",
+            KEY_CERT_HELP_TEXT
+          ),
+        },
+        idpKey: {
+          description: "IdP Signature PrivateKey Certificate",
+          required: true,
+          default: path.resolve(cwd(), "./idp-private-key.pem"),
+          coerce: makeCertFileCoercer(
+            "private key",
+            "IdP Signature PrivateKey Certificate",
+            KEY_CERT_HELP_TEXT
+          ),
+        },
+        idpIssuer: {
+          description: "IdP Issuer URI",
+          required: true,
+          default: "urn:example:idp",
+        },
+        idpAcsUrl: {
+          description: "SP Assertion Consumer URL",
+          required: true,
+        },
+        idpAudience: {
+          description: "SP Audience URI",
+          required: true,
+        },
+        idpServiceProviderId: {
+          description: "SP Issuer/Entity URI",
+          required: false,
+          string: true,
+        },
+        idpRelayState: {
+          description: "Default SAML RelayState for SAMLResponse",
+          required: false,
+        },
+        idpDisableRequestAcsUrl: {
+          description:
+            "Disables ability for SP AuthnRequest to specify Assertion Consumer URL",
+          required: false,
+          boolean: true,
+          default: false,
+        },
+        idpEncryptAssertion: {
+          description: "Encrypts assertion with SP Public Key",
+          required: false,
+          boolean: true,
+          default: false,
+        },
+        idpEncryptionCert: {
+          description: "SP Certificate (pem) for Assertion Encryption",
+          required: false,
+          string: true,
+          coerce: makeCertFileCoercer("certificate", "Encryption cert"),
+        },
+        idpEncryptionPublicKey: {
+          description:
+            "SP RSA Public Key (pem) for Assertion Encryption " +
+            "(e.g. openssl x509 -pubkey -noout -in sp-cert.pem)",
+          required: false,
+          string: true,
+          coerce: makeCertFileCoercer("public key", "Encryption public key"),
+        },
+        idpHttpsPrivateKey: {
+          description: "Web Server TLS/SSL Private Key (pem)",
+          required: false,
+          string: true,
+          coerce: makeCertFileCoercer("private key"),
+        },
+        idpHttpsCert: {
+          description: "Web Server TLS/SSL Certificate (pem)",
+          required: false,
+          string: true,
+          coerce: makeCertFileCoercer("certificate"),
+        },
+        idpHttps: {
+          description:
+            "Enables HTTPS Listener (requires httpsPrivateKey and httpsCert)",
+          required: true,
+          boolean: true,
+          default: false,
+        },
+        idpSignResponse: {
+          description: "Enables signing of responses",
+          required: false,
+          boolean: true,
+          default: true,
+        },
+        idpRollSession: {
+          description:
+            "Create a new session for every authn request instead of reusing an existing session",
+          required: false,
+          boolean: true,
+          default: false,
+        },
+        idpAuthnContextClassRef: {
+          description: "Authentication Context Class Reference",
+          required: false,
+          string: true,
+          default:
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+        },
+        idpAuthnContextDecl: {
+          description: "Authentication Context Declaration (XML FilePath)",
+          required: false,
+          string: true,
+          coerce: loadFileSync,
+        },
+        idpBaseUrl: {
+          description: "IdP Base URL",
+          required: false,
+          string: true,
+        },
+      },
       sentryDSN: {
         description: "URL of the sentry project to send errors",
         required: false,
