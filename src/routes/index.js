@@ -151,22 +151,19 @@ export default function configureExpress(
   );
 
   // This route exposes our static assets - fonts, images, and css
-  Object.entries(idpsOptions).forEach((idpOptionEntry) => {
-    let idp_base_path = "/" + idpOptionEntry[0] + "/idp";
-    if (idpOptionEntry[0] == "default") {
-      idp_base_path = "/samlproxy/idp";
-    }
-    app.use(idp_base_path, express.static(path.join(process.cwd(), "public")));
-    app.use(function (req, res, next) {
-      req.metadata = idpOptionEntry[1].profileMapper.metadata;
-      req.strategies = strategies;
-      req.mpiUserClient = mpiUserClient;
-      req.vsoClient = vsoClient;
-      req.sps = { options: spOptions };
-      req.idp = { options: idpOptionEntry[1] };
-      req.requestAcsUrl = argv.spAcsUrl;
-      next();
-    });
+  app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
+
+  app.use(function (req, res, next) {
+    const path_parts = req.path.split("/");
+    const oauth_server = path_parts[2] === "idp" ? "default" : path_parts[2];
+    req.metadata = idpsOptions[oauth_server].profileMapper.metadata;
+    req.strategies = strategies;
+    req.mpiUserClient = mpiUserClient;
+    req.vsoClient = vsoClient;
+    req.sps = { options: spOptions };
+    req.idp = { options: idpsOptions[oauth_server] };
+    req.requestAcsUrl = argv.spAcsUrl;
+    next();
   });
 
   addRoutes(app, idpsOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
