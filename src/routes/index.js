@@ -35,7 +35,7 @@ function filterProperty(object, property) {
  *
  * @param {*} app param app
  * @param {*} argv argument vector for the sentry environment
- * @param {*} idpOptions user open id options
+ * @param {*} idpsOptions user open id options
  * @param {*} spOptions user service provider options
  * @param {*} strategies map
  * @param {*} mpiUserClient client within the master patient index
@@ -48,7 +48,7 @@ function filterProperty(object, property) {
 export default function configureExpress(
   app,
   argv,
-  idpOptions,
+  idpsOptions,
   spOptions,
   strategies,
   mpiUserClient,
@@ -151,20 +151,25 @@ export default function configureExpress(
   );
 
   // This route exposes our static assets - fonts, images, and css
-  app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
-
-  app.use(function (req, res, next) {
-    req.metadata = idpOptions.profileMapper.metadata;
-    req.strategies = strategies;
-    req.mpiUserClient = mpiUserClient;
-    req.vsoClient = vsoClient;
-    req.sps = { options: spOptions };
-    req.idp = { options: idpOptions };
-    req.requestAcsUrl = argv.spAcsUrl;
-    next();
+  Object.entries(idpsOptions).forEach((idpOptionEntry) => {
+    let idp_base_path = "/" + idpOptionEntry[0] + "/idp";
+    if (idpOptionEntry[0] == "default") {
+      idp_base_path = "/samlproxy/idp";
+    }
+    app.use(idp_base_path, express.static(path.join(process.cwd(), "public")));
+    app.use(function (req, res, next) {
+      req.metadata = idpOptionEntry[1].profileMapper.metadata;
+      req.strategies = strategies;
+      req.mpiUserClient = mpiUserClient;
+      req.vsoClient = vsoClient;
+      req.sps = { options: spOptions };
+      req.idp = { options: idpOptionEntry[1] };
+      req.requestAcsUrl = argv.spAcsUrl;
+      next();
+    });
   });
 
-  addRoutes(app, idpOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
+  addRoutes(app, idpsOptions, spOptions, argv.spAcsUrl, cache, cacheEnabled);
 
   // Catches errors
   app.use(function onError(err, req, res, next) {

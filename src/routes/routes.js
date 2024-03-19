@@ -56,7 +56,7 @@ export default function addRoutes(
       samlLogin("login_selection")
     );
     app.get(idpMetadataPath, function (req, res, next) {
-      samlp.metadata(req.idp.options)(req, res);
+      samlp.metadata(idpEntry[1])(req, res);
     });
   });
 
