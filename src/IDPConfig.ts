@@ -4,6 +4,9 @@ import { DOMParser } from "@xmldom/xmldom";
 import { IdPOptions, DigestAlgorithmType, SignatureAlgorithmType } from "samlp";
 import { Response, Request, NextFunction } from "express";
 import logger from "./logger";
+import path from "path";
+import { cwd } from "process";
+import { makeCertFileCoercer, KEY_CERT_HELP_TEXT } from "./cli/coercing";
 
 interface IdPRequest extends Request {
   authnRequest?: {
@@ -71,9 +74,28 @@ export default class IDPConfig implements IdPOptions {
     this.authnContextDecl = argv.idpAuthnContextDecl;
     this.includeAttributeNameFormat = true;
     this.profileMapper = createProfileMapper;
-    this.postEndpointPath = IDP_SSO;
-    this.redirectEndpointPath = IDP_SSO;
+    this.postEndpointPath = argv.idpRedirectEndpointPath
+      ? argv.idpRedirectEndpointPath
+      : IDP_SSO;
+    this.redirectEndpointPath = argv.idpRedirectEndpointPath
+      ? argv.idpRedirectEndpointPath
+      : IDP_SSO;
     this.logoutEndpointPaths = {};
+
+    if (argv.idpCertCreate) {
+      let fpath = path.resolve(cwd(), argv.idpCert);
+      this.cert = makeCertFileCoercer(
+        "certificate",
+        "IdP Signature PublicKey Certificate",
+        KEY_CERT_HELP_TEXT
+      )(fpath);
+      fpath = path.resolve(cwd(), argv.idpKey);
+      this.key = makeCertFileCoercer(
+        "private key",
+        "IdP Signature PrivateKey Certificate",
+        KEY_CERT_HELP_TEXT
+      )(fpath);
+    }
   }
 
   public getUserFromRequest(req: Request) {
