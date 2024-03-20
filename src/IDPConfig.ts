@@ -83,18 +83,16 @@ export default class IDPConfig implements IdPOptions {
     this.logoutEndpointPaths = {};
 
     if (argv.idpCertCreate) {
-      let fpath = path.resolve(cwd(), argv.idpCert);
       this.cert = makeCertFileCoercer(
         "certificate",
         "IdP Signature PublicKey Certificate",
         KEY_CERT_HELP_TEXT
-      )(fpath);
-      fpath = path.resolve(cwd(), argv.idpKey);
+      )(path.resolve(cwd(), argv.idpCert));
       this.key = makeCertFileCoercer(
         "private key",
         "IdP Signature PrivateKey Certificate",
         KEY_CERT_HELP_TEXT
-      )(fpath);
+      )(path.resolve(cwd(), argv.idpKey));
     }
   }
 
