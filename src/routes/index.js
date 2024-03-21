@@ -156,7 +156,8 @@ export default function configureExpress(
   app.use(function (req, res, next) {
     const path_parts = req.path.split("/");
     const oauth_server = path_parts[2] === "idp" ? "default" : path_parts[2];
-    req.metadata = idpsOptions[oauth_server].profileMapper.metadata;
+    const profileMapper = idpsOptions[oauth_server].profileMapper;
+    req.metadata = profileMapper ? profileMapper.metadata : undefined;
     req.strategies = strategies;
     req.mpiUserClient = mpiUserClient;
     req.vsoClient = vsoClient;
