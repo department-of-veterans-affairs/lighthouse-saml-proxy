@@ -17,6 +17,7 @@ import addRoutes from "./routes";
 
 import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
+// import { SAMLPRXOY_PATH } from "./constants";
 
 /**
  * This function filters the property object
@@ -154,11 +155,11 @@ export default function configureExpress(
   app.use("/samlproxy/idp", express.static(path.join(process.cwd(), "public")));
 
   app.use(function (req, res, next) {
-    const path_parts = req.path.split("/");
-    const oauth_server =
-      path_parts[2] === "idp" || path_parts[2] === "sp"
-        ? "default"
-        : path_parts[2];
+    // const path_parts = req.path.split("/");
+    const oauth_server = "okta2";
+    // path_parts[2] === "idp" || path_parts[2] === "sp"
+    //   ? "default"
+    //   : path_parts[2];
     const profileMapper = idpsOptions[oauth_server].profileMapper;
     const metadata = profileMapper.metadata;
     req.metadata = metadata;
@@ -167,6 +168,10 @@ export default function configureExpress(
     req.vsoClient = vsoClient;
     req.sps = { options: spOptions };
     req.idp = { options: idpsOptions[oauth_server] };
+    // req.requestAcsUrl =
+    //   oauth_server === "default"
+    //     ? argv.spAcsUrl
+    //     : SAMLPRXOY_PATH + "/" + oauth_server + "/sp/saml/sso";
     req.requestAcsUrl = argv.spAcsUrl;
     next();
   });

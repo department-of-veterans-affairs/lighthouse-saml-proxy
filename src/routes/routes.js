@@ -41,9 +41,20 @@ export default function addRoutes(
   Object.entries(idpConfigs).forEach((idpEntry) => {
     var ipdPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + IDP_PATH;
     var idpMetadataPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/idp/metadata";
+    var spMetadataPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/sp/metadata";
+    var spVerifyPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/sp/verify";
+    var spFailureToProofPath =
+      SAMLPRXOY_PATH + "/" + idpEntry[0] + "/sp/failure-to-proof";
+    var spError = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/sp/error";
+    var acsPath = SAMLPRXOY_PATH + "/" + idpEntry[0] + "/sp/saml/sso";
     if (idpEntry[0] == "default") {
       ipdPath = IDP_SSO;
       idpMetadataPath = IDP_METADATA;
+      spMetadataPath = SP_METADATA_URL;
+      spVerifyPath = SP_VERIFY;
+      spFailureToProofPath = SP_FAILURE_TO_PROOF;
+      spError = SP_ERROR_URL;
+      acsPath = acsUrl;
     }
     app.get(
       ["/", "/idp", ipdPath],
@@ -58,20 +69,24 @@ export default function addRoutes(
     app.get(idpMetadataPath, function (req, res, next) {
       samlp.metadata(idpEntry[1])(req, res);
     });
+
+    app.get(spMetadataPath, function (req, res, next) {
+      res.set("Content-Type", "text/xml");
+      res.render(
+        "xml_template/metadata",
+        spConfigs.id_me.getMetadataParams(req)
+      );
+    });
+
+    app.get(spVerifyPath, parseSamlRequest, samlLogin("verify"));
+    app.get(
+      spFailureToProofPath,
+      parseSamlRequest,
+      samlLogin("failure_to_proof")
+    );
+    app.get(spError, handleError);
+    acsFactory(app, acsPath, cache, cacheEnabled);
   });
-
-  app.get(SP_METADATA_URL, function (req, res, next) {
-    res.set("Content-Type", "text/xml");
-    res.render("xml_template/metadata", spConfigs.id_me.getMetadataParams(req));
-  });
-
-  app.get(SP_VERIFY, parseSamlRequest, samlLogin("verify"));
-
-  app.get(SP_FAILURE_TO_PROOF, parseSamlRequest, samlLogin("failure_to_proof"));
-
-  acsFactory(app, acsUrl, cache, cacheEnabled);
-
-  app.get(SP_ERROR_URL, handleError);
 
   return app;
 }
