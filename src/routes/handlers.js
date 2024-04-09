@@ -7,7 +7,7 @@ import {
   getRelayState,
 } from "../utils";
 import samlp from "samlp";
-import { SAML, samlp as _samlp } from "passport-wsfed-saml2";
+import { SAML, samlp as _samlp } from "@node-saml/passport-saml";
 import {
   buildPassportLoginHandler,
   testLevelOfAssuranceOrRedirect,
