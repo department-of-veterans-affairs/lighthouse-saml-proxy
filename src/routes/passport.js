@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-wsfed-saml2";
 import omit from "lodash.omit";
 import { IDPProfileMapper } from "../IDPProfileMapper";
+import { issuerFromSamlResponse } from "../utils";
 
 /**
  * Creates the passport strategy using the response params
@@ -74,12 +75,31 @@ export function preparePassport(strategy) {
  * @returns {*} A string with the correct spIdp key
  */
 export const selectPassportStrategyKey = (req) => {
-  const origin = req.headers.origin;
-  let passportKey = "id_me";
-  Object.entries(req.sps.options).forEach((spIdpEntry) => {
-    if (spIdpEntry[1].idpSsoUrl.startsWith(origin)) {
-      passportKey = spIdpEntry[0];
-    }
+  const samlResponse = req.body?.SAMLResponse || req.query?.SAMLResponse;
+  const issuer = issuerFromSamlResponse(samlResponse);
+  const spIdpKeys = Object.keys(req.sps.options);
+  const foundSpIdpKey = spIdpKeys.find((spIdpKey) => {
+    const spIdpOption = req.sps.options[spIdpKey];
+    const domain = spIdpHostDomain(spIdpOption);
+    return spIdpOption.idpIssuerMatchOverride
+      ? issuer.includes(spIdpOption.idpIssuerMatchOverride)
+      : issuer.includes(domain);
   });
-  return passportKey;
+  return foundSpIdpKey ? foundSpIdpKey : spIdpKeys[0];
 };
+
+/**
+ * Returns the domain that cooresponds to the host of the metadata url.
+ *
+ * @param {spConfig} spIdpOption The SP Config Option
+ * @returns {string} The domain name
+ */
+function spIdpHostDomain(spIdpOption) {
+  const url = new URL(spIdpOption.idpMetaUrl);
+  const domain_parts = url.host.split(".");
+  const domain =
+    domain_parts.length > 1
+      ? domain_parts[domain_parts.length - 2]
+      : domain_parts[0];
+  return domain;
+}
