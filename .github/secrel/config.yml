@@ -1,0 +1,70 @@
+---
+#################
+# SecRel Config #
+#################
+# DESCRIPTION:
+#   This config file located by default in .github/secrel/config.yml specifies the configuration necessary to run
+#   SecRel and build your application. You must configure each section in order to successfully run SecRel.
+#   An example configuration has been provided for you at the bottom of this template.
+
+############################
+# Configuration for Languages #
+# DESCRIPTION:
+#   This configuration should specify all languages within your repository and the settings necessary to successfully build your
+#   application source code. 
+# FIELDS:
+#   languages <Object>
+#     java <Object>
+#       version <string>
+#       package-manager  <string>
+#         Declare package manager tool used, maven|gradle
+#         When using maven, a build and cache key of: maven-${{ hashFiles('**/pom.xml') }} is required
+#         For more information about the cache action, see https://github.com/actions/cache
+#       build-args <[]string>
+#         List of arguments that will be passed to the settings.xml if you use Maven. See https://department-of-veterans-affairs.github.io/delivery-platform-docs/Lighthouse-delivery-infrastructure-tools/Using-the-DI-tools/Step-5-Deploy-Your-API-To-Higher-Envs/Secure-Release-Pipeline/#using-config-args
+#     python <Object>
+#       version <string>
+#       requirements  <[]string>
+#         Declares path(s) to files that contain Python project dependencies.
+#     javascript <Object>
+#       package-manager  <string>
+#         Declare package management tool used, yarn|npm
+#       version <string>
+#         Declare version of node used
+#       env <[]string>
+#         List of environmental vars to be used by the package manager. E.g. env vars referenced in .npmrc files
+#       build-args <[]string>
+#         List of arguments that will be passed to the package manager
+#       paths <[]string>
+#         Declare path(s) to package.json files that include JavaScript project dependencies.
+#     ruby <Object>
+#       version <string>
+#         Declare version of ruby used
+#       paths <[]string>
+#         Declare paths to all Gemfiles in the Repository. Lockfiles will be generated before scanning
+#         A path could also be a directory, in which case "bundle install" will be run for all subdirectories containing a Gemfile
+
+##########################
+# Example configurations #
+##########################
+
+# languages:
+#   java:
+#     version: 17.0
+#     maven-cache: mvn_cache
+#   python:
+#     requirements:
+#       - requirements.txt
+#       - ./lib/module-requirements.txt
+#   javascript:
+#     package-manager: yarn
+#     version: 16.15.0
+#     env:
+#      - GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}
+#     build-args:
+#      - --prefer-offline
+#      - --ignore-scripts
+#      - --production
+#     paths:
+#       - package.json
+#       - ./app/backend/package.json

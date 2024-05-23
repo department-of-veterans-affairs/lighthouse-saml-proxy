@@ -1,0 +1,32 @@
+name: SecRel Reusable Workflow
+
+on:
+  # Trigger on every code push. The branches-ignore section can be deleted or modified
+  push:
+    branches-ignore: 
+      - lhdi-onboarding-769
+
+  # Trigger on all pull requests to main branch
+  pull_request:
+    branches:
+      - master
+
+  # Trigger on all published GitHub Releases
+  release:
+    types: [ "created" ]
+
+  # Trigger manually
+  workflow_dispatch:
+
+jobs:
+  # Sample job that runs after the "dev-stuff" job, that calls the Tornado reusable workflow
+  build-and-scan:
+    # needs: [ dev-stuff ]
+    name: Tornado Pipeline
+    uses: department-of-veterans-affairs/lighthouse-tornado-secrel-pipeline/.github/workflows/pipeline.yml@v5
+    with:
+      requires-prod-signing-keys: true
+      config-file: .github/secrel/config.yml
+      images: |-
+
+    secrets: inherit
