@@ -70,8 +70,12 @@ export class RedisCache implements ICache {
     return val != null;
   }
   async delete(Key: string): Promise<void> {
-    const delAsync = promisify(this.theCache.del).bind(this.theCache);
-    await delAsync();
+    await new Promise<void>((resolve, reject) => {
+      this.theCache.del(Key, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
   }
   async keys(pattern: string): Promise<string[]> {
     const keysAsync = promisify(this.theCache.keys).bind(this.theCache);

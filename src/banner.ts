@@ -33,4 +33,3 @@ export default class Banner {
     this.order = order;
   }
 }
-
