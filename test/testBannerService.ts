@@ -1,72 +1,61 @@
 import { BannerServiceRedis } from "../src/bannerService";
+import { TestCache } from "../src/routes/types";
 import Banner from "../src/banner";
 
-class MockRedisClient {
-    private store: { [key: string]: string } = {};
-
-    async setAsync(key: string, value: string): Promise<void> {
-        this.store[key] = value;
-    }
-
-    async getAsync(key: string): Promise<string | null> {
-        return this.store[key] || null;
-    }
-
-    async delAsync(key: string): Promise<void> {
-        delete this.store[key];
-    }
-
-    async keysAsync(pattern: string): Promise<string[]> {
-        const regex = new RegExp(pattern.replace('*', '.*'));
-        return Object.keys(this.store).filter((key) => regex.test(key));
-    }
-
-}
-
-describe("BannerServiceRedis", () => {
-    let service: BannerServiceRedis;
-    let mockRedisClient: MockRedisClient;
+describe('BannerServiceRedis', () => {
+    let bannerService: BannerServiceRedis;
+    let testCache: TestCache;
 
     beforeEach(() => {
-        mockRedisClient = new MockRedisClient();
-        service = new BannerServiceRedis(0, "");
-        (service as any).redisClient = mockRedisClient;
+        testCache = new TestCache();
+        bannerService = new BannerServiceRedis(testCache);
     });
 
-    it("crud - create new banner", async () => {
-        const banner = new Banner("1", new Date().toISOString, new Date().toISOString, "test message");
-        await service.createBanner(banner);
+    it('create a banner', async () => {
+        const banner = new Banner("1", new Date(), new Date(), "test message", true, 0, 0);
+        const result = await bannerService.createBanner(banner);
+        expect(result).toEqual(banner);
 
-        const storedBanner = await mockRedisClient.getAsync("banner:1");
-        expect(storedBanner).toBe(JSON.stringify(banner));
-    });
-
-    it("crud - retrieve banner", async () => {
-        const banner = new Banner("1", new Date().toISOString, new Date().toISOString, "test message");
-        await mockRedisClient.setAsync("banner:1", JSON.stringify(banner));
-
-        const retrievedBanner = await service.getBanner("1");
+        const retrievedBanner = await bannerService.getBanner(banner.id);
         expect(retrievedBanner).toEqual(banner);
     });
 
-    it("crud - update banner", async () => {
-        const banner = new Banner("1", new Date().toISOString, new Date().toISOString, "test message");
-        await service.createBanner(banner);
+    it('retrieve a banner by id', async () => {
+        const banner = new Banner("2", new Date(), new Date(), "test message2", true, 0, 0);
+        await bannerService.createBanner(banner);
 
-        banner.message = "Updated message";
-        await service.updateBanner("1", banner);
-
-        const updateBanner = await mockRedisClient.getAsync("banner:1");
-        expect(updateBanner).toBe(JSON.stringify(banner));
+        const retrievedBanner = await bannerService.getBanner(banner.id);
+        expect(retrievedBanner).toEqual(banner);
     });
 
-    it("crud - delete banner", async () => {
-        const banner = new Banner("1", new Date().toISOString, new Date().toISOString, "test message");
-        await service.createBanner(banner);
+    it('retrieve all banners', async () => {
+        const banner1 = new Banner("3", new Date(), new Date(), "test message3", true, 0, 0);
+        const banner2 = new Banner("4", new Date(), new Date(), "test message4", true, 0, 0);
 
-        await service.deleteBanner("1");
+        await bannerService.createBanner(banner1);
+        await bannerService.createBanner(banner2);
 
-        const deletedBanner = await mockRedisClient.getAsync("banner:1");
-        expect(deletedBanner).toBeNull();
+        const banners = await bannerService.getBanners();
+        expect(banners).toEqual([banner1, banner2]);
     });
-});
+
+    it('update banner', async () => {
+        const banner = new Banner("5", new Date(), new Date(), "test message5", true, 0, 0);
+        await bannerService.createBanner(banner);
+
+        const updatedBanner = new Banner("5", new Date(), new Date(), "updatedbanner", true, 0, 0);
+        await bannerService.updateBanner(banner.id, updatedBanner);
+
+        const retrievedBanner = await bannerService.getBanner(banner.id);
+        expect(retrievedBanner).toEqual(updatedBanner);
+    });
+    it('delete banner', async () => {
+        const banner = new Banner("6", new Date(), new Date(), "test message6", true, 0, 0);
+        await bannerService.createBanner(banner);
+
+        await bannerService.deleteBanner(banner.id);
+        const retrievedBanner = await bannerService.getBanner(banner.id);
+        expect(retrievedBanner).toBeNull();
+    });
+
+})

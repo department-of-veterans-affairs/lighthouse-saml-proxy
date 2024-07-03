@@ -35,6 +35,8 @@ export interface ICache {
   ): Promise<unknown>;
   get(Key: any): Promise<any>;
   has(Key: any): Promise<boolean>;
+  delete(Key: string): Promise<void>;
+  keys(pattern: string): Promise<string[]>;
 }
 
 /**
@@ -67,6 +69,14 @@ export class RedisCache implements ICache {
     const val = await getAsync(Key);
     return val != null;
   }
+  async delete(Key: string): Promise<void> {
+    const delAsync = promisify(this.theCache.del).bind(this.theCache);
+    await delAsync();
+  }
+  async keys(pattern: string): Promise<string[]> {
+    const keysAsync = promisify(this.theCache.keys).bind(this.theCache);
+    return keysAsync(pattern);
+  }
   constructor(redisPort: number, redisHost: string) {
     this.theCache = Redis.createClient(redisPort, redisHost);
   }
@@ -95,6 +105,19 @@ export class TestCache implements ICache {
     return new Promise((resolve) => {
       const val = this.theCache.has(Key);
       resolve(val);
+    });
+  }
+  delete(Key: string): Promise<void> {
+    return new Promise((resolve) => {
+      this.theCache.del(Key);
+      resolve();
+    });
+  }
+  keys(pattern: string): Promise<string[]> {
+    return new Promise<string[]>((resolve) => {
+      const allKeys = this.theCache.keys();
+      const filteredKeys = allKeys.filter((key) => key.startsWith(pattern));
+      resolve(filteredKeys);
     });
   }
   constructor() {
