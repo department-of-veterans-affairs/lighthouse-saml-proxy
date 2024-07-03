@@ -11,14 +11,22 @@ describe('BannerServiceRedis', () => {
         bannerService = new BannerServiceRedis(testCache);
     });
 
+    describe("createBanner", () => {
     it('create a banner', async () => {
         const banner = new Banner("1", new Date(), new Date(), "test message", true, 0, 0);
         const result = await bannerService.createBanner(banner);
         expect(result).toEqual(banner);
 
-        const retrievedBanner = await bannerService.getBanner(banner.id);
-        expect(retrievedBanner).toEqual(banner);
+        const cachedBanner = await testCache.get(bannerService.generateKey("1"));
+        expect(JSON.parse(cachedBanner)).toEqual(banner);
     });
+    it('create banner errors', async () => {
+        jest.spyOn(testCache, "set").mockRejectedValue(new Error("test error"));
+        const banner = new Banner("1", new Date(), new Date(), "test message", true, 0, 0)
+        const result = await bannerService.createBanner(banner);
+        expect(result).toBeNull();
+    });
+});
 
     it('retrieve a banner by id', async () => {
         const banner = new Banner("2", new Date(), new Date(), "test message2", true, 0, 0);
