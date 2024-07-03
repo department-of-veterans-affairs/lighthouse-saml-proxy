@@ -38,7 +38,7 @@ export class BannerServiceRedis implements BannerService {
   //we will need a new keys function to get all banners without knowing the IDS
   async getBanners(): Promise<Banner[]> {
     try {
-      const keys = await this.cache.keys("banner:*");
+      const keys = await this.cache.keys("banner:");
       const bannerPromises = keys.map(async (key) => {
         const bannerData = await this.cache.get(key);
         return JSON.parse(bannerData) as Banner;

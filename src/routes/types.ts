@@ -79,7 +79,13 @@ export class RedisCache implements ICache {
   }
   async keys(pattern: string): Promise<string[]> {
     const keysAsync = promisify(this.theCache.keys).bind(this.theCache);
-    return keysAsync(pattern);
+    try {
+      const keys = await keysAsync(pattern);
+      return keys;
+    } catch (error) {
+      console.error("Error fetching keys from Redis:", error);
+      return [];
+    }
   }
   constructor(redisPort: number, redisHost: string) {
     this.theCache = Redis.createClient(redisPort, redisHost);
@@ -120,6 +126,10 @@ export class TestCache implements ICache {
   keys(pattern: string): Promise<string[]> {
     return new Promise<string[]>((resolve) => {
       const allKeys = this.theCache.keys();
+      if(!pattern) {
+        resolve(allKeys);
+        return;
+      }
       const filteredKeys = allKeys.filter((key) => key.startsWith(pattern));
       resolve(filteredKeys);
     });
