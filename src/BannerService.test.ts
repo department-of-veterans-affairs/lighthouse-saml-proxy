@@ -85,7 +85,6 @@ describe("BannerServiceRedis", () => {
     const banners = await bannerService.getBanners();
 
     expect(banners.length).toBe(2);
-
   });
 
   it("should update banner", async () => {
@@ -119,7 +118,9 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.priority).toEqual(updatedBanner.priority);
     expect(retrievedBanner!.order).toEqual(updatedBanner.order);
 
-    expect(new Date(retrievedBanner!.startTime)).toEqual(updatedBanner.startTime);
+    expect(new Date(retrievedBanner!.startTime)).toEqual(
+      updatedBanner.startTime
+    );
     expect(new Date(retrievedBanner!.endTime)).toEqual(updatedBanner.endTime);
   });
   it("should delete banner", async () => {

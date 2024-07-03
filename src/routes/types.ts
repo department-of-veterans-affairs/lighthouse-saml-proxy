@@ -126,7 +126,7 @@ export class TestCache implements ICache {
   keys(pattern: string): Promise<string[]> {
     return new Promise<string[]>((resolve) => {
       const allKeys = this.theCache.keys();
-      if(!pattern) {
+      if (!pattern) {
         resolve(allKeys);
         return;
       }
