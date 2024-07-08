@@ -13,8 +13,8 @@ describe("BannerServiceRedis", () => {
   it("create a banner", async () => {
     const banner = new Banner(
       "1",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message",
       true,
       0,
@@ -30,16 +30,15 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.enabled).toEqual(banner.enabled);
     expect(retrievedBanner!.priority).toEqual(banner.priority);
     expect(retrievedBanner!.order).toEqual(banner.order);
-
-    expect(new Date(retrievedBanner!.startTime)).toEqual(banner.startTime);
-    expect(new Date(retrievedBanner!.endTime)).toEqual(banner.endTime);
+    expect(retrievedBanner!.startTime).toEqual(banner.startTime);
+    expect(retrievedBanner!.endTime).toEqual(banner.endTime);
   });
 
   it("should retrieve a banner by id", async () => {
     const banner = new Banner(
       "2",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message2",
       true,
       0,
@@ -54,16 +53,15 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.enabled).toEqual(banner.enabled);
     expect(retrievedBanner!.priority).toEqual(banner.priority);
     expect(retrievedBanner!.order).toEqual(banner.order);
-
-    expect(new Date(retrievedBanner!.startTime)).toEqual(banner.startTime);
-    expect(new Date(retrievedBanner!.endTime)).toEqual(banner.endTime);
+    expect(retrievedBanner!.startTime).toEqual(banner.startTime);
+    expect(retrievedBanner!.endTime).toEqual(banner.endTime);
   });
 
   it("should retrieve all banners", async () => {
     const banner1 = new Banner(
       "3",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message3",
       true,
       0,
@@ -71,8 +69,8 @@ describe("BannerServiceRedis", () => {
     );
     const banner2 = new Banner(
       "4",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message4",
       true,
       0,
@@ -90,8 +88,8 @@ describe("BannerServiceRedis", () => {
   it("should update banner", async () => {
     const banner = new Banner(
       "5",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message5",
       true,
       0,
@@ -101,14 +99,18 @@ describe("BannerServiceRedis", () => {
 
     const updatedBanner = new Banner(
       "6",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "updatedbanner",
       true,
       0,
       0
     );
-    await bannerService.updateBanner(banner.id, updatedBanner);
+    const updateResult = await bannerService.updateBanner(
+      banner.id,
+      updatedBanner
+    );
+    expect(updateResult).toBeTruthy();
 
     const retrievedBanner = await bannerService.getBanner(banner.id);
     expect(retrievedBanner).toBeDefined();
@@ -118,16 +120,14 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.priority).toEqual(updatedBanner.priority);
     expect(retrievedBanner!.order).toEqual(updatedBanner.order);
 
-    expect(new Date(retrievedBanner!.startTime)).toEqual(
-      updatedBanner.startTime
-    );
-    expect(new Date(retrievedBanner!.endTime)).toEqual(updatedBanner.endTime);
+    expect(retrievedBanner!.startTime).toEqual(updatedBanner.startTime);
+    expect(retrievedBanner!.endTime).toEqual(updatedBanner.endTime);
   });
   it("should delete banner", async () => {
     const banner = new Banner(
       "6",
-      new Date(),
-      new Date(),
+      "2024-03-25T14:48:33.063+00:00",
+      "2024-03-25T14:48:33.063+00:00",
       "test message6",
       true,
       0,
@@ -135,7 +135,9 @@ describe("BannerServiceRedis", () => {
     );
     await bannerService.createBanner(banner);
 
-    await bannerService.deleteBanner(banner.id);
+    const deleteResult = await bannerService.deleteBanner(banner.id);
+    expect(deleteResult).toBeTruthy();
+
     const retrievedBanner = await bannerService.getBanner(banner.id);
     expect(retrievedBanner).toBeNull();
   });
