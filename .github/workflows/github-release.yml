@@ -2,7 +2,7 @@ name: Weekly release build
 
 on:
   push:
-    branches: [master]
+    branches: [API-37625-gh-release-build]
   workflow_dispatch:
 
 jobs:
