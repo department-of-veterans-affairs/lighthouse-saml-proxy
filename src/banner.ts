@@ -1,7 +1,7 @@
 export default class Banner {
   id: string;
-  startTime: string;
-  endTime: string;
+  startTime: number;
+  endTime: number;
   message: string;
   enabled: boolean;
   priority: number;
@@ -9,8 +9,8 @@ export default class Banner {
 
   constructor(
     id: string,
-    startTime: string,
-    endTime: string,
+    startTime: number,
+    endTime: number,
     message: string,
     enabled: true,
     priority: 0,

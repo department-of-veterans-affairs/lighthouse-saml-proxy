@@ -35,7 +35,6 @@ export interface ICache {
   ): Promise<unknown>;
   get(Key: any): Promise<any>;
   has(Key: any): Promise<boolean>;
-  delete(Key: string): Promise<void>;
   keys(pattern: string): Promise<string[]>;
 }
 
@@ -68,14 +67,6 @@ export class RedisCache implements ICache {
     const getAsync = promisify(this.theCache.get).bind(this.theCache);
     const val = await getAsync(Key);
     return val != null;
-  }
-  async delete(Key: string): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
-      this.theCache.del(Key, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
   }
   async keys(pattern: string): Promise<string[]> {
     const keysAsync = promisify(this.theCache.keys).bind(this.theCache);
@@ -115,12 +106,6 @@ export class TestCache implements ICache {
     return new Promise((resolve) => {
       const val = this.theCache.has(Key);
       resolve(val);
-    });
-  }
-  delete(Key: string): Promise<void> {
-    return new Promise((resolve) => {
-      this.theCache.del(Key);
-      resolve();
     });
   }
   keys(pattern: string): Promise<string[]> {

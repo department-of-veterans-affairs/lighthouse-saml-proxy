@@ -13,8 +13,8 @@ describe("BannerServiceRedis", () => {
   it("create a banner", async () => {
     const banner = new Banner(
       "1",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "test message",
       true,
       0,
@@ -37,8 +37,8 @@ describe("BannerServiceRedis", () => {
   it("should retrieve a banner by id", async () => {
     const banner = new Banner(
       "2",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "test message2",
       true,
       0,
@@ -60,8 +60,8 @@ describe("BannerServiceRedis", () => {
   it("should retrieve all banners", async () => {
     const banner1 = new Banner(
       "3",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "test message3",
       true,
       0,
@@ -69,8 +69,8 @@ describe("BannerServiceRedis", () => {
     );
     const banner2 = new Banner(
       "4",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "test message4",
       true,
       0,
@@ -88,8 +88,8 @@ describe("BannerServiceRedis", () => {
   it("should update banner", async () => {
     const banner = new Banner(
       "5",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "test message5",
       true,
       0,
@@ -99,8 +99,8 @@ describe("BannerServiceRedis", () => {
 
     const updatedBanner = new Banner(
       "6",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
+      1625889231000,
+      1625889231000,
       "updatedbanner",
       true,
       0,
@@ -122,23 +122,5 @@ describe("BannerServiceRedis", () => {
 
     expect(retrievedBanner!.startTime).toEqual(updatedBanner.startTime);
     expect(retrievedBanner!.endTime).toEqual(updatedBanner.endTime);
-  });
-  it("should delete banner", async () => {
-    const banner = new Banner(
-      "6",
-      "2024-03-25T14:48:33.063+00:00",
-      "2024-03-25T14:48:33.063+00:00",
-      "test message6",
-      true,
-      0,
-      0
-    );
-    await bannerService.createBanner(banner);
-
-    const deleteResult = await bannerService.deleteBanner(banner.id);
-    expect(deleteResult).toBeTruthy();
-
-    const retrievedBanner = await bannerService.getBanner(banner.id);
-    expect(retrievedBanner).toBeNull();
   });
 });
