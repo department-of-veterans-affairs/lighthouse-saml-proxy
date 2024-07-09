@@ -55,7 +55,8 @@ export class BannerServiceRedis implements BannerService {
     try {
       const key = this.generateKey(banner.id);
       const value = JSON.stringify(banner);
-      await this.cache.set(key, value);
+      const ttl = 604800;
+      await this.cache.set(key, value, "EX", ttl);
       return banner;
     } catch (error) {
       console.error("Error creating banner:", error);
@@ -67,7 +68,8 @@ export class BannerServiceRedis implements BannerService {
     try {
       const key = this.generateKey(id);
       const value = JSON.stringify(banner);
-      await this.cache.set(key, value);
+      const ttl = 604800;
+      await this.cache.set(key, value, "EX", ttl);
       return true;
     } catch (error) {
       console.error("Error updating banner:", error);
