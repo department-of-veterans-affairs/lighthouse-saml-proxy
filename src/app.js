@@ -72,7 +72,7 @@ const handleMetadata = (argv) => {
  */
 function runServer(argv) {
   const strategies = new Map();
-  IdPMetadata.fetch(argv.spIdpMetaUrl)
+  IdPMetadata.fetch(argv.spIdpMetadata)
     .then(handleMetadata(argv))
     .then(() => {
       const app = express();
@@ -83,7 +83,7 @@ function runServer(argv) {
       app.use(passport.initialize());
       if (argv.idpSamlLoginsEnabled) {
         argv.idpSamlLogins.forEach((spIdpEntry) => {
-          IdPMetadata.fetch(spIdpEntry.spIdpMetaUrl)
+          IdPMetadata.fetch(spIdpEntry.spIdpMetadata)
             .then(handleMetadata(spIdpEntry))
             .then(() => {
               spIdpEntry.spKey = argv.spKey;
