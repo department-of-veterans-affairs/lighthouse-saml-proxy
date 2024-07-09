@@ -123,4 +123,22 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.startTime).toEqual(updatedBanner.startTime);
     expect(retrievedBanner!.endTime).toEqual(updatedBanner.endTime);
   });
+  it("should delete banner", async () => {
+    const banner = new Banner(
+      "6",
+      1625889231000,
+      1625889231000,
+      "test message6",
+      true,
+      0,
+      0
+    );
+    await bannerService.createBanner(banner);
+
+    const deleteResult = await bannerService.deleteBanner(banner.id);
+    expect(deleteResult).toBeTruthy();
+
+    const retrievedBanner = await bannerService.getBanner(banner.id);
+    expect(retrievedBanner).toBeNull();
+  });
 });

@@ -6,6 +6,7 @@ export interface BannerService {
   getBanners(): Promise<Banner[]>;
   createBanner(banner: Banner): Promise<Banner | null>;
   updateBanner(id: string, banner: Banner): Promise<boolean>;
+  deleteBanner(id: string): Promise<boolean>;
 }
 
 export class BannerServiceRedis implements BannerService {
@@ -72,6 +73,18 @@ export class BannerServiceRedis implements BannerService {
       return true;
     } catch (error) {
       console.error("Error updating banner:", error);
+      return false;
+    }
+  }
+
+  async deleteBanner(id: string): Promise<boolean> {
+    try {
+      const key = this.generateKey(id);
+      await this.cache.delete(key);
+      const exists = await this.cache.has(key);
+      return !exists;
+    } catch (error) {
+      console.error("Error deleting banner:", error);
       return false;
     }
   }
