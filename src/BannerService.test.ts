@@ -28,7 +28,7 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.id).toEqual(banner.id);
     expect(retrievedBanner!.message).toEqual(banner.message);
     expect(retrievedBanner!.enabled).toEqual(banner.enabled);
-    expect(retrievedBanner!.priority).toEqual(banner.priority);
+    expect(retrievedBanner!.alertStyle).toEqual(banner.alertStyle);
     expect(retrievedBanner!.order).toEqual(banner.order);
     expect(retrievedBanner!.startTime).toEqual(banner.startTime);
     expect(retrievedBanner!.endTime).toEqual(banner.endTime);
@@ -51,7 +51,7 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.id).toEqual(banner.id);
     expect(retrievedBanner!.message).toEqual(banner.message);
     expect(retrievedBanner!.enabled).toEqual(banner.enabled);
-    expect(retrievedBanner!.priority).toEqual(banner.priority);
+    expect(retrievedBanner!.alertStyle).toEqual(banner.alertStyle);
     expect(retrievedBanner!.order).toEqual(banner.order);
     expect(retrievedBanner!.startTime).toEqual(banner.startTime);
     expect(retrievedBanner!.endTime).toEqual(banner.endTime);
@@ -117,7 +117,7 @@ describe("BannerServiceRedis", () => {
     expect(retrievedBanner!.id).toEqual(updatedBanner.id);
     expect(retrievedBanner!.message).toEqual(updatedBanner.message);
     expect(retrievedBanner!.enabled).toEqual(updatedBanner.enabled);
-    expect(retrievedBanner!.priority).toEqual(updatedBanner.priority);
+    expect(retrievedBanner!.alertStyle).toEqual(updatedBanner.alertStyle);
     expect(retrievedBanner!.order).toEqual(updatedBanner.order);
 
     expect(retrievedBanner!.startTime).toEqual(updatedBanner.startTime);

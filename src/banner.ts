@@ -4,7 +4,7 @@ export default class Banner {
   endTime: number;
   message: string;
   enabled: boolean;
-  priority: number;
+  alertStyle: number;
   order: number;
 
   constructor(
@@ -21,12 +21,12 @@ export default class Banner {
     this.endTime = endTime;
     this.message = message;
     this.enabled = enabled;
-    this.priority = priority;
+    this.alertStyle = priority;
     this.order = order;
   }
 
   setPriority(priority: number): void {
-    this.priority = priority;
+    this.alertStyle = priority;
   }
 
   setOrder(order: number): void {
