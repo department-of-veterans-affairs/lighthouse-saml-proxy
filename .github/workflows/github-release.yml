@@ -1,97 +1,24 @@
-name: Weekly Release Build
+# name: Weekly Release Build
 
-on:
-  push:
-    branches: [API-37625-gh-release-build]
-  schedule:
-    - cron: '0 22 * * 1'
+# on:
+#   push:
+#     branches: [API-37625-gh-release-build]
+#   schedule:
+#     - cron: '0 22 * * 1'
 
-jobs:
-  release_build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: ['dev', 'staging']
+# jobs:
+#   release_build:
+#     runs-on: ubuntu-latest
+#     env:
+#       REPO: "lighthouse-saml-proxy"
+#       IMAGE: "saml-proxy"
+#       XCHECKS: "saml-proxy-release"
+#     strategy:
+#       matrix:
+#         environment: ['dev', 'staging']
     
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-
-      - name: Run Build
-        env:
-          NODE_ENV: production
-          BUILD_ENV: ${{ matrix.environment }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build -- --env=${{ matrix.environment }}
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: ${{secrets.AWS_REGION}}
-          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-          role-duration-seconds: 1200
-          role-session-name: GitHubActions
-
-      - name: Delay for CI jobs
-        run: sleep 90s
-
-      - name: Post to Slack
-        run: ./slackpost.sh -t  started "started SAML Proxy release..."
-
-      - name: Check CI status
-        run: ./gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
       
-      - name: Get Old Tag
-        id: old_tag
-        run: echo "::set-output name=old_tag::$(git tag --sort=creatordate | grep fargate-saml-proxy | head -1)"
-
-      - name: Increment Tag
-        id: new_tag
-        run: echo "::set-output name=new_tag::$(./increment.sh ${{ steps.old_tag.outputs.old_tag }})"
-
-      - name: Create Release
-        run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            gh release create ${{ steps.new_tag.outputs.new_tag }} -t ${{ steps.new_tag.outputs.new_tag }}
-          else
-            echo "Testing mode: Skipping release creation"
-          fi
-
-      - name: Tag ECR Image
-        run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            make tag IMAGE=${IMAGE} TAG=${GITHUB_SHA:0:7} NEW_TAG=${{ steps.new_tag.outputs.new_tag }}
-          else
-            echo "Testing mode: Skipping release creation"
-          fi
-
-      - name: Tag ECR Image Tests
-        run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            make tag IMAGE=${IMAGE}-tests TAG=${GITHUB_SHA:0:7} NEW_TAG=${{ steps.new_tag.outputs.new_tag }}
-          else
-            echo "Testing mode: Skipping release creation"
-          fi
-
-      - name: Deploy to AWS Codebuild
-        run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            aws codebuild start-build --project-name saml-proxy-deploy --environment-variables-override name=RELEASE,value${{ steps.new_tag.outputs.new_tag }}
-          else
-            echo "Testing mode: Skipping release creation"           
-          fi
-
-      - name: Post to Slack (Success or Failure)
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            ./slackpost.sh -t success "SAML Proxy release ${{ steps.new_tag.outputs.new_tag }} was successful."
-          else
-            ./slackpost.sh -t "There was an error with the release process for SAML Proxy."
-          fi
+#         -name: Setup No
