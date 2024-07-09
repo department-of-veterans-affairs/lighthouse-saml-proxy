@@ -41,12 +41,12 @@ jobs:
       - name: Print env
         run: printenv
 
-      - name: Run Build
-        env:
-          NODE_ENV: production
-          BUILD_ENV: ${{matrix.environment}}
-          REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
-        run: npm run build $BUILD_ENV
+    #   - name: Run Build
+    #     env:
+    #       NODE_ENV: production
+    #       BUILD_ENV: ${{matrix.environment}}
+    #       REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
+    #     run: npm run build $BUILD_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2.0.0
