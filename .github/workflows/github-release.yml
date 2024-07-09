@@ -42,8 +42,8 @@ jobs:
 
       - name: Create Release
         run: |
-          slackpost.sh -t started "started SAML Proxy release"
-          gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
+          ./slackpost.sh -t started "started SAML Proxy release"
+          ./gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
           old_tag=$(git tag --sort=-creatordate | grep fargate-saml-proxy | head -1)
           echo "Found ${old_tag} - incrementing..."
           new_tag=$(./increment.sh ${old_tag})
