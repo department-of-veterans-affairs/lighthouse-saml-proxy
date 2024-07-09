@@ -7,23 +7,26 @@ on:
     - cron: '0 22 * * 1'
 
 jobs:
-  release_build:
+  install:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: ['dev', 'staging']
-    
+    outputs:
+      node_version: ${{ steps.node_version.outputs.node_version }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
+      - uses: actions/checkout@v2
+      - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: 16
+
+      - id: node_version
+        name: Set Node Version to ENV
+        run: |
+          NODE_VERSION=$(node -v)
+          echo $NODE_VERSION
+          echo "node_version=$NODE_VERSION" >> $GITHUB_OUTPUT
 
       - name: Install Dependencies
-        run: npm ci 
+        run: npm ci
 
       - name: Run Build
         env:
