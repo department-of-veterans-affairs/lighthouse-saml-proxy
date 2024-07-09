@@ -13,7 +13,7 @@ export default class Banner {
     endTime: number,
     message: string,
     enabled: true,
-    priority: 0,
+    alertStyle: 0,
     order: 0
   ) {
     this.id = id;
@@ -21,12 +21,12 @@ export default class Banner {
     this.endTime = endTime;
     this.message = message;
     this.enabled = enabled;
-    this.alertStyle = priority;
+    this.alertStyle = alertStyle;
     this.order = order;
   }
 
-  setPriority(priority: number): void {
-    this.alertStyle = priority;
+  setAlertStyle(alertStyle: number): void {
+    this.alertStyle = alertStyle;
   }
 
   setOrder(order: number): void {
