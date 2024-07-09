@@ -33,8 +33,17 @@ jobs:
           echo "XCHECKS=${XCHECKS}"
           echo "GITHUB_SHA=${GITHUB_SHA}"
 
+      - name: Execute pre_build commands
+        run: |
+          gh config set prompt disabled
+          gh config set git_protocol ssh
+          COMMIT_HASH=${GITHUB_SHA}
+          printenv
+
       - name: Create Release
         run: |
+          slackpost.sh -t started "started SAML Proxy release"
+          gh-status.sh -r ${REPO} -c ${COMMIT_HASH} -x ${XCHECKS}
           old_tag=$(git tag --sort=-creatordate | grep fargate-saml-proxy | head -1)
           echo "Found ${old_tag} - incrementing..."
           new_tag=$(./increment.sh ${old_tag})
