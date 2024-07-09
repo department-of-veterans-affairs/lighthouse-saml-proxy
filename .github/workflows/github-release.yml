@@ -1,24 +1,65 @@
-# name: Weekly Release Build
+name: Weekly Release Build
 
-# on:
-#   push:
-#     branches: [API-37625-gh-release-build]
-#   schedule:
-#     - cron: '0 22 * * 1'
+on:
+  push:
+    branches: [API-37625-gh-release-build]
+  schedule:
+    - cron: '0 22 * * 1'
 
-# jobs:
-#   release_build:
-#     runs-on: ubuntu-latest
-#     env:
-#       REPO: "lighthouse-saml-proxy"
-#       IMAGE: "saml-proxy"
-#       XCHECKS: "saml-proxy-release"
-#     strategy:
-#       matrix:
-#         environment: ['dev', 'staging']
+jobs:
+  release_build:
+    runs-on: ubuntu-latest
+    env:
+      REPO: "lighthouse-saml-proxy"
+      IMAGE: "saml-proxy"
+      XCHECKS: "saml-proxy-release"
+    strategy:
+      matrix:
+        environment: ['dev', 'staging']
     
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       
-#         -name: Setup No
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+            node-version: '16'
+
+      - name: Print Environment Variables
+        run: |
+          echo "REPO=${REPO}"
+          echo "IMAGE=${IMAGE}"
+          echo "XCHECKS=${XCHECKS}"
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+
+      - name: Create Release
+        run: |
+          old_tag=$(git tag --sort=-creatordate | grep fargate-saml-proxy | head -1)
+          echo "Found ${old_tag} - incrementing..."
+          new_tag=$(./increment.sh ${old_tag})
+          echo "Creating release ${new_tag}"
+          gh release create ${new_tag} -t ${new_tag}
+
+      - name: Tag ECR Image
+        run: |
+          make tag IMAGE=${IMAGE} TAG=${GITHUB_SHA:0:7} NEW_TAG=${new_tag}
+
+      - name: Tag ECR Image
+        run: |
+          make tag IMAGE=${IMAGE}-tests TAG=${GITHUB_SHA:0:7} NEW_TAG=${new_tag}
+
+      - name: Deploy to AWS codebuild
+        if: env.DEPLOY == 'true'
+        run: |
+          aws codebuild start-build --project-name saml-proxy-deploy --environment-variables-override name=RELEASE,value=${new_tag}
+
+      - name: Post to Slack (Success or Failure)
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            ./slackpost.sh -t success "SAML Proxy release ${new_tag} was successful."
+          else
+            ./slackpost.sh -t failure "there was an error with the release process for SAML Proxy!"
+          fi
+
+
