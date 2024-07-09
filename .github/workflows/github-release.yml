@@ -1,72 +1,118 @@
-name: Weekly Release Build
+name: Weekly release build
 
 on:
   push:
-    branches: [API-37625-gh-release-build]
-  schedule:
-    - cron: '0 22 * * 1'
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
-  release_build:
+  install:
     runs-on: ubuntu-latest
-    env:
-      REPO: "lighthouse-saml-proxy"
-      IMAGE: "saml-proxy"
-      XCHECKS: "saml-proxy-release"
+    outputs:
+      node_version: ${{ steps.node_version.outputs.node_version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - id: node_version
+        name: Set Node Version to ENV
+        run: |
+          NODE_VERSION=$(node -v)
+          echo $NODE_VERSION
+          echo "node_version=$NODE_VERSION" >> $GITHUB_OUTPUT
+
+  release_builds:
+    needs: [install]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: ['dev', 'staging']
-    
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      
-      - name: Setup Node.js
+      - uses: actions/checkout@v2
+      - name: Setup node
         uses: actions/setup-node@v2
         with:
-            node-version: '16'
+          node-version: 16
 
-      - name: Print Environment Variables
-        run: |
-          echo "REPO=${REPO}"
-          echo "IMAGE=${IMAGE}"
-          echo "XCHECKS=${XCHECKS}"
-          echo "GITHUB_SHA=${GITHUB_SHA}"
+      - name: Print env
+        run: printenv
 
-      - name: Execute pre_build commands
-        run: |
-          gh config set prompt disabled
-          gh config set git_protocol ssh
-          COMMIT_HASH=${GITHUB_SHA}
-          printenv
+      - name: Run Build
+        env:
+          NODE_ENV: production
+          BUILD_ENV: ${{matrix.environment}}
+          REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
+        run: npm run build $BUILD_ENV
 
-      - name: Create Release
-        run: |
-          old_tag=$(git tag --sort=-creatordate | grep fargate-saml-proxy | head -1)
-          echo "Found ${old_tag} - incrementing..."
-          new_tag=$(./increment.sh ${old_tag})
-          echo "Creating release ${new_tag}"
-          gh release create ${new_tag} -t ${new_tag}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2.0.0
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+          role-duration-seconds: 1200
+          role-session-name: GitHubActions
 
-      - name: Tag ECR Image
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [release_builds]
+    steps:
+      - id: latest_release
+        name: Get latest release with tag
         run: |
-          make tag IMAGE=${IMAGE} TAG=${GITHUB_SHA:0:7} NEW_TAG=${new_tag}
+          echo ${{secrets.GIT_AUTO_DEPLOY_TOKEN}} | gh auth login --with-token
+          LATEST_RELEASE=$(gh api /repos/$GITHUB_REPOSITORY/releases/latest | jq '.tag_name' | sed 's/\"//g')
+          echo $LATEST_RELEASE
+          echo "tag=$LATEST_RELEASE" >> $GITHUB_OUTPUT
 
-      - name: Tag ECR Image
-        run: |
-          make tag IMAGE=${IMAGE}-tests TAG=${GITHUB_SHA:0:7} NEW_TAG=${new_tag}
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{steps.latest_release.outputs.tag}}
 
-      - name: Deploy to AWS codebuild
-        if: env.DEPLOY == 'true'
-        run: |
-          aws codebuild start-build --project-name saml-proxy-deploy --environment-variables-override name=RELEASE,value=${new_tag}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2.0.0
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+          role-duration-seconds: 1200
+          role-session-name: GitHubActions
 
-      - name: Post to Slack (Success or Failure)
+      - name: Download archives
+        env:
+          S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
         run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            ./slackpost.sh -t success "SAML Proxy release ${new_tag} was successful."
-          else
-            ./slackpost.sh -t failure "there was an error with the release process for SAML Proxy!"
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          mkdir release
+          aws s3 cp --no-progress --recursive s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/ release/
+
+      - name: Create the release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          RELEASE_TITLE=`gh api /repos/department-of-veterans-affairs/lighthouse-saml-proxy/commits/$GITHUB_SHA | jq -r '.commit.message' | head -1`
+          # If the commit message doesn't include the PR number at the end, append it.
+          if ! [[ $RELEASE_TITLE =~ \(\#[0-9]{4,}\) ]]; then
+            echo "PR number missing. This will append it to the release title."
+            PR_NUMBER=`gh api -X GET search/issues -f q="$GITHUB_SHA" | jq -r '.items[0].number'`
+            RELEASE_TITLE="$RELEASE_TITLE (#$PR_NUMBER)"
           fi
+          NEW_TAG=$(git tag --sort=-creatordate | head -1 | awk -F. -v OFS=. '{$NF++;print}')
+          VERSION=${NEW_TAG#"lighthouse-saml-proxy/v"}
+          gh release create $NEW_TAG --title="$RELEASE_TITLE"
+          for env in 'dev' 'staging' 'production' ; do
+            mv "release/lighthouse-saml-proxy-${env}.tar.bz2" "release/lighthouse-saml-proxy-${env}-${VERSION}.tar.bz2"
+            gh release upload ${NEW_TAG} "release/lighthouse-saml-proxy-${env}-${VERSION}.tar.bz2#${NEW_TAG}_${env}.tar.bz2"
+            echo "${env} artifact uploaded"
+          done
 
-
+      - name: Build dev and staging
+        run: |
+          aws codebuild start-build --project-name lighthouse-saml-proxy --environment-variables-override name=RELEASE,value=${NEW_TAG}
+          
