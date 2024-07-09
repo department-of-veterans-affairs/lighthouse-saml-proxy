@@ -28,7 +28,7 @@ export function checkEncryptionCerts(argv) {
  * @returns {boolean} returns a true when metadata is present or returns message to show what is required
  */
 export function checkWhenNoMetadata(argv) {
-  if (!isString(argv.spIdpMetaUrl)) {
+  if (!isString(argv.spIdpMetadata)) {
     if (!isString(argv.spIdpSsoUrl) || argv.spIdpSsoUrl === "") {
       return "IdP SSO Assertion Consumer URL (spIdpSsoUrl) is required when IdP metadata is not specified";
     }

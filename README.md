@@ -18,7 +18,7 @@ dev-config.json
   "idpIssuer": "idp-issuer.example.com",
   "idpAudience": "https://idp.example.com/audience",
   "idpBaseUrl": "https://idp.example.com/base/url",
-  "spIdpMetaUrl": "https://sp.example.com/idp/meta/url",
+  "spIdpMetadata": "./spIdpMetadata.xml",
   "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   "spAudience": "sp-audience.example.com",
   "spIdpIssuer": "sp-idp-issuer.example.com",
@@ -45,7 +45,7 @@ dev-config.json
   [
     {
       "category": "example2SamlIdp",
-      "spIdpMetaUrl": "https://saml-idp-2.example.com/metadata",
+      "spIdpMetadata": "./spIdp2Metadata.xml",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       "spAudience": "https://saml-idp-2.example.com",
       "spAuthnContextClassRef": "http://sp-2.example.com/authn/context/class/ref",

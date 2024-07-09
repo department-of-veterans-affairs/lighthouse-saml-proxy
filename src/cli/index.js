@@ -225,8 +225,8 @@ export function processArgs() {
           return value ? value.replace(/:/g, "") : value;
         },
       },
-      spIdpMetaUrl: {
-        description: "IdP SAML Metadata URL",
+      spIdpMetadata: {
+        description: "IdP SAML Metadata",
         required: false,
         string: true,
       },
@@ -472,8 +472,8 @@ export function processArgs() {
             return value ? value.replace(/:/g, "") : value;
           },
         },
-        spIdpMetaUrl: {
-          description: "IdP SAML Metadata URL",
+        spIdpMetadata: {
+          description: "IdP SAML Metadata",
           required: false,
           string: true,
         },
