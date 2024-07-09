@@ -1,6 +1,8 @@
 name: Weekly Release Build
 
 on:
+  push:
+    branches: [API-37625-gh-release-build]
   schedule:
     - cron: '0 22 * * 1'
 
