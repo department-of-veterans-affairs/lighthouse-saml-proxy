@@ -48,15 +48,15 @@ jobs:
     #       REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
     #     run: npm run build $BUILD_ENV
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.0.0
-        with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: us-east-1
-          role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-          role-duration-seconds: 1200
-          role-session-name: GitHubActions
+    #   - name: Configure AWS Credentials
+    #     uses: aws-actions/configure-aws-credentials@v2.0.0
+    #     with:
+    #       aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+    #       aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+    #       aws-region: us-east-1
+    #       role-to-assume: ${{secrets.AWS_ROLE_ARN}}
+    #       role-duration-seconds: 1200
+    #       role-session-name: GitHubActions
 
   create_release:
     runs-on: ubuntu-latest
