@@ -1,51 +1,27 @@
 name: Weekly Release Build
 
 on:
-  push:
-    branches: [API-37625-gh-release-build]
-  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * 1'
 
 jobs:
-  install:
-    runs-on: ubuntu-latest
-    outputs:
-      node_version: ${{ steps.node_version.outputs.node_version }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-
-      - id: node_version
-        name: Set Node Version to ENV
-        run: |
-          NODE_VERSION=$(node -v)
-          echo $NODE_VERSION
-          echo "node_version=$NODE_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Install dependencies
-        run: npm ci
-
-  release_builds:
-    needs: [install]
+  release_build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: ['dev', 'staging']
-
+    
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup node
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: '16'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Print env
-        run: printenv
+      - name: Install Dependencies
+        run: npm install --prefer-offline
 
       - name: Run Build
         env:
