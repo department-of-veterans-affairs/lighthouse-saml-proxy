@@ -59,8 +59,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
-          aws-access-key-id: ${{secrets.AWS_ACCOUNT_ID}}
-          aws-region: ${{secrets.AWS_REGION}}
+          aws-access-key-id: ${{ secrets.AWS_ACCOUNT_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 1200
           role-session-name: GitHubActions
 
