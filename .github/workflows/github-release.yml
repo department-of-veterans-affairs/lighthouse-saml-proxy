@@ -1,4 +1,4 @@
-name: Weekly release build
+name: weekly release build
 
 on:
   push:
@@ -23,11 +23,10 @@ jobs:
           NODE_VERSION=$(node -v)
           echo $NODE_VERSION
           echo "node_version=$NODE_VERSION" >> $GITHUB_OUTPUT
-          
+
       - name: Install dependencies
         run: |
           npm update && npm ci
-  
 
   release_builds:
     needs: [install]
@@ -43,25 +42,41 @@ jobs:
         with:
           node-version: 16
 
+      - name: Install dependencies
+        run: |
+          npm update && npm ci
+
       - name: Print env
         run: printenv
 
-    #   - name: Run Build
-    #     env:
-    #       NODE_ENV: production
-    #       BUILD_ENV: ${{matrix.environment}}
-    #       REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
-    #     run: npm run build $BUILD_ENV
+      - name: Run Build
+        env:
+          NODE_ENV: production
+          BUILD_ENV: ${{matrix.environment}}
+          REACT_APP_COMMIT_HASH: ${{needs.install.outputs.hash}}
+        run: npm run build $BUILD_ENV
 
-    #   - name: Configure AWS Credentials
-    #     uses: aws-actions/configure-aws-credentials@v2.0.0
-    #     with:
-    #       aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-    #       aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-    #       aws-region: us-east-1
-    #       role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-    #       role-duration-seconds: 1200
-    #       role-session-name: GitHubActions
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCOUNT_ID}}
+          aws-region: ${{secrets.AWS_REGION}}
+          role-duration-seconds: 1200
+          role-session-name: GitHubActions
+
+      - name: Create archive tarballs
+        env:
+          BUILD_ENV: ${{matrix.environment}}
+        run: |
+          tar -C build/$BUILD_ENV -cf build/$BUILD_ENV.tar.bz2 .
+
+      - name: Upload to archive s3 bucket
+        env:
+          BUILD_ENV: ${{matrix.environment}}
+          S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
+        run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          aws s3 cp --no-progress --acl public-read build/$BUILD_ENV.tar.bz2 s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/lighthouse-saml-proxy-$BUILD_ENV.tar.bz2
 
   create_release:
     runs-on: ubuntu-latest
@@ -75,27 +90,25 @@ jobs:
           echo $LATEST_RELEASE
           echo "tag=$LATEST_RELEASE" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{steps.latest_release.outputs.tag}}
 
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v2.0.0
-      #   with:
-      #     aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-      #     aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-      #     aws-region: ${{secrets.AWS_REGION}}
-      #     role-to-assume: ${{secrets.AWS_ROLE_ARN}}
-      #     role-duration-seconds: 1200
-      #     role-session-name: GitHubActions
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCOUNT_ID}}
+          aws-region: ${{secrets.AWS_REGION}}
+          role-duration-seconds: 1200
+          role-session-name: GitHubActions
 
-      # - name: Download archives
-      #   env:
-      #     S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
-      #   run: |
-      #     SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-      #     mkdir release
-      #     aws s3 cp --no-progress --recursive s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/ release/
+      - name: Download archives
+        env:
+          S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
+        run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          mkdir release
+          aws s3 cp --no-progress --recursive s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/ release/
 
       - name: Create the release
         env:
@@ -119,5 +132,4 @@ jobs:
 
       - name: Build dev and staging
         run: |
-          aws codebuild start-build --project-name lighthouse-saml-proxy --environment-variables-override name=RELEASE,value=${NEW_TAG}
-          
+          aws codebuild start-build --project-name saml-proxy-deploy --environment-variables-override name=RELEASE,value=${NEW_TAG}
