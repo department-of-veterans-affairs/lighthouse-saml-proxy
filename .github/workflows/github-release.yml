@@ -84,13 +84,13 @@ jobs:
       #     role-duration-seconds: 1200
       #     role-session-name: GitHubActions
 
-      - name: Download archives
-        env:
-          S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
-        run: |
-          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-          mkdir release
-          aws s3 cp --no-progress --recursive s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/ release/
+      # - name: Download archives
+      #   env:
+      #     S3_ARCHIVE_BUCKET: ${{secrets.AWS_S3_ARCHIVE_BUCKET}}
+      #   run: |
+      #     SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+      #     mkdir release
+      #     aws s3 cp --no-progress --recursive s3://$S3_ARCHIVE_BUCKET/$SHORT_SHA/ release/
 
       - name: Create the release
         env:
