@@ -23,6 +23,11 @@ jobs:
           NODE_VERSION=$(node -v)
           echo $NODE_VERSION
           echo "node_version=$NODE_VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Install dependencies
+        run: |
+          npm update && npm ci
+  
 
   release_builds:
     needs: [install]
