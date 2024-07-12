@@ -52,7 +52,7 @@ function getFirstCert(keyEl) {
 }
 
 /**
- * Function to read and parse XML file
+ * Read and parse XML file
  *
  * @param {string} filePath Path to the XML file
  * @returns {*} Parsed XML object
@@ -118,7 +118,7 @@ export function fetch(url, idpMetadataFallback) {
 }
 
 /**
- * Process IDP metadata from XML data
+ * Process IDP XML metadata
  *
  * @param {*} docEl Parsed XML object
  * @param {*} metadata Metadata object to populate
