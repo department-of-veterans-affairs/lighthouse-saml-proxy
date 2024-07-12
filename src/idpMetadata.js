@@ -97,7 +97,9 @@ export function fetch(url, idpMetadataFallback) {
 
         parser.parseString(responseData, (err, docEl) => {
           if (err || !docEl) {
-            // Error parsing response data, fallback to idpMetadataFallback
+            console.error(
+              "Error parsing response data, fallback to idpMetadataFallback"
+            );
             parseXML(idpMetadataFallback)
               .then((xmlData) => processMetadata(xmlData, metadata))
               .then(resolve)
@@ -108,7 +110,9 @@ export function fetch(url, idpMetadataFallback) {
         });
       })
       .catch(() => {
-        // Error fetching metadata from URL, fallback to idpMetadataFallback
+        console.error(
+          "Error fetching metadata from URL, fallback to idpMetadataFallback"
+        );
         parseXML(idpMetadataFallback)
           .then((xmlData) => processMetadata(xmlData, metadata))
           .then(resolve)
