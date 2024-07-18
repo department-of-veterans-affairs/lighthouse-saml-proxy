@@ -230,6 +230,11 @@ export function processArgs() {
         required: false,
         string: true,
       },
+      spIdpMetadata: {
+        description: "IdP SAML Metadata URL",
+        required: false,
+        string: true,
+      },
       spAudience: {
         description: "SP Audience URI / RP Realm",
         required: false,
@@ -473,6 +478,11 @@ export function processArgs() {
           },
         },
         spIdpMetaUrl: {
+          description: "IdP SAML Metadata URL",
+          required: false,
+          string: true,
+        },
+        spIdpMetadata: {
           description: "IdP SAML Metadata URL",
           required: false,
           string: true,
