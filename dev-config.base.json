@@ -4,6 +4,7 @@
   "idpAudience": "https://idp.example.com/audience",
   "idpBaseUrl": "https://idp.example.com/base/url",
   "spIdpMetaUrl": "https://sp.example.com/idp/meta/url",
+  "spIdpMetadata": "./spIdpMetadataExample.xml",
   "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
   "spAudience": "sp-audience.example.com",
   "spIdpIssuer": "sp-idp-issuer.example.com",
@@ -33,6 +34,7 @@
     {
       "category": "example2SamlIdp",
       "spIdpMetaUrl": "https://saml-idp.example2.com/metadata",
+      "spIdpMetadata": "./spIdpMetadataExample2.xml",
       "spNameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       "spAudience": "https://saml-idp.example2.com",
       "spAuthnContextClassRef": "http://sp.example2.com/authn/context/class/ref",
