@@ -79,21 +79,29 @@
   </div>
   <div class="usa-grid">
     <div class="columns">
-      <h2 class="usa-heading">Or create an account</h2>
+      <h2 class="usa-heading" style="display: inline-block; margin-right: 10px;">Or create an account</h2>
+      <div style="display: inline-block; vertical-align: middle; width: auto;">
+        <hr style="border: 0.8px solid #ccc; width: 40%; margin: 10px; vertical-align: middle; margin-left: 30%;">
+      </div>
     </div>
   </div>
-  <hr style="width: 35%; border: 1px solid #ccc; margin: -20px 0; margin-left: 33.5%;">
   <div class="usa-grid">
     <div class="columns">
       <% if (login_gov_signup_link_enabled) { %>
-      <div>
-        <a href="<%- login_gov_signup_link -%>"><h5><strong>Create an account with Login.gov</strong></h5></a>
-        <hr style="width: 38.5%; border: 1px solid #ccc; margin: 25px 0; margin-left: 31.5%;">
-      </div>  
+        <div>  
+          <a href="<%- login_gov_signup_link -%>">
+            <img src="/samlproxy/idp/img/arrow-accurate.png" style="margin-right: 2px; width: 45px; height: 40px">
+            <strong>Create an account with Login.gov</strong>
+          </a>
+          <hr style="width: 42%; border: 0.8px solid #ccc; margin: 10px 0; margin-left: 29%;">
+        </div>
       <% } %>
       <div>  
-        <a href="<%- id_me_signup_link -%>"><h5><strong>Create an account with ID.me</strong></h5></a>
-        <hr style="width: 38.5%; border: 1px solid #ccc; margin: 25px 0; margin-left: 31.6%;">
+        <a href="<%- id_me_signup_link -%>">
+          <img src="/samlproxy/idp/img/arrow-accurate.png" style="margin-right: 2px; width: 45px; height: 40px">
+          <strong>Create an account with ID.me</strong>
+        </a>
+        <hr style="width: 42%; border: 0.8px solid #ccc; margin: 10px 0; margin-left: 29%;">
       </div>
     </div>
   </div>
