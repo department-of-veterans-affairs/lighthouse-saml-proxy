@@ -1,13 +1,12 @@
 <div class="usa-grid login-selection-header">
   <div class="columns">
-    <h2 class="usa-heading">Sign in to VA.gov</h2>
-    <p>Sign in using your preferred VA related account</p>
+    <h2 class="usa-heading">Verify your identity</h2>
   </div>
 </div>
-<div class="usa-grid login-selection">
-  <div class="usa-width-one-half">
+<div class="usa-grid login-selection-header">
+  <div class="usa-width-one-half medium-offset-3">
     <% if (login_gov_enabled) { %>
-    <a class="no-external-icon usa-button logingov-signin" href="<%- login_gov_login_link -%>">
+    <a class="no-external-icon usa-button logingov-signin" href="<%- login_gov_login_link -%>" style="margin-bottom: 12px;">
       <svg
         role="img"
         viewBox="0 0 114 15"
@@ -50,7 +49,7 @@
       </svg>
     </a>
     <% } %>
-    <a class="no-external-icon usa-button idme-signin" href="<%- id_me_login_link -%>">
+    <a class="no-external-icon usa-button idme-signin" href="<%- id_me_login_link -%>" style="margin-bottom: 12px;">
       <svg
         role="img"
         xmlns="http://www.w3.org/2000/svg"
@@ -75,32 +74,40 @@
         </g>
       </svg>
     </a>
-    <a class="no-external-icon usa-button dslogon" href="<%- dslogon_login_link -%>">DS Logon</a>
-    <a class="no-external-icon usa-button mhv" href="<%-  mhv_login_link -%>">My HealtheVet</a>
+    <a class="no-external-icon usa-button dslogon" href="<%- dslogon_login_link -%>" style="margin-bottom: 12px;">DS Logon</a>
+    <a class="no-external-icon usa-button mhv" href="<%-  mhv_login_link -%>" style="margin-bottom: 12px; margin-block-end: 40px;">My HealtheVet</a>
   </div>
-  <div class="usa-width-one-half login-help">
-    <h4>Having trouble signing in?</h4>
-    <p><a href="https://va.gov/resources/signing-in-to-vagov/">Get answers to Frequently Asked Questions</a></p>
-    <p><a href="https://www.accesstocare.va.gov/sign-in-help?_ga=2.98277471.1975490765.1548084298-2093117929.1533218023">Submit a request to get help signing in</a></p>
+  <div class="usa-grid">
+    <div class="columns">
+      <h2 class="usa-heading">Or create an account</h2>
+    </div>
   </div>
-  <span class="sidelines">OR</span>
-  <div class="usa-grid idme-signup-footer">
-    <div class="usa-width-one-half">
-      <h4>Don't have these accounts?</h4>
+  <hr style="width: 35%; border: 1px solid #ccc; margin: -20px 0; margin-left: 33.5%;">
+  <div class="usa-grid">
+    <div class="columns">
       <% if (login_gov_signup_link_enabled) { %>
       <div>
-        <a href="<%- login_gov_signup_link -%>">Create an account with Login.gov</a>
+        <a href="<%- login_gov_signup_link -%>"><h5><strong>Create an account with Login.gov</strong></h5></a>
+        <hr style="width: 38.5%; border: 1px solid #ccc; margin: 25px 0; margin-left: 31.5%;">
       </div>  
       <% } %>
       <div>  
-        <a href="<%- id_me_signup_link -%>">Create an account with ID.me</a>
+        <a href="<%- id_me_signup_link -%>"><h5><strong>Create an account with ID.me</strong></h5></a>
+        <hr style="width: 38.5%; border: 1px solid #ccc; margin: 25px 0; margin-left: 31.6%;">
       </div>
+    </div>
+  </div>
+  <div class="usa-grid" style="padding-top: 20px;">
+    <div class="columns">
+      <h2 class="usa-heading">Need help?</h2>
+      <p>Get answers to common questions about <a href="https://www.va.gov/resources/verifying-your-identity-on-vagov/">verifying your identity</a></p>
+      <p>Call our MyVA411 main information line for help at <a href=>800-698-2411</a> (TTY:711). We're here 24/7.</p>
     </div>
   </div>
 </div>
 <footer class="fed-warning usa-grid">
   <hr>
-  <p>When you sign in to VA.gov, you’re using a United States federal government information system.</p>
+  <p>When you sign in to VA.gov, you're using a United States federal government information system.</p>
   <p>By signing in, you agree to only use information you have legal authority to view and use. You also agree to let us monitor and record your activity on the system and share this information with auditors or law enforcement officials.</p>
   <p>By signing in, you confirm that you understand the following:</p>
   <p>Unauthorized use of this system is prohibited and may result in criminal, civil, or administrative penalties. Unauthorized use includes gaining unauthorized data access, changing data, harming the system or its data, or misusing the system. We can suspend or block your access to this system if we suspect any unauthorized use.</p>
