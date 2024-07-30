@@ -79,29 +79,34 @@
   </div>
   <div class="usa-grid">
     <div class="columns">
-      <h2 class="usa-heading" style="display: inline-block; margin-bottom: 20px;">Or create an account</h2>
-      <div style="display: inline-block; vertical-align: middle; width: auto;">
-      </div>
+      <h2 class="usa-heading">Or create an account</h2>
+      <hr style="width: 100%; max-width: 320px; margin: 0 auto; border: 0.8px solid #999; margin-bottom: 10px;">
     </div>
   </div>
-  <div class="usa-grid">
-    <div class="columns">
-      <% if (login_gov_signup_link_enabled) { %>
-        <div style="padding-right: 45px; margin-top: 5px;">  
-          <a href="<%- login_gov_signup_link -%>">
-            <img src="/samlproxy/idp/img/arrow-accurate.png" style="margin-right: 1px; width: 45px; height: 38px">
-            <strong>Create an account with Login.gov</strong>
+  <% if (login_gov_signup_link_enabled) { %>
+    <div class="usa-grid">
+      <div class="columns" style="position: relative;">
+        <div style="margin-right: 45px;">
+          <a href="<%= login_gov_signup_link %>" style="display: inline-flex; align-items: center; text-decoration: none;">
+            <img src="/samlproxy/idp/img/arrow-accurate.png" style="margin-right: 1px; width: 43px; height: 38px;">
+            <strong style="text-decoration: underline;">Create an account with Login.gov</strong>
           </a>
         </div>
-      <% } %>
-      <div style="padding-right: 75px; margin-top: 15px;">  
-        <a href="<%- id_me_signup_link -%>">
-          <img src="/samlproxy/idp/img/arrow-accurate.png" style="margin-right: 1px; width: 45px; height: 38px">
-          <strong>Create an account with ID.me</strong>
-        </a>
+        <hr style="width: 100%; max-width: 320px; margin: 10px auto; border: 0.8px solid #999;">
       </div>
     </div>
-  </div>
+    <% } %>
+    <div class="usa-grid">
+      <div class="columns" style="position: relative;">
+        <div style="margin-right: 70px;">
+          <a href="<%= id_me_signup_link %>" style="display: inline-flex; align-items: center; text-decoration: none;">
+            <img src="/samlproxy/idp/img/arrow-accurate.png" alt="Arrow right" style="margin-right: 1px; width: 43px; height: 38px;">
+            <strong style="text-decoration: underline;">Create an account with ID.me</strong>
+          </a>
+        </div>
+        <hr style="width: 100%; max-width: 320px; margin: 15px auto; border: 0.8px solid #999; margin-top: 7px">
+      </div>
+    </div>
   <div class="usa-grid" style="padding-top: 30px;">
     <div class="columns">
       <h2 class="usa-heading">Need help?</h2>
@@ -115,7 +120,7 @@
 </div>
 <footer class="fed-warning usa-grid">
   <hr>
-  <p>When you sign in to VA.gov, you're using a United States federal government information system.</p>
+  <p>When you sign in to VA.gov, you’re using a United States federal government information system.</p>
   <p>By signing in, you agree to only use information you have legal authority to view and use. You also agree to let us monitor and record your activity on the system and share this information with auditors or law enforcement officials.</p>
   <p>By signing in, you confirm that you understand the following:</p>
   <p>Unauthorized use of this system is prohibited and may result in criminal, civil, or administrative penalties. Unauthorized use includes gaining unauthorized data access, changing data, harming the system or its data, or misusing the system. We can suspend or block your access to this system if we suspect any unauthorized use.</p>
