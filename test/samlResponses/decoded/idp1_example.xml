@@ -1,0 +1,7 @@
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_7bb1775fba384475ae3593649740af7d"
+    Version="2.0" IssueInstant="2023-09-01T22:00:12Z"
+    Destination="http://localhost:7000/samlproxy/sp/saml/sso"
+    InResponseTo="id32154644961507252952328722">
+    <saml:Issuer>api.idp1.com</saml:Issuer>
+</samlp:Response>

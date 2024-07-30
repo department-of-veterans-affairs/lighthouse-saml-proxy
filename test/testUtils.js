@@ -1,6 +1,8 @@
 import btoa from "btoa";
 import { getSamlResponse } from "samlp";
 import { getUser } from "./testUsers";
+const fs = require("fs");
+const path = require("path");
 
 /**
  * This test function builds the saml response function using session index
@@ -33,9 +35,6 @@ export let defaultMockRequest = {
   query: {
     relayState: "relay",
   },
-  headers: {
-    origin: "https://idp.example.com",
-  },
   body: {
     RelayState: "relay",
     SAMLResponse: null
@@ -45,6 +44,7 @@ export let defaultMockRequest = {
       id_me: {
         getResponseParams: jest.fn(() => {}),
         idpSsoUrl: "https://idp.example.com/saml/sso",
+        idpMetaUrl: "https://api.idmelabs.com/metadata",
       },
     },
   },
@@ -72,3 +72,17 @@ export let defaultMockRequest = {
   originalUrl: "http://original.example.com",
   x_fowarded_host: "fowarded.example.com",
 };
+
+/**
+ * Loads test data into a string.
+ *
+ * @param {*} fname The file with test data
+ */
+export function b64encodedDataFromFile(fname) {
+  const file = path.join("./test/samlResponses/decoded", fname);
+  const samlResponse = fs.readFileSync(file, "utf8", function (err, data) {
+    return data;
+  });
+  const encoded = Buffer.from(samlResponse, "ascii").toString("base64");
+  return encoded;
+}
