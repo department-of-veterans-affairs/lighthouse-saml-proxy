@@ -19,7 +19,8 @@ LABEL org.opencontainers.image.authors="Pivot!" \
 
 # Install chrome dependencies
 USER root
-RUN yum -y install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+RUN sudo amazon-linux-extras install epel -y
+RUN sudo yum install -y chromium
 
 FROM devchromebase as devnodebase
 
