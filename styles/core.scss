@@ -496,6 +496,7 @@ span.sidelines {
   border-top: 1px solid var(--vads-color-base-light);
   border-bottom: 1px solid var(--vads-color-base-light);
   line-height: 100%;
+  font-weight: bold;
 
   &:before {
     top: unset !important;
