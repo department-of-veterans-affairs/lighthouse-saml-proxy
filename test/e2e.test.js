@@ -296,19 +296,19 @@ describe("Logins for idp", () => {
     let response = await ssoIdpRequest();
     let dsLogonRequest = getIdpSamlRequest(
       response,
-      "no-external-icon usa-button dslogon"
+      "usa-button dslogon-signin"
     );
     let dsLogonId = getIdFromSamlRequest(dsLogonRequest);
     expect(dsLogonId).toBeTruthy;
     let myHealtheVetRequest = getIdpSamlRequest(
       response,
-      "no-external-icon usa-button mhv"
+      "usa-button mhv-signin"
     );
     let myHealtheVetID = getIdFromSamlRequest(myHealtheVetRequest);
     expect(myHealtheVetID).toBeTruthy;
     let idMeRequest = getIdpSamlRequest(
       response,
-      "no-external-icon usa-button idme-signin"
+      "usa-button idme-signin"
     );
     let idMeID = getIdFromSamlRequest(idMeRequest);
     expect(idMeID).toBeTruthy;
