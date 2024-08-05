@@ -28,11 +28,23 @@ $dslogon-blue: #003e73;
       padding-right: 0;
     }
 
+    h1 {
+      @media screen and (max-width: $small-screen - 1) {
+        font-size: 30px;
+      }
+    }
+
+    h2 {
+      @media screen and (max-width: $small-screen - 1) {
+        font-size: 24px;
+      }
+    }
+
     .row {
       max-width: 650px;
 
       @media screen and (max-width: $small-screen - 1) {
-        max-width: 300px;
+        max-width: 350px;
       }
     }
 
