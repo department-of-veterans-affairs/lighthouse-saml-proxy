@@ -1,12 +1,12 @@
 <section class="login">
   <div class="container">
     <div class="row">
-      <div class="columns small-12">
+      <div class="columns small-12 center-text">
         <h1 class="vads-u-margin-top--2 medium-screen:vads-u-margin-top--1 medium-screen:vads-u-margin-bottom--2">Verify your identity</h1>
       </div>
     </div>
     <div class="row">
-      <div class="columns small-12" id="sign-in-wrapper">
+      <div id="sign-in-wrapper">
         <div id="sign-in">
           <% if (login_gov_enabled) { %>
             <a class="usa-button logingov-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- login_gov_login_link -%>">
@@ -81,12 +81,12 @@
           <a class="usa-button mhv-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%-  mhv_login_link -%>">My HealtheVet</a>
         </div>
         <div class="row" id="loginNote">
-          <p class="vads-u-font-size--base vads-u-margin-top--3 vads-u-padding-x--2"><strong>Note:</strong> We're moving to a simpler and more modern sign-in experience. We'll remove the My HealtheVet option after <strong>January 31, 2025,</strong> and the DS Logon option after <strong>September 30, 2025.</strong><br>
+          <p class="vads-u-font-size--base vads-u-margin-top--3 vads-u-padding-x--2 center-text"><strong>Note:</strong> We're moving to a simpler and more modern sign-in experience. We'll remove the My HealtheVet option after <strong>January 31, 2025,</strong> and the DS Logon option after <strong>September 30, 2025.</strong><br>
             <a href="https://www.va.gov/resources/creating-an-account-for-vagov">Learn more about creating a Login.gov or ID.me account</a>
           </p>
         </div>
         <div id="create-account">
-          <h2 class="vads-u-margin-top--3">Or create an account</h2>
+          <h2 class="vads-u-margin-top--3 center-text">Or create an account</h2>
           <div class="vads-u-display--flex vads-u-flex-direction--column">
             <% if (login_gov_signup_link_enabled) { %>
               <a href="<%= login_gov_signup_link %>" class="vads-c-action-link--blue vads-u-padding-y--2p5 vads-u-width--full logingov">
@@ -102,7 +102,7 @@
     </div>
     <div class="row" id="need-help">
       <div class="columns small-12">
-        <div class="help-info">
+        <div class="help-info center-text">
           <h2 class="vads-u-margin-top--0">Having trouble signing in?</h2>
           <p class="vads-u-font-size--base">Get answers to common questions about <a href="https://www.va.gov/resources/verifying-your-identity-on-vagov/">verifying your identity</a></p>
           <p class="vads-u-font-size--base">Call our MyVA411 main information line for help at
@@ -112,12 +112,22 @@
         </div>
       </div>
     </div>
-    <footer class="fed-warning usa-grid">
-      <hr>
-      <p>When you sign in to VA.gov, you're using a United States federal government information system.</p>
-      <p>By signing in, you agree to only use information you have legal authority to view and use. You also agree to let us monitor and record your activity on the system and share this information with auditors or law enforcement officials.</p>
-      <p>By signing in, you confirm that you understand the following:</p>
-      <p>Unauthorized use of this system is prohibited and may result in criminal, civil, or administrative penalties. Unauthorized use includes gaining unauthorized data access, changing data, harming the system or its data, or misusing the system. We can suspend or block your access to this system if we suspect any unauthorized use.</p>
-    </footer>
+    <div class="row">
+      <footer class="fed-warning usa-grid center-text no-padding">
+        <hr>
+        <p>When you sign in to VA.gov, you're using a United States federal government information system.</p>
+        <p>By signing in, you agree to only use information you have legal authority to view and use. You also agree to let us monitor and record your activity on the system and share this information with auditors or law enforcement officials.</p>
+        <p>By signing in, you confirm that you understand the following:</p>
+        <p>Unauthorized use of this system is prohibited and may result in criminal, civil, or administrative penalties. Unauthorized use includes gaining unauthorized data access, changing data, harming the system or its data, or misusing the system. We can suspend or block your access to this system if we suspect any unauthorized use.</p>
+      </footer>
+    </div>
   </div>
 </section>
+<style>
+/* custom styling for layout element */
+  .custom-login {
+    max-width: 650px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+</style>
