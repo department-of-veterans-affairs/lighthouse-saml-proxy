@@ -90,7 +90,7 @@ $dslogon-blue: #003e73;
         margin-bottom: 1em;
 
         h2 {
-            margin-top: 0;
+            margin-top: 24px;
         }
     }
 
@@ -350,7 +350,7 @@ span.sidelines {
     }
   
     .help-info {
-      padding: 1em 0 0;
+      padding: 0;
 
       p:first-of-type {
         margin-top: 0;
@@ -392,7 +392,11 @@ span.sidelines {
       margin-bottom: 2em;
   
       p {
-        margin: 0.5em 0;
+        margin: 24px 0;
+      }
+
+      hr {
+        margin: 32px 0 24px;
       }
     }
   
