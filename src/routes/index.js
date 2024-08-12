@@ -15,7 +15,6 @@ import {
 } from "../logger";
 import addRoutes from "./routes";
 
-import promBundle from "express-prom-bundle";
 import * as Sentry from "@sentry/node";
 
 /**
@@ -84,18 +83,6 @@ export default function configureExpress(
     });
   }
 
-  const metricsMiddleware = promBundle({
-    includeMethod: true,
-    includePath: true,
-    customLabels: { app: "saml_proxy" },
-    normalizePath: [
-      ["^/(img|fonts|~font-awesome)/.*", "/samlproxy/idp/#static"],
-      [
-        "^/samlproxy/idp/(img|fonts|~font-awesome)/.*",
-        "/samlproxy/idp/#static",
-      ],
-    ],
-  });
   app.set("port", process.env.PORT || argv.port);
   app.set("views", path.join(process.cwd(), "./views"));
   // Express needs to know it is being ran behind a trusted proxy. Setting 'trust proxy' to true does a few things
@@ -115,7 +102,6 @@ export default function configureExpress(
       })
     );
   }
-  app.use(metricsMiddleware);
 
   /**
    * Middleware
