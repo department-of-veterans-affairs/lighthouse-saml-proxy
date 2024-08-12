@@ -1,69 +1,87 @@
-import client from "prom-client";
+const COUNT_MVI_LOOKUP_ATTEMPT = "mvi_lookup_attempt";
+const COUNT_MVI_LOOKUP_FAILURE = "mvi_lookup_failure";
+const COUNT_VSO_LOOKUP_ATTEMPT = "vso_lookup_attempt";
+const COUNT_VSO_LOOKUP_FAILURE = "vso_lookup_failure";
+const COUNT_LOGIN_IDME = "id_me_login";
+const COUNT_LOGIN_LOGINGOV = "login_gov_login";
+const COUNT_LOGIN_DSLOGON = "ds_logon_login";
+const COUNT_LOGIN_MHV = "my_healthe_vet_login";
 
-const defaultLabels = { app: "saml_proxy" };
-client.register.setDefaultLabels(defaultLabels);
-// Default buckets are [.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10]. There are too many buckets
-// on the low end and the max bucket is too high as well. Anything above 5 is too high. To help focus
-// the histogram on latencies we care about we only use a subset of the default
-const latencyBucketsSecs = [0.05, 0.1, 0.25, 0.5, 1, 2.5, 5];
-const bucketLabels = ["status_code"];
+/**
+ *
+ * @param {*} msg a message to log
+ */
+function logger(msg: string): void {
+  console.info(msg);
+}
 
-const MVILookupBucket = new client.Histogram({
-  name: "mvi_lookup_request_duration_seconds",
-  help:
-    "histogram of duration of MVI lookup requests labeled with: app, status_code",
-  buckets: latencyBucketsSecs,
-  labelNames: bucketLabels,
-});
+class Timer {
+  start_int: bigint | undefined;
+  label: string;
+  constructor(label: string) {
+    this.label = label;
+  }
+  start(): void {
+    this.start_int = process.hrtime.bigint();
+  }
+  stop(): void {
+    if (!this.start_int) return;
+    const end = process.hrtime.bigint();
+    logger(this.label + ": " + Number(end - this.start_int) / 1000000000);
+  }
+}
 
-const MVIAttempt = new client.Counter({
-  name: "mvi_lookup_attempt",
-  help: "counter of number of lookup requests sent to MVI",
-});
+const MVITimer = new Timer("mvi_lookup_gauge");
 
-const MVIFailure = new client.Counter({
-  name: "mvi_lookup_failure",
-  help: "counter of number of lookup request failures from MVI",
-});
+const VSOTimer = new Timer("vso_lookup_gauge");
 
-const VSOLookupBucket = new client.Histogram({
-  name: "vso_lookup_request_duration_seconds",
-  help:
-    "histogram of duration of VSO lookup requests labeled with: app, status_code",
-  buckets: latencyBucketsSecs,
-  labelNames: bucketLabels,
-});
+const MVIAttempt = function () {
+  logger(COUNT_MVI_LOOKUP_ATTEMPT);
+};
 
-const VSOAttempt = new client.Counter({
-  name: "vso_lookup_attempt",
-  help: "counter of number of lookup requests sent to VSO",
-});
+const MVIFailure = function () {
+  logger(COUNT_MVI_LOOKUP_FAILURE);
+};
 
-const VSOFailure = new client.Counter({
-  name: "vso_lookup_failure",
-  help: "counter of number of lookup request failures from VSO",
-});
+const VSOAttempt = function () {
+  logger(COUNT_VSO_LOOKUP_ATTEMPT);
+};
 
-export const IdpLoginCounter = new client.Counter({
-  name: "idp_login_counter",
-  help: "counter of number of logins per idp",
-  labelNames: ["idp"],
-});
+const VSOFailure = function () {
+  logger(COUNT_VSO_LOOKUP_FAILURE);
+};
+
+class IdpCounter {
+  idme(): void {
+    logger(COUNT_LOGIN_IDME);
+  }
+  logingov(): void {
+    logger(COUNT_LOGIN_LOGINGOV);
+  }
+  dslogon(): void {
+    logger(COUNT_LOGIN_DSLOGON);
+  }
+  mhv(): void {
+    logger(COUNT_LOGIN_MHV);
+  }
+}
+
+export const IdpLoginCounter = new IdpCounter();
 
 export const MVIRequestMetrics = {
-  histogram: MVILookupBucket,
+  timer: MVITimer,
   attempt: MVIAttempt,
   failure: MVIFailure,
 };
 
 export const VSORequestMetrics = {
-  histogram: VSOLookupBucket,
+  timer: VSOTimer,
   attempt: VSOAttempt,
   failure: VSOFailure,
 };
 
 export interface IRequestMetrics {
-  histogram: client.Histogram<any>;
-  attempt: client.Counter<any>;
-  failure: client.Counter<any>;
+  timer: Timer;
+  attempt: () => void;
+  failure: () => void;
 }

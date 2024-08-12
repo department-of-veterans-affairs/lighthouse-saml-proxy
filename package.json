@@ -102,7 +102,6 @@
     "node-sass-tilde-importer": "^1.0.2",
     "passport": "^0.6.0",
     "passport-wsfed-saml2": "github:auth0/passport-wsfed-saml2",
-    "prom-client": "^13.1.0",
     "redis": "^3.0.2",
     "samlp": "^7.0.1",
     "sass": "1.35.2",
