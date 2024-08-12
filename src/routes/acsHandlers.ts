@@ -44,19 +44,19 @@ export const urlUserErrorTemplate = () => {
 const sufficientLevelOfAssurance = (claims: any) => {
   if (claims.idp === "id_me" && claims.mhv_account_type) {
     logger.info("Checking MyHealtheVet LOA.");
-    IdpLoginCounter.labels({ idp: "my_healthe_vet" }).inc();
+    IdpLoginCounter.mhv();
     return claims.mhv_account_type === "Premium";
   } else if (claims.idp === "id_me" && claims.dslogon_assurance) {
     logger.info("Checking DsLogon LOA.");
-    IdpLoginCounter.labels({ idp: "ds_logon" }).inc();
+    IdpLoginCounter.dslogon();
     return claims.dslogon_assurance === "2" || claims.dslogon_assurance === "3";
   } else if (claims.idp === "id_me") {
     logger.info("Checking ID.me LOA.");
-    IdpLoginCounter.labels({ idp: "id_me" }).inc();
+    IdpLoginCounter.idme();
     return claims.level_of_assurance === "3";
   } else if (claims.idp === "logingov" && claims.ial && claims.aal) {
     logger.info("Checking LogonGov LOA.");
-    IdpLoginCounter.labels({ idp: "login_gov" }).inc();
+    IdpLoginCounter.logingov();
     return claims.aal >= 2 && claims.ial >= 2;
   }
 };
@@ -306,15 +306,16 @@ export async function requestWithMetrics(
   metrics: IRequestMetrics,
   promiseFunc: () => Promise<any>
 ) {
-  const timer = metrics.histogram.startTimer();
-  metrics.attempt.inc();
+  const timer = metrics.timer;
+  timer.start();
+  metrics.attempt();
   try {
     const res = await promiseFunc();
-    timer({ status_code: "200" });
+    timer.stop();
     return res;
   } catch (err) {
-    metrics.failure.inc();
-    timer({ status_code: err.statusCode || "unknown" });
+    metrics.failure();
+    timer.stop();
     throw err;
   }
 }
