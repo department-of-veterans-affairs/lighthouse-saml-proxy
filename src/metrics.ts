@@ -9,7 +9,7 @@ const COUNT_LOGIN_MHV = "my_healthe_vet_login";
 
 /**
  *
- * @param {*} msg a message to log
+ * @param msg a message to log
  */
 function logger(msg: string): void {
   console.info(msg);
