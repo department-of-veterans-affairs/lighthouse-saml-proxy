@@ -6,11 +6,9 @@ import { VsoClient } from "../VsoClient";
 import { MVIRequestMetrics } from "../metrics";
 import { TestCache } from "./types";
 import {
-  buildSamlResponseFunction,
   defaultMockRequest,
+  b64encodedDataFromFile,
 } from "../../test/testUtils";
-import { idpConfig } from "../../test/testServer";
-import { IDME_USER } from "../../test/testUsers";
 import { accessiblePhoneNumber } from "../utils";
 import samlp from "samlp";
 jest.mock("passport");
@@ -593,7 +591,6 @@ describe("buildPassportLoginHandler", () => {
   let req: any;
   let mockResponse: any;
   let mockNext: any;
-  const buildSamlResponse = buildSamlResponseFunction(1);
   beforeEach(async () => {
     req = defaultMockRequest;
     mockResponse = {
@@ -608,7 +605,7 @@ describe("buildPassportLoginHandler", () => {
   });
 
   it("happy path", () => {
-    req.query.SAMLResponse = buildSamlResponse(IDME_USER, "3", idpConfig);
+    req.query.SAMLResponse = b64encodedDataFromFile("idp1_example.xml");
     handlers.buildPassportLoginHandler("http://example.com/acs")(
       req,
       mockResponse,

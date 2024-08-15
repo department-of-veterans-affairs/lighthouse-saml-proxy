@@ -17,6 +17,7 @@ export default class SPConfig {
     this.idpCert = argv.spIdpCert;
     this.idpThumbprint = argv.spIdpThumbprint;
     this.idpMetaUrl = argv.spIdpMetaUrl;
+    this.idpIssuerMatchOverride = argv.spIdpIssuerMatchOverride;
     this.audience = argv.spAudience;
     this.providerName = argv.spProviderName;
     this.signAuthnRequests = argv.spSignAuthnRequests;

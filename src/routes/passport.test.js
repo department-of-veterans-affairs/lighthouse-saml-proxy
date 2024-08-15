@@ -1,5 +1,7 @@
+/* eslint-disable jsdoc/require-returns */
 import "jest";
 import { selectPassportStrategyKey } from "./passport";
+import { b64encodedDataFromFile } from "../../test/testUtils";
 
 const mockReq = {
   headers: {
@@ -8,24 +10,50 @@ const mockReq = {
   sps: {
     options: {
       idp1: {
-        idpSsoUrl: "http://login.example1.com/saml/sso",
+        category: "idp1",
+        idpMetaUrl: "https://api.idp1.com/saml/metadata/provider",
       },
       idp2: {
-        idpSsoUrl: "http://login.example2.com/saml/sso",
+        category: "idp2",
+        idpMetaUrl: "https://idp.int.idp2.org/api/saml/metadata2023",
+      },
+      idp3: {
+        category: "idp3",
+        idpMetaUrl: "https://idp3:18443/realms/xxxx/protocol/saml/descriptor",
+      },
+      idp4: {
+        category: "idp4",
+        idpMetaUrl:
+          "https://deptyyy.idp4preview.com/app/yyyy/sso/saml/metadata",
+        idpIssuerMatchOverride: "idp4.com",
       },
     },
   },
 };
 describe("selectPassportStrategyKey", () => {
   test("selectPassportStrategyKey idp1", () => {
+    mockReq.body = { SAMLResponse: b64encodedDataFromFile("idp1_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
   test("selectPassportStrategyKey idp2", () => {
-    mockReq.headers.origin = "http://login.example2.com";
+    mockReq.body = { SAMLResponse: b64encodedDataFromFile("idp2_example.xml") };
     expect(selectPassportStrategyKey(mockReq)).toBe("idp2");
   });
-  test("selectPassportStrategyKey default 'id_me'", () => {
-    mockReq.headers.origin = "http://login.example0.com";
-    expect(selectPassportStrategyKey(mockReq)).toBe("id_me");
+
+  test("selectPassportStrategyKey idp3", () => {
+    mockReq.body = { SAMLResponse: b64encodedDataFromFile("idp3_example.xml") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp3");
+  });
+
+  test("selectPassportStrategyKey idp4", () => {
+    mockReq.body = { SAMLResponse: b64encodedDataFromFile("idp4_example.xml") };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp4");
+  });
+
+  test("selectPassportStrategyKey default 'idp1'", () => {
+    mockReq.body = {
+      SAMLResponse: b64encodedDataFromFile("unmatched_example.xml"),
+    };
+    expect(selectPassportStrategyKey(mockReq)).toBe("idp1");
   });
 });
