@@ -21,11 +21,12 @@ const defaultScope = [
 const redirect_uri = "https://app/after-auth";
 const authorization_url = process.env.AUTHORIZATION_URL;
 const saml_proxy_url = process.env.SAML_PROXY_URL;
-const valid_user_email = process.env.VALID_USER_EMAIL;
-const valid_user_seed = process.env.VALID_USER_SEED;
-const user_password = process.env.USER_PASSWORD;
-const icn_error_user_email = process.env.ICN_ERROR_USER_EMAIL;
-const icn_error_user_seed = process.env.ICN_ERROR_USER_SEED;
+const valid_login_gov_user_email = process.env.VALID_LOGIN_GOV_USER_EMAIL;
+const valid_login_gov_user_seed = process.env.VALID_LOGIN_GOV_USER_SEED;
+const login_gov_user_password = process.env.LOGIN_GOV_USER_PASSWORD;
+const icn_error_login_gov_user_email =
+  process.env.ICN_ERROR_LOGIN_GOV_USER_EMAIL;
+const icn_error_login_gov_user_seed = process.env.ICN_ERROR_LOGIN_GOV_USER_SEED;
 const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT
   ? Number(process.env.REGRESSION_TEST_TIMEOUT)
   : 70000;
@@ -47,9 +48,9 @@ describe("Regression tests", () => {
 
     let code = await login(
       page,
-      valid_user_email,
-      user_password,
-      valid_user_seed,
+      valid_login_gov_user_email,
+      login_gov_user_password,
+      valid_login_gov_user_seed,
       true
     );
     expect(code).not.toBeNull();
@@ -59,14 +60,17 @@ describe("Regression tests", () => {
     const page = await browser.newPage();
     await requestToken(page);
 
-    await login(page, icn_error_user_email, user_password, icn_error_user_seed);
+    await login(
+      page,
+      icn_error_login_gov_user_email,
+      login_gov_user_password,
+      icn_error_login_gov_user_seed
+    );
 
-    debug("Waiting for Request");
     await page.waitForRequest((request) => {
       return request.url().includes("/samlproxy/sp/saml/sso");
     });
 
-    debug("Waiting for Navigation");
     await page.waitForNavigation({
       waitUntil: "networkidle0",
     });
@@ -147,9 +151,9 @@ describe("Regression tests", () => {
     await requestToken(page);
     await authentication(
       page,
-      valid_user_email,
-      user_password,
-      valid_user_seed
+      valid_login_gov_user_email,
+      login_gov_user_password,
+      valid_login_gov_user_seed
     );
 
     page.on("request", async (request) => {
@@ -187,7 +191,7 @@ describe("Regression tests", () => {
 });
 
 const requestToken = async (page) => {
-  await page.setViewport({ width: 1352, height: 716 });
+  await page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 });
   await page.goto(
     `${authorization_url}/authorization?client_id=${
       process.env.CLIENT_ID
@@ -204,57 +208,46 @@ const requestToken = async (page) => {
 
 const login = async (page, useremail, password, seed, get_code = false) => {
   await authentication(page, useremail, password, seed);
-  debug("Authentication has finished");
 
   let code;
   if (get_code) {
-    debug("Wait for the request");
     let request = await page.waitForRequest((request) =>
       request.url().includes(redirect_uri)
     );
 
-    debug("Get the Request URL");
     let url = new URL(request.url());
 
-    debug("Get the Authorization code");
     code = url.searchParams.get("code");
   }
 
-  debug("Return the code");
   return code;
 };
 
 const authentication = async (
   page,
-  email = valid_user_email,
-  password = user_password,
-  seed = valid_user_seed
+  email = valid_login_gov_user_email,
+  password = login_gov_user_password,
+  seed = valid_login_gov_user_seed
 ) => {
-  debug("Looking for Login.gov sign-in button on saml-proxy");
   await page.waitForSelector(".logingov-signin");
 
-  debug("Clicking Login.gov sign-in button from saml-proxy");
   await Promise.all([
     page.$eval(".logingov-signin", (elem) => elem.click()),
-    page.setViewport({ width: 1352, height: 796 }),
+    page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 }),
   ]);
 
-  debug("Looking for expected elements on login.gov sign-in page");
   await Promise.all([
     page.waitForSelector("#user_email"),
     page.waitForSelector('[name="user[password]"]'),
     page.waitForSelector('[name="button"]'),
   ]);
 
-  debug("Typing username and password on login.gov sign-in page");
   await page.type("#user_email", email);
   await page.type('[name="user[password]"]', password);
 
-  debug("Clicking sign-in button on login.gov sign-in page");
   await page.$eval('[name="button"]', (elem) => elem.click());
 
   if (page.url().includes("rules_of_use")) {
-    debug("Looking for rules of use if there");
     await Promise.all([
       page.$eval('[class="usa-checkbox__label boolean required"]', (elem) =>
         elem.click()
@@ -263,11 +256,10 @@ const authentication = async (
     ]);
   }
 
-  debug("Looking for expected elements on 2FA page");
   await Promise.all([
     page.waitForSelector('[autocomplete="one-time-code"]'),
     page.waitForSelector('[name="button"]'),
-    page.setViewport({ width: 1352, height: 796 }),
+    page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 }),
   ]);
 
   const totp = speakeasy.totp({
@@ -275,20 +267,15 @@ const authentication = async (
     encoding: "base32",
   });
 
-  debug("Typing mfa code on the authentication page");
   await page.type('[autocomplete="one-time-code"]', totp);
 
-  debug("Waiting for expected elements to load");
   await page.waitForSelector('[type="submit"]');
 
-  debug("Clicking the submit button once mfa code is typed");
   await page.$eval('[type="submit"]', (elem) => elem.click());
   await page.waitForNavigation();
 
   if (page.url().includes("second_mfa_reminder")) {
-    debug("Waiting for continue to sandbox button");
     await page.waitForSelector('[type="submit"]');
-    debug("Clicking the Continue to Saml proxy-sandbox button");
     const buttons = await page.$$('[type="submit"]');
 
     for (const button of buttons) {
@@ -301,22 +288,10 @@ const authentication = async (
   }
 
   if (page.url().includes("sign_up/completed")) {
-    debug("Waiting for expected elements on consent page to load");
     await page.waitForSelector('[type="submit"]');
-
-    debug("Clicking the submit button");
     await page.$eval('[type="submit"]', (elem) => elem.click());
   }
 };
-
-/**
- * Log a message to console.
- *
- * @param {string} message The debug message.
- */
-function debug(message) {
-  console.log(`DEBUG - ${new Date().toISOString()} - ${message}`);
-}
 
 const encode = async (data) => {
   await SAML.encodeSamlPost(data.SAMLResponse, function (err, encoded) {
