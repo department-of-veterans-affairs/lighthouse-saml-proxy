@@ -46,9 +46,11 @@ env:
     DEV_IDP: "/dvp/common/ecs-saml-proxy/codebuild/dev_idp"
     SANDBOX_IDP: "/dvp/common/ecs-saml-proxy/codebuild/sandbox_idp"
     AUTHORIZATION_URL: "/dvp/common/ecs-saml-proxy/codebuild/authorization_url"
-    USER_PASSWORD: "/dvp/common/ecs-saml-proxy/codebuild/user_password"
-    VALID_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/valid_user_email"
-    ICN_ERROR_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/icn_error_user_email"
+    VALID_LOGIN_GOV_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/valid_login_gov_user_email"
+    VALID_LOGIN_GOV_USER_SEED: "/dvp/common/ecs-saml-proxy/codebuild/valid_login_gov_user_seed"
+    LOGIN_GOV_USER_PASSWORD: "/dvp/common/ecs-saml-proxy/codebuild/login_gov_user_password"
+    ICN_ERROR_LOGIN_GOV_USER_EMAIL: "/dvp/common/ecs-saml-proxy/codebuild/icn_error_login_gov_user_email"
+    ICN_ERROR_LOGIN_GOV_USER_SEED: "/dvp/common/ecs-saml-proxy/codebuild/icn_error_login_gov_user_seed"
     REGRESSION_TEST_TIMEOUT: "/dvp/common/ecs-saml-proxy/codebuild/regression_test_timeout"
 phases:
   install:
@@ -119,9 +121,11 @@ phases:
               CLIENT_ID=${CLIENT_ID} \
               IDP=${IDP} \
               AUTHORIZATION_URL=${AUTHORIZATION_URL} \
-              USER_PASSWORD=${USER_PASSWORD} \
-              VALID_USER_EMAIL=${VALID_USER_EMAIL} \
-              ICN_ERROR_USER_EMAIL=${ICN_ERROR_USER_EMAIL}
+              VALID_LOGIN_GOV_USER_EMAIL=${VALID_LOGIN_GOV_USER_EMAIL} \
+              VALID_LOGIN_GOV_USER_SEED=${VALID_LOGIN_GOV_USER_SEED} \
+              LOGIN_GOV_USER_PASSWORD=${LOGIN_GOV_USER_PASSWORD} \
+              ICN_ERROR_LOGIN_GOV_USER_EMAIL=${ICN_ERROR_LOGIN_GOV_USER_EMAIL} \
+              ICN_ERROR_LOGIN_GOV_USER_SEED=${ICN_ERROR_LOGIN_GOV_USER_SEED} \
               REGRESSION_TEST_TIMEOUT=${REGRESSION_TEST_TIMEOUT}
             if [[ $? -gt 0 ]]; then
               slackpost.sh -t warning "Some regression tests failed."

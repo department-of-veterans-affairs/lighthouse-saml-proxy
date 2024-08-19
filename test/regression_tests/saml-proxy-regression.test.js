@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const puppeteer = require("puppeteer");
 const qs = require("querystring");
 const SAML = require("saml-encoder-decoder-js");
+const speakeasy = require("speakeasy");
 const ModifyAttack = require("./modifyAttack");
 const launchArgs = {
   headless: process.env.HEADLESS > 0,
@@ -17,12 +18,15 @@ const defaultScope = [
   "address phone",
 ];
 
+const redirect_uri = "https://app/after-auth";
 const authorization_url = process.env.AUTHORIZATION_URL;
 const saml_proxy_url = process.env.SAML_PROXY_URL;
-const redirect_uri = "https://app/after-auth";
-const user_password = process.env.USER_PASSWORD;
-const valid_user = process.env.VALID_USER_EMAIL;
-const icn_error_user = process.env.ICN_ERROR_USER_EMAIL;
+const valid_login_gov_user_email = process.env.VALID_LOGIN_GOV_USER_EMAIL;
+const valid_login_gov_user_seed = process.env.VALID_LOGIN_GOV_USER_SEED;
+const login_gov_user_password = process.env.LOGIN_GOV_USER_PASSWORD;
+const icn_error_login_gov_user_email =
+  process.env.ICN_ERROR_LOGIN_GOV_USER_EMAIL;
+const icn_error_login_gov_user_seed = process.env.ICN_ERROR_LOGIN_GOV_USER_SEED;
 const regression_test_timeout = process.env.REGRESSION_TEST_TIMEOUT
   ? Number(process.env.REGRESSION_TEST_TIMEOUT)
   : 70000;
@@ -42,7 +46,13 @@ describe("Regression tests", () => {
     const page = await browser.newPage();
     await requestToken(page);
 
-    let code = await login(page, valid_user, user_password, true);
+    let code = await login(
+      page,
+      valid_login_gov_user_email,
+      login_gov_user_password,
+      valid_login_gov_user_seed,
+      true
+    );
     expect(code).not.toBeNull();
   });
 
@@ -50,7 +60,12 @@ describe("Regression tests", () => {
     const page = await browser.newPage();
     await requestToken(page);
 
-    await login(page, icn_error_user, user_password);
+    await login(
+      page,
+      icn_error_login_gov_user_email,
+      login_gov_user_password,
+      icn_error_login_gov_user_seed
+    );
 
     await page.waitForRequest((request) => {
       return request.url().includes("/samlproxy/sp/saml/sso");
@@ -134,7 +149,12 @@ describe("Regression tests", () => {
   test("modify", async () => {
     const page = await browser.newPage();
     await requestToken(page);
-    await authentication(page, valid_user, true);
+    await authentication(
+      page,
+      valid_login_gov_user_email,
+      login_gov_user_password,
+      valid_login_gov_user_seed
+    );
 
     page.on("request", async (request) => {
       if (
@@ -171,6 +191,7 @@ describe("Regression tests", () => {
 });
 
 const requestToken = async (page) => {
+  await page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 });
   await page.goto(
     `${authorization_url}/authorization?client_id=${
       process.env.CLIENT_ID
@@ -185,34 +206,91 @@ const requestToken = async (page) => {
   });
 };
 
-const login = async (page, useremail, password, get_code = false) => {
-  await authentication(page, useremail);
+const login = async (page, useremail, password, seed, get_code = false) => {
+  await authentication(page, useremail, password, seed);
 
   let code;
   if (get_code) {
     let request = await page.waitForRequest((request) =>
       request.url().includes(redirect_uri)
     );
+
     let url = new URL(request.url());
+
     code = url.searchParams.get("code");
   }
 
   return code;
 };
 
-const authentication = async (page, email = valid_user, intercept = false) => {
-  await page.$eval(".idme-signin", (elem) => elem.click());
-  await page.waitForSelector("#user_email");
+const authentication = async (
+  page,
+  email = valid_login_gov_user_email,
+  password = login_gov_user_password,
+  seed = valid_login_gov_user_seed
+) => {
+  await page.waitForSelector(".logingov-signin");
+
+  await Promise.all([
+    page.$eval(".logingov-signin", (elem) => elem.click()),
+    page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 }),
+  ]);
+
+  await Promise.all([
+    page.waitForSelector("#user_email"),
+    page.waitForSelector('[name="user[password]"]'),
+    page.waitForSelector('[name="button"]'),
+  ]);
+
   await page.type("#user_email", email);
-  await page.type("#user_password", user_password);
-  await page.$eval('[name="commit"]', (elem) => elem.click());
-  await page.waitForSelector(".phone");
-  await page.$eval("button.btn-primary", (elem) => elem.click());
-  await page.waitForSelector("#multifactor_code");
+  await page.type('[name="user[password]"]', password);
 
-  await page.setRequestInterception(intercept);
+  await page.$eval('[name="button"]', (elem) => elem.click());
 
-  await page.$eval("button.btn-primary", (elem) => elem.click());
+  if (page.url().includes("rules_of_use")) {
+    await Promise.all([
+      page.$eval('[class="usa-checkbox__label boolean required"]', (elem) =>
+        elem.click()
+      ),
+      page.$eval('[name="button"]', (elem) => elem.click()),
+    ]);
+  }
+
+  await Promise.all([
+    page.waitForSelector('[autocomplete="one-time-code"]'),
+    page.waitForSelector('[name="button"]'),
+    page.setViewport({ width: 0, height: 0, deviceScaleFactor: 0 }),
+  ]);
+
+  const totp = speakeasy.totp({
+    secret: seed,
+    encoding: "base32",
+  });
+
+  await page.type('[autocomplete="one-time-code"]', totp);
+
+  await page.waitForSelector('[type="submit"]');
+
+  await page.$eval('[type="submit"]', (elem) => elem.click());
+  await page.waitForNavigation();
+
+  if (page.url().includes("second_mfa_reminder")) {
+    await page.waitForSelector('[type="submit"]');
+    const buttons = await page.$$('[type="submit"]');
+
+    for (const button of buttons) {
+      const buttonText = await button.evaluate((node) => node.textContent);
+      if (buttonText.includes("Continue to")) {
+        await button.click(), page.waitForNavigation();
+        break;
+      }
+    }
+  }
+
+  if (page.url().includes("sign_up/completed")) {
+    await page.waitForSelector('[type="submit"]');
+    await page.$eval('[type="submit"]', (elem) => elem.click());
+  }
 };
 
 const encode = async (data) => {

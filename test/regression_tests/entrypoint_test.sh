@@ -11,9 +11,11 @@ docker run \
   --client-id=$CLIENT_ID \
   --idp=$IDP \
   --authorization-url=$AUTHORIZATION_URL \
-  --user-password=$USER_PASSWORD \
-  --valid-user=$VALID_USER_EMAIL \
-  --icn-error-user=$ICN_ERROR_USER_EMAIL
+  --valid-login-gov-user-email=$VALID_LOGIN_GOV_USER_EMAIL \
+  --valid-login-gov-user-seed=$VALID_LOGIN_GOV_USER_SEED \
+  --login-gov-user-password=$LOGIN_GOV_USER_PASSWORD \
+  --icn-error-login-gov-user-email=$ICN_ERROR_LOGIN_GOV_USER_EMAIL \
+  --icn-error-login-gov-user-seed=$ICN_ERROR_LOGIN_GOV_USER_SEED
 
 EOF
 }
@@ -38,12 +40,16 @@ case $i in
       export IDP="${i#*=}"; shift ;;
     --authorization-url=*)
       export AUTHORIZATION_URL="${i#*=}"; shift ;;
-    --user-password=*)
-      export USER_PASSWORD="${i#*=}"; shift ;;
-    --valid-user=*)
-      export VALID_USER_EMAIL="${i#*=}"; shift ;;
-    --icn-error-user=*)
-      export ICN_ERROR_USER_EMAIL="${i#*=}"; shift ;;
+    --valid-login-gov-user-email=*)
+      export VALID_LOGIN_GOV_USER_EMAIL="${i#*=}"; shift ;;
+    --valid-login-gov-user-seed=*)
+      export VALID_LOGIN_GOV_USER_SEED="${i#*=}"; shift ;;
+    --login-gov-user-password=*)
+      export LOGIN_GOV_USER_PASSWORD="${i#*=}"; shift ;;
+    --icn-error-login-gov-user-email=*)
+      export ICN_ERROR_LOGIN_GOV_USER_EMAIL="${i#*=}"; shift ;;
+    --icn-error-login-gov-user-seed=*)
+      export ICN_ERROR_LOGIN_GOV_USER_SEED="${i#*=}"; shift ;;
 esac
 done
 
