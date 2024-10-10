@@ -25,12 +25,11 @@
   "sessionSecret": "fake-session-secret",
   "cacheEnabled": true,
   "redisPort": "6379",
-  "fraudBlockEnabled": true,
   "redisHost": "127.0.0.1",
   "spIdpSsoBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
   "idpSamlLoginsEnabled": true,
   "logStyleElementsEnabled": true,
-  "idpSamlLogins":
+  "idpSamlLogins": 
   [
     {
       "category": "example2SamlIdp",

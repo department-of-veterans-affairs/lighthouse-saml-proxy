@@ -22,8 +22,6 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
-import { processArgs } from "../cli";
-const argv = processArgs();
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -143,9 +141,10 @@ export const loadICN = async (
       result: "success",
     });
 
-    if (argv.fraudBlockEnabled && idTheftIndicator) {
+    if (req.mpiUserClient.fraudIdTheft && idTheftIndicator) {
       logger.warn("Fradulent identity detected, blocking login.");
-      return res.render("sensitive_error", {
+      return res.render("layout", {
+        body: "sensitive_error",
         request_id: rTracer.id(),
       });
     }

@@ -4,13 +4,20 @@ import axios from "axios";
 export class MpiUserClient {
   mpiUserEndpoint: string;
   headers: object;
+  fraudIdTheft: boolean;
 
-  constructor(apiKey: string, mpiUserEndpoint: string, accessKey: string) {
+  constructor(
+    apiKey: string,
+    mpiUserEndpoint: string,
+    accessKey: string,
+    fraudIdTheft: boolean
+  ) {
     this.mpiUserEndpoint = mpiUserEndpoint;
     this.headers = {
       apiKey: apiKey,
       accesskey: accessKey,
     };
+    this.fraudIdTheft = fraudIdTheft;
   }
 
   public async getMpiTraitsForLoa3User(
