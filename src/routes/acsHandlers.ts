@@ -22,6 +22,8 @@ import {
 } from "../metrics";
 import rTracer from "cls-rtracer";
 import { selectPassportStrategyKey } from "./passport";
+import { processArgs } from "../cli";
+const argv = processArgs();
 
 const unknownUsersErrorTemplate = (error: any) => {
   // `error` comes from:
@@ -123,7 +125,12 @@ export const loadICN = async (
   const action = "loadICN";
 
   try {
-    const { icn, first_name, last_name } = await requestWithMetrics(
+    const {
+      icn,
+      first_name,
+      last_name,
+      idTheftIndicator,
+    } = await requestWithMetrics(
       MVIRequestMetrics,
       (): Promise<any> => {
         return req.mpiUserClient.getMpiTraitsForLoa3User(req.user.claims);
@@ -135,6 +142,13 @@ export const loadICN = async (
       action,
       result: "success",
     });
+
+    if (argv.fraudBlockEnabled && idTheftIndicator) {
+      logger.warn("Fradulent identity detected, blocking login.");
+      return res.render("sensitive_error", {
+        request_id: rTracer.id(),
+      });
+    }
     req.user.claims.icn = icn;
     if (first_name) {
       req.user.claims.firstName = first_name;

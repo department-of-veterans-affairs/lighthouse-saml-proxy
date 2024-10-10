@@ -15,7 +15,12 @@ export class MpiUserClient {
 
   public async getMpiTraitsForLoa3User(
     user: SAMLUser
-  ): Promise<{ icn: string; first_name: string; last_name: string }> {
+  ): Promise<{
+    icn: string;
+    first_name: string;
+    last_name: string;
+    idTheftIndicator: boolean;
+  }> {
     const body: Record<string, any> = {
       idp_uuid: user.uuid,
       dslogon_edipi: user.edipi || null,
@@ -38,7 +43,12 @@ export class MpiUserClient {
       })
       .then((response) => {
         const data = response.data.data;
-        return data.attributes;
+        return {
+          icn: data.attributes.icn,
+          first_name: data.attributes.first_name,
+          last_name: data.attributes.last_name,
+          idTheftIndicator: data.id_theft_indicator || false,
+        };
       })
       .catch(() => {
         throw {
