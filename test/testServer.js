@@ -36,6 +36,7 @@ const defaultTestingConfig = {
   spValidateNameIDFormat: true,
   spNameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
   spRequestAuthnContext: true,
+  fraudBlockEnabled: true,
 };
 
 export const idpConfig = new IDPConfig(defaultTestingConfig);
