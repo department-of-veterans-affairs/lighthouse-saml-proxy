@@ -41,6 +41,13 @@ export function processArgs() {
           KEY_CERT_HELP_TEXT
         ),
       },
+      fraudBlockEnabled: {
+        description:
+          "Enable or disable blocking logins based on the fraud identity indicator",
+        required: false,
+        boolean: true,
+        default: false,
+      },
       idpKey: {
         description: "IdP Signature PrivateKey Certificate",
         required: true,

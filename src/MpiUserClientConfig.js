@@ -3,5 +3,6 @@ export default class MpiUserClientConfig {
     this.mpiUserEndpoint = argv.mpiUserEndpoint;
     this.accessKey = argv.accessKey;
     this.apiKey = argv.vetsAPIToken;
+    this.fraudBlockEnabled = argv.fraudBlockEnabled || false;
   }
 }
