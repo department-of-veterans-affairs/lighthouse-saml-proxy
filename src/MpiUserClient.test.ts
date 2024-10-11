@@ -50,6 +50,7 @@ beforeEach(() => {
             icn: "fakeICN",
             first_name: "Edward",
             last_name: "Paget",
+            id_theft_indicator: true,
           },
         },
       },
@@ -62,7 +63,8 @@ describe("getMVITraitsForLoa3User", () => {
     const client = new MpiUserClient(
       "faketoken",
       "https://example.gov/mvi-user",
-      "faketoken"
+      "faketoken",
+      true
     );
     await client.getMpiTraitsForLoa3User(samlTraitsEDIPI);
     expect(axios.post).toHaveBeenCalledWith(
@@ -89,7 +91,8 @@ describe("getMVITraitsForLoa3User", () => {
     const client = new MpiUserClient(
       "faketoken",
       "https://example.gov/mpi-user",
-      "faketoken"
+      "faketoken",
+      true
     );
     await client.getMpiTraitsForLoa3User(samlTraitsICN);
     expect(axios.post).toHaveBeenCalledWith(
@@ -111,7 +114,8 @@ describe("getMVITraitsForLoa3User", () => {
     const client = new MpiUserClient(
       "faketoken",
       "https://example.gov/mpi-user",
-      "faketoken"
+      "faketoken",
+      true
     );
     await client.getMpiTraitsForLoa3User(samlTraits);
     expect(axios.post).toHaveBeenCalledWith(
@@ -138,9 +142,11 @@ describe("getMVITraitsForLoa3User", () => {
     const client = new MpiUserClient(
       "faketoken",
       "https://example.gov",
-      "faketoken"
+      "faketoken",
+      false
     );
-    const { icn } = await client.getMpiTraitsForLoa3User(samlTraits);
-    expect(icn).toEqual("fakeICN");
+    const mpiTraits = await client.getMpiTraitsForLoa3User(samlTraits);
+    expect(mpiTraits.icn).toEqual("fakeICN");
+    expect(mpiTraits.idTheftIndicator).toEqual(false);
   });
 });

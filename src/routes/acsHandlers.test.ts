@@ -25,7 +25,8 @@ const vsoClient = new VsoClient("fakeToken", "https://example.gov");
 const mpiUserClient = new MpiUserClient(
   "fakeToken",
   "http://example.com/mpiuser",
-  "fakekey"
+  "fakekey",
+  true
 );
 
 // Technically Doesn't TypeCheck, but typechecking is off for test files
@@ -211,12 +212,68 @@ describe("scrubUserClaims", () => {
   });
 });
 
+
+
 describe("loadICN", () => {
   beforeEach(() => {
     // @ts-ignore
     mpiUserClient.getMpiTraitsForLoa3User.mockReset();
     // @ts-ignore
     vsoClient.getVSOSearch.mockReset();
+  });
+
+  it("should block login when fraudIdTheft is true and idTheftIndicator is true", async () => {
+    const nextFn = jest.fn();
+    const renderMock = jest.fn();
+    const req: any = {
+      mpiUserClient: { ...mpiUserClient, fraudIdTheft: true },
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
+      icn: "anICN",
+      first_name: "Edward",
+      last_name: "Paget",
+      idTheftIndicator: true,
+    });
+
+    const response: any = { render: renderMock };
+    await handlers.loadICN(req, response, nextFn);
+
+    expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
+    expect(renderMock).toHaveBeenCalledWith("layout", {
+      body: "sensitive_error",
+    });
+    expect(nextFn).not.toHaveBeenCalled();
+  });
+
+  it("should not block login when fraudIdTheft is true and idTheftIndicator is false", async () => {
+    const nextFn = jest.fn();
+    const renderMock = jest.fn();
+    const req: any = {
+      mpiUserClient: { ...mpiUserClient, fraudIdTheft: true },
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
+      icn: "anICN",
+      first_name: "Edward",
+      last_name: "Paget",
+      idTheftIndicator: false,
+    });
+
+    const response: any = { render: renderMock };
+    await handlers.loadICN(req, response, nextFn);
+
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
+    expect(req.user.claims.icn).toEqual("anICN");
   });
 
   it("should call getMVITraits... calls when ICN Exists", async () => {
