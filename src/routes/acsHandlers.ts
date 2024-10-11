@@ -141,7 +141,7 @@ export const loadICN = async (
       result: "success",
     });
 
-    if (req.mpiUserClient.fraudIdTheft && idTheftIndicator) {
+    if (req.mpiUserClient.fraudBlockEnabled && idTheftIndicator) {
       logger.warn("Fradulent identity detected, blocking login.");
       return res.render("layout", {
         body: "sensitive_error",

@@ -212,8 +212,6 @@ describe("scrubUserClaims", () => {
   });
 });
 
-
-
 describe("loadICN", () => {
   beforeEach(() => {
     // @ts-ignore
@@ -222,11 +220,11 @@ describe("loadICN", () => {
     vsoClient.getVSOSearch.mockReset();
   });
 
-  it("should block login when fraudIdTheft is true and idTheftIndicator is true", async () => {
+  it("should block login when fraudBlockEnabled is true and idTheftIndicator is true", async () => {
     const nextFn = jest.fn();
     const renderMock = jest.fn();
     const req: any = {
-      mpiUserClient: { ...mpiUserClient, fraudIdTheft: true },
+      mpiUserClient: { ...mpiUserClient, fraudBlockEnabled: true },
       vsoClient: vsoClient,
       user: {
         claims: { ...claimsWithICN },
@@ -250,11 +248,11 @@ describe("loadICN", () => {
     expect(nextFn).not.toHaveBeenCalled();
   });
 
-  it("should not block login when fraudIdTheft is true and idTheftIndicator is false", async () => {
+  it("should not block login when fraudBlockEnabled is true and idTheftIndicator is false", async () => {
     const nextFn = jest.fn();
     const renderMock = jest.fn();
     const req: any = {
-      mpiUserClient: { ...mpiUserClient, fraudIdTheft: true },
+      mpiUserClient: { ...mpiUserClient, fraudBlockEnabled: true },
       vsoClient: vsoClient,
       user: {
         claims: { ...claimsWithICN },
@@ -266,6 +264,32 @@ describe("loadICN", () => {
       first_name: "Edward",
       last_name: "Paget",
       idTheftIndicator: false,
+    });
+
+    const response: any = { render: renderMock };
+    await handlers.loadICN(req, response, nextFn);
+
+    expect(renderMock).not.toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
+    expect(req.user.claims.icn).toEqual("anICN");
+  });
+
+  it("should not block login when fraudBlockEnabled is false and idTheftIndicator is true", async () => {
+    const nextFn = jest.fn();
+    const renderMock = jest.fn();
+    const req: any = {
+      mpiUserClient: { ...mpiUserClient, fraudBlockEnabled: false },
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockResolvedValueOnce({
+      icn: "anICN",
+      first_name: "Edward",
+      last_name: "Paget",
+      idTheftIndicator: true,
     });
 
     const response: any = { render: renderMock };

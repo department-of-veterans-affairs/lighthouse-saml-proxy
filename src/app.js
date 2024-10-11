@@ -102,7 +102,7 @@ function runServer(argv) {
         mpiUserClientConfig.apiKey,
         mpiUserClientConfig.mpiUserEndpoint,
         mpiUserClientConfig.accessKey,
-        mpiUserClientConfig.fraudIdTheft
+        mpiUserClientConfig.fraudBlockEnabled
       );
       const vsoClient = new VsoClient(
         vsoConfig.token,
