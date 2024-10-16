@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@department-of-veterans-affairs/formation": "^11.0.12",
-    "@sentry/node": "^8.34.0",
+    "@sentry/node": "^6.4.0",
     "@types/lodash.assignin": "^4.2.6",
     "@types/morgan": "^1.9.2",
     "@types/passport": "^1.0.6",
