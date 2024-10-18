@@ -45,18 +45,6 @@ HEALTHCHECK --interval=1m --timeout=4s --start-period=30s \
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["node", "build/app.js", "--config", "/etc/saml-proxy/config.json"]
 
-FROM npminstall as testandlint
-
-COPY --chown=lhuser:lhuser bin/ bin/
-COPY --chown=lhuser:lhuser src/ src/
-COPY --chown=lhuser:lhuser test/ test/
-COPY --chown=lhuser:lhuser public/ public/
-COPY --chown=lhuser:lhuser styles/ styles/
-COPY --chown=lhuser:lhuser views/ views/
-COPY --chown=lhuser:lhuser tsconfig.json ./
-COPY --chown=lhuser:lhuser .eslint* ./
-COPY --chown=lhuser:lhuser tsconfig.json ./
-
 # Static Labels
 LABEL org.opencontainers.image.authors="leeroy-jenkles@va.gov" \
       org.opencontainers.image.url="https://github.com/department-of-veterans-affairs/lighthouse-saml-proxy/tree/master/Dockerfile" \
