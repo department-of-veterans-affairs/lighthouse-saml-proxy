@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ master, API-41055-utlint ]
 
 jobs:
   lint:

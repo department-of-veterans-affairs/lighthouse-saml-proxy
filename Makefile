@@ -56,21 +56,6 @@ build/saml:
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
 
-## build/saml:	Build interim saml-proxy unit test and lint image
-.PHONY: build/saml_utlint
-build/saml_utlint : IMAGE = saml-proxy-utlint
-build/saml_utlint:
-	## build:	Build Docker image
-	docker build -t $(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
-		-f Dockerfile \
-		--target testandlint \
-		--build-arg AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
-		--build-arg BUILD_DATE_TIME=$(BUILD_DATE_TIME) \
-		--build-arg BUILD_TOOL=$(BUILD_TOOL) \
-		--build-arg VERSION=$(BUILD_VERSION) \
-		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
-		--no-cache .
-
 ## build/saml_tests:	Build saml-proxy image
 .PHONY: build/saml_tests
 build/saml_tests : IMAGE = saml-proxy-tests
@@ -84,22 +69,6 @@ build/saml_tests:
 		--build-arg BUILD_VERSION=$(BUILD_VERSION) \
 		--build-arg BUILD_NUMBER=$(BUILD_NUMBER) \
 		--no-cache .
-
-## lint: Linting
-.PHONY: lint
-lint:
-	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
-	docker run --rm --entrypoint='' \
-		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
-		npm run-script lint
-
-## test: Unit Tests
-.PHONY: test
-test:
-	@:$(call check_defined, IMAGE, IMAGE variable should be saml-proxy)
-	docker run --rm --entrypoint='' \
-		$(REPOSITORY)/$(NAMESPACE)/$(IMAGE):$(TAG) \
-		npm run test:ci
 
 ## regression: Regression Tests
 .PHONY: regression
