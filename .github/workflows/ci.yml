@@ -23,7 +23,7 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm update && npm ci
 
       - name: Lint code
         run: npm run lint
@@ -44,7 +44,7 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm update && npm ci
 
       - name: Run tests
         run: npm run test:ci
