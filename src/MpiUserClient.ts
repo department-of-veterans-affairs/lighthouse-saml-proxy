@@ -57,12 +57,20 @@ export class MpiUserClient {
           idTheftIndicator: data.id_theft_indicator || false,
         };
       })
-      .catch(() => {
-        throw {
-          name: "MPILookupFailure",
-          statusCode: 404,
-          message: "Error with MPI Lookup",
-        };
+      .catch((error) => {
+        const statusCode = error.response.status;
+        if (statusCode === 503) {
+          throw {
+            name: "MPILookupFailure",
+            statusCode: 503,
+            message: "Service unavailable for MPI Lookup",
+          };
+        } else
+          throw {
+            name: "MPILookupFailure",
+            statusCode: 404,
+            message: "Error with MPI Lookup",
+          };
       });
   }
 }
