@@ -161,12 +161,23 @@ export const loadICN = async (
     }
     next();
   } catch (mviError) {
+    if (mviError?.statusCode == 503) {
+      logger.warn(mviError?.message, {
+        session,
+        action,
+        result: "failure",
+      });
+      return res.render("layout", {
+        body: "sensitive_error",
+        request_id: rTracer.id(),
+      });
+    }
+
     logger.warn("Failed MVI lookup; will try VSO search", {
       session,
       action,
       result: "failure",
     });
-
     try {
       await requestWithMetrics(
         VSORequestMetrics,
