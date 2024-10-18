@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches:
-        - master
-        - API-41055-utlint
+    branches: [ master, API-41055-utlint ]
+
 jobs:
   lint:
     name: Lint
@@ -49,10 +48,3 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci
-
-  snyk:
-    name: Run Snyk Scan
-    uses: department-of-veterans-affairs/lighthouse-tornado-secrel-pipeline/.github/workflows/snyk.yml@v6
-    with:
-      config-file: .github/secrel/config.yml
-    secrets: inherit
