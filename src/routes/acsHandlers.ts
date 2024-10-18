@@ -168,8 +168,9 @@ export const loadICN = async (
         result: "failure",
       });
       return res.render("layout", {
-        body: "sensitive_error",
+        body: unknownUsersErrorTemplate(mviError),
         request_id: rTracer.id(),
+        wrapper_tags: accessiblePhoneNumber,
       });
     }
 

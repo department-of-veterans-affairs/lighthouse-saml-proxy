@@ -243,7 +243,9 @@ describe("loadICN", () => {
     expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
     expect(req.vsoClient.getVSOSearch).not.toHaveBeenCalled();
     expect(renderMock).toHaveBeenCalledWith("layout", {
-      body: "sensitive_error",
+      body: "internal_failure",
+      request_id: undefined,
+      wrapper_tags: accessiblePhoneNumber,
     });
     expect(nextFn).not.toHaveBeenCalled();
   });
