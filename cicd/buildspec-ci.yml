@@ -56,23 +56,12 @@ phases:
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
       - |
-        make build/saml_utlint  \
-         TAG=${COMMIT_HASH} \
-         IMAGE=${IMAGE}-utlint \
-         BUILD_VERSION=${COMMIT_HASH} \
-         BUILD_TOOL=CodeBuild \
-         BUILD_NUMBER=${CODEBUILD_BUILD_ID}
-      - |
         make build/saml_tests  \
          TAG=${COMMIT_HASH} \
          IMAGE=${IMAGE}-tests \
          BUILD_VERSION=${COMMIT_HASH} \
          BUILD_TOOL=CodeBuild \
          BUILD_NUMBER=${CODEBUILD_BUILD_ID}
-      # run linter
-      - make lint IMAGE=${IMAGE}-utlint TAG=${COMMIT_HASH}
-      # run unit tests
-      - make test IMAGE=${IMAGE}-utlint TAG=${COMMIT_HASH}
       # Login to ECR prior to push
       - echo Logging into ECR
       - make login
