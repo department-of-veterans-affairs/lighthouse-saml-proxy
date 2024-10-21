@@ -59,7 +59,7 @@ export class MpiUserClient {
       })
       .catch((error) => {
         const statusCode = error.response.status;
-        if (statusCode === 503) {
+        if (statusCode == 503) {
           throw {
             name: "MPILookupFailure",
             statusCode: 503,
