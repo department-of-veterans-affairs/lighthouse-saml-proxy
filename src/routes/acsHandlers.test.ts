@@ -220,6 +220,61 @@ describe("loadICN", () => {
     vsoClient.getVSOSearch.mockReset();
   });
 
+  it("should block login when mpi-user returns 503", async () => {
+    const nextFn = jest.fn();
+    const renderMock = jest.fn();
+    const req: any = {
+      mpiUserClient: { ...mpiUserClient },
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockRejectedValueOnce({
+      name: "MPILookupFailure",
+      statusCode: 503,
+      message: "Service unavailable for MPI Lookup",
+    });
+
+    const response: any = { render: renderMock };
+    await handlers.loadICN(req, response, nextFn);
+
+    expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
+    expect(req.vsoClient.getVSOSearch).not.toHaveBeenCalled();
+    expect(renderMock).toHaveBeenCalledWith("layout", {
+      body: "internal_failure",
+      request_id: undefined,
+      wrapper_tags: accessiblePhoneNumber,
+    });
+    expect(nextFn).not.toHaveBeenCalled();
+  });
+
+  it("should not block login when mpi-user returns 404", async () => {
+    const nextFn = jest.fn();
+    const renderMock = jest.fn();
+    const req: any = {
+      mpiUserClient: { ...mpiUserClient },
+      vsoClient: vsoClient,
+      user: {
+        claims: { ...claimsWithICN },
+      },
+    };
+
+    req.mpiUserClient.getMpiTraitsForLoa3User.mockRejectedValueOnce({
+      name: "MPILookupFailure",
+      statusCode: 404,
+      message: "Error with MPI Lookup",
+    });
+
+    const response: any = { render: renderMock };
+    await handlers.loadICN(req, response, nextFn);
+
+    expect(req.mpiUserClient.getMpiTraitsForLoa3User).toHaveBeenCalled();
+    expect(req.vsoClient.getVSOSearch).toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
+  });
+
   it("should block login when fraudBlockEnabled is true and idTheftIndicator is true", async () => {
     const nextFn = jest.fn();
     const renderMock = jest.fn();
