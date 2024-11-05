@@ -77,26 +77,37 @@
               </g>
             </svg>
           </a>
+          <a href="https://www.va.gov/resources/creating-an-account-for-vagov">
+            Learn more about creating a Login.gov or ID.me account
+          </a>
+          <h2 id="otherSignInOptions">Other sign-in options</h2>
+          <h3 id="mhvH3">
+            My HealtheVet sign-in option
+            <span class="vads-u-display--block vads-u-font-size--md vads-u-font-family--sans">
+              Available through January 31, 2025
+            </span>
+          </h3>
+          <p id="mhvP">
+            You’ll still be able to use the <strong>My HealtheVet</strong> website after this date.
+            You’ll just need to start signing in with a <strong>Login.gov</strong> or <strong>ID.me</strong> account.
+          </p>
+          <a class="usa-button mhv-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- mhv_login_link -%>">
+            My HealtheVet
+          </a>
+          <h3 id="dslogonH3" class="vads-u-margin-bottom--0 vads-u-margin-top--3">
+            DS Logon sign-in option
+            <span class="vads-u-display--block vads-u-font-size--base vads-u-font-family--sans">
+              Available through September 30, 2025
+            </span>
+          </h3>
+          <p id="dslogonP">
+            You’ll still be able to use your <strong>DS Logon</strong> account on Defense Department websites after this date.
+          </p>
           <a class="usa-button dslogon-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- dslogon_login_link -%>">DS Logon</a>
-          <a class="usa-button mhv-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%-  mhv_login_link -%>">My HealtheVet</a>
         </div>
         <div class="row" id="loginNote">
           <p class="vads-u-font-size--base vads-u-margin-top--2 vads-u-padding-x--2"><strong>Note:</strong> We're moving to a simpler and more modern sign-in experience. We'll remove the My HealtheVet option after <strong>January 31, 2025</strong> and the DS Logon option after <strong>September 30, 2025.</strong><br>
-            <a href="https://www.va.gov/resources/creating-an-account-for-vagov">Learn more about creating a Login.gov or ID.me account</a>
           </p>
-        </div>
-        <div id="create-account">
-          <h2 class="vads-u-margin-top--2 center-text">Or create an account</h2>
-          <div class="vads-u-display--flex vads-u-flex-direction--column">
-            <% if (login_gov_signup_link_enabled) { %>
-              <a href="<%= login_gov_signup_link %>" class="vads-c-action-link--blue vads-u-padding-y--2p5 vads-u-width--full logingov">
-                Create an account with Login.gov
-              </a>
-            <% } %>
-            <a href="<%= id_me_signup_link %>" class="vads-c-action-link--blue vads-u-padding-y--2p5 vads-u-width--full idme">
-              Create an account with ID.me
-            </a>
-          </div>
         </div>
       </div>
     </div>
@@ -129,5 +140,21 @@
     max-width: 650px;
     padding-left: 0;
     padding-right: 0;
+  }
+
+  #mhvH3 {
+    margin: 0 0 10px;
+  }
+
+  #mhvP {
+    margin: 0 0 16.96px;
+  }
+
+  #dslogonP {
+    margin: 16.96px 0;
+  }
+
+  #otherSignInOptions {
+    margin: 45px 0 15px;
   }
 </style>
