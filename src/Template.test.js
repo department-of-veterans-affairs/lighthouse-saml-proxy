@@ -17,6 +17,7 @@ describe("button configuration renders correctly", () => {
         expect(html).not.toMatch(/DS Logon/);
         expect(html).not.toMatch(/My HealtheVet/);
         expect(html).not.toMatch(/<title>Login.gov<\/title>/);
+        expect(html).not.toMatch(/Other ways to verify/);
       }
     );
   });
@@ -37,6 +38,7 @@ describe("button configuration renders correctly", () => {
         expect(html).toMatch(/DS Logon/);
         expect(html).toMatch(/My HealtheVet/);
         expect(html).toMatch(/<title>Login.gov<\/title>/);
+        expect(html).toMatch(/Other ways to verify/);
       }
     );
   });
