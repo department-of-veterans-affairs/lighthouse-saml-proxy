@@ -525,7 +525,7 @@ export function processArgs() {
           default: true,
         },
         mhvLogonEnabled: {
-          description: "Enables MHV Logon signin option, enabled by default",
+          description: "Enables MHV signin option, enabled by default",
           required: false,
           boolean: true,
           default: true,

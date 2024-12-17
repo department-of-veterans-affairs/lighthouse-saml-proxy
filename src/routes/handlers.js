@@ -122,14 +122,14 @@ export const samlLogin = function (template) {
           });
         });
       }, Promise.resolve({}))
-      .then((authOptions) => {
-        authOptions.mhv_logon_enabled = isMhvLogonEnabled(req);
-        authOptions.ds_logon_enabled = isDsLogonEnabled(req);
-        authOptions.body = template;
-        authOptions.login_gov_enabled = login_gov_enabled;
-        authOptions.login_gov_signup_link_enabled =
+      .then((loginViewModel) => {
+        loginViewModel.mhv_logon_enabled = !!req.sps?.options?.id_me?.mhvLogonEnabled;
+        loginViewModel.ds_logon_enabled = !!req.sps?.options?.id_me?.dsLogonEnabled;
+        loginViewModel.body = template;
+        loginViewModel.login_gov_enabled = login_gov_enabled;
+        loginViewModel.login_gov_signup_link_enabled =
           login_gov_enabled && req.sps.options.logingov.signupLinkEnabled;
-        res.render("layout", authOptions);
+        res.render("layout", loginViewModel);
         logger.info("User arrived from Okta. Rendering IDP login template.", {
           action: "parseSamlRequest",
           result: "success",
@@ -200,24 +200,4 @@ function enabled_logingov(req) {
     return true;
   }
   return false;
-}
-
-/**
- * Is MHV enabled?
- *
- * @param {*} req service provider request
- * @returns {*} boolean
- */
-function isMhvLogonEnabled(req) {
-  return !!req.sps.options.id_me.mhvLogonEnabled;
-}
-
-/**
- * Is DS Logon enabled?
- *
- * @param {*} req service provider request
- * @returns {*} boolean
- */
-function isDsLogonEnabled(req) {
-  return !!req.sps.options.id_me.dsLogonEnabled;
 }
