@@ -518,6 +518,18 @@ export function processArgs() {
           boolean: true,
           default: false,
         },
+        dsLogonEnabled: {
+          description: "Enables DS Logon signin option, enabled by default",
+          required: false,
+          boolean: true,
+          default: true,
+        },
+        mhvLogonEnabled: {
+          description: "Enables MHV Logon signin option, enabled by default",
+          required: false,
+          boolean: true,
+          default: true,
+        },
       },
     })
     .example(

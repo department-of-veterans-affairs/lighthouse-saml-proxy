@@ -123,6 +123,8 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((authOptions) => {
+        authOptions.mhv_logon_enabled = isMhvLogonEnabled(req);
+        authOptions.ds_logon_enabled = isDsLogonEnabled(req);
         authOptions.body = template;
         authOptions.login_gov_enabled = login_gov_enabled;
         authOptions.login_gov_signup_link_enabled =
@@ -198,4 +200,24 @@ function enabled_logingov(req) {
     return true;
   }
   return false;
+}
+
+/**
+ * Is MHV enabled?
+ *
+ * @param {*} req service provider request
+ * @returns {*} boolean
+ */
+function isMhvLogonEnabled(req) {
+  return !!req.sps.options.id_me.mhvLogonEnabled;
+}
+
+/**
+ * Is DS Logon enabled?
+ *
+ * @param {*} req service provider request
+ * @returns {*} boolean
+ */
+function isDsLogonEnabled(req) {
+  return !!req.sps.options.id_me.dsLogonEnabled;
 }

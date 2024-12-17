@@ -80,30 +80,36 @@
           <a href="https://www.va.gov/resources/creating-an-account-for-vagov">
             Learn more about creating a Login.gov or ID.me account
           </a>
-          <h2 style="margin: 45px 0 15px;">Other ways to verify</h2>
-          <h3 style="margin: 0 0 10px;">
-            My HealtheVet
-            <span class="vads-u-display--block vads-u-font-size--md vads-u-font-family--sans">
-              Available through January 31, 2025
-            </span>
-          </h3>
-          <p style="margin: 0 0 16.96px;">
-            You’ll still be able to use <strong>My HealtheVet</strong> after this date.
-            You’ll just need to verify yourself with <strong>Login.gov</strong> or <strong>ID.me</strong>.
-          </p>
-          <a class="usa-button mhv-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- mhv_login_link -%>">
-            My HealtheVet
-          </a>
-          <h3 class="vads-u-margin-bottom--0 vads-u-margin-top--3">
-            DS Logon
-            <span class="vads-u-display--block vads-u-font-size--base vads-u-font-family--sans">
-              Available through September 30, 2025
-            </span>
-          </h3>
-          <p style="margin: 16.96px 0;">
-            You’ll still be able to use <strong>DS Logon</strong> for Defense Department websites after this date.
-          </p>
-          <a class="usa-button dslogon-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- dslogon_login_link -%>">DS Logon</a>
+          <% if (ds_logon_enabled || mhv_logon_enabled) { %>
+            <h2 style="margin: 45px 0 15px;">Other ways to verify</h2>
+          <% } %>
+          <% if (mhv_logon_enabled) { %>
+            <h3 style="margin: 0 0 10px;">
+              My HealtheVet
+              <span class="vads-u-display--block vads-u-font-size--md vads-u-font-family--sans">
+                Available through January 31, 2025
+              </span>
+            </h3>
+            <p style="margin: 0 0 16.96px;">
+              You’ll still be able to use <strong>My HealtheVet</strong> after this date.
+              You’ll just need to verify yourself with <strong>Login.gov</strong> or <strong>ID.me</strong>.
+            </p>
+            <a class="usa-button mhv-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- mhv_login_link -%>">
+              My HealtheVet
+            </a>
+          <% } %>
+          <% if (ds_logon_enabled) { %>
+            <h3 class="vads-u-margin-bottom--0 vads-u-margin-top--3">
+              DS Logon
+              <span class="vads-u-display--block vads-u-font-size--base vads-u-font-family--sans">
+                Available through September 30, 2025
+              </span>
+            </h3>
+            <p style="margin: 16.96px 0;">
+              You’ll still be able to use <strong>DS Logon</strong> for Defense Department websites after this date.
+            </p>
+            <a class="usa-button dslogon-signin vads-u-margin-y--1p5 vads-u-padding-y--2" href="<%- dslogon_login_link -%>">DS Logon</a>
+          <% } %>
         </div>
       </div>
     </div>
