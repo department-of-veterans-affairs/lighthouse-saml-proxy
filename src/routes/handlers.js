@@ -123,8 +123,10 @@ export const samlLogin = function (template) {
         });
       }, Promise.resolve({}))
       .then((loginViewModel) => {
-        loginViewModel.mhv_logon_enabled = !!req.sps?.options?.id_me?.mhvLogonEnabled;
-        loginViewModel.ds_logon_enabled = !!req.sps?.options?.id_me?.dsLogonEnabled;
+        loginViewModel.mhv_logon_enabled = !!req.sps?.options?.id_me
+          ?.mhvLogonEnabled;
+        loginViewModel.ds_logon_enabled = !!req.sps?.options?.id_me
+          ?.dsLogonEnabled;
         loginViewModel.body = template;
         loginViewModel.login_gov_enabled = login_gov_enabled;
         loginViewModel.login_gov_signup_link_enabled =
