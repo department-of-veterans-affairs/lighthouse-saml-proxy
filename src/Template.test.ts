@@ -2,10 +2,15 @@ import { renderFile } from "ejs";
 import { join } from "path";
 
 describe("button configuration renders correctly", () => {
-  const templatePath = join(__dirname, "..", "views", "login_selection.ejs");
+  const templatePath: string = join(
+    __dirname,
+    "..",
+    "views",
+    "login_selection.ejs"
+  );
 
   test("does not render element", async () => {
-    const html = await renderFile(templatePath, {
+    const html: string = await renderFile(templatePath, {
       login_gov_enabled: false,
       mhv_logon_enabled: false,
       ds_logon_enabled: false,
@@ -17,7 +22,7 @@ describe("button configuration renders correctly", () => {
   });
 
   test("does render element", async () => {
-    const html = await renderFile(templatePath, {
+    const html: string = await renderFile(templatePath, {
       login_gov_enabled: true,
       mhv_logon_enabled: true,
       ds_logon_enabled: true,
