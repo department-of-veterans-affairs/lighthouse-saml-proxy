@@ -3,7 +3,7 @@
 
 .*password="?\$USER_PASSWORD
 .*password=\*\)
---user-password=\$\(USER_PASSWORD\)
+--*(user-password=\$\(USER_PASSWORD\)
 
 .*client_id=\"*\$[A-z]*[0-9]*\"*
 .*client_secret=\"*\$[A-z]*[0-9]*\"*
