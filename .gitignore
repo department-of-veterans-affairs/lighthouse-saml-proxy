@@ -138,3 +138,5 @@ local-config.json
 
 ## Webstorm
 .idea/
+
+.devcontainer/
